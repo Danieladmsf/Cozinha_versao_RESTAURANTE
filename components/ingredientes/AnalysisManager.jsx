@@ -5,6 +5,7 @@ import { Supplier } from "@/app/api/entities";
 import { Brand } from "@/app/api/entities";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -38,7 +39,19 @@ import {
   EyeOff,
   Search,
   Folder,
+  Check,
+  ChevronsUpDown,
+  X,
+  Plus,
 } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { format, subDays, parseISO, differenceInDays, startOfMonth, endOfMonth, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -95,6 +108,10 @@ export default function AnalysisManager() {
   const [expandedHistories, setExpandedHistories] = useState(new Set());
   const { toast } = useToast();
 
+  // State for Chart Comparison
+  const [selectedComparisonIds, setSelectedComparisonIds] = useState([]);
+  const [openCombobox, setOpenCombobox] = useState(false);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -124,7 +141,7 @@ export default function AnalysisManager() {
           if (dates.length > 0) {
             setDateRange({ start: dates[0], end: dates[dates.length - 1] });
           }
-        } catch (error) {}
+        } catch (error) { }
       }
 
       setCategories((categoriesData || [])
@@ -139,7 +156,7 @@ export default function AnalysisManager() {
         (historyData || [])
           .map(h => h.supplier)
           .filter(Boolean)
-      )].sort().map(s => ({ value: s, label: s }));setSuppliers(uniqueSuppliers);
+      )].sort().map(s => ({ value: s, label: s })); setSuppliers(uniqueSuppliers);
 
       // CORREÇÃO: Carregar marcas de MÚLTIPLAS fontes
       const brandsFromHistory = [...new Set(
@@ -147,13 +164,13 @@ export default function AnalysisManager() {
           .map(h => h.brand)
           .filter(Boolean) // Remove valores null/undefined/vazios
       )];
-      
+
       const brandsFromIngredients = [...new Set(
         (ingredientsData || [])
           .map(ing => ing.brand)
           .filter(Boolean) // Remove valores null/undefined/vazios
       )];
-      
+
       const brandsFromBrandEntity = (brandsData || [])
         .filter(brand => brand && brand.active && brand.name)
         .map(brand => brand.name);
@@ -163,9 +180,10 @@ export default function AnalysisManager() {
         ...brandsFromHistory,
         ...brandsFromIngredients,
         ...brandsFromBrandEntity
-      ])].sort().map(b => ({ value: b, label: b }));setBrands(allUniqueBrands);
+      ])].sort().map(b => ({ value: b, label: b })); setBrands(allUniqueBrands);
 
-    } catch (err) {setError(err.message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -184,24 +202,25 @@ export default function AnalysisManager() {
           brandMatch = record.brand && record.brand === selectedBrand;
         }
         return isInDateRange && supplierMatch && brandMatch;
-      } catch (e) {return false;
+      } catch (e) {
+        return false;
       }
     });
 
     // Create indices for history search
     const historyByIngredientId = {};
     const historyByIngredientName = {};
-    
+
     historyFilteredByPeriodSupplierBrand.forEach(historyRecord => {
       if (!historyRecord) return;
-      
+
       if (historyRecord.ingredient_id) {
         if (!historyByIngredientId[historyRecord.ingredient_id]) {
           historyByIngredientId[historyRecord.ingredient_id] = [];
         }
         historyByIngredientId[historyRecord.ingredient_id].push(historyRecord);
       }
-      
+
       if (historyRecord.ingredient_name) {
         const normalizedName = historyRecord.ingredient_name.toLowerCase().trim();
         if (!historyByIngredientName[normalizedName]) {
@@ -223,7 +242,7 @@ export default function AnalysisManager() {
     if (selectedSupplier !== "all") {
       const ingredientIdsWithSupplier = new Set();
       const ingredientNamesWithSupplier = new Set();
-      
+
       historyFilteredByPeriodSupplierBrand
         .filter(record => record.supplier === selectedSupplier)
         .forEach(record => {
@@ -245,7 +264,7 @@ export default function AnalysisManager() {
     if (selectedBrand !== "all") {
       const ingredientIdsWithBrand = new Set();
       const ingredientNamesWithBrand = new Set();
-      
+
       historyFilteredByPeriodSupplierBrand
         .filter(record => record.brand === selectedBrand)
         .forEach(record => {
@@ -267,12 +286,12 @@ export default function AnalysisManager() {
     // Process each ingredient with analysis
     const processedIngredients = ingredientsFilteredByHistory.map(ingredient => {
       let historyForIngredient = [];
-      
+
       // Search history by ID
       if (ingredient.id && historyByIngredientId[ingredient.id]) {
         historyForIngredient = historyByIngredientId[ingredient.id];
       }
-      
+
       // Search by name if not found by ID
       if (historyForIngredient.length === 0 && ingredient.name) {
         const normalizedIngredientName = ingredient.name.toLowerCase().trim();
@@ -284,15 +303,15 @@ export default function AnalysisManager() {
       // Additional search by name similarity
       if (historyForIngredient.length === 0 && ingredient.name) {
         const normalizedIngredientName = ingredient.name.toLowerCase().trim();
-        
+
         const similarNameHistory = historyFilteredByPeriodSupplierBrand.filter(record => {
           if (!record.ingredient_name) return false;
           const normalizedRecordName = record.ingredient_name.toLowerCase().trim();
-          
+
           return normalizedRecordName.includes(normalizedIngredientName) ||
-                 normalizedIngredientName.includes(normalizedRecordName);
+            normalizedIngredientName.includes(normalizedRecordName);
         });
-        
+
         if (similarNameHistory.length > 0) {
           historyForIngredient = similarNameHistory;
         }
@@ -317,7 +336,7 @@ export default function AnalysisManager() {
 
       if (sortedHistory.length > 0) {
         currentPrice = parseFloat(sortedHistory[0].new_price) || ingredient.current_price;
-        
+
         if (sortedHistory.length >= 2) {
           const lastPrice = parseFloat(sortedHistory[0].new_price) || 0;
           const prevPrice = parseFloat(sortedHistory[1].new_price) || 0;
@@ -340,7 +359,7 @@ export default function AnalysisManager() {
             supplierPrices[r.supplier].push(parseFloat(r.new_price));
           }
         });
-        
+
         if (Object.keys(supplierPrices).length > 0) {
           let minAvgPrice = Infinity;
           Object.keys(supplierPrices).forEach(s => {
@@ -384,6 +403,85 @@ export default function AnalysisManager() {
 
   }, [ingredients, priceHistory, dateRange, selectedCategory, selectedSupplier, selectedBrand, loading]);
 
+
+  // Preparar dados para o gráfico
+  const chartData = React.useMemo(() => {
+    // Determine source ingredients: Comparison (priority) or Filtered
+    const isComparisonMode = selectedComparisonIds.length > 0;
+    let sourceIngredients = isComparisonMode
+      ? ingredients.filter(i => selectedComparisonIds.includes(i.id))
+      : filteredIngredients;
+
+    if (!sourceIngredients || sourceIngredients.length === 0) return [];
+
+    // 1. Coletar todas as datas de histórico disponíveis
+    const allDates = new Set();
+    sourceIngredients.forEach(ing => {
+      if (ing.history) {
+        ing.history.forEach(h => {
+          if (h.date) allDates.add(h.date);
+        });
+      }
+    });
+
+    if (allDates.size === 0) return [];
+
+    const sortedDates = Array.from(allDates).sort();
+
+    // Se temos muitos ingredientes E NÃO estamos em modo manual, calcular apenas a média
+    if (!isComparisonMode && sourceIngredients.length > 10) {
+      return sortedDates.map(date => {
+        let total = 0;
+        let count = 0;
+
+        filteredIngredients.forEach(ing => {
+          const history = ing.history || [];
+          // Encontrar o preço vigente (o mais recente <= date)
+          // Assumindo history ordenado DESC (novo -> antigo)
+          const effectiveRecord = history.find(h => h.date <= date);
+
+          if (effectiveRecord) {
+            total += parseFloat(effectiveRecord.new_price || 0);
+            count++;
+          }
+        });
+
+        return {
+          date,
+          displayDate: format(parseISO(date), 'dd/MM'),
+          avgPrice: count > 0 ? (total / count).toFixed(2) : 0
+        };
+      });
+    }
+
+    // Se temos poucos ingredientes, mostrar linhas individuais
+    return sortedDates.map(date => {
+      const point = {
+        date,
+        displayDate: format(parseISO(date), 'dd/MM')
+      };
+
+      sourceIngredients.forEach(ing => {
+        const history = ing.history || [];
+        const effectiveRecord = history.find(h => h.date <= date);
+
+        if (effectiveRecord) {
+          point[ing.name] = parseFloat(effectiveRecord.new_price || 0);
+        } else {
+          point[ing.name] = null;
+        }
+      });
+      return point;
+    });
+
+  }, [filteredIngredients, ingredients, selectedComparisonIds]);
+
+  const CHART_COLORS = ['#2563eb', '#16a34a', '#dc2626', '#d97706', '#9333ea', '#0891b2', '#db2777', '#4b5563', '#84cc16', '#6366f1'];
+
+  const sortedIngredientsList = React.useMemo(() => {
+    return [...ingredients].sort((a, b) => a.name.localeCompare(b.name));
+  }, [ingredients]);
+
   // Export functions
   const exportToPDF = () => {
     window.print();
@@ -391,21 +489,23 @@ export default function AnalysisManager() {
 
   const exportToExcel = () => {
     const csvData = filteredIngredients.map(ing => ({
-      Nome: ing.name,
-      Categoria: ing.category || '',
-      'Preço Atual': ing.current_price || 0,
-      'Última Variação': ing.last_variation_display,
-      'Melhor Fornecedor': ing.best_supplier_name,
-      'Volatilidade': ing.volatility.toFixed(1) + '%',
+      Nome: `"${ing.name}"`, // Quote strings to avoid issues
+      Categoria: `"${ing.category || ''}"`,
+      'Preço Atual': (ing.current_price || 0).toFixed(2).replace('.', ','), // Format for PT-BR Excel
+      'Variação (%)': (ing.last_variation_value || 0).toFixed(2).replace('.', ','),
+      'Melhor Fornecedor': `"${ing.best_supplier_name !== 'Não disponível' ? ing.best_supplier_name : ''}"`,
+      'Preço Melhor Fornecedor': ing.best_supplier_price ? ing.best_supplier_price.toFixed(2).replace('.', ',') : '',
+      'Volatilidade (%)': (ing.volatility || 0).toFixed(2).replace('.', ','),
       'Registros': ing.history_count
     }));
 
-    const csvContent = [
-      Object.keys(csvData[0]).join(','),
-      ...csvData.map(row => Object.values(row).join(','))
-    ].join('\n');
+    const headers = Object.keys(csvData[0]).join(';'); // Use semicolon for PT-BR
+    const rows = csvData.map(row => Object.values(row).join(';'));
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const csvContent = [headers, ...rows].join('\n');
+
+    // Add BOM for Excel to recognize UTF-8
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -433,7 +533,7 @@ export default function AnalysisManager() {
   const renderIngredientCard = (ingredient) => {
     const isHistoryExpanded = expandedHistories.has(ingredient.id);
     const historyToShow = isHistoryExpanded ? ingredient.history : ingredient.history?.slice(0, 3);
-    
+
     return (
       <Card key={ingredient.id} className="hover:shadow-lg transition-shadow duration-200 bg-white border border-gray-200">
         <CardContent className="p-4">
@@ -465,16 +565,15 @@ export default function AnalysisManager() {
           {/* Última Variação */}
           <div className="mb-3">
             <div className="text-sm font-medium text-gray-700 mb-1">Última Variação</div>
-            <div className={`text-lg font-semibold flex items-center gap-1 ${
-              ingredient.last_variation_value > 0 ? 'text-red-600' :
+            <div className={`text-lg font-semibold flex items-center gap-1 ${ingredient.last_variation_value > 0 ? 'text-red-600' :
               ingredient.last_variation_value < 0 ? 'text-green-600' : 'text-gray-500'
-            }`}>
+              }`}>
               {ingredient.last_variation_display === 'Sem histórico' ? (
                 <span className="text-gray-400 text-sm">Sem histórico</span>
               ) : (
                 <>
                   {ingredient.last_variation_value > 0 ? <TrendingUp className="w-4 h-4" /> :
-                   ingredient.last_variation_value < 0 ? <TrendingDown className="w-4 h-4" /> : null}
+                    ingredient.last_variation_value < 0 ? <TrendingDown className="w-4 h-4" /> : null}
                   {ingredient.last_variation_display}
                 </>
               )}
@@ -484,10 +583,9 @@ export default function AnalysisManager() {
           {/* Volatilidade */}
           <div className="mb-3">
             <div className="text-sm font-medium text-gray-700 mb-1">Volatilidade</div>
-            <div className={`text-lg font-semibold ${
-              ingredient.volatility > 20 ? 'text-red-600' :
+            <div className={`text-lg font-semibold ${ingredient.volatility > 20 ? 'text-red-600' :
               ingredient.volatility > 10 ? 'text-yellow-600' : 'text-green-600'
-            }`}>
+              }`}>
               {ingredient.volatility.toFixed(1)}%
             </div>
           </div>
@@ -533,21 +631,21 @@ export default function AnalysisManager() {
                   </Button>
                 )}
               </div>
-              
+
               <div className="space-y-1 max-h-64 overflow-y-auto">
                 {historyToShow?.map((historyRecord, index) => {
                   const recordDate = new Date(historyRecord.date + 'T00:00:00');
                   const formattedDate = format(recordDate, 'dd/MM/yyyy', { locale: ptBR });
                   const price = parseFloat(historyRecord.new_price) || 0;
-                  
+
                   return (
                     <div key={index} className="flex justify-between items-center text-xs py-1">
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500 font-mono">{formattedDate}</span>
                         {historyRecord.supplier && (
                           <Badge variant="outline" className="text-xs py-0 px-1">
-                            {historyRecord.supplier.length > 15 ? 
-                              historyRecord.supplier.substring(0, 15) + '...' : 
+                            {historyRecord.supplier.length > 15 ?
+                              historyRecord.supplier.substring(0, 15) + '...' :
                               historyRecord.supplier}
                           </Badge>
                         )}
@@ -559,7 +657,7 @@ export default function AnalysisManager() {
                   );
                 })}
               </div>
-              
+
               {!isHistoryExpanded && ingredient.history.length > 3 && (
                 <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-100 mt-2">
                   + {ingredient.history.length - 3} registro{ingredient.history.length - 3 !== 1 ? 's' : ''} mais antigo{ingredient.history.length - 3 !== 1 ? 's' : ''}
@@ -594,61 +692,25 @@ export default function AnalysisManager() {
 
       {/* Filtros de Histórico */}
       <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold">Filtros de Histórico e Ingredientes</h3>
-        </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start gap-2">
-            <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs font-bold">ℹ</span>
-            </div>
-            <div className="text-sm">
-              <p className="font-semibold text-blue-800 mb-2">Como funcionam estes filtros:</p>
-              <div className="space-y-1 text-blue-700">
-                <p className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /><strong>Histórico:</strong> Afetam qual histórico de preços é usado para cálculos (variação, volatilidade, melhor fornecedor)</p>
-                <p className="flex items-center gap-1"><Search className="w-3 h-3" /><strong>Ingredientes:</strong> Também filtram quais ingredientes são exibidos na lista</p>
-                <p className="flex items-center gap-1"><Folder className="w-3 h-3" /><strong>Categoria:</strong> O filtro de categoria no header funciona independentemente</p>
-              </div>
-            </div>
-          </div>
-        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="start-date" className="text-sm font-medium text-gray-700">Data inicial</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {dateRange.start ? format(dateRange.start, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <DatePicker 
-                  selected={dateRange.start} 
-                  onChange={(date) => setDateRange(prev => ({ ...prev, start: date }))} 
-                  inline 
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              selected={dateRange.start}
+              onChange={(date) => setDateRange(prev => ({ ...prev, start: date ? new Date(date + 'T12:00:00') : null }))}
+              placeholder="Selecionar data"
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="end-date" className="text-sm font-medium text-gray-700">Data final</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {dateRange.end ? format(dateRange.end, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <DatePicker 
-                  selected={dateRange.end} 
-                  onChange={(date) => setDateRange(prev => ({ ...prev, end: date }))} 
-                  inline 
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              selected={dateRange.end}
+              onChange={(date) => setDateRange(prev => ({ ...prev, end: date ? new Date(date + 'T12:00:00') : null }))}
+              placeholder="Selecionar data"
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="supplier-filter" className="text-sm font-medium text-gray-700">
@@ -701,7 +763,7 @@ export default function AnalysisManager() {
       {/* Ações */}
       <div className="flex justify-between items-center">
         <div className="text-sm text-gray-600">
-          Mostrando {filteredIngredients.length} ingrediente{filteredIngredients.length !== 1 ? 's' : ''} 
+          Mostrando {filteredIngredients.length} ingrediente{filteredIngredients.length !== 1 ? 's' : ''}
           {filteredIngredients.filter(ing => ing.has_history).length > 0 && (
             <span className="ml-2">
               ({filteredIngredients.filter(ing => ing.has_history).length} com histórico)
@@ -731,21 +793,21 @@ export default function AnalysisManager() {
       {/* Visualizações */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-white border border-gray-200 rounded-lg p-1">
-          <TabsTrigger 
-            value="cards" 
+          <TabsTrigger
+            value="cards"
             className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-200"
           >
             <Eye className="w-4 h-4 mr-2" />
             Cards
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="table"
             className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-200"
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             Tabela
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="chart"
             className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-200"
           >
@@ -797,12 +859,11 @@ export default function AnalysisManager() {
                           {ingredient.last_variation_display === 'Sem histórico' ? (
                             <span className="text-gray-400">Sem histórico</span>
                           ) : (
-                            <div className={`flex items-center gap-1 ${
-                              ingredient.last_variation_value > 0 ? 'text-red-600' :
+                            <div className={`flex items-center gap-1 ${ingredient.last_variation_value > 0 ? 'text-red-600' :
                               ingredient.last_variation_value < 0 ? 'text-green-600' : 'text-gray-500'
-                            }`}>
+                              }`}>
                               {ingredient.last_variation_value > 0 ? <TrendingUp className="w-4 h-4" /> :
-                               ingredient.last_variation_value < 0 ? <TrendingDown className="w-4 h-4" /> : null}
+                                ingredient.last_variation_value < 0 ? <TrendingDown className="w-4 h-4" /> : null}
                               {ingredient.last_variation_display}
                             </div>
                           )}
@@ -824,10 +885,9 @@ export default function AnalysisManager() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <span className={`font-medium ${
-                            ingredient.volatility > 20 ? 'text-red-600' :
+                          <span className={`font-medium ${ingredient.volatility > 20 ? 'text-red-600' :
                             ingredient.volatility > 10 ? 'text-yellow-600' : 'text-green-600'
-                          }`}>
+                            }`}>
                             {ingredient.volatility.toFixed(1)}%
                           </span>
                         </TableCell>
@@ -844,17 +904,164 @@ export default function AnalysisManager() {
         <TabsContent value="chart" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Análise Visual de Preços</CardTitle>
-              <CardDescription>
-                Visualização gráfica da evolução dos preços no período selecionado
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-96 w-full">
-                <p className="text-center text-gray-500 mt-20">
-                  Gráfico será implementado em breve
-                </p>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                <div>
+                  <CardTitle>
+                    {selectedComparisonIds.length > 0
+                      ? 'Comparação Personalizada'
+                      : (filteredIngredients.length > 10
+                        ? 'Média Geral de Preços'
+                        : 'Evolução de Preços por Ingrediente')}
+                  </CardTitle>
+                  <CardDescription>
+                    {selectedComparisonIds.length > 0
+                      ? 'Comparando a evolução de preços dos ingredientes selecionados.'
+                      : (filteredIngredients.length > 10
+                        ? 'Exibindo média geral. Use a busca ao lado para comparar itens específicos.'
+                        : 'Filtre por fornecedor ou use a busca para personalizar.')}
+                  </CardDescription>
+                </div>
+
+                <div className="flex flex-col items-end gap-2 w-full md:w-auto">
+                  {/* Toolbar de Comparação */}
+                  <div className="flex items-center gap-2 w-full md:w-auto">
+                    <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openCombobox}
+                          className="w-[250px] justify-between"
+                        >
+                          <span className="truncate">Confirmar ou buscar ingrediente...</span>
+                          <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[250px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Buscar ingrediente..." />
+                          <CommandList>
+                            <CommandEmpty>Nenhum ingrediente encontrado.</CommandEmpty>
+                            <CommandGroup>
+                              {sortedIngredientsList.map((ingredient) => (
+                                <CommandItem
+                                  key={ingredient.id}
+                                  value={ingredient.name}
+                                  onSelect={() => {
+                                    if (!selectedComparisonIds.includes(ingredient.id)) {
+                                      setSelectedComparisonIds([...selectedComparisonIds, ingredient.id]);
+                                    }
+                                    setOpenCombobox(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedComparisonIds.includes(ingredient.id) ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {ingredient.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+
+                    {selectedComparisonIds.length > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedComparisonIds([])}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        Limpar
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {/* Tags de Seleção */}
+              {selectedComparisonIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {selectedComparisonIds.map(id => {
+                    const ing = ingredients.find(i => i.id === id);
+                    if (!ing) return null;
+                    return (
+                      <Badge key={id} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
+                        {ing.name}
+                        <button
+                          onClick={() => setSelectedComparisonIds(selectedComparisonIds.filter(x => x !== id))}
+                          className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
+
+            </CardHeader>
+            <CardContent className="h-[400px]">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsLineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="displayDate"
+                      tick={{ fontSize: 12 }}
+                      interval="preserveStartEnd"
+                    />
+                    <YAxis
+                      tickFormatter={(value) => `R$ ${value}`}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value) => [`R$ ${parseFloat(value).toFixed(2)}`, 'Preço']}
+                      labelFormatter={(label) => `Data: ${label}`}
+                    />
+                    <Legend />
+                    {(!selectedComparisonIds.length && filteredIngredients.length > 10) ? (
+                      <Line
+                        type="monotone"
+                        dataKey="avgPrice"
+                        name="Média de Preço"
+                        stroke="#2563eb"
+                        strokeWidth={3}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    ) : (
+                      // Render lines for source keys (need to know which keys exist in chartData points)
+                      // Actually, we can iterate filteredIngredients OR selectedComparisonIds
+                      (selectedComparisonIds.length > 0
+                        ? ingredients.filter(i => selectedComparisonIds.includes(i.id))
+                        : filteredIngredients
+                      ).map((ing, index) => (
+                        <Line
+                          key={ing.id || index}
+                          connectNulls
+                          type="monotone"
+                          dataKey={ing.name}
+                          name={ing.name}
+                          stroke={CHART_COLORS[index % CHART_COLORS.length]}
+                          strokeWidth={2}
+                          dot={{ r: 3 }}
+                          activeDot={{ r: 5 }}
+                        />
+                      ))
+                    )}
+                  </RechartsLineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <BarChart3 className="w-12 h-12 mb-3 opacity-50" />
+                  <p>Dados insuficientes para gerar o gráfico no período selecionado.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

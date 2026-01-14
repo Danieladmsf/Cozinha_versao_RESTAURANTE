@@ -303,7 +303,7 @@ export default function IngredientAnalysis() {
           const normalizedRecordName = record.ingredient_name.toLowerCase().trim();
 
           return normalizedRecordName.includes(normalizedIngredientName) ||
-                 normalizedIngredientName.includes(normalizedRecordName);
+            normalizedIngredientName.includes(normalizedRecordName);
         });
 
         if (similarNameHistory.length > 0) {
@@ -333,7 +333,8 @@ export default function IngredientAnalysis() {
 
         if (sortedHistory.length >= 2) {
           const lastPrice = parseFloat(sortedHistory[0].new_price) || 0;
-          const prevPrice = parseFloat(sortedHistory[1].new_price) || 0;
+          const prevPrice = parseFloat(sortedHistory[0].old_price) || parseFloat(sortedHistory[1].new_price) || 0; // Check old_price of current record first
+
           if (prevPrice > 0) {
             const change = ((lastPrice - prevPrice) / prevPrice) * 100;
             lastVariationValue = change;
@@ -341,8 +342,21 @@ export default function IngredientAnalysis() {
           } else {
             lastVariationDisplay = 'Primeiro registro';
           }
+        } else if (sortedHistory.length === 1) {
+          // Handle single record case - check if it has a price change
+          const record = sortedHistory[0];
+          const lastPrice = parseFloat(record.new_price) || 0;
+          const prevPrice = parseFloat(record.old_price) || 0;
+
+          if (prevPrice > 0 && Math.abs(lastPrice - prevPrice) >= 0.01) {
+            const change = ((lastPrice - prevPrice) / prevPrice) * 100;
+            lastVariationValue = change;
+            lastVariationDisplay = `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
+          } else {
+            lastVariationDisplay = 'Apenas 1 registro';
+          }
         } else {
-          lastVariationDisplay = 'Apenas 1 registro';
+          lastVariationDisplay = 'Sem histórico';
         }
 
         // Calcular melhor fornecedor
@@ -469,7 +483,7 @@ export default function IngredientAnalysis() {
   const exportToExcel = () => {
     let csvContent = "Ingrediente,Categoria,Preço Atual (Filtrado),Última Variação (Filtrado)(%),Data Última Variação (Filtrado),Melhor Fornecedor (Filtrado),Preço Melhor Fornecedor (Filtrado),Volatilidade (Filtrado)(%),Registros de Histórico (Filtrado)\n";
     sortedIngredients.forEach(ing => {
-      const row = [ `"${ing.name || ''}"`, `"${ing.category || 'N/A'}"`, ing.current_price ? ing.current_price.toFixed(2) : 'N/A', typeof ing.last_variation_value === 'number' ? ing.last_variation_value.toFixed(1) : 'N/A', ing.history?.[0]?.date ? formatDate(ing.history[0].date) : 'N/A', ing.best_supplier_name !== 'Não disponível' ? `"${ing.best_supplier_name}"` : 'N/A', typeof ing.best_supplier_price === 'number' ? ing.best_supplier_price.toFixed(2) : 'N/A', ing.volatility.toFixed(1), ing.history.length ];
+      const row = [`"${ing.name || ''}"`, `"${ing.category || 'N/A'}"`, ing.current_price ? ing.current_price.toFixed(2) : 'N/A', typeof ing.last_variation_value === 'number' ? ing.last_variation_value.toFixed(1) : 'N/A', ing.history?.[0]?.date ? formatDate(ing.history[0].date) : 'N/A', ing.best_supplier_name !== 'Não disponível' ? `"${ing.best_supplier_name}"` : 'N/A', typeof ing.best_supplier_price === 'number' ? ing.best_supplier_price.toFixed(2) : 'N/A', ing.volatility.toFixed(1), ing.history.length];
       csvContent += row.join(',') + '\n';
     });
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -620,39 +634,21 @@ export default function IngredientAnalysis() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label htmlFor="start-date" className="text-sm font-medium text-gray-700">Data inicial</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {dateRange.start ? format(dateRange.start, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <DatePicker 
-                    selected={dateRange.start} 
-                    onChange={(date) => setDateRange(prev => ({ ...prev, start: date }))} 
-                    inline 
-                  />
-                </PopoverContent>
-              </Popover>
+              <DatePicker
+                selected={dateRange.start}
+                onChange={(date) => setDateRange(prev => ({ ...prev, start: date ? new Date(date + 'T12:00:00') : null }))}
+                placeholder="Selecionar data"
+                className="mt-1"
+              />
             </div>
             <div>
               <Label htmlFor="end-date" className="text-sm font-medium text-gray-700">Data final</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {dateRange.end ? format(dateRange.end, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <DatePicker 
-                    selected={dateRange.end} 
-                    onChange={(date) => setDateRange(prev => ({ ...prev, end: date }))} 
-                    inline 
-                  />
-                </PopoverContent>
-              </Popover>
+              <DatePicker
+                selected={dateRange.end}
+                onChange={(date) => setDateRange(prev => ({ ...prev, end: date ? new Date(date + 'T12:00:00') : null }))}
+                placeholder="Selecionar data"
+                className="mt-1"
+              />
             </div>
             <div>
               <Label htmlFor="supplier-filter" className="text-sm font-medium text-gray-700">
@@ -878,7 +874,7 @@ export default function IngredientAnalysis() {
                           <SelectContent>
                             {filteredIngredients
                               .filter(ing => ing.has_history)
-                              .sort((a,b)=>a.name.localeCompare(b.name))
+                              .sort((a, b) => a.name.localeCompare(b.name))
                               .map(ing => (
                                 <SelectItem key={ing.id} value={ing.id}>
                                   {ing.name} ({ing.history.length} registros)
@@ -946,13 +942,13 @@ export default function IngredientAnalysis() {
                       <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                           <div><span className="font-medium text-blue-700 flex items-center gap-1"><Calendar className="w-3 h-3" />Filtro Aplicado:</span><br /><span className="text-blue-600">{format(dateRange.start, 'dd/MM/yyyy')} até {format(dateRange.end, 'dd/MM/yyyy')}</span><div className="text-xs text-blue-500 mt-1">(Período que você selecionou para análise)</div></div>
-                          <div><span className="font-medium text-blue-700 flex items-center gap-1"><BarChart3 className="w-3 h-3" />Dados Disponíveis (Total):</span><br /><span className="text-blue-600">{(() => { const fullHistory = priceHistory.filter(h => h.ingredient_id === selectedIngredient); if(fullHistory.length === 0) return 'N/A'; const dates = fullHistory.map(h => new Date(h.date + 'T00:00:00')).sort((a,b)=>a-b); return `${format(dates[0], 'dd/MM/yyyy')} até ${format(dates[dates.length - 1], 'dd/MM/yyyy')}`; })()}</span><div className="text-xs text-blue-500 mt-1">(Período real dos registros de preços para este ingrediente)</div></div>
+                          <div><span className="font-medium text-blue-700 flex items-center gap-1"><BarChart3 className="w-3 h-3" />Dados Disponíveis (Total):</span><br /><span className="text-blue-600">{(() => { const fullHistory = priceHistory.filter(h => h.ingredient_id === selectedIngredient); if (fullHistory.length === 0) return 'N/A'; const dates = fullHistory.map(h => new Date(h.date + 'T00:00:00')).sort((a, b) => a - b); return `${format(dates[0], 'dd/MM/yyyy')} até ${format(dates[dates.length - 1], 'dd/MM/yyyy')}`; })()}</span><div className="text-xs text-blue-500 mt-1">(Período real dos registros de preços para este ingrediente)</div></div>
                         </div>
                         <div className="mt-3 pt-2 border-t border-blue-200">
                           {selectedIngredientData.history?.length > 0 ? <div className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full"></div><span className="text-sm text-green-700"><strong>Exibindo {selectedIngredientData.history.length} registros</strong> de {selectedIngredientData.name} que estão dentro do período selecionado e filtros de fornecedor/marca.</span></div> : <div className="flex flex-col items-center gap-2"><div className="w-2 h-2 bg-gray-400 rounded-full"></div><span className="text-sm text-gray-600">Nenhum registro encontrado para este ingrediente com os filtros atuais.</span></div>}
                         </div>
                         {selectedIngredientData.history?.length > 0 && (
-                          <div className="mt-2 pt-2 border-t border-blue-200"><span className="text-xs font-medium text-blue-700">Dates no gráfico:</span><div className="text-xs text-blue-600 mt-1">{(() => { const dates = selectedIngredientData.history.map(h => format(new Date(h.date + 'T00:00:00'), 'dd/MM/yyyy')).sort(); return dates.length <= 5 ? dates.join(', ') : `${dates.slice(0,3).join(', ')}, ... e mais ${dates.length-3} datas`; })()}</div></div>
+                          <div className="mt-2 pt-2 border-t border-blue-200"><span className="text-xs font-medium text-blue-700">Dates no gráfico:</span><div className="text-xs text-blue-600 mt-1">{(() => { const dates = selectedIngredientData.history.map(h => format(new Date(h.date + 'T00:00:00'), 'dd/MM/yyyy')).sort(); return dates.length <= 5 ? dates.join(', ') : `${dates.slice(0, 3).join(', ')}, ... e mais ${dates.length - 3} datas`; })()}</div></div>
                         )}
                       </div>
                       {chartData.length > 1 ? (

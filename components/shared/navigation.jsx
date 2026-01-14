@@ -26,7 +26,7 @@ export default function SidebarNav({
       className={cn(
         "fixed top-0 left-0 z-50 h-full bg-white border-r shadow-sm transition-all duration-200",
         "lg:relative",
-        sidebarCollapsed && !isHovering ? "lg:w-20" : "w-64"
+        sidebarCollapsed && !isHovering ? "lg:w-16" : "w-52"
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -34,13 +34,13 @@ export default function SidebarNav({
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-4 border-b">
           {(!sidebarCollapsed || isHovering) ? (
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-800 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-800 bg-clip-text text-transparent truncate">
               Cozinha e Afeto
             </h1>
           ) : (
-            <Home className="h-5 w-5 text-blue-600 mx-auto" />
+            <Home className="h-4 w-4 text-blue-600 mx-auto" />
           )}
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -62,17 +62,17 @@ export default function SidebarNav({
             {navigation.map((item) => {
               const isActive = currentPageName === item.href;
               const isRecipes = item.href === "Recipes";
-              
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "sidebar-nav-item flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded-md",
+                    "sidebar-nav-item flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-md",
                     isActive
                       ? "active text-blue-700 bg-blue-50"
                       : "text-gray-600 hover:bg-gray-50",
-                    sidebarCollapsed && !isHovering ? "justify-center px-2" : ""
+                    sidebarCollapsed && !isHovering ? "justify-center px-1" : ""
                   )}
                   onClick={() => {
                     if (window.innerWidth >= 1024) {
@@ -84,11 +84,11 @@ export default function SidebarNav({
                 >
                   <item.icon
                     className={cn(
-                      "h-5 w-5 sidebar-icon",
+                      "h-4 w-4 sidebar-icon",
                       isActive ? "text-blue-600" : "text-gray-400"
                     )}
                   />
-                  
+
                   {(!sidebarCollapsed || isHovering) && (
                     <span className={cn(
                       "sidebar-text whitespace-nowrap",
@@ -97,7 +97,7 @@ export default function SidebarNav({
                       {item.name}
                     </span>
                   )}
-                  
+
                   {isRecipes && isActive && !sidebarCollapsed && (
                     <span className="absolute right-3 h-2 w-2 rounded-full bg-blue-600" />
                   )}
@@ -106,7 +106,7 @@ export default function SidebarNav({
             })}
           </div>
         </nav>
-        
+
         <div className="p-4 border-t text-center">
           {(!sidebarCollapsed || isHovering) && (
             <div className="text-xs text-gray-500">

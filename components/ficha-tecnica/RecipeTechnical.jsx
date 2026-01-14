@@ -32,8 +32,24 @@ import {
   ChevronUp,
   Check,
   X,
-  StickyNote
+  StickyNote,
+  ChevronsUpDown
 } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CategoryTree } from "@/app/api/entities";
+import { cn } from "@/lib/utils";
 
 // Componente de refresh
 import { RefreshButton } from "@/components/ui/refresh-button";
@@ -58,8 +74,8 @@ import { useIngredientSearch } from "@/hooks/ficha-tecnica/useIngredientSearch";
 import useRecipeZustandStore from '@/lib/recipe-engine/RecipeStore.js';
 import { formatCurrency, formatWeight } from "@/lib/formatUtils";
 import { processTypes } from "@/lib/recipeConstants";
-import { 
-  calculateRecipeMetrics, 
+import {
+  calculateRecipeMetrics,
   updateRecipeMetrics,
   calculateCubaCost,
   updatePreparationsMetrics
@@ -87,18 +103,18 @@ export default function RecipeTechnical() {
     isEditing, setIsEditing,
     currentRecipeId, setCurrentRecipeId,
     isDirty, setIsDirty,
-    
+
     // Estados de dados
     recipeData, setRecipeData,
     preparationsData, setPreparationsData,
     groups, setGroups,
-    
+
     // Estados de interface
     activeTab, setActiveTab,
     searchQuery, setSearchQuery,
     searchOpen, setSearchOpen,
     showConfigDialog, setShowConfigDialog,
-    
+
     // Estados de modais
     searchModalOpen, setSearchModalOpen,
     isProcessCreatorOpen, setIsProcessCreatorOpen,
@@ -108,25 +124,25 @@ export default function RecipeTechnical() {
     isPrintDialogOpen, setIsPrintDialogOpen,
     isPrintCollectDialogOpen, setIsPrintCollectDialogOpen,
     isPrintSimpleDialogOpen, setIsPrintSimpleDialogOpen,
-    
+
     // Estados de dados externos
     categories, setCategories,
     ingredients, setIngredients,
     recipes, setRecipes,
     allCategories, setAllCategories,
     selectedCategory, setSelectedCategory,
-    
+
     // Estados de processos
     selectedProcesses, setSelectedProcesses,
     currentPrepIndex, setCurrentPrepIndex,
     currentPrepIndexForAssembly, setCurrentPrepIndexForAssembly,
     currentItemType, setCurrentItemType,
-    
+
     // Estados de ingredientes
     ingredientSearchTerm, setIngredientSearchTerm,
     currentIngredient, setCurrentIngredient,
     processFormData, setProcessFormData,
-    
+
     // Estados de cópia de receita
     sourceRecipeSearch, setSourceRecipeSearch,
     selectedSourceRecipe, setSelectedSourceRecipe,
@@ -134,7 +150,7 @@ export default function RecipeTechnical() {
     selectedStageLevel, setSelectedStageLevel,
     sourceRecipeStages, setSourceRecipeStages,
     recipePreview, setRecipePreview,
-    
+
     // Funções de reset
     resetRecipeData,
     resetModals
@@ -181,10 +197,10 @@ export default function RecipeTechnical() {
     handleSave,
     handleClear,
     formatDisplayValue
-  } = useRecipeInterface({ 
-    recipeData, 
-    preparationsData, 
-    updateRecipeData 
+  } = useRecipeInterface({
+    recipeData,
+    preparationsData,
+    updateRecipeData
   });
 
   // ==== HOOKS DE CÁLCULOS (CONECTADOS) ====
@@ -265,13 +281,88 @@ export default function RecipeTechnical() {
   const [editingNoteTitle, setEditingNoteTitle] = useState(false);
   const [tempNoteTitle, setTempNoteTitle] = useState('');
 
+  // ==== STATES FOR SMART CATEGORY SELECTOR ====
+  const [categorySelectorOpen, setCategorySelectorOpen] = useState(false);
+  const [groupedCategories, setGroupedCategories] = useState([]);
+
+  useEffect(() => {
+    loadCategoriesTree();
+  }, []);
+
+  const loadCategoriesTree = async () => {
+    try {
+      const data = await CategoryTree.list();
+
+      // Filter only recipe categories
+      const recipeCats = data.filter(cat => cat.type === "receitas" && cat.active !== false);
+
+      const roots = recipeCats
+        .filter(c => c.level === 1)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      const groups = roots.map(root => {
+        // Flatten descendants
+        const buildDescendants = (cats, parentId, prefix) => {
+          let list = [];
+          const children = cats
+            .filter(c => c.parent_id === parentId)
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+          for (const child of children) {
+            const label = `${prefix} > ${child.name}`;
+            list.push({
+              value: child.id,
+              label: label,
+              originalName: child.name,
+              id: child.id
+            });
+            list = [...list, ...buildDescendants(cats, child.id, label)];
+          }
+          return list;
+        };
+
+        const descendants = buildDescendants(recipeCats, root.id, root.name);
+
+        // The root itself is also an option
+        const rootItem = {
+          value: root.id,
+          label: root.name,
+          originalName: root.name,
+          id: root.id,
+          isRoot: true
+        };
+
+        return {
+          groupName: root.name,
+          items: [rootItem, ...descendants]
+        };
+      });
+
+      setGroupedCategories(groups);
+
+    } catch (error) {
+      console.error("Erro ao carregar árvore de categorias", error);
+    }
+  };
+
+  const getSelectedCategoryLabel = () => {
+    if (!recipeData.category) return "Selecione a categoria";
+    const found = groupedCategories.flatMap(g => g.items).find(c => c.originalName === recipeData.category);
+    return found ? found.label : recipeData.category;
+  };
+
+  const handleSmartCategorySelect = (originalName) => {
+    handleCategoryChange(originalName);
+    setCategorySelectorOpen(false);
+  };
+
   // ==== FUNÇÕES DE CARREGAMENTO (como no Editar Cliente) ====
   const loadRecipeById = async (recipeId) => {
     if (!recipeId) return;
-    
+
     try {
       setLoading(true);
-      
+
       const result = await loadRecipe(recipeId);
 
       console.log('🔴 [LOAD] Receita carregada do Firebase:', {
@@ -292,7 +383,7 @@ export default function RecipeTechnical() {
         setCurrentRecipeId(recipeId);
         setIsEditing(true);
         setIsDirty(false);
-        
+
         toast({
           title: "Receita carregada",
           description: `"${result.recipe.name}" foi carregada para edição.`
@@ -441,7 +532,7 @@ export default function RecipeTechnical() {
         ...recipeDataToSave,
         ...newMetrics
       };
-      
+
       console.log('🟢 [SAVE] Enviando para saveRecipeConfig:', JSON.stringify(finalPreparationsData.map(p => ({
         id: p.id,
         title: p.title,
@@ -460,10 +551,10 @@ export default function RecipeTechnical() {
         setRecipeData(recipeDataToSave);
 
         if (result.recipe && result.recipe.id && !recipeData.id) {
-            setCurrentRecipeId(result.recipe.id);
-            setIsEditing(true);
+          setCurrentRecipeId(result.recipe.id);
+          setIsEditing(true);
         }
-        
+
         try {
           await refreshRecipes();
           if (isEditing && recipeDataToSave.name) {
@@ -499,12 +590,12 @@ export default function RecipeTechnical() {
   // ==== FUNÇÃO DE RECÁLCULO AUTOMÁTICO ====
   const recalculateRecipeMetrics = useCallback(() => {
     const hasValidData = (preparationsData && preparationsData.length > 0) ||
-                         (recipeData && (recipeData.name || recipeData.id));
+      (recipeData && (recipeData.name || recipeData.id));
 
     if (!hasValidData) {
       return;
     }
-    
+
     try {
       if (!preparationsData || preparationsData.length === 0) {
         // ... (o código para zerar as métricas permanece o mesmo)
@@ -535,11 +626,11 @@ export default function RecipeTechnical() {
           };
           return updatedData;
         });
-        
+
         if (metricsResult.updatedPreparations) {
           setPreparationsData(metricsResult.updatedPreparations);
         }
-        
+
         setIsDirty(true);
       }
     } catch (error) {
@@ -734,11 +825,11 @@ export default function RecipeTechnical() {
     setPreparationsData(prev => {
       const newPreparations = [...prev];
       const targetPrep = newPreparations[prepIndex];
-      
+
       if (!targetPrep) {
         return prev;
       }
-      
+
       // Determine the correct type based on the itemData
       let itemType = 'preparation'; // default
       if (itemData.isRecipe) {
@@ -753,7 +844,7 @@ export default function RecipeTechnical() {
         name: itemData.name,
         type: itemType, // Use the corrected type
         // Pass the price through for ingredients
-        current_price: itemData.current_price || 0, 
+        current_price: itemData.current_price || 0,
         input_yield_weight: String(itemData.yield_weight || 0).replace('.', ','),
         input_total_cost: String(itemData.total_cost || 0).replace('.', ','),
         weight_portioned: '',
@@ -761,23 +852,23 @@ export default function RecipeTechnical() {
         total_cost: '',
         assembly_weight_kg: ''
       };
-      
+
       // Adicionar aos sub_components
       newPreparations[prepIndex] = {
         ...targetPrep,
         sub_components: [...(targetPrep.sub_components || []), newSubComponent]
       };
-      
+
       return newPreparations;
     });
-    
+
     setIsDirty(true);
-    
+
     toast({
       title: "Item adicionado",
       description: `"${itemData.name}" foi adicionado à preparação.`
     });
-    
+
     handleCloseAssemblyItemModal();
   };
 
@@ -786,13 +877,13 @@ export default function RecipeTechnical() {
       // Fechar modal imediatamente para evitar múltiplas chamadas
       const prepIndex = currentPrepIndexForIngredient;
       handleCloseIngredientModal();
-      
+
       // Verificar se o ingrediente já existe na preparação
       const currentPrep = preparationsData[prepIndex];
       const ingredientExists = currentPrep?.ingredients?.some(
         ing => ing.ingredient_id === ingredient.id || ing.name === ingredient.name || ing.id === ingredient.id
       );
-      
+
       if (ingredientExists) {
         toast({
           title: "Ingrediente já existe",
@@ -801,7 +892,7 @@ export default function RecipeTechnical() {
         });
         return;
       }
-      
+
       // Criar um novo ingrediente com ID único para evitar duplicatas
       const newIngredient = {
         ...ingredient,
@@ -817,7 +908,7 @@ export default function RecipeTechnical() {
         weight_portioned: '',
         current_price: String(ingredient.current_price || '').replace('.', ',')
       };
-      
+
       // Adicionar ingrediente com implementação direta para evitar problemas no hook
       setPreparationsData(prev => {
         const newPreparations = [...prev];
@@ -830,7 +921,7 @@ export default function RecipeTechnical() {
         return newPreparations;
       });
       setIsDirty(true);
-      
+
       toast({
         title: "Ingrediente adicionado",
         description: `"${ingredient.name}" foi adicionado à preparação.`
@@ -1093,7 +1184,7 @@ export default function RecipeTechnical() {
     setIsEditing(true);
     setCurrentRecipeId(selectedRecipe.id);
     setIsDirty(false); // Não está sujo ainda, acabou de carregar
-    
+
     // Forçar recálculo das métricas após um pequeno delay para garantir que os estados foram atualizados
     setTimeout(() => {
       recalculateRecipeMetrics();
@@ -1109,12 +1200,12 @@ export default function RecipeTechnical() {
     const processes = prep.processes || [];
     const hasProcess = (processName) => processes.includes(processName);
     const ingredients = prep.ingredients || [];
-    
+
     // Casos especiais: Assembly ou Portioning puros (sem outros processos)
-    const isAssemblyOnly = hasProcess('assembly') && 
+    const isAssemblyOnly = hasProcess('assembly') &&
       !hasProcess('defrosting') && !hasProcess('cleaning') && !hasProcess('cooking');
-    
-    const isPortioningOnly = hasProcess('portioning') && 
+
+    const isPortioningOnly = hasProcess('portioning') &&
       !hasProcess('defrosting') && !hasProcess('cleaning') && !hasProcess('cooking') && !hasProcess('assembly');
 
     // Para processos puros de Assembly ou Portioning, usar o componente especializado
@@ -1169,7 +1260,7 @@ export default function RecipeTechnical() {
         </div>
       );
     }
-    
+
     // Mapeamento de cores para processos normais
     const processColors = {
       'defrosting': { bg: 'bg-blue-50/50', text: 'text-blue-600' },
@@ -1177,7 +1268,7 @@ export default function RecipeTechnical() {
       'cooking': { bg: 'bg-orange-50/50', text: 'text-orange-600' },
       'portioning': { bg: 'bg-teal-50/50', text: 'text-teal-600' }
     };
-    
+
     // Processos ordenados conforme a sequência natural
     const orderedActiveProcesses = ['defrosting', 'cleaning', 'cooking', 'portioning']
       .filter(p => hasProcess(p));
@@ -1189,9 +1280,9 @@ export default function RecipeTechnical() {
           <p className="text-gray-500 mb-3">
             Nenhum ingrediente adicionado ainda
           </p>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => handleOpenIngredientModal(prepIndex)}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -1205,9 +1296,9 @@ export default function RecipeTechnical() {
       <div className="space-y-4">
         {/* Botão para adicionar ingredientes - processos normais */}
         <div className="flex gap-3 justify-start">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => handleOpenIngredientModal(prepIndex)}
             className="border-dashed hover:bg-blue-50 hover:border-blue-200 transition-all duration-200"
           >
@@ -1219,149 +1310,149 @@ export default function RecipeTechnical() {
         <div className="bg-white rounded-xl overflow-x-auto shadow-sm border">
           <Table>
             <TableHeader>
-            {/* Primeira linha do cabeçalho - grupos de colunas */}
-            <TableRow>
-              <TableHead colSpan="3" className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center border-b">
-                Dados Ingrediente
-              </TableHead>
-              {orderedActiveProcesses.map(processId => {
-                const processInfo = processTypes[processId];
-                const colors = processColors[processId] || { bg: 'bg-gray-50/50', text: 'text-gray-600' };
-                let colSpan = 2;
-                
-                // Lógica de colspan baseada no processo
-                if (processId === 'defrosting') {
-                  colSpan = 3;
-                } else if (processId === 'cleaning') {
-                  colSpan = hasProcess('defrosting') ? 3 : 3;
-                } else if (processId === 'cooking') {
-                  colSpan = 3;
-                } else if (processId === 'portioning') {
-                  if (!hasProcess('defrosting') && !hasProcess('cleaning') && !hasProcess('cooking')) {
-                    colSpan = 3;
-                  } else {
-                    colSpan = 2;
-                  }
-                }
-                
-                return (
-                  <TableHead 
-                    key={processId} 
-                    colSpan={colSpan} 
-                    className={`px-4 py-2 ${colors.bg} font-medium ${colors.text} text-center border-b`}
-                  >
-                    {processInfo.label}
-                  </TableHead>
-                );
-              })}
-              <TableHead colSpan="2" className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center border-b">
-                Dados Rendimento
-              </TableHead>
-            </TableRow>
-
-            {/* Segunda linha do cabeçalho - colunas específicas */}
-            <TableRow>
-              <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-left whitespace-nowrap">
-                Ingrediente
-              </TableHead>
-              <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center whitespace-nowrap">
-                Preço/kg (Bruto)
-              </TableHead>
-              <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center whitespace-nowrap">
-                Preço/kg (Líquido)
-              </TableHead>
-              
-              {hasProcess('defrosting') && (
-                <>
-                  <TableHead className="px-4 py-2 bg-blue-50/50 font-medium text-blue-600 text-center whitespace-nowrap">
-                    Peso Congelado
-                  </TableHead>
-                  <TableHead className="px-4 py-2 bg-blue-50/50 font-medium text-blue-600 text-center whitespace-nowrap">
-                    Peso Resfriado
-                  </TableHead>
-                  <TableHead className="px-4 py-2 bg-blue-50/50 font-medium text-blue-600 text-center whitespace-nowrap">
-                    Perda Desc.(%)
-                  </TableHead>
-                </>
-              )}
-              
-              {hasProcess('cleaning') && (
-                <>
-                  {!hasProcess('defrosting') && (
-                    <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
-                      Peso Bruto (Limpeza)
-                    </TableHead>
-                  )}
-                  {hasProcess('defrosting') && (
-                    <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
-                      Peso Entrada (Limpeza)
-                    </TableHead>
-                  )}
-                  <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
-                    Pós Limpeza
-                  </TableHead>
-                  <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
-                    Perda Limpeza(%)
-                  </TableHead>
-                </>
-              )}
-              
-              {hasProcess('cooking') && (
-                <>
-                  <TableHead className="px-4 py-2 bg-orange-50/50 font-medium text-orange-600 text-center whitespace-nowrap">
-                    Pré Cocção
-                  </TableHead>
-                  <TableHead className="px-4 py-2 bg-orange-50/50 font-medium text-orange-600 text-center whitespace-nowrap">
-                    Pós Cocção
-                  </TableHead>
-                  <TableHead className="px-4 py-2 bg-orange-50/50 font-medium text-orange-600 text-center whitespace-nowrap">
-                    Perda Cocção(%)
-                  </TableHead>
-                </>
-              )}
-              
-              {hasProcess('portioning') && (
-                <>
-                  {!hasProcess('defrosting') && !hasProcess('cleaning') && !hasProcess('cooking') && (
-                    <TableHead className="px-4 py-2 bg-teal-50/50 font-medium text-teal-600 text-center whitespace-nowrap">
-                      Peso Bruto (Porc.)
-                    </TableHead>
-                  )}
-                  <TableHead className="px-4 py-2 bg-teal-50/50 font-medium text-teal-600 text-center whitespace-nowrap">
-                    Pós Porcionamento
-                  </TableHead>
-                  <TableHead className="px-4 py-2 bg-teal-50/50 font-medium text-teal-600 text-center whitespace-nowrap">
-                    Perda Porcion.(%)
-                  </TableHead>
-                </>
-              )}
-              
-              <TableHead className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center whitespace-nowrap">
-                Rendimento(%)
-              </TableHead>
-              <TableHead className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center">
-                Ações
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {ingredients.length === 0 ? (
+              {/* Primeira linha do cabeçalho - grupos de colunas */}
               <TableRow>
-                <TableCell colSpan={15} className="px-4 py-8 text-center text-gray-500">
-                  <div className="flex flex-col items-center gap-2">
-                    <ClipboardList className="h-8 w-8 text-gray-400" />
-                    <span>Nenhum ingrediente adicionado</span>
-                  </div>
-                </TableCell>
+                <TableHead colSpan="3" className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center border-b">
+                  Dados Ingrediente
+                </TableHead>
+                {orderedActiveProcesses.map(processId => {
+                  const processInfo = processTypes[processId];
+                  const colors = processColors[processId] || { bg: 'bg-gray-50/50', text: 'text-gray-600' };
+                  let colSpan = 2;
+
+                  // Lógica de colspan baseada no processo
+                  if (processId === 'defrosting') {
+                    colSpan = 3;
+                  } else if (processId === 'cleaning') {
+                    colSpan = hasProcess('defrosting') ? 3 : 3;
+                  } else if (processId === 'cooking') {
+                    colSpan = 3;
+                  } else if (processId === 'portioning') {
+                    if (!hasProcess('defrosting') && !hasProcess('cleaning') && !hasProcess('cooking')) {
+                      colSpan = 3;
+                    } else {
+                      colSpan = 2;
+                    }
+                  }
+
+                  return (
+                    <TableHead
+                      key={processId}
+                      colSpan={colSpan}
+                      className={`px-4 py-2 ${colors.bg} font-medium ${colors.text} text-center border-b`}
+                    >
+                      {processInfo.label}
+                    </TableHead>
+                  );
+                })}
+                <TableHead colSpan="2" className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center border-b">
+                  Dados Rendimento
+                </TableHead>
               </TableRow>
-            ) : (
-              ingredients.map((ingredient, ingredientIndex) => 
-                renderIngredientRow(ingredient, prepIndex, ingredientIndex, prep)
-              )
-            )}
-          </TableBody>
-        </Table>
+
+              {/* Segunda linha do cabeçalho - colunas específicas */}
+              <TableRow>
+                <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-left whitespace-nowrap">
+                  Ingrediente
+                </TableHead>
+                <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center whitespace-nowrap">
+                  Preço/kg (Bruto)
+                </TableHead>
+                <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center whitespace-nowrap">
+                  Preço/kg (Líquido)
+                </TableHead>
+
+                {hasProcess('defrosting') && (
+                  <>
+                    <TableHead className="px-4 py-2 bg-blue-50/50 font-medium text-blue-600 text-center whitespace-nowrap">
+                      Peso Congelado
+                    </TableHead>
+                    <TableHead className="px-4 py-2 bg-blue-50/50 font-medium text-blue-600 text-center whitespace-nowrap">
+                      Peso Resfriado
+                    </TableHead>
+                    <TableHead className="px-4 py-2 bg-blue-50/50 font-medium text-blue-600 text-center whitespace-nowrap">
+                      Perda Desc.(%)
+                    </TableHead>
+                  </>
+                )}
+
+                {hasProcess('cleaning') && (
+                  <>
+                    {!hasProcess('defrosting') && (
+                      <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
+                        Peso Bruto (Limpeza)
+                      </TableHead>
+                    )}
+                    {hasProcess('defrosting') && (
+                      <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
+                        Peso Entrada (Limpeza)
+                      </TableHead>
+                    )}
+                    <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
+                      Pós Limpeza
+                    </TableHead>
+                    <TableHead className="px-4 py-2 bg-green-50/50 font-medium text-green-600 text-center whitespace-nowrap">
+                      Perda Limpeza(%)
+                    </TableHead>
+                  </>
+                )}
+
+                {hasProcess('cooking') && (
+                  <>
+                    <TableHead className="px-4 py-2 bg-orange-50/50 font-medium text-orange-600 text-center whitespace-nowrap">
+                      Pré Cocção
+                    </TableHead>
+                    <TableHead className="px-4 py-2 bg-orange-50/50 font-medium text-orange-600 text-center whitespace-nowrap">
+                      Pós Cocção
+                    </TableHead>
+                    <TableHead className="px-4 py-2 bg-orange-50/50 font-medium text-orange-600 text-center whitespace-nowrap">
+                      Perda Cocção(%)
+                    </TableHead>
+                  </>
+                )}
+
+                {hasProcess('portioning') && (
+                  <>
+                    {!hasProcess('defrosting') && !hasProcess('cleaning') && !hasProcess('cooking') && (
+                      <TableHead className="px-4 py-2 bg-teal-50/50 font-medium text-teal-600 text-center whitespace-nowrap">
+                        Peso Bruto (Porc.)
+                      </TableHead>
+                    )}
+                    <TableHead className="px-4 py-2 bg-teal-50/50 font-medium text-teal-600 text-center whitespace-nowrap">
+                      Pós Porcionamento
+                    </TableHead>
+                    <TableHead className="px-4 py-2 bg-teal-50/50 font-medium text-teal-600 text-center whitespace-nowrap">
+                      Perda Porcion.(%)
+                    </TableHead>
+                  </>
+                )}
+
+                <TableHead className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center whitespace-nowrap">
+                  Rendimento(%)
+                </TableHead>
+                <TableHead className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center">
+                  Ações
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {ingredients.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={15} className="px-4 py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center gap-2">
+                      <ClipboardList className="h-8 w-8 text-gray-400" />
+                      <span>Nenhum ingrediente adicionado</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                ingredients.map((ingredient, ingredientIndex) =>
+                  renderIngredientRow(ingredient, prepIndex, ingredientIndex, prep)
+                )
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
     );
@@ -1371,7 +1462,7 @@ export default function RecipeTechnical() {
   const renderIngredientRow = (ingredient, prepIndex, ingredientIndex, prep) => {
     const processes = prep.processes || [];
     const hasProcess = (processName) => processes.includes(processName);
-    
+
     // Funções auxiliares para cálculos (versões simplificadas)
     const parseNumericValue = (value) => {
       if (!value) return 0;
@@ -1379,31 +1470,31 @@ export default function RecipeTechnical() {
       const parsed = parseFloat(cleaned);
       return isNaN(parsed) ? 0 : parsed;
     };
-    
+
     const calculateLoss = (initial, final) => {
       const initialNum = parseNumericValue(initial);
       const finalNum = parseNumericValue(final);
       if (initialNum === 0) return 0;
       return ((initialNum - finalNum) / initialNum) * 100;
     };
-    
+
     const calculateYield = () => {
       // Encontrar o peso inicial e final corretos baseado nos processos
       let initialWeight = 0;
       let finalWeight = 0;
-      
+
       // Determinar peso inicial (primeiro processo da cadeia)
       if (hasProcess('defrosting')) {
         initialWeight = parseNumericValue(ingredient.weight_frozen);
       } else if (hasProcess('cleaning')) {
         initialWeight = parseNumericValue(ingredient.weight_raw);
       } else if (hasProcess('cooking')) {
-        initialWeight = parseNumericValue(ingredient.weight_pre_cooking) || 
-                       parseNumericValue(ingredient.weight_raw);
+        initialWeight = parseNumericValue(ingredient.weight_pre_cooking) ||
+          parseNumericValue(ingredient.weight_raw);
       } else if (hasProcess('portioning')) {
         initialWeight = parseNumericValue(ingredient.weight_raw);
       }
-      
+
       // Determinar peso final (último processo da cadeia)
       if (hasProcess('portioning')) {
         finalWeight = parseNumericValue(ingredient.weight_portioned);
@@ -1414,10 +1505,10 @@ export default function RecipeTechnical() {
       } else if (hasProcess('defrosting')) {
         finalWeight = parseNumericValue(ingredient.weight_thawed);
       }
-      
+
       // Se não há peso inicial, retornar 0
       if (initialWeight === 0) return 0;
-      
+
       // Calcular rendimento
       return (finalWeight / initialWeight) * 100;
     };
@@ -1440,23 +1531,23 @@ export default function RecipeTechnical() {
         <TableCell className="font-medium px-4 py-2">
           {ingredient.name}
         </TableCell>
-        
+
         {/* Preço bruto */}
         <TableCell className="text-center px-4 py-2">
           {(() => {
             // Buscar preço atual dinamicamente se ingrediente tem ingredient_id
-            const currentPrice = ingredient.ingredient_id 
+            const currentPrice = ingredient.ingredient_id
               ? useRecipeZustandStore.getState().getIngredientCurrentPrice(ingredient.ingredient_id)
               : parseNumericValue(ingredient.current_price);
             return formatCurrency(currentPrice);
           })()}
         </TableCell>
-        
+
         {/* Preço líquido - calculado */}
         <TableCell className="text-center px-4 py-2">
           {(() => {
             // Buscar preço atual dinamicamente
-            const brutPrice = ingredient.ingredient_id 
+            const brutPrice = ingredient.ingredient_id
               ? useRecipeZustandStore.getState().getIngredientCurrentPrice(ingredient.ingredient_id)
               : parseNumericValue(ingredient.current_price);
             const yieldPercent = calculateYield();
@@ -1464,7 +1555,7 @@ export default function RecipeTechnical() {
             return formatCurrency(liquidPrice);
           })()}
         </TableCell>
-        
+
         {/* Campos de descongelamento */}
         {hasProcess('defrosting') && (
           <>
@@ -1493,7 +1584,7 @@ export default function RecipeTechnical() {
             </TableCell>
           </>
         )}
-        
+
         {/* Campos de limpeza */}
         {hasProcess('cleaning') && (
           <>
@@ -1549,7 +1640,7 @@ export default function RecipeTechnical() {
             </TableCell>
           </>
         )}
-        
+
         {/* Campos de cocção */}
         {hasProcess('cooking') && (
           <>
@@ -1579,15 +1670,15 @@ export default function RecipeTechnical() {
                   // Para cocção, usar peso pré-cocção como base
                   const preWeight = parseNumericValue(ingredient.weight_pre_cooking);
                   const postWeight = parseNumericValue(ingredient.weight_cooked);
-                  
+
                   // Se não há peso pré-cocção, usar peso bruto ou peso limpo como fallback
                   let initialWeight = preWeight;
                   if (initialWeight === 0) {
-                    initialWeight = parseNumericValue(ingredient.weight_clean) || 
-                                   parseNumericValue(ingredient.weight_thawed) || 
-                                   parseNumericValue(ingredient.weight_raw);
+                    initialWeight = parseNumericValue(ingredient.weight_clean) ||
+                      parseNumericValue(ingredient.weight_thawed) ||
+                      parseNumericValue(ingredient.weight_raw);
                   }
-                  
+
                   const loss = calculateLoss(initialWeight, postWeight);
                   return `${loss.toFixed(1)}%`;
                 })()}
@@ -1595,7 +1686,7 @@ export default function RecipeTechnical() {
             </TableCell>
           </>
         )}
-        
+
         {/* Campos de porcionamento */}
         {hasProcess('portioning') && (
           <>
@@ -1629,14 +1720,14 @@ export default function RecipeTechnical() {
             </TableCell>
           </>
         )}
-        
+
         {/* Rendimento total */}
         <TableCell className="text-center px-4 py-2">
           <Badge variant="default">
             {calculateYield().toFixed(1)}%
           </Badge>
         </TableCell>
-        
+
         {/* Ações */}
         <TableCell className="px-4 py-2">
           <div className="flex gap-1 justify-end">
@@ -1695,7 +1786,7 @@ export default function RecipeTechnical() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 p-4 md:p-6">
       <div className="max-w-[1400px] mx-auto space-y-6">
-        
+
         {/* Card de Cabeçalho */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
           <div className="space-y-4">
@@ -1714,7 +1805,7 @@ export default function RecipeTechnical() {
                   Crie e estruture suas receitas com detalhes profissionais
                 </p>
               </div>
-              <RefreshButton 
+              <RefreshButton
                 text="Atualizar Dados"
                 onClick={handleRefresh}
                 className="shrink-0"
@@ -1857,7 +1948,7 @@ export default function RecipeTechnical() {
                   className="w-full"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="name_complement" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <span className="text-purple-500 mr-1.5">●</span> Complemento (opcional)
@@ -1871,7 +1962,7 @@ export default function RecipeTechnical() {
                   className="w-full"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="cuba_weight" className="flex items-center text-sm font-medium text-gray-700 mb-1">
                   <span className="text-pink-500 mr-1.5">●</span> {recipeData.weight_field_name || 'Peso da Cuba'} (kg)
@@ -1901,34 +1992,46 @@ export default function RecipeTechnical() {
                     </span>
                   )}
                 </Label>
-                <Select 
-                  value={recipeData.category} 
-                  onValueChange={handleCategoryChange}
-                >
-                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400">
-                    <SelectValue 
-                      placeholder={categoriesLoading ? "Carregando categorias..." : "Selecione a categoria"}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categoriesLoading ? (
-                      <SelectItem value="loading" disabled>Carregando categorias...</SelectItem>
-                    ) : categoriesError ? (
-                      <SelectItem value="error" disabled>Erro ao carregar categorias</SelectItem>
-                    ) : availableCategories.length === 0 ? (
-                      <SelectItem value="empty" disabled>Nenhuma categoria disponível</SelectItem>
-                    ) : (
-                      getCategoriesWithCurrent(recipeData.category).map(category => (
-                        <SelectItem key={category.id} value={category.value}>
-                          {category.name}
-                          {category.id.startsWith('custom-') && (
-                            <span className="text-xs text-gray-400 ml-1">(personalizada)</span>
-                          )}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                <Popover open={categorySelectorOpen} onOpenChange={setCategorySelectorOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={categorySelectorOpen}
+                      className="w-full justify-between font-normal"
+                    >
+                      {getSelectedCategoryLabel()}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Buscar categoria..." />
+                      <CommandList>
+                        <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
+                        {groupedCategories.map((group) => (
+                          <CommandGroup key={group.groupName} heading={group.groupName}>
+                            {group.items.map((category) => (
+                              <CommandItem
+                                key={category.value}
+                                value={category.label}
+                                onSelect={() => handleSmartCategorySelect(category.originalName)}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    recipeData.category === category.originalName ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {category.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        ))}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="space-y-2">
@@ -2002,7 +2105,7 @@ export default function RecipeTechnical() {
                 <div className="text-xl font-bold flex items-center text-pink-700">
                   <span className="text-pink-400 mr-1">R$</span>
                   {formatDisplayValue(
-                    calculateCubaCost(recipeData.cuba_weight, recipeData.cost_per_kg_yield), 
+                    calculateCubaCost(recipeData.cuba_weight, recipeData.cost_per_kg_yield),
                     'currency'
                   )}
                 </div>
@@ -2013,9 +2116,9 @@ export default function RecipeTechnical() {
 
         {/* Sistema de Abas */}
         <Card className="bg-white shadow-sm border">
-          <Tabs 
-            value={activeTab} 
-            onValueChange={(value) => handleTabChange(setActiveTab, value)} 
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => handleTabChange(setActiveTab, value)}
             className="w-full"
           >
             <div className="border-b border-gray-200 px-6 pt-6">
@@ -2069,377 +2172,376 @@ export default function RecipeTechnical() {
                         </div>
                       ) : (
                         preparationsData.map((prep, index) => {
-                    const isExpanded = expandedCards[prep.id] !== false; // Expandido por padrão
-                    const isEditingThisTitle = editingTitle === index;
+                          const isExpanded = expandedCards[prep.id] !== false; // Expandido por padrão
+                          const isEditingThisTitle = editingTitle === index;
 
-                    return (
-                      <Draggable key={prep.id} draggableId={prep.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                          >
-                            <Card
-                              className={`border-l-4 border-l-blue-400 ${
-                                snapshot.isDragging ? 'shadow-2xl ring-2 ring-blue-400' : ''
-                              }`}
-                            >
-                              <CardHeader className="bg-blue-50 border-b">
-                                <div className="flex justify-between items-center gap-3">
-                                  {/* Handle de Drag */}
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    className="cursor-move p-1 hover:bg-blue-100 rounded"
+                          return (
+                            <Draggable key={prep.id} draggableId={prep.id} index={index}>
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                >
+                                  <Card
+                                    className={`border-l-4 border-l-blue-400 ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-blue-400' : ''
+                                      }`}
                                   >
-                                    <List className="h-4 w-4 text-blue-600" />
-                                  </div>
-
-                                  {/* Botão de Expandir/Recolher */}
-                                  <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleCardExpansion(prep.id)}
-                              className="text-blue-600 hover:bg-blue-100"
-                            >
-                              {isExpanded ? (
-                                <ChevronUp className="h-4 w-4" />
-                              ) : (
-                                <ChevronDown className="h-4 w-4" />
-                              )}
-                            </Button>
-
-                            {/* Título editável */}
-                            <div className="flex-1 flex items-center gap-2">
-                              {isEditingThisTitle ? (
-                                <>
-                                  <Input
-                                    value={tempTitle}
-                                    onChange={(e) => setTempTitle(e.target.value)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        saveTitle(index);
-                                      } else if (e.key === 'Escape') {
-                                        cancelEditingTitle();
-                                      }
-                                    }}
-                                    className="text-lg font-semibold"
-                                    autoFocus
-                                  />
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => saveTitle(index)}
-                                    className="text-green-600 hover:bg-green-50"
-                                  >
-                                    <Check className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={cancelEditingTitle}
-                                    className="text-gray-600 hover:bg-gray-100"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  <CardTitle className="text-lg text-blue-800">
-                                    {prep.title}
-                                  </CardTitle>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => startEditingTitle(index, prep.title)}
-                                    className="text-blue-600 hover:bg-blue-100"
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-
-                            {/* Botão de Deletar */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removePreparation(preparationsData, setPreparationsData, prep.id)}
-                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </CardHeader>
-
-                        {isExpanded && (
-                          <>
-                            <CardContent className="p-6">
-                              <div className="space-y-4">
-                                {/* Tabela de Ingredientes com Processos */}
-                                <IngredientTable
-                                  prep={prep}
-                                  prepIndex={index}
-                                  onOpenIngredientModal={handleOpenIngredientModal}
-                                  onOpenRecipeModal={handleOpenRecipeModal}
-                                  onOpenAddAssemblyItemModal={openAddAssemblyItemModal}
-                                  onUpdatePreparation={(prepIdx, field, value) => {
-                                    setPreparationsData(prev => {
-                                      const newData = [...prev];
-                                      if (newData[prepIdx]) {
-                                        newData[prepIdx][field] = value;
-                                      }
-                                      return newData;
-                                    });
-                                    setIsDirty(true);
-                                  }}
-                                  onUpdateIngredient={(prepIdx, ingIdx, field, value) => {
-                                    updateIngredient(
-                                      preparationsData,
-                                      setPreparationsData,
-                                      prepIdx,
-                                      ingIdx,
-                                      field,
-                                      value
-                                    );
-                                    setIsDirty(true);
-                                  }}
-                                  onUpdateRecipe={(prepIdx, recIdx, field, value) => {
-                                    updateRecipe(
-                                      preparationsData,
-                                      setPreparationsData,
-                                      prepIdx,
-                                      recIdx,
-                                      field,
-                                      value
-                                    );
-                                    setIsDirty(true);
-                                  }}
-                                  onRemoveIngredient={(prepIdx, ingIdx) => {
-                                    removeIngredient(
-                                      preparationsData,
-                                      setPreparationsData,
-                                      prepIdx,
-                                      ingIdx
-                                    );
-                                    setIsDirty(true);
-                                  }}
-                                  onRemoveRecipe={(prepIdx, recIdx) => {
-                                    removeRecipe(
-                                      preparationsData,
-                                      setPreparationsData,
-                                      prepIdx,
-                                      recIdx
-                                    );
-                                    setIsDirty(true);
-                                    toast({
-                                      title: "Receita removida",
-                                      description: "A receita foi removida da preparação."
-                                    });
-                                  }}
-                                  preparations={preparationsData}
-                                />
-                              </div>
-                            </CardContent>
-
-                            {/* Rodapé com Notas */}
-                            <CardFooter className="bg-gray-50 border-t flex flex-col gap-3 p-4">
-                              {/* Formulário Inline de Edição */}
-                              {editingNote?.prepIndex === index ? (
-                                <div className="w-full space-y-3 p-4 border-l-4 border-l-orange-400 bg-white rounded">
-                                  {/* Título com prefixo fixo + complemento editável */}
-                                  <div className="flex items-center gap-2 mb-2">
-                                    {editingNoteTitle ? (
-                                      <>
-                                        <div className="flex items-center gap-2 flex-1">
-                                          <span className="text-sm font-semibold text-orange-700 whitespace-nowrap">
-                                            {editingNote ? getAutoNoteTitle(editingNote.noteIndex) : '1º Passo'}
-                                          </span>
-                                          <span className="text-sm font-medium text-gray-500">-</span>
-                                          <Input
-                                            value={tempNoteTitle}
-                                            onChange={(e) => setTempNoteTitle(e.target.value)}
-                                            onKeyDown={(e) => {
-                                              if (e.key === 'Enter') {
-                                                saveNoteTitle();
-                                              } else if (e.key === 'Escape') {
-                                                cancelEditingNoteTitle();
-                                              }
-                                            }}
-                                            placeholder="adicione um complemento (opcional)"
-                                            className="text-sm font-medium flex-1"
-                                            autoFocus
-                                          />
+                                    <CardHeader className="bg-blue-50 border-b">
+                                      <div className="flex justify-between items-center gap-3">
+                                        {/* Handle de Drag */}
+                                        <div
+                                          {...provided.dragHandleProps}
+                                          className="cursor-move p-1 hover:bg-blue-100 rounded"
+                                        >
+                                          <List className="h-4 w-4 text-blue-600" />
                                         </div>
+
+                                        {/* Botão de Expandir/Recolher */}
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            saveNoteTitle();
-                                          }}
-                                          className="text-green-600 hover:bg-green-50 h-7 w-7 p-0"
+                                          onClick={() => toggleCardExpansion(prep.id)}
+                                          className="text-blue-600 hover:bg-blue-100"
                                         >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            cancelEditingNoteTitle();
-                                          }}
-                                          className="text-gray-600 hover:bg-gray-100 h-7 w-7 p-0"
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Label className="text-sm font-medium text-gray-700 flex-1">
-                                          <span className="font-semibold text-orange-700">
-                                            {editingNote ? getAutoNoteTitle(editingNote.noteIndex) : '1º Passo'}
-                                          </span>
-                                          {noteTitle && (
-                                            <span className="text-gray-700"> - {noteTitle}</span>
+                                          {isExpanded ? (
+                                            <ChevronUp className="h-4 w-4" />
+                                          ) : (
+                                            <ChevronDown className="h-4 w-4" />
                                           )}
-                                        </Label>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            startEditingNoteTitle();
-                                          }}
-                                          className="text-orange-600 hover:bg-orange-50 h-7 w-7 p-0"
-                                        >
-                                          <Edit className="h-3 w-3" />
                                         </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (confirm('Deseja excluir esta nota?')) {
-                                              deleteNote(index, editingNote.noteIndex);
-                                              cancelEditingNote();
-                                            }
-                                          }}
-                                          className="text-red-500 hover:bg-red-50 h-7 w-7 p-0"
-                                        >
-                                          <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                      </>
-                                    )}
-                                  </div>
 
-                                  <div className="space-y-2">
-                                    <Textarea
-                                      placeholder="Descreva as informações importantes desta etapa..."
-                                      value={noteContent}
-                                      onChange={(e) => updateNoteContent(index, editingNote.noteIndex, e.target.value)}
-                                      rows={4}
-                                      className="border-gray-200 focus:border-orange-400 resize-none"
-                                    />
-
-                                    {/* Botão para Concluir Edição */}
-                                    <div className="flex justify-end">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          // Fechar edição apenas se a nota tiver algum conteúdo
-                                          if (noteContent.trim()) {
-                                            cancelEditingNote();
-                                            toast({
-                                              title: "Nota salva",
-                                              description: "A nota foi salva com sucesso."
-                                            });
-                                          } else {
-                                            // Se não tiver conteúdo, deletar e fechar
-                                            deleteNote(index, editingNote.noteIndex);
-                                            cancelEditingNote();
-                                          }
-                                        }}
-                                        className="text-green-600 border-green-300 hover:bg-green-50 hover:text-green-700"
-                                      >
-                                        <Check className="h-4 w-4 mr-2" />
-                                        Concluir Edição
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                <>
-                                  {/* Notas Existentes */}
-                                  {Array.isArray(prep.notes) && prep.notes.filter(note => note.content).length > 0 && (
-                                    <div className="w-full space-y-2">
-                                      {prep.notes
-                                        .map((note, noteIndex) => ({ note, noteIndex }))
-                                        .filter(({ note }) => note.content)
-                                        .map(({ note, noteIndex }) => (
-                                          <div
-                                            key={noteIndex}
-                                            className="bg-amber-50 border border-amber-200 rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
-                                            onClick={() => startEditingNote(index, noteIndex)}
-                                          >
-                                            <h4 className="font-semibold text-amber-900 text-sm mb-1">
-                                              <span className="text-orange-700">{getAutoNoteTitle(noteIndex)}</span>
-                                              {note.title && (
-                                                <span className="text-amber-900"> - {note.title}</span>
-                                              )}
-                                            </h4>
-                                            {note.content && (
-                                              <p className="text-amber-800 text-xs whitespace-pre-wrap">
-                                                {note.content}
-                                              </p>
-                                            )}
-                                            <div className="flex justify-end items-center mt-2">
+                                        {/* Título editável */}
+                                        <div className="flex-1 flex items-center gap-2">
+                                          {isEditingThisTitle ? (
+                                            <>
+                                              <Input
+                                                value={tempTitle}
+                                                onChange={(e) => setTempTitle(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter') {
+                                                    saveTitle(index);
+                                                  } else if (e.key === 'Escape') {
+                                                    cancelEditingTitle();
+                                                  }
+                                                }}
+                                                className="text-lg font-semibold"
+                                                autoFocus
+                                              />
                                               <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                onClick={() => saveTitle(index)}
+                                                className="text-green-600 hover:bg-green-50"
+                                              >
+                                                <Check className="h-4 w-4" />
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={cancelEditingTitle}
+                                                className="text-gray-600 hover:bg-gray-100"
+                                              >
+                                                <X className="h-4 w-4" />
+                                              </Button>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <CardTitle className="text-lg text-blue-800">
+                                                {prep.title}
+                                              </CardTitle>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => startEditingTitle(index, prep.title)}
+                                                className="text-blue-600 hover:bg-blue-100"
+                                              >
+                                                <Edit className="h-3 w-3" />
+                                              </Button>
+                                            </>
+                                          )}
+                                        </div>
+
+                                        {/* Botão de Deletar */}
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => removePreparation(preparationsData, setPreparationsData, prep.id)}
+                                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </CardHeader>
+
+                                    {isExpanded && (
+                                      <>
+                                        <CardContent className="p-6">
+                                          <div className="space-y-4">
+                                            {/* Tabela de Ingredientes com Processos */}
+                                            <IngredientTable
+                                              prep={prep}
+                                              prepIndex={index}
+                                              onOpenIngredientModal={handleOpenIngredientModal}
+                                              onOpenRecipeModal={handleOpenRecipeModal}
+                                              onOpenAddAssemblyItemModal={openAddAssemblyItemModal}
+                                              onUpdatePreparation={(prepIdx, field, value) => {
+                                                setPreparationsData(prev => {
+                                                  const newData = [...prev];
+                                                  if (newData[prepIdx]) {
+                                                    newData[prepIdx][field] = value;
+                                                  }
+                                                  return newData;
+                                                });
+                                                setIsDirty(true);
+                                              }}
+                                              onUpdateIngredient={(prepIdx, ingIdx, field, value) => {
+                                                updateIngredient(
+                                                  preparationsData,
+                                                  setPreparationsData,
+                                                  prepIdx,
+                                                  ingIdx,
+                                                  field,
+                                                  value
+                                                );
+                                                setIsDirty(true);
+                                              }}
+                                              onUpdateRecipe={(prepIdx, recIdx, field, value) => {
+                                                updateRecipe(
+                                                  preparationsData,
+                                                  setPreparationsData,
+                                                  prepIdx,
+                                                  recIdx,
+                                                  field,
+                                                  value
+                                                );
+                                                setIsDirty(true);
+                                              }}
+                                              onRemoveIngredient={(prepIdx, ingIdx) => {
+                                                removeIngredient(
+                                                  preparationsData,
+                                                  setPreparationsData,
+                                                  prepIdx,
+                                                  ingIdx
+                                                );
+                                                setIsDirty(true);
+                                              }}
+                                              onRemoveRecipe={(prepIdx, recIdx) => {
+                                                removeRecipe(
+                                                  preparationsData,
+                                                  setPreparationsData,
+                                                  prepIdx,
+                                                  recIdx
+                                                );
+                                                setIsDirty(true);
+                                                toast({
+                                                  title: "Receita removida",
+                                                  description: "A receita foi removida da preparação."
+                                                });
+                                              }}
+                                              preparations={preparationsData}
+                                            />
+                                          </div>
+                                        </CardContent>
+
+                                        {/* Rodapé com Notas */}
+                                        <CardFooter className="bg-gray-50 border-t flex flex-col gap-3 p-4">
+                                          {/* Formulário Inline de Edição */}
+                                          {editingNote?.prepIndex === index ? (
+                                            <div className="w-full space-y-3 p-4 border-l-4 border-l-orange-400 bg-white rounded">
+                                              {/* Título com prefixo fixo + complemento editável */}
+                                              <div className="flex items-center gap-2 mb-2">
+                                                {editingNoteTitle ? (
+                                                  <>
+                                                    <div className="flex items-center gap-2 flex-1">
+                                                      <span className="text-sm font-semibold text-orange-700 whitespace-nowrap">
+                                                        {editingNote ? getAutoNoteTitle(editingNote.noteIndex) : '1º Passo'}
+                                                      </span>
+                                                      <span className="text-sm font-medium text-gray-500">-</span>
+                                                      <Input
+                                                        value={tempNoteTitle}
+                                                        onChange={(e) => setTempNoteTitle(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                          if (e.key === 'Enter') {
+                                                            saveNoteTitle();
+                                                          } else if (e.key === 'Escape') {
+                                                            cancelEditingNoteTitle();
+                                                          }
+                                                        }}
+                                                        placeholder="adicione um complemento (opcional)"
+                                                        className="text-sm font-medium flex-1"
+                                                        autoFocus
+                                                      />
+                                                    </div>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        saveNoteTitle();
+                                                      }}
+                                                      className="text-green-600 hover:bg-green-50 h-7 w-7 p-0"
+                                                    >
+                                                      <Check className="h-3 w-3" />
+                                                    </Button>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        cancelEditingNoteTitle();
+                                                      }}
+                                                      className="text-gray-600 hover:bg-gray-100 h-7 w-7 p-0"
+                                                    >
+                                                      <X className="h-3 w-3" />
+                                                    </Button>
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    <Label className="text-sm font-medium text-gray-700 flex-1">
+                                                      <span className="font-semibold text-orange-700">
+                                                        {editingNote ? getAutoNoteTitle(editingNote.noteIndex) : '1º Passo'}
+                                                      </span>
+                                                      {noteTitle && (
+                                                        <span className="text-gray-700"> - {noteTitle}</span>
+                                                      )}
+                                                    </Label>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        startEditingNoteTitle();
+                                                      }}
+                                                      className="text-orange-600 hover:bg-orange-50 h-7 w-7 p-0"
+                                                    >
+                                                      <Edit className="h-3 w-3" />
+                                                    </Button>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (confirm('Deseja excluir esta nota?')) {
+                                                          deleteNote(index, editingNote.noteIndex);
+                                                          cancelEditingNote();
+                                                        }
+                                                      }}
+                                                      className="text-red-500 hover:bg-red-50 h-7 w-7 p-0"
+                                                    >
+                                                      <Trash2 className="h-3 w-3" />
+                                                    </Button>
+                                                  </>
+                                                )}
+                                              </div>
+
+                                              <div className="space-y-2">
+                                                <Textarea
+                                                  placeholder="Descreva as informações importantes desta etapa..."
+                                                  value={noteContent}
+                                                  onChange={(e) => updateNoteContent(index, editingNote.noteIndex, e.target.value)}
+                                                  rows={4}
+                                                  className="border-gray-200 focus:border-orange-400 resize-none"
+                                                />
+
+                                                {/* Botão para Concluir Edição */}
+                                                <div className="flex justify-end">
+                                                  <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      // Fechar edição apenas se a nota tiver algum conteúdo
+                                                      if (noteContent.trim()) {
+                                                        cancelEditingNote();
+                                                        toast({
+                                                          title: "Nota salva",
+                                                          description: "A nota foi salva com sucesso."
+                                                        });
+                                                      } else {
+                                                        // Se não tiver conteúdo, deletar e fechar
+                                                        deleteNote(index, editingNote.noteIndex);
+                                                        cancelEditingNote();
+                                                      }
+                                                    }}
+                                                    className="text-green-600 border-green-300 hover:bg-green-50 hover:text-green-700"
+                                                  >
+                                                    <Check className="h-4 w-4 mr-2" />
+                                                    Concluir Edição
+                                                  </Button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <>
+                                              {/* Notas Existentes */}
+                                              {Array.isArray(prep.notes) && prep.notes.filter(note => note.content).length > 0 && (
+                                                <div className="w-full space-y-2">
+                                                  {prep.notes
+                                                    .map((note, noteIndex) => ({ note, noteIndex }))
+                                                    .filter(({ note }) => note.content)
+                                                    .map(({ note, noteIndex }) => (
+                                                      <div
+                                                        key={noteIndex}
+                                                        className="bg-amber-50 border border-amber-200 rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
+                                                        onClick={() => startEditingNote(index, noteIndex)}
+                                                      >
+                                                        <h4 className="font-semibold text-amber-900 text-sm mb-1">
+                                                          <span className="text-orange-700">{getAutoNoteTitle(noteIndex)}</span>
+                                                          {note.title && (
+                                                            <span className="text-amber-900"> - {note.title}</span>
+                                                          )}
+                                                        </h4>
+                                                        {note.content && (
+                                                          <p className="text-amber-800 text-xs whitespace-pre-wrap">
+                                                            {note.content}
+                                                          </p>
+                                                        )}
+                                                        <div className="flex justify-end items-center mt-2">
+                                                          <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              if (confirm('Deseja remover esta nota?')) {
+                                                                deleteNote(index, noteIndex);
+                                                              }
+                                                            }}
+                                                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                          >
+                                                            <Trash2 className="h-3 w-3" />
+                                                          </Button>
+                                                        </div>
+                                                      </div>
+                                                    ))}
+                                                </div>
+                                              )}
+
+                                              {/* Botão para Adicionar Nota */}
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  if (confirm('Deseja remover esta nota?')) {
-                                                    deleteNote(index, noteIndex);
-                                                  }
+                                                  startEditingNote(index);
                                                 }}
-                                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                className="w-full text-orange-600 border-orange-300 hover:bg-orange-50 hover:text-orange-700"
                                               >
-                                                <Trash2 className="h-3 w-3" />
+                                                <StickyNote className="h-4 w-4 mr-2" />
+                                                Adicionar Nota
                                               </Button>
-                                            </div>
-                                          </div>
-                                        ))}
-                                    </div>
-                                  )}
-
-                                  {/* Botão para Adicionar Nota */}
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      startEditingNote(index);
-                                    }}
-                                    className="w-full text-orange-600 border-orange-300 hover:bg-orange-50 hover:text-orange-700"
-                                  >
-                                    <StickyNote className="h-4 w-4 mr-2" />
-                                    Adicionar Nota
-                                  </Button>
-                                </>
+                                            </>
+                                          )}
+                                        </CardFooter>
+                                      </>
+                                    )}
+                                  </Card>
+                                </div>
                               )}
-                            </CardFooter>
-                          </>
-                        )}
-                      </Card>
-                    </div>
-                  )}
-                </Draggable>
-                    );
-                  })
-                )}
-                {provided.placeholder}
+                            </Draggable>
+                          );
+                        })
+                      )}
+                      {provided.placeholder}
                     </div>
                   )}
                 </Droppable>
@@ -2469,7 +2571,7 @@ export default function RecipeTechnical() {
         preparationsLength={preparationsData.length}
         currentRecipeId={currentRecipeId}
       />
-      
+
       {/* Modal de Configuração */}
       <Dialog open={showConfigDialog} onOpenChange={setShowConfigDialog}>
         <DialogContent className="sm:max-w-md">

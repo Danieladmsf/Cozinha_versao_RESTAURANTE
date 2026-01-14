@@ -19,20 +19,23 @@ export default function DatePicker({
   ...props
 }) {
   const [isClient, setIsClient] = useState(false);
-  
+  const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState(new Date());
+
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   // Garantir que selected seja uma instância válida de Date, sem ajuste de timezone
   const ensureValidDate = (date) => {
     if (!date) return undefined;
-    
+
     if (typeof date === 'string') {
       // Se for string no formato ISO, criar objeto Date sem ajuste de timezone
       if (date.includes('T')) {
         return new Date(date);
       }
-      
+
       // Se for string no formato YYYY-MM-DD, criar um Date às 12h (meio-dia)
       // para evitar problemas de timezone
       const [year, month, day] = date.split('-').map(Number);
@@ -43,10 +46,18 @@ export default function DatePicker({
       newDate.setHours(12, 0, 0, 0);
       return newDate;
     }
-    
+
     // Se já for Date, usar como está
     return date;
   };
+
+  const selectedDate = ensureValidDate(selected);
+
+  useEffect(() => {
+    if (open) {
+      setMonth(selectedDate || new Date());
+    }
+  }, [open, selectedDate]);
 
   // Manipulador personalizado para garantir consistência nas datas
   const handleDateChange = (date) => {
@@ -54,49 +65,63 @@ export default function DatePicker({
       onChange(null);
       return;
     }
-    
+
     // Criar uma cópia da data às 12h (meio-dia) para evitar problemas de timezone
     const newDate = new Date(date);
     newDate.setHours(12, 0, 0, 0);
-    
+
     // Formatar como string YYYY-MM-DD
     const year = newDate.getFullYear();
     const month = String(newDate.getMonth() + 1).padStart(2, '0');
     const day = String(newDate.getDate()).padStart(2, '0');
     const dateString = `${year}-${month}-${day}`;
-    
+
     // Chamamos o callback com a string formatada
     onChange(dateString);
+
+    // Fechar o popover após selecionar
+    setOpen(false);
   };
 
-  const selectedDate = ensureValidDate(selected);
-  
   return (
-    <div className={cn("grid gap-2", className)}>
-      <Popover>
-        <PopoverTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !selected && "text-muted-foreground",
+            className
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {selectedDate && isClient ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : <span>{placeholder}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleDateChange}
+          month={month}
+          onMonthChange={setMonth}
+          locale={ptBR}
+          initialFocus
+          {...props}
+        />
+        <div className="border-t border-border p-3 bg-slate-50">
           <Button
-            variant={"outline"}
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !selected && "text-muted-foreground"
-            )}
+            variant="outline"
+            size="sm"
+            className="w-full text-xs h-8"
+            onClick={() => {
+              handleDateChange(new Date());
+            }}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedDate && isClient ? format(selectedDate, "PPP", { locale: ptBR }) : <span>{placeholder}</span>}
+            Ir para hoje
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateChange}
-            locale={ptBR}
-            initialFocus
-            {...props}
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }

@@ -6,7 +6,7 @@ import { Ingredient } from "@/app/api/entities";
 import { Supplier } from "@/app/api/entities";
 import { NutritionFood } from "@/app/api/entities";
 import { Brand } from "@/app/api/entities";
-import { Category } from "@/app/api/entities"; // Added Category import
+import { Category, CategoryTree, PriceHistory } from "@/app/api/entities"; // Added Category, CategoryTree and PriceHistory import
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,7 +46,7 @@ export default function IngredientEditor() {
   const [brands, setBrands] = useState([]);
   const [tacoFoods, setTacoFoods] = useState([]);
   const [categories, setCategories] = useState([]);
-  
+
   // NOVOS ESTADOS para os campos inteligentes
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [brandOptions, setBrandOptions] = useState([]);
@@ -60,7 +60,6 @@ export default function IngredientEditor() {
     commercial_name: "",
     unit: "kg",
     current_price: "",
-    base_price: "",
     last_update: new Date().toISOString().split('T')[0],
     active: true,
     notes: "",
@@ -81,6 +80,7 @@ export default function IngredientEditor() {
   const [activeTab, setActiveTab] = useState("general");
   const [tacoSearchTerm, setTacoSearchTerm] = useState("");
   const [loadingTaco, setLoadingTaco] = useState(false); // ✅ Novo estado para loading TACO
+  const [initialPrice, setInitialPrice] = useState(null); // Store initial price for comparison
 
 
   const handleInputChange = (e) => {
@@ -96,7 +96,7 @@ export default function IngredientEditor() {
       const suppliersData = await Supplier.list();
       const activeSuppliers = Array.isArray(suppliersData) ? suppliersData.filter(s => s.active) : [];
       setSuppliers(activeSuppliers);
-      
+
       // Criar opções para o combobox
       const supplierOptions = activeSuppliers.map(s => ({
         value: s.company_name || s.name,
@@ -115,7 +115,7 @@ export default function IngredientEditor() {
       const brandsData = await Brand.list();
       const activeBrands = Array.isArray(brandsData) ? brandsData.filter(b => b.active) : [];
       setBrands(activeBrands);
-      
+
       // Criar opções para o combobox
       const brandOptions = activeBrands.map(b => ({
         value: b.name,
@@ -146,68 +146,82 @@ export default function IngredientEditor() {
 
   const loadCategories = async () => {
     try {
-      // ✅ OTIMIZAÇÃO: Carregar apenas da entidade Category (não precisa de todos os ingredientes)
-      const categoryData = await Category.list();
-      const categories = categoryData
-        .filter(cat => cat.type === "ingredient" && cat.active)
-        .map(cat => cat.name)
-        .sort();
+      console.log("🔍 Iniciando loadCategories com CategoryTree...");
+      const categoryTreeData = await CategoryTree.list();
 
-      setCategories(categories);
-      setCategoryOptions(categories.map(cat => ({ value: cat, label: cat })));
-    } catch (err) {
-      // Se falhar, tentar carregar do localStorage como fallback
-      const cachedCategories = localStorage.getItem('ingredient_categories');
-      if (cachedCategories) {
-        try {
-          const parsed = JSON.parse(cachedCategories);
-          setCategories(parsed);
-          setCategoryOptions(parsed.map(cat => ({ value: cat, label: cat })));
-        } catch (e) {
-          // Usar categorias padrão
-          const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos'];
-          setCategories(defaultCategories);
-          setCategoryOptions(defaultCategories.map(cat => ({ value: cat, label: cat })));
+      // 1. Filtrar apenas Ingredientes
+      const ingredientCats = categoryTreeData.filter(cat =>
+        (cat.type === "ingredient" || cat.type === "ingredientes") && cat.active
+      );
+
+      // 2. Criar mapa para lookup rápido por ID
+      const catMap = new Map();
+      ingredientCats.forEach(cat => catMap.set(cat.id, cat));
+
+      // 3. Função recursiva para gerar nome completo (Breadcrumbs)
+      const getFullPath = (cat) => {
+        if (!cat.parent_id || !catMap.has(cat.parent_id)) {
+          return cat.name;
         }
+        const parent = catMap.get(cat.parent_id);
+        return `${getFullPath(parent)} > ${cat.name}`;
+      };
+
+      // 4. Gerar lista de opções com nomes hierárquicos
+      let formattedCategories = ingredientCats.map(cat => ({
+        original: cat,
+        displayName: getFullPath(cat),
+        value: getFullPath(cat)
+      }));
+
+      // Ordenar alfabeticamente pelo nome exibido
+      formattedCategories.sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+      const options = formattedCategories.map(item => ({
+        value: item.value,
+        label: item.displayName
+      }));
+
+
+
+      if (options.length === 0) {
+        console.warn("⚠️ Nenhuma categoria encontrada. Usando padrões.");
+        const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos', 'Massas', 'Molhos', 'Outros'];
+        setCategories(defaultCategories);
+        setCategoryOptions(defaultCategories.map(c => ({ value: c, label: c })));
+      } else {
+        setCategories(options.map(o => o.value));
+        setCategoryOptions(options);
       }
+
+    } catch (err) {
+      console.error("Erro ao carregar categorias:", err);
+      const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos', 'Massas', 'Molhos', 'Outros'];
+      setCategories(defaultCategories);
+      setCategoryOptions(defaultCategories.map(cat => ({ value: cat, label: cat })));
     }
   };
 
-  // FUNÇÃO para gerar código automático do fornecedor
-  const generateSupplierCode = (supplierName) => {
-    if (!supplierName) return '';
-    
-    // Gerar código baseado no nome (primeiras letras + timestamp)
-    const initials = supplierName
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 3);
-    
-    const timestamp = Date.now().toString().slice(-4);
-    return `${initials}${timestamp}`;
-  };
 
   // FUNÇÃO para selecionar fornecedor
   const handleSupplierSelect = (selectedValue) => {
     const selectedSupplier = supplierOptions.find(s => s.value === selectedValue);
-    
+
     if (selectedSupplier) {
-      // Fornecedor existente
+      // Fornecedor existente - usar código do cadastro
       setFormData(prev => ({
         ...prev,
         main_supplier: selectedSupplier.value,
         supplier_id: selectedSupplier.supplier_id,
-        supplier_code: selectedSupplier.supplier_code || generateSupplierCode(selectedSupplier.value)
+        supplier_code: selectedSupplier.supplier_code || ''
       }));
     } else {
       // Novo fornecedor (usuário digitou algo que não existe)
       setFormData(prev => ({
         ...prev,
         main_supplier: selectedValue,
-        supplier_id: '', // Limpar ID pois é novo
-        supplier_code: generateSupplierCode(selectedValue)
+        supplier_id: '',
+        supplier_code: '' // Sem código pois não existe no cadastro
       }));
     }
     setOpenSupplierCombobox(false);
@@ -216,7 +230,7 @@ export default function IngredientEditor() {
   // FUNÇÃO para selecionar marca
   const handleBrandSelect = (selectedValue) => {
     const selectedBrand = brandOptions.find(b => b.value === selectedValue);
-    
+
     if (selectedBrand) {
       // Marca existente
       setFormData(prev => ({
@@ -268,7 +282,7 @@ export default function IngredientEditor() {
     setIsEditing(false);
     setCurrentIngredientId(null);
   };
-  
+
   const loadIngredient = async (id) => {
     try {
       setLoading(true);
@@ -315,10 +329,8 @@ export default function IngredientEditor() {
 
       const mappedData = {
         name: safeString(ingredient.name),
-        commercial_name: safeString(ingredient.commercial_name),
         unit: ingredient.unit || 'kg',
         current_price: safeNumber(ingredient.current_price),
-        base_price: safeNumber(ingredient.base_price),
         last_update: ingredient.last_update || new Date().toISOString().split('T')[0],
         active: ingredient.active !== false,
         notes: safeString(ingredient.notes),
@@ -336,6 +348,7 @@ export default function IngredientEditor() {
       };
 
       setFormData(mappedData);
+      setInitialPrice(safeNumber(ingredient.current_price)); // Set initial price
       setCurrentIngredientId(id);
 
     } catch (err) {
@@ -360,7 +373,7 @@ export default function IngredientEditor() {
     };
 
     const updatedVariations = [...formData.taco_variations, newVariation];
-    
+
     setFormData(prev => ({
       ...prev,
       taco_variations: updatedVariations,
@@ -442,11 +455,9 @@ export default function IngredientEditor() {
 
       const ingredientDataToSave = {
         name: formData.name,
-        commercial_name: formData.commercial_name,
         supplier_id: formData.supplier_id,
         main_supplier: formData.main_supplier,
         current_price: parseFloat(formData.current_price) || 0,
-        base_price: parseFloat(formData.base_price) || 0,
         brand: formData.brand,
         unit: formData.unit,
         current_stock: parseFloat(formData.current_stock) || 0,
@@ -472,10 +483,70 @@ export default function IngredientEditor() {
       } else {
         // Criar novo ingrediente
         result = await Ingredient.create(ingredientDataToSave);
+
+        // Criar histórico inicial para novo ingrediente (Opcional, mas bom para consistência)
+        if (ingredientDataToSave.current_price > 0) {
+          try {
+            await PriceHistory.create({
+              ingredient_id: result.id,
+              old_price: 0,
+              new_price: ingredientDataToSave.current_price,
+              date: ingredientDataToSave.last_update,
+              supplier: ingredientDataToSave.main_supplier,
+              supplier_id: ingredientDataToSave.supplier_id || null,
+              brand: ingredientDataToSave.brand,
+              brand_id: ingredientDataToSave.brand_id || null,
+              category: ingredientDataToSave.category,
+              unit: ingredientDataToSave.unit,
+              ingredient_name: ingredientDataToSave.name,
+              change_type: 'initial_creation',
+              change_source: 'ingredient_editor',
+              user_id: 'mock-user-id',
+              notes: 'Preço inicial no cadastro',
+              timestamp: new Date().toISOString()
+            });
+          } catch (histError) {
+            console.error("Erro ao criar histórico inicial:", histError);
+          }
+        }
+
         toast({
           title: "Ingrediente criado",
           description: `O ingrediente "${formData.name}" foi criado com sucesso.`
         });
+      }
+
+      // Check for price change and create history if editing
+      if (isEditing && currentIngredientId) {
+        const newPrice = parseFloat(formData.current_price) || 0;
+        const oldPrice = parseFloat(initialPrice) || 0;
+
+        if (Math.abs(newPrice - oldPrice) >= 0.01) {
+          try {
+            await PriceHistory.create({
+              ingredient_id: currentIngredientId,
+              old_price: oldPrice,
+              new_price: newPrice,
+              date: formData.last_update,
+              supplier: formData.main_supplier,
+              supplier_id: formData.supplier_id || null,
+              brand: formData.brand,
+              brand_id: formData.brand_id || null,
+              category: formData.category,
+              unit: formData.unit,
+              ingredient_name: formData.name,
+              change_type: 'manual_update',
+              change_source: 'ingredient_editor',
+              user_id: 'mock-user-id', // Should be dynamic in real app
+              notes: formData.notes || `Atualização de preço no editor: ${oldPrice.toFixed(2)} -> ${newPrice.toFixed(2)}`,
+              timestamp: new Date().toISOString()
+            });
+          } catch (histError) {
+            console.error("Erro ao salvar histórico de preço:", histError);
+            // Don't block the main flow if history fails, but maybe warn?
+            // For now, just log.
+          }
+        }
       }
 
       // Redirecionar para a lista de ingredientes
@@ -515,22 +586,23 @@ export default function IngredientEditor() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center mb-4">
+      <div className="mb-4">
+        <div className="flex items-center mb-2">
           <Button
             variant="outline"
             onClick={() => router.push('/ingredientes')}
             size="sm"
+            className="h-8 text-xs border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-3 h-3 mr-2" />
             Voltar
           </Button>
         </div>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {isEditing ? `Editar Ingrediente: ${formData.name || formData.commercial_name}` : 'Novo Ingrediente'}
+          <h1 className="text-xl font-bold text-gray-900">
+            {isEditing ? `Editar Ingrediente: ${formData.name}` : 'Novo Ingrediente'}
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 text-xs">
             Gerencie os detalhes do seu ingrediente consolidado.
           </p>
         </div>
@@ -538,470 +610,444 @@ export default function IngredientEditor() {
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive" className="mb-4 py-2">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Formulário principal */}
-      <form onSubmit={handleSave} className="space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="general" className="flex items-center gap-2 text-xs sm:text-sm">
-                  <CircleCheckBig className="h-4 w-4" />
-                  <span className="hidden sm:inline">Dados Gerais</span>
-                  <span className="sm:hidden">Dados</span>
-                </TabsTrigger>
-                <TabsTrigger value="taco" className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Package className="h-4 w-4" />
-                  <span className="hidden sm:inline">Variações TACO</span>
-                  <span className="sm:hidden">TACO</span>
-                </TabsTrigger>
-                <TabsTrigger value="preview" className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Eye className="h-4 w-4" />
-                  Preview
-                </TabsTrigger>
-              </TabsList>
+      <form onSubmit={handleSave} className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-4 h-9 bg-gradient-to-r from-slate-100 to-slate-50">
+            <TabsTrigger value="general" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+              <CircleCheckBig className="h-3 w-3" />
+              <span className="hidden sm:inline">Dados Gerais</span>
+              <span className="sm:hidden">Dados</span>
+            </TabsTrigger>
+            <TabsTrigger value="taco" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+              <Package className="h-3 w-3" />
+              <span className="hidden sm:inline">Variações TACO</span>
+              <span className="sm:hidden">TACO</span>
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+              <Eye className="h-3 w-3" />
+              Preview
+            </TabsTrigger>
+          </TabsList>
 
-              <TabsContent value="general" className="space-y-6 mt-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Informações do Ingrediente</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Nome Principal e Comercial */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="name" className="text-sm font-medium">Nome Principal *</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          placeholder="Ex: Muçarela"
-                          required
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="commercial_name" className="text-sm font-medium">Nome Comercial</Label>
-                        <Input
-                          id="commercial_name"
-                          name="commercial_name"
-                          value={formData.commercial_name}
-                          onChange={handleInputChange}
-                          placeholder="Ex: Queijo Muçarela Tirolez"
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
+          <TabsContent value="general" className="space-y-4 mt-0">
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-base">Informações do Ingrediente</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 pb-4">
+                {/* Nome Principal e Comercial */}
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <Label htmlFor="name" className="text-xs font-medium">Nome Principal *</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Ex: Muçarela"
+                      required
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                </div>
 
-                    {/* Fornecedor e Categoria */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {/* Fornecedor Principal - Combobox Inteligente */}
-                      <div>
-                        <Label className="text-sm font-medium">Fornecedor Principal</Label>
-                        <Popover open={openSupplierCombobox} onOpenChange={setOpenSupplierCombobox}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={openSupplierCombobox}
-                              className="w-full justify-between mt-1 h-10"
-                            >
-                              <span className="truncate">
-                                {formData.main_supplier || "Selecione um fornecedor"}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Command>
-                              <CommandInput placeholder="Buscar ou criar fornecedor..." className="h-9" />
-                              <CommandEmpty>
-                                <div className="py-6 text-center text-sm">
-                                  <p>Nenhum fornecedor encontrado.</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    Digite para criar um novo fornecedor
-                                  </p>
-                                </div>
-                              </CommandEmpty>
-                              <CommandGroup className="max-h-[200px] overflow-auto">
-                                {supplierOptions.map((supplier) => (
-                                  <CommandItem
-                                    key={supplier.value}
-                                    value={supplier.value}
-                                    onSelect={handleSupplierSelect}
-                                    className="cursor-pointer"
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        formData.main_supplier === supplier.value ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    <span className="truncate">{supplier.label}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {/* Categoria - Combobox Inteligente (ReadOnly se TACO) */}
-                      <div>
-                        <Label className="text-sm font-medium flex items-center gap-2">
-                          Categoria 
-                          {isCategoryReadOnly && <Badge variant="secondary" className="text-xs">Auto (TACO)</Badge>}
-                        </Label>
-                        {isCategoryReadOnly ? (
-                          <div className="mt-1">
-                            <Input
-                              value={formData.category}
-                              readOnly
-                              className="bg-gray-100"
-                              placeholder="Categoria será preenchida ao vincular TACO"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                              Categoria preenchida automaticamente com base nas variações TACO vinculadas.
-                            </p>
-                          </div>
-                        ) : (
-                          <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={openCategoryCombobox}
-                                className="w-full justify-between mt-1 h-10"
-                              >
-                                <span className="truncate">
-                                  {formData.category || "Selecione uma categoria"}
-                                </span>
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-full p-0" align="start">
-                              <Command>
-                                <CommandInput placeholder="Buscar ou criar categoria..." className="h-9" />
-                                <CommandEmpty>
-                                  <div className="py-6 text-center text-sm">
-                                    <p>Nenhuma categoria encontrada.</p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      Digite para criar uma nova categoria
-                                    </p>
-                                  </div>
-                                </CommandEmpty>
-                                <CommandGroup className="max-h-[200px] overflow-auto">
-                                  {categoryOptions.map((category) => (
-                                    <CommandItem
-                                      key={category.value}
-                                      value={category.value}
-                                      onSelect={handleCategorySelect}
-                                      className="cursor-pointer"
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          formData.category === category.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                      />
-                                      {category.label}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Unidade, Preços */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium">Unidade de Compra *</Label>
-                        <Select 
-                          value={formData.unit} 
-                          onValueChange={(value) => setFormData(prev => ({...prev, unit: value}))}
+                {/* Fornecedor e Categoria */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {/* Fornecedor Principal - Combobox Inteligente */}
+                  <div>
+                    <Label className="text-xs font-medium">Fornecedor Principal</Label>
+                    <Popover open={openSupplierCombobox} onOpenChange={setOpenSupplierCombobox}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openSupplierCombobox}
+                          className="w-full justify-between mt-1 h-8 text-sm"
                         >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="kg">Quilograma (kg)</SelectItem>
-                            <SelectItem value="g">Grama (g)</SelectItem>
-                            <SelectItem value="l">Litro (l)</SelectItem>
-                            <SelectItem value="ml">Mililitro (ml)</SelectItem>
-                            <SelectItem value="unidade">Unidade</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="current_price" className="text-sm font-medium">Preço Atual (R$)</Label>
+                          <span className="truncate">
+                            {formData.main_supplier || "Selecione um fornecedor"}
+                          </span>
+                          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
+                          <CommandEmpty>
+                            <div className="py-2 text-center text-xs text-muted-foreground">
+                              Nenhum fornecedor encontrado.
+                            </div>
+                          </CommandEmpty>
+                          <CommandGroup className="max-h-[200px] overflow-auto">
+                            {supplierOptions.map((supplier) => (
+                              <CommandItem
+                                key={supplier.value}
+                                value={supplier.value}
+                                onSelect={handleSupplierSelect}
+                                className="cursor-pointer text-xs"
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-3 w-3",
+                                    formData.main_supplier === supplier.value ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                <span className="truncate">{supplier.label}</span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Categoria - Combobox Inteligente (ReadOnly se TACO) */}
+                  <div>
+                    <Label className="text-xs font-medium flex items-center gap-2">
+                      Categoria
+                      {isCategoryReadOnly && <Badge variant="secondary" className="text-[10px] px-1 h-4">Auto (TACO)</Badge>}
+                    </Label>
+                    {isCategoryReadOnly ? (
+                      <div className="mt-1">
                         <Input
-                          id="current_price"
-                          name="current_price"
-                          type="number" 
-                          step="0.01" 
-                          min="0"
-                          value={formData.current_price}
-                          onChange={handleInputChange}
-                          placeholder="0.00"
-                          className="mt-1"
+                          value={formData.category}
+                          readOnly
+                          className="bg-gray-100 h-8 text-sm"
+                          placeholder="Categoria será preenchida..."
                         />
-                      </div>
-                      <div>
-                        <Label htmlFor="base_price" className="text-sm font-medium">Preço Base (R$)</Label>
-                        <Input
-                          id="base_price"
-                          name="base_price"
-                          type="number" 
-                          step="0.01" 
-                          min="0"
-                          value={formData.base_price}
-                          onChange={handleInputChange}
-                          placeholder="0.00"
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Marca, Código Fornecedor, Data */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Marca - Combobox Inteligente */}
-                      <div>
-                        <Label className="text-sm font-medium">Marca</Label>
-                        <Popover open={openBrandCombobox} onOpenChange={setOpenBrandCombobox}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={openBrandCombobox}
-                              className="w-full justify-between mt-1 h-10"
-                            >
-                              <span className="truncate">
-                                {formData.brand || "Selecione uma marca"}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Command>
-                              <CommandInput placeholder="Buscar ou criar marca..." className="h-9" />
-                              <CommandEmpty>
-                                <div className="py-6 text-center text-sm">
-                                  <p>Nenhuma marca encontrada.</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    Digite para criar uma nova marca
-                                  </p>
-                                </div>
-                              </CommandEmpty>
-                              <CommandGroup className="max-h-[200px] overflow-auto">
-                                {brandOptions.map((brand) => (
-                                  <CommandItem
-                                    key={brand.value}
-                                    value={brand.value}
-                                    onSelect={handleBrandSelect}
-                                    className="cursor-pointer"
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        formData.brand === brand.value ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {brand.label}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {/* Código do Fornecedor - Auto-gerado */}
-                      <div>
-                        <Label htmlFor="supplier_code" className="text-sm font-medium">Código do Fornecedor</Label>
-                        <Input
-                          id="supplier_code"
-                          name="supplier_code"
-                          value={formData.supplier_code}
-                          onChange={handleInputChange}
-                          placeholder="Gerado automaticamente"
-                          className="bg-gray-50 mt-1"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Gerado automaticamente ao selecionar fornecedor
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="last_update" className="text-sm font-medium">Última Atualização</Label>
-                        <Input
-                          id="last_update"
-                          name="last_update"
-                          type="date"
-                          value={formData.last_update}
-                          onChange={handleInputChange}
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Observações */}
-                    <div>
-                      <Label htmlFor="notes" className="text-sm font-medium">Observações</Label>
-                      <Textarea
-                        id="notes"
-                        name="notes"
-                        value={formData.notes}
-                        onChange={handleInputChange}
-                        placeholder="Observações sobre o ingrediente"
-                        rows={3}
-                        className="mt-1 resize-none"
-                      />
-                    </div>
-
-                    {/* Switch Ativo */}
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="active"
-                        checked={formData.active}
-                        onCheckedChange={(checked) => setFormData(prev => ({...prev, active: checked}))}
-                      />
-                      <Label htmlFor="active" className="text-sm font-medium">Ingrediente ativo</Label>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="taco" className="space-y-6 mt-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Vincular Alimentos TACO</CardTitle>
-                    <p className="text-sm text-gray-600">
-                      Vincule alimentos da tabela TACO para cálculo nutricional automático.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* ✅ Loading state para TACO */}
-                    {loadingTaco ? (
-                      <div className="flex items-center justify-center py-12">
-                        <div className="text-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto mb-3"></div>
-                          <p className="text-sm text-gray-600">Carregando alimentos TACO...</p>
-                        </div>
                       </div>
                     ) : (
-                      <>
-                        {/* Busca de alimentos TACO */}
-                        <div className="relative">
-                          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            placeholder="Buscar alimentos TACO..."
-                            value={tacoSearchTerm}
-                            onChange={(e) => setTacoSearchTerm(e.target.value)}
-                            className="pl-10"
-                          />
-                        </div>
-                      </>
+                      <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openCategoryCombobox}
+                            className="w-full justify-between mt-1 h-8 text-sm"
+                          >
+                            <span className="truncate">
+                              {formData.category || "Selecione uma categoria"}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
+                            <CommandEmpty>
+                              <div className="py-2 text-center text-xs text-muted-foreground">
+                                Nenhuma categoria encontrada.
+                              </div>
+                            </CommandEmpty>
+                            <CommandGroup className="max-h-[200px] overflow-auto">
+                              {categoryOptions.map((category) => (
+                                <CommandItem
+                                  key={category.value}
+                                  value={category.value}
+                                  onSelect={handleCategorySelect}
+                                  className="cursor-pointer text-xs"
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-3 w-3",
+                                      formData.category === category.value ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {category.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     )}
+                  </div>
+                </div>
 
-                    {/* Lista de alimentos TACO para adicionar */}
-                    {!loadingTaco && tacoSearchTerm && (
-                      <div className="max-h-40 overflow-y-auto border rounded-lg">
-                        {filteredTacoFoods.slice(0, 5).map(food => (
-                          <div key={food.id} className="p-3 border-b hover:bg-gray-50 cursor-pointer"
-                            onClick={() => addTacoVariation(food)}>
-                            <div className="font-medium">{food.name}</div>
-                            <div className="text-sm text-gray-500">{food.description}</div>
-                            <Badge variant="outline" className="mt-1">{food.category_name}</Badge>
+                {/* Unidade, Preços */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium">Unidade de Compra *</Label>
+                    <Select
+                      value={formData.unit}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, unit: value }))}
+                    >
+                      <SelectTrigger className="mt-1 h-8 text-sm">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="kg">Quilograma (kg)</SelectItem>
+                        <SelectItem value="g">Grama (g)</SelectItem>
+                        <SelectItem value="l">Litro (l)</SelectItem>
+                        <SelectItem value="ml">Mililitro (ml)</SelectItem>
+                        <SelectItem value="unidade">Unidade</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="current_price" className="text-xs font-medium">Preço Atual (R$)</Label>
+                    <Input
+                      id="current_price"
+                      name="current_price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.current_price}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Marca, Código Fornecedor, Data */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Marca - Combobox Inteligente */}
+                  <div>
+                    <Label className="text-xs font-medium">Marca</Label>
+                    <Popover open={openBrandCombobox} onOpenChange={setOpenBrandCombobox}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openBrandCombobox}
+                          className="w-full justify-between mt-1 h-8 text-sm"
+                        >
+                          <span className="truncate">
+                            {formData.brand || "Selecione uma marca"}
+                          </span>
+                          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
+                          <CommandEmpty>
+                            <div className="py-2 text-center text-xs text-muted-foreground">
+                              Nenhuma marca encontrada.
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Digite para criar uma nova marca
+                              </p>
+                            </div>
+                          </CommandEmpty>
+                          <CommandGroup className="max-h-[200px] overflow-auto">
+                            {brandOptions.map((brand) => (
+                              <CommandItem
+                                key={brand.value}
+                                value={brand.value}
+                                onSelect={handleBrandSelect}
+                                className="cursor-pointer"
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    formData.brand === brand.value ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {brand.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Código do Fornecedor - Somente Leitura (vem do cadastro) */}
+                  <div>
+                    <Label htmlFor="supplier_code" className="text-xs font-medium">Código do Fornecedor</Label>
+                    <Input
+                      id="supplier_code"
+                      name="supplier_code"
+                      value={formData.supplier_code}
+                      readOnly
+                      placeholder="Definido no cadastro do fornecedor"
+                      className="bg-gray-100 mt-1 h-8 text-sm cursor-not-allowed"
+                    />
+                    <p className="text-[10px] text-gray-500 mt-1">
+                      Este código vem do cadastro em "Fornecedores e Serviços"
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="last_update" className="text-xs font-medium">Última Atualização</Label>
+                    <Input
+                      id="last_update"
+                      name="last_update"
+                      type="date"
+                      value={formData.last_update}
+                      onChange={handleInputChange}
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Observações */}
+                <div>
+                  <Label htmlFor="notes" className="text-xs font-medium">Observações</Label>
+                  <Textarea
+                    id="notes"
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInputChange}
+                    placeholder="Observações sobre o ingrediente"
+                    rows={2}
+                    className="mt-1 resize-none text-xs"
+                  />
+                </div>
+
+                {/* Switch Ativo */}
+                <div className="flex items-center space-x-3 p-3 rounded-lg border bg-gradient-to-r from-slate-50 to-white">
+                  <Switch
+                    id="active"
+                    checked={formData.active}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
+                    className={`scale-90 ${formData.active ? 'data-[state=checked]:bg-emerald-500' : 'data-[state=unchecked]:bg-gray-300'}`}
+                  />
+                  <div className="flex flex-col">
+                    <Label htmlFor="active" className="text-xs font-medium cursor-pointer">
+                      Ingrediente ativo
+                    </Label>
+                    <span className={`text-[10px] font-medium ${formData.active ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      {formData.active ? '✓ Visível no sistema' : '✗ Oculto do sistema'}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="taco" className="space-y-4 mt-0">
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-base">Vincular Alimentos TACO</CardTitle>
+                <p className="text-xs text-gray-600">
+                  Vincule alimentos da tabela TACO para cálculo nutricional automático.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 pb-4">
+                {/* ✅ Loading state para TACO */}
+                {loadingTaco ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto mb-3"></div>
+                      <p className="text-sm text-gray-600">Carregando alimentos TACO...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Busca de alimentos TACO */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Buscar alimentos TACO..."
+                        value={tacoSearchTerm}
+                        onChange={(e) => setTacoSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Lista de alimentos TACO para adicionar */}
+                {!loadingTaco && tacoSearchTerm && (
+                  <div className="max-h-40 overflow-y-auto border rounded-lg">
+                    {filteredTacoFoods.slice(0, 5).map(food => (
+                      <div key={food.id} className="p-3 border-b hover:bg-gray-50 cursor-pointer"
+                        onClick={() => addTacoVariation(food)}>
+                        <div className="font-medium">{food.name}</div>
+                        <div className="text-sm text-gray-500">{food.description}</div>
+                        <Badge variant="outline" className="mt-1">{food.category_name}</Badge>
+                      </div>
+                    ))}
+                    {filteredTacoFoods.length === 0 && (
+                      <div className="p-3 text-sm text-gray-500 text-center">Nenhum alimento TACO encontrado.</div>
+                    )}
+                  </div>
+                )}
+
+                {/* Variações TACO vinculadas */}
+                {!loadingTaco && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Variações Vinculadas</Label>
+                    {formData.taco_variations.length === 0 ? (
+                      <p className="text-sm text-gray-500">Nenhuma variação TACO vinculada ainda.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {formData.taco_variations.map((variation, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <div className="font-medium">{variation.taco_name}</div>
+                              <div className="text-sm text-gray-500">
+                                Variação: {variation.variation_name} | Perda: {variation.loss_percentage}%
+                              </div>
+                              {variation.is_base && <Badge variant="outline" className="mt-1 text-gray-700">Base</Badge>}
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeTacoVariation(index)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         ))}
-                        {filteredTacoFoods.length === 0 && (
-                          <div className="p-3 text-sm text-gray-500 text-center">Nenhum alimento TACO encontrado.</div>
-                        )}
                       </div>
                     )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                    {/* Variações TACO vinculadas */}
-                    {!loadingTaco && (
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Variações Vinculadas</Label>
-                        {formData.taco_variations.length === 0 ? (
-                          <p className="text-sm text-gray-500">Nenhuma variação TACO vinculada ainda.</p>
-                        ) : (
-                          <div className="space-y-2">
-                            {formData.taco_variations.map((variation, index) => (
-                              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                                <div>
-                                  <div className="font-medium">{variation.taco_name}</div>
-                                  <div className="text-sm text-gray-500">
-                                    Variação: {variation.variation_name} | Perda: {variation.loss_percentage}%
-                                  </div>
-                                  {variation.is_base && <Badge variant="outline" className="mt-1 text-gray-700">Base</Badge>}
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeTacoVariation(index)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="preview" className="space-y-6 mt-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Preview do Ingrediente</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Nome</Label>
-                        <p className="font-medium">{formData.name || "Não informado"}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Categoria</Label>
-                        <p className="font-medium">{formData.category || "Não informado"}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Fornecedor</Label>
-                        <p className="font-medium truncate">{formData.main_supplier || "Não informado"}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Preço Atual</Label>
-                        <p className="font-medium">R$ {formData.current_price || "0,00"}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Variações TACO</Label>
-                        <p className="font-medium">{formData.taco_variations.length} vinculada(s)</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+          <TabsContent value="preview" className="space-y-4 mt-0">
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-base">Preview do Ingrediente</CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-500">Nome</Label>
+                    <p className="font-medium">{formData.name || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-500">Categoria</Label>
+                    <p className="font-medium">{formData.category || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-500">Fornecedor</Label>
+                    <p className="font-medium truncate">{formData.main_supplier || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-500">Preço Atual</Label>
+                    <p className="font-medium">R$ {formData.current_price || "0,00"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-500">Variações TACO</Label>
+                    <p className="font-medium">{formData.taco_variations.length} vinculada(s)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Botões de ação */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t mt-6">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t mt-4">
           <Button
             type="button"
             variant="outline"
             onClick={() => router.push('/ingredientes')}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto h-8 text-xs border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
             disabled={saving}
           >
             Cancelar
@@ -1009,12 +1055,12 @@ export default function IngredientEditor() {
           <Button
             type="submit"
             disabled={saving || loading}
-            className="bg-gray-800 hover:bg-gray-900 w-full sm:w-auto"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 w-full sm:w-auto h-8 text-xs shadow-md hover:shadow-lg transition-all"
           >
             {saving ? "Salvando..." : (isEditing ? "Atualizar Ingrediente" : "Criar Ingrediente")}
           </Button>
         </div>
-      </form>
-    </div>
+      </form >
+    </div >
   );
 }

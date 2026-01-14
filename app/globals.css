@@ -43,7 +43,9 @@
 }
 
 @layer base {
-  html, body {
+
+  html,
+  body {
     height: 100%;
     margin: 0;
     padding: 0;
@@ -60,7 +62,10 @@
 
   html {
     background-color: white;
+    font-size: 13px;
+    /* Escala global: 13px base faz 1rem = 13px */
   }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -96,6 +101,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -136,12 +142,14 @@
   * {
     border-color: hsl(var(--border));
   }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-size: 14px; /* Reduz o tamanho base da fonte */
+    font-size: 13px;
+    /* Reduz o tamanho base da fonte para 13px */
   }
-  
+
   /* Ajuste global de escala para uma aparência mais compacta */
   .main-app-container {
     /* TEMPORARIAMENTE DESABILITADO - estava causando scroll extra
@@ -151,44 +159,54 @@
     height: 111.11%;
     */
   }
-  
+
   /* Reduz espaçamentos em componentes para interface mais compacta */
   .compact-ui button {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    /* 12px */
+    height: 2rem;
+    /* 32px */
   }
-  
-  .compact-ui input, 
-  .compact-ui select, 
+
+  .compact-ui input,
+  .compact-ui select,
   .compact-ui textarea {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+    /* 13px */
+    height: 2rem;
+    /* 32px standard height for compact inputs */
   }
-  
+
   .compact-ui .card {
-    padding: 1rem;
+    padding: 0.75rem;
   }
-  
+
   .compact-ui h1 {
-    font-size: 1.5rem;
-  }
-  
-  .compact-ui h2 {
     font-size: 1.25rem;
+    /* 20px */
   }
-  
-  .compact-ui h3 {
+
+  .compact-ui h2 {
     font-size: 1.125rem;
+    /* 18px */
+  }
+
+  .compact-ui h3 {
+    font-size: 1rem;
+    /* 16px */
   }
 }
 
 /* Fix for dropdown and overlay z-index issues */
 @layer components {
+
   /* Ensure all Radix overlays have proper z-index and backgrounds */
   [data-radix-popper-content-wrapper] {
     z-index: 9999 !important;
   }
-  
+
   [data-radix-dropdown-menu-content] {
     z-index: 9999 !important;
     background-color: white !important;
@@ -196,7 +214,7 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
     backdrop-filter: blur(8px) !important;
   }
-  
+
   [data-radix-select-content] {
     z-index: 9999 !important;
     background-color: white !important;
@@ -204,7 +222,7 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
     backdrop-filter: blur(8px) !important;
   }
-  
+
   [data-radix-popover-content] {
     z-index: 9999 !important;
     background-color: white !important;
@@ -212,59 +230,140 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
     backdrop-filter: blur(8px) !important;
   }
-  
+
   [data-radix-dialog-overlay] {
     z-index: 9998 !important;
     background-color: rgba(0, 0, 0, 0.8) !important;
   }
-  
+
   [data-radix-dialog-content] {
     z-index: 9999 !important;
     background-color: white !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
   }
-  
+
   /* Fix for any other overlay components */
   .z-50 {
     z-index: 9999 !important;
   }
-  
+
   /* Ensure dropdown items are properly styled */
   [data-radix-dropdown-menu-item] {
     color: #1f2937 !important;
   }
-  
+
   [data-radix-dropdown-menu-item]:hover {
     background-color: #f3f4f6 !important;
     color: #1f2937 !important;
   }
-  
+
   [data-radix-select-item] {
     color: #1f2937 !important;
   }
-  
+
   [data-radix-select-item]:hover {
     background-color: #f3f4f6 !important;
     color: #1f2937 !important;
   }
-  
+
   /* Força a visualização dos checkboxes */
   button[role="checkbox"][data-state="checked"] {
     background-color: #3b82f6 !important;
     border-color: #3b82f6 !important;
   }
-  
+
   button[role="checkbox"][data-state="checked"] svg {
     color: white !important;
     opacity: 1 !important;
   }
-  
+
   button[role="checkbox"][data-state="unchecked"] {
     background-color: white !important;
     border-color: #d1d5db !important;
   }
-  
+
   button[role="checkbox"] {
     transition: all 0.2s ease !important;
+  }
+}
+
+/* Print Styles for PDF Export */
+@media print {
+  @page {
+    margin: 1cm;
+    size: landscape;
+  }
+
+  /* Hide navigation, sidebar, header */
+  aside,
+  header,
+  nav,
+  .sidebar,
+  [role="tablist"],
+  /* Hide typical UI elements */
+  button,
+  .no-print,
+  /* Hide search and filters container by common classes found in analysis */
+  input[placeholder*="Buscar"],
+  button[role="combobox"],
+  /* Hide action column in tables */
+  th:last-child,
+  td:last-child,
+  /* Hide specific wrapper elements if needed */
+  .fixed.top-0,
+  .sticky {
+    display: none !important;
+  }
+
+  /* Reset Main Container Layout */
+  body,
+  html,
+  main,
+  #root,
+  .main-app-container {
+    background-color: white !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    display: block !important;
+  }
+
+  /* Force background colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Typographic adjustments for print */
+  body {
+    font-size: 10pt !important;
+    color: black !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Ensure tables and charts are fully visible */
+  table,
+  .recharts-wrapper {
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Hide scrollbars */
+  ::-webkit-scrollbar {
+    display: none;
   }
 }

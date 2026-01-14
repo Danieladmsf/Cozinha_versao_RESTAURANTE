@@ -8,12 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  DollarSign, 
-  AlertTriangle, 
-  Save, 
-  X, 
-  TrendingUp, 
+import {
+  DollarSign,
+  AlertTriangle,
+  Save,
+  X,
+  TrendingUp,
   TrendingDown,
   Package,
   Store,
@@ -25,11 +25,11 @@ import { toast } from "@/components/ui/use-toast";
 import { formatCurrency } from "@/lib/formatUtils";
 import { Ingredient, PriceHistory, Supplier, Brand } from "@/app/api/entities";
 
-export default function PriceUpdateModal({ 
-  ingredient, 
-  isOpen, 
-  onClose, 
-  onUpdate 
+export default function PriceUpdateModal({
+  ingredient,
+  isOpen,
+  onClose,
+  onUpdate
 }) {
   // Função para forçar fechamento do modal
   const forceClose = () => {
@@ -95,7 +95,7 @@ export default function PriceUpdateModal({
         Supplier.list().catch(() => []),
         Brand.list().catch(() => [])
       ]);
-      
+
       setSuppliers(Array.isArray(suppliersData) ? suppliersData.filter(s => s.active) : []);
       setBrands(Array.isArray(brandsData) ? brandsData.filter(b => b.active) : []);
     } catch (err) {
@@ -129,7 +129,7 @@ export default function PriceUpdateModal({
 
   const validateForm = () => {
     const errors = [];
-    
+
     // Validar preço
     const price = parseFloat(formData.new_price);
     if (!formData.new_price || isNaN(price)) {
@@ -145,10 +145,7 @@ export default function PriceUpdateModal({
       errors.push("Fornecedor é obrigatório");
     }
 
-    // Validar categoria
-    if (!formData.category.trim()) {
-      errors.push("Categoria é obrigatória");
-    }
+
 
     // Validar data
     if (!formData.update_date) {
@@ -163,7 +160,7 @@ export default function PriceUpdateModal({
     const newPrice = parseFloat(formData.new_price) || 0;
     const change = newPrice - oldPrice;
     const percentChange = oldPrice > 0 ? (change / oldPrice) * 100 : 0;
-    
+
     return {
       oldPrice,
       newPrice,
@@ -175,7 +172,7 @@ export default function PriceUpdateModal({
 
   const handleSave = async () => {
     setError(null);
-    
+
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       setError(validationErrors.join(", "));
@@ -190,16 +187,16 @@ export default function PriceUpdateModal({
 
     try {
       setSaving(true);
-      
+
       const currentTimestamp = new Date().toISOString();
-      
+
       // Criar histórico PRIMEIRO
       const historyPayload = {
         ingredient_id: ingredient.id,
         old_price: priceCalc.oldPrice,
         new_price: priceCalc.newPrice,
         date: formData.update_date,
-        
+
         // Dados atualizados
         supplier: formData.supplier,
         supplier_id: formData.supplier_id || null,
@@ -208,7 +205,7 @@ export default function PriceUpdateModal({
         category: formData.category,
         unit: ingredient.unit || 'kg',
         ingredient_name: ingredient.name,
-        
+
         // Metadados
         change_type: 'manual_price_update',
         change_source: 'price_update_modal',
@@ -218,7 +215,7 @@ export default function PriceUpdateModal({
       };
 
       const historyRecord = await PriceHistory.create(historyPayload);
-      
+
       // Atualizar ingrediente
       await Ingredient.update(ingredient.id, {
         current_price: priceCalc.newPrice,
@@ -253,7 +250,7 @@ export default function PriceUpdateModal({
       });
 
       // Garantir que o modal feche após salvar com sucesso
-      
+
       // Aguardar um pequeno delay para o toast aparecer, depois fechar
       setTimeout(() => {
         forceClose();
@@ -316,7 +313,7 @@ export default function PriceUpdateModal({
                   </div>
                 </div>
               </div>
-              
+
               {priceCalc.hasChange && (
                 <div className="flex items-center justify-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200">
                   {priceCalc.change > 0 ? (
@@ -325,7 +322,7 @@ export default function PriceUpdateModal({
                     <TrendingDown className="w-5 h-5 text-green-600" />
                   )}
                   <div className={`text-lg font-bold ${priceCalc.change > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    {priceCalc.change > 0 ? '+' : ''}R$ {priceCalc.change.toFixed(2)} 
+                    {priceCalc.change > 0 ? '+' : ''}R$ {priceCalc.change.toFixed(2)}
                     ({priceCalc.percentChange > 0 ? '+' : ''}{priceCalc.percentChange.toFixed(1)}%)
                   </div>
                 </div>
@@ -356,8 +353,8 @@ export default function PriceUpdateModal({
             {/* Fornecedor */}
             <div>
               <Label className="text-sm font-medium">Fornecedor *</Label>
-              <Select 
-                value={formData.supplier_id} 
+              <Select
+                value={formData.supplier_id}
                 onValueChange={handleSupplierSelect}
                 disabled={loading}
               >
@@ -383,8 +380,8 @@ export default function PriceUpdateModal({
             {/* Marca */}
             <div>
               <Label className="text-sm font-medium">Marca</Label>
-              <Select 
-                value={formData.brand_id} 
+              <Select
+                value={formData.brand_id}
                 onValueChange={handleBrandSelect}
                 disabled={loading}
               >
@@ -401,20 +398,7 @@ export default function PriceUpdateModal({
               </Select>
             </div>
 
-            {/* Categoria */}
-            <div>
-              <Label htmlFor="category" className="text-sm font-medium">
-                Categoria *
-              </Label>
-              <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                className="mt-1"
-                placeholder="Ex: Laticínios, Carnes, etc."
-                required
-              />
-            </div>
+
 
             {/* Data */}
             <div>

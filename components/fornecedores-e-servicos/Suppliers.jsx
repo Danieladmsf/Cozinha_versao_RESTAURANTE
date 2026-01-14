@@ -27,9 +27,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Plus, 
-  Search, 
+import {
+  Plus,
+  Search,
   Building2,
   User,
   Phone,
@@ -56,7 +56,7 @@ export default function Suppliers() {
   const [currentSupplier, setCurrentSupplier] = useState(null);
   const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
   const [cnpj, setCnpj] = useState("");
-  
+
   // Estados para as categorias
   const [categoryTypes, setCategoryTypes] = useState([]);
   const [selectedCategoryType, setSelectedCategoryType] = useState("");
@@ -83,7 +83,7 @@ export default function Suppliers() {
   // Filtrar subcategorias quando a categoria muda
   useEffect(() => {
     if (selectedCategory) {
-      const subs = allCategories.filter(cat => 
+      const subs = allCategories.filter(cat =>
         cat.parent_id === selectedCategory && cat.level === 2
       );
       setFilteredSubcategories(subs);
@@ -96,6 +96,9 @@ export default function Suppliers() {
     try {
       const data = await Supplier.list();
       setSuppliers(data);
+
+      // Migração: gerar códigos para fornecedores sem código
+      await migrateSupplierCodes(data);
     } catch (error) {
     }
   };
@@ -105,7 +108,7 @@ export default function Suppliers() {
       const types = await CategoryType.list();
       types.sort((a, b) => (a.order || 99) - (b.order || 99));
       setCategoryTypes(types);
-      
+
       // Se tiver tipos, seleciona o primeiro por padrão
       if (types.length > 0) {
         setSelectedCategoryType(types[0].value);
@@ -118,10 +121,10 @@ export default function Suppliers() {
     try {
       const categoryData = await CategoryTree.list();
       setAllCategories(categoryData);
-      
+
       // Organizar categorias por tipo
       const categoriesByTypeObj = {};
-      
+
       // Agrupar todas as categorias de nível 1 por seu tipo
       categoryData
         .filter(cat => cat.level === 1)
@@ -131,25 +134,83 @@ export default function Suppliers() {
           }
           categoriesByTypeObj[cat.type].push(cat);
         });
-      
+
       setCategoriesByType(categoriesByTypeObj);
     } catch (error) {
+    }
+  };
+
+  // Função para gerar código único de fornecedor
+  const generateSupplierCode = (companyName, existingCodes = []) => {
+    if (!companyName) return '';
+
+    // Gerar prefixo com as 3 primeiras letras (ou menos se o nome for curto)
+    const prefix = companyName
+      .replace(/[^a-zA-Z0-9]/g, '') // Remove caracteres especiais
+      .toUpperCase()
+      .slice(0, 3);
+
+    // Encontrar o próximo número sequencial para este prefixo
+    let counter = 1;
+    let newCode = `${prefix}${String(counter).padStart(3, '0')}`;
+
+    while (existingCodes.includes(newCode)) {
+      counter++;
+      newCode = `${prefix}${String(counter).padStart(3, '0')}`;
+    }
+
+    return newCode;
+  };
+
+  // Migração: atribuir códigos a fornecedores existentes sem código
+  const migrateSupplierCodes = async (supplierList) => {
+    const suppliersWithoutCode = supplierList.filter(s => !s.supplier_code);
+
+    if (suppliersWithoutCode.length === 0) return;
+
+    const existingCodes = supplierList
+      .filter(s => s.supplier_code)
+      .map(s => s.supplier_code);
+
+    for (const supplier of suppliersWithoutCode) {
+      const newCode = generateSupplierCode(supplier.company_name, existingCodes);
+      existingCodes.push(newCode); // Adicionar ao array para evitar duplicatas
+
+      try {
+        await Supplier.update(supplier.id, {
+          ...supplier,
+          supplier_code: newCode
+        });
+      } catch (error) {
+        console.error(`Erro ao migrar código para ${supplier.company_name}:`, error);
+      }
+    }
+
+    // Recarregar lista após migração
+    if (suppliersWithoutCode.length > 0) {
+      const updatedData = await Supplier.list();
+      setSuppliers(updatedData);
+
+      toast({
+        title: "Códigos gerados",
+        description: `${suppliersWithoutCode.length} fornecedor(es) receberam códigos automaticamente.`,
+      });
     }
   };
 
   // Função para formatar CNPJ
   const formatCnpj = (value) => {
     if (!value) return "";
-    
+
     // Remove todos os caracteres não numéricos
     const cnpjDigits = value.replace(/\D/g, "");
-    
+
     // Limita a 14 dígitos
     const limitedCnpj = cnpjDigits.slice(0, 14);
-    
+
     // Aplica a formatação XX.XXX.XXX/XXXX-XX
     let formattedCnpj = limitedCnpj;
-    
+
     if (limitedCnpj.length > 2) {
       formattedCnpj = limitedCnpj.replace(/^(\d{2})/, "$1.");
     }
@@ -162,7 +223,7 @@ export default function Suppliers() {
     if (limitedCnpj.length > 12) {
       formattedCnpj = formattedCnpj.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})/, "$1.$2.$3/$4-");
     }
-    
+
     return formattedCnpj;
   };
 
@@ -195,9 +256,9 @@ export default function Suppliers() {
         ...supplier,
         active: !supplier.active
       });
-      
+
       await loadSuppliers();
-      
+
       toast({
         title: "Sucesso",
         description: `Fornecedor ${!supplier.active ? 'ativado' : 'inativado'} com sucesso.`,
@@ -219,13 +280,13 @@ export default function Suppliers() {
     try {
       await Supplier.delete(supplier.id);
       await loadSuppliers();
-      
+
       toast({
         title: "Sucesso",
         description: "Fornecedor excluído com sucesso.",
       });
     } catch (error) {
-      
+
       if (error.message?.includes("constraint") || error.status === 409) {
         toast({
           title: "Erro",
@@ -245,14 +306,14 @@ export default function Suppliers() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    
+
     // Obter valores dos campos
     const categoryId = formData.get("category");
     const subcategoryId = formData.get("subcategory");
-    
+
     // Determinar a categoria a ser usada: subcategoria se selecionada, ou categoria principal
     let selectedCategoryName = "";
-    
+
     if (subcategoryId) {
       const selectedSubcat = allCategories.find(sub => sub.id === subcategoryId);
       selectedCategoryName = selectedSubcat ? selectedSubcat.name : "";
@@ -260,10 +321,14 @@ export default function Suppliers() {
       const selectedCat = allCategories.find(cat => cat.id === categoryId);
       selectedCategoryName = selectedCat ? selectedCat.name : "";
     }
-    
+
     const data = {
       company_name: formData.get("company_name"),
       cnpj: cnpj, // Usar o estado formatado
+      supplier_code: formData.get("supplier_code") || generateSupplierCode(
+        formData.get("company_name"),
+        suppliers.map(s => s.supplier_code).filter(Boolean)
+      ),
       vendor_name: formData.get("vendor_name"),
       vendor_phone: formData.get("vendor_phone"),
       address: formData.get("address"),
@@ -301,10 +366,10 @@ export default function Suppliers() {
     setCurrentSupplier(supplier);
     setUploadedPhotoUrl(supplier.vendor_photo || "");
     setCnpj(supplier.cnpj || ""); // Definir CNPJ formatado
-    
+
     // Tenta encontrar a categoria ou subcategoria do fornecedor
     const matchingCategory = allCategories.find(cat => cat.name === supplier.category);
-    
+
     if (matchingCategory) {
       // Se for uma subcategoria (nível 2)
       if (matchingCategory.level === 2 && matchingCategory.parent_id) {
@@ -316,7 +381,7 @@ export default function Suppliers() {
           setSelectedCategory(parentCategory.id);
           // As subcategorias serão filtradas pelo useEffect
         }
-      } 
+      }
       // Se for uma categoria de nível 1
       else if (matchingCategory.level === 1) {
         setSelectedCategoryType(matchingCategory.type);
@@ -325,7 +390,7 @@ export default function Suppliers() {
     } else {
       resetCategorySelections();
     }
-    
+
     setIsDialogOpen(true);
   };
 
@@ -375,6 +440,7 @@ export default function Suppliers() {
             <TableRow>
               <TableHead>Foto</TableHead>
               <TableHead>Empresa</TableHead>
+              <TableHead>Código</TableHead>
               <TableHead>CNPJ</TableHead>
               <TableHead>Vendedor</TableHead>
               <TableHead>WhatsApp</TableHead>
@@ -396,6 +462,7 @@ export default function Suppliers() {
                   </Avatar>
                 </TableCell>
                 <TableCell className="font-medium font-mono">{formatCapitalize(supplier.company_name)}</TableCell>
+                <TableCell className="font-mono text-xs">{supplier.supplier_code || '-'}</TableCell>
                 <TableCell className="font-mono">{formatCapitalize(supplier.cnpj)}</TableCell>
                 <TableCell className="font-mono">{formatCapitalize(supplier.vendor_name)}</TableCell>
                 <TableCell className="font-mono">{formatCapitalize(supplier.vendor_phone)}</TableCell>
@@ -448,7 +515,7 @@ export default function Suppliers() {
             ))}
             {filteredSuppliers.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
                   Nenhum fornecedor encontrado
                 </TableCell>
               </TableRow>
@@ -484,9 +551,9 @@ export default function Suppliers() {
                 <div className="flex flex-col items-center gap-2">
                   <Avatar className="h-24 w-24"> {/* Reduzido de h-32 w-32 para h-24 w-24 */}
                     {(uploadedPhotoUrl || currentSupplier?.vendor_photo) ? (
-                      <AvatarImage 
-                        src={uploadedPhotoUrl || currentSupplier?.vendor_photo} 
-                        alt={currentSupplier?.vendor_name} 
+                      <AvatarImage
+                        src={uploadedPhotoUrl || currentSupplier?.vendor_photo}
+                        alt={currentSupplier?.vendor_name}
                       />
                     ) : (
                       <AvatarFallback>
@@ -521,6 +588,21 @@ export default function Suppliers() {
                     />
                   </div>
 
+                  <div className="space-y-1">
+                    <label htmlFor="supplier_code" className="text-sm font-medium flex items-center gap-1">
+                      <File className="w-3 h-3" />
+                      Código
+                    </label>
+                    <Input
+                      id="supplier_code"
+                      name="supplier_code"
+                      defaultValue={currentSupplier?.supplier_code}
+                      placeholder="Ex: 001, ABC123"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label htmlFor="cnpj" className="text-sm font-medium flex items-center gap-1">
                       <File className="w-3 h-3" />
@@ -581,9 +663,9 @@ export default function Suppliers() {
                     <label htmlFor="category_type" className="text-sm font-medium">
                       Tipo de Categoria
                     </label>
-                    <Select 
+                    <Select
                       id="category_type"
-                      name="category_type" 
+                      name="category_type"
                       value={selectedCategoryType}
                       onValueChange={setSelectedCategoryType}>
                       <SelectTrigger>
@@ -603,7 +685,7 @@ export default function Suppliers() {
                     </Select>
                   </div>
                 </div>
-                
+
                 {/* Categorias de acordo com o tipo selecionado */}
                 {selectedCategoryType && categoriesByType[selectedCategoryType] && (
                   <div className="grid grid-cols-2 gap-3">
@@ -612,9 +694,9 @@ export default function Suppliers() {
                       <label htmlFor="category" className="text-sm font-medium">
                         Categoria
                       </label>
-                      <Select 
+                      <Select
                         id="category"
-                        name="category" 
+                        name="category"
                         value={selectedCategory}
                         onValueChange={setSelectedCategory}>
                         <SelectTrigger>
@@ -629,7 +711,7 @@ export default function Suppliers() {
                         </SelectContent>
                       </Select>
                     </div>
-                  
+
                     {/* Dropdown 3: Subcategorias da categoria selecionada */}
                     {selectedCategory && filteredSubcategories.length > 0 && (
                       <div className="space-y-1">

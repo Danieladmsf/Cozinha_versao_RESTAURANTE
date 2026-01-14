@@ -141,12 +141,12 @@ export default function Ingredients() {
   return (
     <div className="p-4 md:p-8 space-y-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
-        <div className="space-y-2">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
             Ingredientes
           </h1>
-          <p className="text-gray-600 text-base md:text-lg flex items-center gap-2">
+          <p className="text-gray-600 text-sm md:text-base flex items-center gap-2">
             <Package className="w-4 h-4 text-orange-500" />
             Gerencie seus ingredientes e preços
           </p>
@@ -212,75 +212,75 @@ export default function Ingredients() {
 
         <TabsContent value="ingredients" className="space-y-6 pt-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <Card className="border-l-4 border-l-orange-500 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-orange-50/30">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total</CardTitle>
-                <div className="p-3 rounded-xl bg-orange-100">
-                  <Package className="h-5 w-5 text-orange-600" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="border-l-4 border-l-orange-500 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-orange-50/30">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
+                <CardTitle className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Total</CardTitle>
+                <div className="p-2 rounded-lg bg-orange-100">
+                  <Package className="h-4 w-4 text-orange-600" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{stats.total}</div>
-                <p className="text-xs text-gray-500 mt-1">Ingredientes cadastrados</p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+                <p className="text-[10px] text-gray-500 mt-1">Ingredientes cadastrados</p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-green-500 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-green-50/30">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Ativos</CardTitle>
-                <div className="p-3 rounded-xl bg-green-100">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
+            <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-green-50/30">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
+                <CardTitle className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Ativos</CardTitle>
+                <div className="p-2 rounded-lg bg-green-100">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{stats.active}</div>
-                <p className="text-xs text-gray-500 mt-1">Em uso nas receitas</p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold text-gray-900">{stats.active}</div>
+                <p className="text-[10px] text-gray-500 mt-1">Em uso nas receitas</p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-blue-50/30">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Para Receitas</CardTitle>
-                <div className="p-3 rounded-xl bg-blue-100">
-                  <Package className="h-5 w-5 text-blue-600" />
+            <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-blue-50/30">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
+                <CardTitle className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Para Receitas</CardTitle>
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <Package className="h-4 w-4 text-blue-600" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{stats.traditional}</div>
-                <p className="text-xs text-gray-500 mt-1">Ingredientes tradicionais</p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold text-gray-900">{stats.traditional}</div>
+                <p className="text-[10px] text-gray-500 mt-1">Ingredientes tradicionais</p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-purple-500 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-purple-50/30">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Comerciais</CardTitle>
-                <div className="p-3 rounded-xl bg-purple-100">
-                  <Store className="h-5 w-5 text-purple-600" />
+            <Card className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-purple-50/30">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
+                <CardTitle className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Comerciais</CardTitle>
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <Store className="h-4 w-4 text-purple-600" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{stats.commercial}</div>
-                <p className="text-xs text-gray-500 mt-1">Produtos prontos</p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold text-gray-900">{stats.commercial}</div>
+                <p className="text-[10px] text-gray-500 mt-1">Produtos prontos</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Busca e Filtros */}
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-5">
-            <div className="flex flex-col sm:flex-row gap-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-400" />
                 <Input
                   placeholder="Buscar ingredientes..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 border-gray-200 focus:border-orange-400 focus:ring-orange-400 rounded-lg text-base shadow-sm"
+                  className="pl-10 h-10 border-gray-200 focus:border-orange-400 focus:ring-orange-400 rounded-lg text-sm shadow-sm"
                 />
               </div>
 
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-full sm:w-56 h-12 border-gray-200 rounded-lg shadow-sm hover:border-orange-300 transition-colors">
+                <SelectTrigger className="w-full sm:w-48 h-10 border-gray-200 rounded-lg shadow-sm hover:border-orange-300 transition-colors text-sm">
                   <SelectValue placeholder="Todas categorias" />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
@@ -292,7 +292,7 @@ export default function Ingredients() {
               </Select>
 
               <Select value={supplierFilter} onValueChange={setSupplierFilter}>
-                <SelectTrigger className="w-full sm:w-56 h-12 border-gray-200 rounded-lg shadow-sm hover:border-orange-300 transition-colors">
+                <SelectTrigger className="w-full sm:w-48 h-10 border-gray-200 rounded-lg shadow-sm hover:border-orange-300 transition-colors text-sm">
                   <SelectValue placeholder="Todos fornecedores" />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">

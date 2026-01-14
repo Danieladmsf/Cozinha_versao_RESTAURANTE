@@ -56,7 +56,8 @@ export default function BrandsManager() {
       setLoading(true);
       const brandsData = await Brand.list();
       setBrands(brandsData || []);
-    } catch (error) {toast({
+    } catch (error) {
+      toast({
         title: "Erro",
         description: "Não foi possível carregar os dados",
         variant: "destructive"
@@ -68,7 +69,7 @@ export default function BrandsManager() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast({
         title: "Erro",
@@ -84,16 +85,17 @@ export default function BrandsManager() {
       } else {
         await Brand.create(formData);
       }
-      
+
       setIsDialogOpen(false);
       setCurrentBrand(null);
       await loadData();
-      
+
       toast({
         title: "Sucesso",
         description: currentBrand ? "Marca atualizada" : "Marca criada"
       });
-    } catch (error) {toast({
+    } catch (error) {
+      toast({
         title: "Erro",
         description: "Erro ao salvar marca",
         variant: "destructive"
@@ -109,12 +111,13 @@ export default function BrandsManager() {
     try {
       await Brand.delete(brand.id);
       await loadData();
-      
+
       toast({
         title: "Sucesso",
         description: "Marca excluída"
       });
-    } catch (error) {toast({
+    } catch (error) {
+      toast({
         title: "Erro",
         description: "Não foi possível excluir a marca",
         variant: "destructive"
@@ -153,7 +156,7 @@ export default function BrandsManager() {
     );
   }
 
-  const filteredBrands = brands.filter(brand => 
+  const filteredBrands = brands.filter(brand =>
     brand.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     brand.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -201,7 +204,6 @@ export default function BrandsManager() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Fabricante</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Preferida</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -211,7 +213,6 @@ export default function BrandsManager() {
                 {filteredBrands.map((brand) => (
                   <TableRow key={brand.id}>
                     <TableCell className="font-medium font-mono">{formatCapitalize(brand.name)}</TableCell>
-                    <TableCell className="font-mono">{formatCapitalize(brand.manufacturer || "-")}</TableCell>
                     <TableCell className="font-mono">
                       <span className={brand.active ? "text-green-700 font-semibold" : "text-gray-500 font-semibold"}>
                         {brand.active ? "Ativa" : "Inativa"}
@@ -247,7 +248,7 @@ export default function BrandsManager() {
                 ))}
               </TableBody>
             </Table>
-            
+
             {filteredBrands.length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 {searchTerm ? "Nenhuma marca encontrada para a busca" : "Nenhuma marca cadastrada"}
@@ -275,16 +276,6 @@ export default function BrandsManager() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Nome da marca"
                 required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="manufacturer">Fabricante</Label>
-              <Input
-                id="manufacturer"
-                value={formData.manufacturer}
-                onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
-                placeholder="Nome do fabricante"
               />
             </div>
 
