@@ -13,7 +13,7 @@ export const useMenuSettings = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [configId, setConfigId] = useState(null);
-  
+
   // Estados de configuração
   const [selectedMainCategories, setSelectedMainCategories] = useState([]);
   const [activeCategories, setActiveCategories] = useState({});
@@ -56,27 +56,27 @@ export const useMenuSettings = () => {
   const loadConfig = async (categoriesData, categoryTreeData) => {
     try {
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
-      
+
       const configs = await MenuConfigEntity.query([
         { field: 'user_id', operator: '==', value: mockUserId },
         { field: 'is_default', operator: '==', value: true }
       ]);
-      
+
       if (configs && configs.length > 0) {
         const config = configs[0];
         setConfigId(config.id);
         console.log('useMenuSettings: loadConfig - config loaded:', config);
-        
+
         setExpandedCategories(config.expanded_categories || []);
         setCategoryColors(config.category_colors || {});
         setFixedDropdowns(config.fixed_dropdowns || {});
         setAvailableDays(config.available_days || [1, 2, 3, 4, 5]);
         setSelectedMainCategories(config.selected_main_categories || []);
         setClientCategorySettings(config.client_category_settings || {});
-        
+
         const rootCategories = categoryTreeData.filter(cat => cat.level === 1);
         const categoriesToUse = rootCategories.length > 0 ? rootCategories : categoryTreeData;
-        
+
         let orderToSet;
         if (config.category_order && config.category_order.length > 0) {
           // Filter out any IDs from config.category_order that are no longer valid categories
@@ -87,10 +87,10 @@ export const useMenuSettings = () => {
         } else {
           orderToSet = categoriesToUse.map(cat => cat.id);
         }
-        
+
         setCategoryOrder(orderToSet);
         console.log('useMenuSettings: loadConfig - orderToSet:', orderToSet);
-        
+
         if (config.active_categories) {
           setActiveCategories(config.active_categories);
         } else {
@@ -113,7 +113,7 @@ export const useMenuSettings = () => {
   const createDefaultConfig = async (categoriesData) => {
     try {
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
-      
+
       const defaultConfig = {
         user_id: mockUserId,
         expanded_categories: [],
@@ -127,7 +127,7 @@ export const useMenuSettings = () => {
           return obj;
         }, {})
       };
-      
+
       const newConfig = await MenuConfigEntity.create(defaultConfig);
       setConfigId(newConfig.id);
       console.log('useMenuSettings: createDefaultConfig - new config created:', newConfig);
@@ -141,9 +141,9 @@ export const useMenuSettings = () => {
     try {
       setSaving(true);
       setError(null);
-      
+
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
-      
+
       const configData = {
         user_id: mockUserId,
         expanded_categories: expandedCategories || [],
@@ -157,14 +157,14 @@ export const useMenuSettings = () => {
         is_default: true
       };
       console.log('useMenuSettings: saveConfig - configData being saved:', configData);
-      
+
       if (configId) {
         await MenuConfigEntity.update(configId, configData);
       } else {
         const newConfig = await MenuConfigEntity.create(configData);
         setConfigId(newConfig.id);
       }
-      
+
       // Atualizar localStorage - usar mesmo formato do banco (snake_case)
       const menuConfigForCache = {
         expanded_categories: configData.expanded_categories,
@@ -176,7 +176,7 @@ export const useMenuSettings = () => {
         selected_main_categories: configData.selected_main_categories
       };
       localStorage.setItem('menuConfig', JSON.stringify(menuConfigForCache));
-      
+
       return true;
     } catch (error) {
       setError("Não foi possível salvar as configurações.");
@@ -189,20 +189,24 @@ export const useMenuSettings = () => {
   // Funções utilitárias
   const getFilteredCategories = () => {
     console.log('useMenuSettings: getFilteredCategories - selectedMainCategories:', selectedMainCategories);
+
+    // Filtrar primeiro por nível 1 (categorias raiz)
+    let result = categoryTree.filter(cat => cat.level === 1);
+
     if (selectedMainCategories.length === 0) {
-      console.log('useMenuSettings: getFilteredCategories - returning all categoryTree (no filter):', categoryTree);
-      return categoryTree;
+      console.log('useMenuSettings: getFilteredCategories - returning all level 1 categories:', result);
+      return result;
     }
-    
-    const filteredCategories = categoryTree.filter(subCategory => {
-      const mainCategory = categories.find(cat => 
+
+    const filteredCategories = result.filter(subCategory => {
+      const mainCategory = categories.find(cat =>
         cat.value === subCategory.type
       );
-      
+
       if (mainCategory) {
         return selectedMainCategories.includes(mainCategory.value);
       }
-      
+
       return false;
     });
     console.log('useMenuSettings: getFilteredCategories - returning filtered categories:', filteredCategories);
@@ -217,7 +221,7 @@ export const useMenuSettings = () => {
   };
 
   const toggleExpandedCategory = (categoryId) => {
-    setExpandedCategories(prev => 
+    setExpandedCategories(prev =>
       prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
@@ -272,7 +276,7 @@ export const useMenuSettings = () => {
     availableDays,
     categoryOrder,
     clientCategorySettings,
-    
+
     // Setters
     setSelectedMainCategories,
     setActiveCategories,
@@ -282,7 +286,7 @@ export const useMenuSettings = () => {
     setAvailableDays,
     setCategoryOrder,
     setClientCategorySettings,
-    
+
     // Funções
     saveConfig,
     getFilteredCategories,

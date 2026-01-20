@@ -22,8 +22,7 @@ const OrdersTab = ({
   currentOrder,
   orderItems,
   orderTotals,
-  mealsExpected,
-  setMealsExpected,
+
   generalNotes,
   setGeneralNotes,
   updateOrderItem,
@@ -39,19 +38,19 @@ const OrdersTab = ({
   generateCategoryStyles
 }) => {
   const { registerInput, handleKeyDown } = useKeyboardNavigation();
-  
+
   // Função para formatar peso baseado na unidade
   const formatWeightByUnit = (item) => {
     const pesoFinal = item.total_weight || item.calculated_total_weight || (item.recipe_cuba_weight * (item.quantity || item.base_quantity || 0)) || 0;
     const unitType = (item.unit_type || '').toLowerCase();
-    
+
     if (unitType === 'unid' || unitType === 'unid.' || unitType === 'unidade') {
       return `${utilFormattedQuantity(item.quantity || item.base_quantity || 0)} Unid.`;
     }
-    
+
     return utilFormatWeight(pesoFinal);
   };
-  
+
 
   if (!currentOrder?.items || currentOrder.items.length === 0) {
     return (
@@ -106,7 +105,7 @@ const OrdersTab = ({
                   <p className="text-sm text-green-600">Este pedido já foi processado e enviado. Clique em "Editar" para fazer alterações.</p>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={enableEditMode}
                 variant="outline"
                 size="sm"
@@ -119,58 +118,25 @@ const OrdersTab = ({
         </Card>
       )}
 
-      {/* Campo Refeições Esperadas */}
-      <Card className="border-blue-200">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-blue-700 mb-2">
-                Refeições Esperadas <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                inputMode="decimal"
-                value={mealsExpected === 0 ? '' : mealsExpected || ''}
-                onChange={(e) => {
-                  if (isEditMode) {
-                    const rawValue = e.target.value;
-                    // Apenas permitir números e vírgula/ponto
-                    const sanitizedValue = rawValue.replace(/[^0-9,.]/g, '');
-                    const parsedValue = utilParseQuantity(sanitizedValue);
-                    setMealsExpected(parsedValue || 0);
-                  }
-                }}
-                onFocus={(e) => e.target.select()} // Adicionado para selecionar o texto ao focar
-                className={`border-blue-300 focus:border-blue-500 ${
-                  (!mealsExpected || mealsExpected <= 0) && isEditMode 
-                    ? 'border-red-300 bg-red-50' 
-                    : ''
-                }`}
-                placeholder="Número de refeições esperadas (obrigatório)"
-                disabled={!isEditMode}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Tabelas de Pedido por Categoria */}
       {orderedCategories.map(({ name: categoryName, data: categoryData }) => {
         const { headerStyle } = generateCategoryStyles(categoryData.categoryInfo.color);
-        
+
         // Obter configuração das colunas baseada na categoria
         const columnConfig = CategoryLogic.getCategoryColumnConfig(categoryName);
         const tableHeaders = CategoryLogic.getTableHeaders(columnConfig.isCarneCategory);
-        
+
         return (
           <div key={categoryName} className="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-md transition-all duration-300">
-            <div 
-              className="py-4 px-6 relative border-b border-gray-100/50" 
+            <div
+              className="py-4 px-6 relative border-b border-gray-100/50"
               style={headerStyle}
             >
               <div className="flex items-center">
-                <div 
-                  className="w-5 h-5 rounded-full mr-3 shadow-sm border-2 border-white/30 ring-2 ring-white/20" 
+                <div
+                  className="w-5 h-5 rounded-full mr-3 shadow-sm border-2 border-white/30 ring-2 ring-white/20"
                   style={{ backgroundColor: categoryData.categoryInfo.color }}
                 />
                 <h3 className="text-lg font-semibold text-gray-800">{categoryName}</h3>
@@ -194,7 +160,7 @@ const OrdersTab = ({
                       const baseInputId = `qty-${categoryIndex}-${index}`;
                       const percentInputId = `pct-${categoryIndex}-${index}`;
                       const notesInputId = `notes-${categoryIndex}-${index}`;
-                      
+
                       return (
                         <tr key={item.unique_id} className="border-b border-blue-50">
                           <td className="p-2">
@@ -204,7 +170,7 @@ const OrdersTab = ({
                                 {item.tech_sheet_units_quantity > 0 && item.tech_sheet_unit_weight > 0 && (() => {
                                   const isPorcao = item.unit_type && item.unit_type.toLowerCase() === 'porção';
                                   const unitText = isPorcao ? 'Unid.' : (item.unit_type && item.unit_type.toLowerCase() !== 'unid' && item.unit_type.toLowerCase() !== 'unidade' ? item.unit_type : (item.tech_sheet_units_quantity > 1 ? 'unidades' : 'unidade'));
-                                  
+
                                   let weightInfo = '';
                                   if (isPorcao) {
                                     weightInfo = ` | Peso: ${utilFormatWeight((item.tech_sheet_units_quantity || 0) * (item.tech_sheet_unit_weight || 0))}`;
@@ -259,7 +225,6 @@ const OrdersTab = ({
                               placeholder={item.unit_type && (item.unit_type.toLowerCase() === 'unid' || item.unit_type.toLowerCase() === 'unid.') ? 'Auto (Refeições)' : '0'}
                               onKeyDown={(e) => handleKeyDown(e, baseInputId)}
                               className="block mx-auto text-center text-xs h-8 max-w-[60px] border-blue-300 focus:border-blue-500"
-                              placeholder="0"
                               disabled={!isEditMode}
                             />
                           </td>
@@ -358,7 +323,7 @@ const OrdersTab = ({
                   <p className="text-xs font-medium text-amber-800 mb-1">Devoluções Registradas:</p>
                   {orderTotals.depreciation.returnedItems.map((item, index) => (
                     <div key={index} className="text-xs text-amber-700">
-                      • {item.recipe_name}: {utilFormattedQuantity(item.returned_quantity)} {item.unit_type} 
+                      • {item.recipe_name}: {utilFormattedQuantity(item.returned_quantity)} {item.unit_type}
                       <span className="text-red-600 ml-1">(-{utilFormatCurrency(item.depreciation_value)})</span>
                     </div>
                   ))}
@@ -373,20 +338,12 @@ const OrdersTab = ({
       <Card className="border-blue-200">
         <CardContent className="p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-blue-700">Refeições Esperadas</p>
-              <p className="text-2xl font-bold text-blue-900">{mealsExpected || 0}</p>
-            </div>
+
             <div className="text-center">
               <p className="text-sm font-medium text-blue-700">Total de Peso</p>
               <p className="text-2xl font-bold text-blue-900">{utilFormatWeight(orderTotals.totalWeight || 0)}</p>
             </div>
-            <div className="text-center">
-              <p className="text-sm font-medium text-blue-700">Valor por Refeição</p>
-              <p className="text-2xl font-bold text-blue-900">
-                {mealsExpected > 0 ? utilFormatCurrency(orderTotals.finalAmount / mealsExpected) : 'R$ 0,00'}
-              </p>
-            </div>
+
             <div className="text-center">
               <p className="text-sm font-medium text-blue-700">
                 {(orderTotals.depreciationAmount > 0 || orderTotals.nonReceivedDiscountAmount > 0) ? 'Valor Original' : 'Valor Total'}
@@ -405,8 +362,8 @@ const OrdersTab = ({
               )}
             </div>
           </div>
-          
-          
+
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-blue-700 mb-2">
               Observações Gerais

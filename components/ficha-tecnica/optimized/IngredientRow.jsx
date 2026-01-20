@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, StickyNote } from "lucide-react";
 import { formatCurrency } from '@/lib/formatUtils';
 import { formatCapitalize } from '@/lib/textUtils';
 
@@ -14,6 +14,7 @@ const IngredientRow = ({
   prep,
   onUpdateIngredient,
   onRemoveIngredient,
+  readOnly = false,
 }) => {
   const processes = prep.processes || [];
   const hasProcess = (processName) => processes.includes(processName);
@@ -71,7 +72,7 @@ const IngredientRow = ({
     };
 
     const defrostingLoss = calculateLoss(ingredient.weight_frozen, ingredient.weight_thawed);
-    
+
     let cleaningInitialWeight = 0;
     if (hasProcess('defrosting')) {
       cleaningInitialWeight = parseNumericValue(ingredient.weight_thawed);
@@ -87,7 +88,7 @@ const IngredientRow = ({
         parseNumericValue(ingredient.weight_raw);
     }
     const cookingLoss = calculateLoss(cookingInitialWeight, parseNumericValue(ingredient.weight_cooked));
-    
+
     const portioningLoss = calculateLoss(
       ingredient.weight_raw || ingredient.weight_cooked || ingredient.weight_clean,
       ingredient.weight_portioned
@@ -158,6 +159,19 @@ const IngredientRow = ({
     }, 0);
   };
 
+  if (ingredient.is_note_row) {
+    return (
+      <TableRow className="border-b border-gray-100 bg-yellow-50/50 hover:bg-yellow-50">
+        <TableCell colSpan={100} className="px-6 py-3 text-sm text-yellow-800 italic">
+          <div className="flex items-start gap-2">
+            <StickyNote className="h-4 w-4 mt-0.5 opacity-60 flex-shrink-0" />
+            <span className="whitespace-pre-wrap">{ingredient.name}</span>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
   return (
     <TableRow className="border-b border-gray-50 hover:bg-gray-50/50">
       <TableCell className="font-medium px-4 py-2 font-mono">
@@ -184,7 +198,8 @@ const IngredientRow = ({
               type="text"
               value={ingredient.weight_frozen || ''}
               onChange={(e) => updateIngredientField('weight_frozen', e.target.value)}
-              className="w-24 h-8 text-center text-xs"
+              disabled={readOnly || ingredient.locked}
+              className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="0,000"
             />
           </TableCell>
@@ -193,7 +208,8 @@ const IngredientRow = ({
               type="text"
               value={ingredient.weight_thawed || ''}
               onChange={(e) => updateIngredientField('weight_thawed', e.target.value)}
-              className="w-24 h-8 text-center text-xs"
+              disabled={readOnly || ingredient.locked}
+              className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="0,000"
             />
           </TableCell>
@@ -213,7 +229,8 @@ const IngredientRow = ({
                 type="text"
                 value={ingredient.weight_raw || ''}
                 onChange={(e) => updateIngredientField('weight_raw', e.target.value)}
-                className="w-24 h-8 text-center text-xs"
+                disabled={readOnly || ingredient.locked}
+                className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 placeholder="0,000"
               />
             </TableCell>
@@ -235,7 +252,8 @@ const IngredientRow = ({
               type="text"
               value={ingredient.weight_clean || ''}
               onChange={(e) => updateIngredientField('weight_clean', e.target.value)}
-              className="w-24 h-8 text-center text-xs"
+              disabled={readOnly || ingredient.locked}
+              className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="0,000"
             />
           </TableCell>
@@ -254,7 +272,8 @@ const IngredientRow = ({
               type="text"
               value={ingredient.weight_pre_cooking || ''}
               onChange={(e) => updateIngredientField('weight_pre_cooking', e.target.value)}
-              className="w-24 h-8 text-center text-xs"
+              disabled={readOnly || ingredient.locked}
+              className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="0,000"
               title="Peso antes da cocção"
             />
@@ -264,7 +283,8 @@ const IngredientRow = ({
               type="text"
               value={ingredient.weight_cooked || ''}
               onChange={(e) => updateIngredientField('weight_cooked', e.target.value)}
-              className="w-24 h-8 text-center text-xs"
+              disabled={readOnly || ingredient.locked}
+              className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="0,000"
               title="Peso depois da cocção"
             />
@@ -285,7 +305,8 @@ const IngredientRow = ({
                 type="text"
                 value={ingredient.weight_raw || ''}
                 onChange={(e) => updateIngredientField('weight_raw', e.target.value)}
-                className="w-24 h-8 text-center text-xs"
+                disabled={readOnly || ingredient.locked}
+                className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 placeholder="0,000"
               />
             </TableCell>
@@ -295,7 +316,8 @@ const IngredientRow = ({
               type="text"
               value={ingredient.weight_portioned || ''}
               onChange={(e) => updateIngredientField('weight_portioned', e.target.value)}
-              className="w-24 h-8 text-center text-xs"
+              disabled={readOnly || ingredient.locked}
+              className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="0,000"
             />
           </TableCell>
@@ -314,27 +336,41 @@ const IngredientRow = ({
       </TableCell>
 
       <TableCell className="px-4 py-2">
-        <div className="flex gap-1 justify-end">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 rounded-full hover:bg-blue-50"
-            title="Editar ingrediente"
-          >
-            <Edit className="h-3 w-3 text-blue-500" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onRemoveIngredient(
-              prepIndex,
-              ingredientIndex
-            )}
-            className="h-7 w-7 rounded-full hover:bg-red-50"
-            title="Remover ingrediente"
-          >
-            <Trash2 className="h-3 w-3 text-red-500" />
-          </Button>
+        <div className="flex gap-1 justify-end items-center">
+          {!readOnly && (
+            <>
+              {!ingredient.locked && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 rounded-full hover:bg-blue-50"
+                  title="Editar ingrediente"
+                >
+                  <Edit className="h-3 w-3 text-blue-500" />
+                </Button>
+              )}
+              {ingredient.locked && (
+                <span className="text-xs text-amber-500 mr-2 flex items-center" title="Este item faz parte de uma receita importada e não pode ser editado.">
+                  <span className="mr-1">🔒</span>
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onRemoveIngredient(
+                  prepIndex,
+                  ingredientIndex
+                )}
+                className="h-7 w-7 rounded-full hover:bg-red-50"
+                title="Remover ingrediente"
+              >
+                <Trash2 className="h-3 w-3 text-red-500" />
+              </Button>
+            </>
+          )}
+          {readOnly && ingredient.locked && (
+            <span className="text-xs text-gray-400 italic">Locked</span>
+          )}
         </div>
       </TableCell>
     </TableRow>

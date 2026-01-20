@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Customer } from "@/app/api/entities";
-import { formatCapitalize } from "@/lib/textUtils"; 
+import { formatCapitalize } from "@/lib/textUtils";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -42,7 +42,7 @@ import {
   Link,
   Copy
 } from "lucide-react";
-import { UploadFile } from "@/app/api/integrations"; 
+import { UploadFile } from "@/app/api/integrations";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -71,15 +71,15 @@ export default function Customers() {
   const [saving, setSaving] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
-  
+
   // Estados para os novos modais de link
   const [showCreateLinkModal, setShowCreateLinkModal] = useState(false);
   const [showLinkDisplayModal, setShowLinkDisplayModal] = useState(false);
   const [linkDisplayData, setLinkDisplayData] = useState({ link: '', customerName: '' });
-  
+
   // Hook para gerenciamento de links
   const { isCreatingLink, createCustomerWithLink, copyExistingCustomerLink } = useCustomerLink();
-  
+
   // Adicionar refs para otimização de salvamento
   const saveTimerRef = useRef(null);
   const dirtyCustomerRef = useRef(null);
@@ -183,12 +183,20 @@ export default function Customers() {
     };
 
     if (!data.name) {
-        toast({ title: "Erro", description: "O nome do cliente é obrigatório.", variant: "destructive" });
-        return;
+      toast({ title: "Erro", description: "O nome do cliente é obrigatório.", variant: "destructive" });
+      return;
     }
 
     try {
-      // Lógica de salvamento removida  
+      if (currentCustomer?.id) {
+        await Customer.update(currentCustomer.id, data);
+        toast({ title: "Sucesso", description: "Cliente atualizado." });
+      } else {
+        await Customer.create(data);
+        toast({ title: "Sucesso", description: "Cliente criado." });
+      }
+      loadCustomers();
+      setIsDialogOpen(false); // Fecha o modal
     } catch (error) {
       toast({
         title: "Erro ao salvar",
@@ -218,7 +226,7 @@ export default function Customers() {
 
   const confirmDelete = async () => {
     if (!customerToDelete) return;
-    
+
     try {
       await Customer.delete(customerToDelete.id);
       toast({ title: "Sucesso", description: "Cliente excluído." });
@@ -235,7 +243,7 @@ export default function Customers() {
   };
 
   const handleToggleActive = async (customer) => {
-     if (!customer || !customer.id) return;
+    if (!customer || !customer.id) return;
     try {
       await Customer.update(customer.id, { active: !customer.active });
       toast({
@@ -255,11 +263,11 @@ export default function Customers() {
   // --- Link Generation and Management ---
   const handleCopyCustomerLink = async (customer) => {
     const result = await copyExistingCustomerLink(customer);
-    
+
     if (!result.success && result.needsManualCopy) {
-      setLinkDisplayData({ 
-        link: result.link, 
-        customerName: customer.name 
+      setLinkDisplayData({
+        link: result.link,
+        customerName: customer.name
       });
       setShowLinkDisplayModal(true);
     }
@@ -267,21 +275,21 @@ export default function Customers() {
 
   const handleCreateNewLink = async (customerName) => {
     const result = await createCustomerWithLink(customerName);
-    
+
     if (result) {
       // Recarregar lista para mostrar o novo cliente
       loadCustomers();
-      
+
       // Se precisar de cópia manual, mostrar modal
       if (result.needsManualCopy) {
-        setLinkDisplayData({ 
-          link: result.link, 
-          customerName: customerName 
+        setLinkDisplayData({
+          link: result.link,
+          customerName: customerName
         });
         setShowLinkDisplayModal(true);
       }
     }
-    
+
     return result;
   };
 
@@ -326,9 +334,9 @@ export default function Customers() {
       const result = await UploadFile({ file });
       if (result.success && result.file_url) {
         setUploadedPhotoUrl(result.file_url);
-         toast({ title: "Upload Concluído", description: "Foto carregada." });
+        toast({ title: "Upload Concluído", description: "Foto carregada." });
       } else {
-         throw new Error(result.error || "Erro no upload do arquivo.");
+        throw new Error(result.error || "Erro no upload do arquivo.");
       }
     } catch (error) {
       setUploadedPhotoUrl(currentCustomer?.photo || "");
@@ -346,41 +354,41 @@ export default function Customers() {
     (customer.company?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (customer.cnpj?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
-  
+
   // Otimizar salvamento para utilizar o estado local sem recarregar dados
   useEffect(() => {
     if (!isDirty || !dirtyCustomerRef.current) {
       return;
     }
-    
+
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
     }
-    
+
     saveTimerRef.current = setTimeout(async () => {
       try {
         setSaving(true);
-        
+
         const customerToSave = dirtyCustomerRef.current;
-        
+
         if (customerToSave.id) {
           await Customer.update(customerToSave.id, customerToSave);
-          
+
           // Atualizar o estado local em vez de recarregar do banco
-          setCustomers(prev => prev.map(customer => 
+          setCustomers(prev => prev.map(customer =>
             customer.id === customerToSave.id ? customerToSave : customer
           ));
         } else {
           const savedCustomer = await Customer.create(customerToSave);
-          
+
           // Adicionar ao estado local em vez de recarregar do banco
           setCustomers(prev => [...prev, savedCustomer]);
         }
-        
+
         // Limpar estado de sujeira
         dirtyCustomerRef.current = null;
         setIsDirty(false);
-        
+
         toast({
           description: "Cliente salvo com sucesso!"
         });
@@ -395,7 +403,7 @@ export default function Customers() {
         saveTimerRef.current = null;
       }
     }, 1000); // Debounce de 1 segundo
-    
+
     return () => {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
@@ -409,18 +417,18 @@ export default function Customers() {
       // Encontrar o cliente a ser atualizado
       const index = prev.findIndex(customer => customer.id === id);
       if (index === -1) return prev;
-      
+
       // Criar uma nova lista com o cliente atualizado
       const newCustomers = [...prev];
       newCustomers[index] = {
         ...newCustomers[index],
         ...changes
       };
-      
+
       // Armazenar a versão suja para salvamento
       dirtyCustomerRef.current = newCustomers[index];
       setIsDirty(true);
-      
+
       return newCustomers;
     });
   }, []);
@@ -488,8 +496,8 @@ export default function Customers() {
           <TableBody>
             {filteredCustomers.length > 0 ? (
               filteredCustomers.map((customer) => (
-                <TableRow 
-                  key={customer.id} 
+                <TableRow
+                  key={customer.id}
                   className={`dark:border-gray-700 ${customer.pending_registration ? 'opacity-50 bg-gray-50 dark:bg-gray-900/50' : ''}`}
                 >
                   {/* Avatar */}
@@ -528,22 +536,22 @@ export default function Customers() {
                     {customer.billing_period ? (
                       <span className="text-purple-700 font-semibold">
                         {customer.billing_period === "diario" ? "Diário" :
-                         customer.billing_period === "semanal" ? "Semanal" :
-                         customer.billing_period === "quinzenal" ? "Quinzenal" :
-                         customer.billing_period === "mensal" ? "Mensal" :
-                         customer.billing_period // Fallback
-                         }
+                          customer.billing_period === "semanal" ? "Semanal" :
+                            customer.billing_period === "quinzenal" ? "Quinzenal" :
+                              customer.billing_period === "mensal" ? "Mensal" :
+                                customer.billing_period // Fallback
+                        }
                       </span>
                     ) : (
-                       <span className="text-purple-700 font-semibold">Mensal</span> // Default
+                      <span className="text-purple-700 font-semibold">Mensal</span> // Default
                     )}
                   </TableCell>
                   {/* Payment Day/Term */}
                   <TableCell className="text-center font-mono">
                     {customer.billing_period === 'mensal' && customer.payment_day ? `Dia ${customer.payment_day}` :
-                     (customer.billing_period === 'semanal' || customer.billing_period === 'quinzenal') && customer.payment_day ? `${customer.payment_day} dias` :
-                     customer.billing_period === 'diario' ? 'Na entrega' : // Example for daily
-                     '-'}
+                      (customer.billing_period === 'semanal' || customer.billing_period === 'quinzenal') && customer.payment_day ? `${customer.payment_day} dias` :
+                        customer.billing_period === 'diario' ? 'Na entrega' : // Example for daily
+                          '-'}
                   </TableCell>
                   {/* Status */}
                   <TableCell className="font-mono">
@@ -590,7 +598,7 @@ export default function Customers() {
                             <><Eye className="mr-2 h-4 w-4" /> Ativar</>
                           )}
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="dark:bg-gray-600"/>
+                        <DropdownMenuSeparator className="dark:bg-gray-600" />
                         <DropdownMenuItem
                           onClick={() => handleDelete(customer)}
                           className="flex items-center text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:bg-red-900/50 cursor-pointer"
@@ -632,8 +640,8 @@ export default function Customers() {
             </p>
           </div>
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowDeleteDialog(false);
                 setCustomerToDelete(null);
@@ -642,7 +650,7 @@ export default function Customers() {
             >
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={confirmDelete}
               variant="destructive"
               className="bg-red-600 hover:bg-red-700 text-white"
@@ -671,167 +679,160 @@ export default function Customers() {
 
       {/* Dialog for New/Edit Customer */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[650px] dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 dark:text-white">
+        <DialogContent className="sm:max-w-[700px] w-full dark:bg-gray-800 dark:border-gray-700 p-4 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center gap-2 dark:text-white text-lg">
               {currentCustomer ? <Pencil className="w-5 h-5" /> : <User className="w-5 h-5" />}
               {currentCustomer ? "Editar Cliente" : "Novo Cliente"}
             </DialogTitle>
           </DialogHeader>
+
           {/* Form */}
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-             {/* Photo Upload */}
-             <div className="space-y-2">
-              <label htmlFor="photo-upload" className="text-sm font-medium dark:text-gray-300">Foto</label>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={uploadedPhotoUrl || currentCustomer?.photo || undefined} alt={currentCustomer?.name || 'Avatar'}/>
-                  <AvatarFallback>
-                    {currentCustomer?.name ? currentCustomer.name.charAt(0).toUpperCase() : <User size={24}/>}
-                  </AvatarFallback>
-                </Avatar>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Photo Upload - Compact */}
+            <div className="flex items-center gap-4 p-2 bg-gray-50 dark:bg-gray-900/50 rounded-lg border dark:border-gray-700">
+              <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                <AvatarImage src={uploadedPhotoUrl || currentCustomer?.photo || undefined} alt={currentCustomer?.name || 'Avatar'} />
+                <AvatarFallback className="bg-blue-100 text-blue-700">
+                  {currentCustomer?.name ? currentCustomer.name.charAt(0).toUpperCase() : <User size={20} />}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <label htmlFor="photo-upload" className="block text-xs font-medium mb-1 text-gray-500 uppercase tracking-wide">Foto do Cliente</label>
                 <Input
                   id="photo-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/50 dark:file:text-blue-300 dark:hover:file:bg-blue-900"
+                  className="h-8 text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 w-full max-w-sm"
                 />
               </div>
             </div>
 
-            {/* Grid for Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Name */}
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium flex items-center gap-1 dark:text-gray-300"><User className="w-4 h-4" /> Nome*</label>
-                <Input id="name" name="name" defaultValue={currentCustomer?.name} required className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+            {/* Grid for Fields - Compact Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Name (span 2 cols) */}
+              <div className="md:col-span-2 space-y-1">
+                <label htmlFor="name" className="text-xs font-medium flex items-center gap-1 dark:text-gray-300"><User className="w-3 h-3" /> Nome*</label>
+                <Input id="name" name="name" defaultValue={currentCustomer?.name} required className="h-9 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
               </div>
+
               {/* Company */}
-              <div className="space-y-2">
-                <label htmlFor="company" className="text-sm font-medium flex items-center gap-1 dark:text-gray-300"><Building2 className="w-4 h-4" /> Empresa</label>
-                <Input id="company" name="company" defaultValue={currentCustomer?.company} className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              <div className="space-y-1">
+                <label htmlFor="company" className="text-xs font-medium flex items-center gap-1 dark:text-gray-300"><Building2 className="w-3 h-3" /> Empresa</label>
+                <Input id="company" name="company" defaultValue={currentCustomer?.company} className="h-9 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
               </div>
-              {/* CNPJ */}
-              <div className="space-y-2">
-                <label htmlFor="cnpj" className="text-sm font-medium flex items-center gap-1 dark:text-gray-300"><File className="w-4 h-4" /> CNPJ</label>
-                <Input id="cnpj" name="cnpj" defaultValue={currentCustomer?.cnpj} className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+
+              {/* Contact Info Row */}
+              <div className="space-y-1">
+                <label htmlFor="cnpj" className="text-xs font-medium flex items-center gap-1 dark:text-gray-300"><File className="w-3 h-3" /> CNPJ</label>
+                <Input id="cnpj" name="cnpj" defaultValue={currentCustomer?.cnpj} className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
               </div>
-              {/* Phone */}
-              <div className="space-y-2">
-                <label htmlFor="phone" className="text-sm font-medium flex items-center gap-1 dark:text-gray-300"><Phone className="w-4 h-4" /> Telefone</label>
-                <Input id="phone" name="phone" defaultValue={currentCustomer?.phone} className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              <div className="space-y-1">
+                <label htmlFor="phone" className="text-xs font-medium flex items-center gap-1 dark:text-gray-300"><Phone className="w-3 h-3" /> Telefone</label>
+                <Input id="phone" name="phone" defaultValue={currentCustomer?.phone} className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
               </div>
-              {/* Email */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium flex items-center gap-1 dark:text-gray-300"><Mail className="w-4 h-4" /> Email</label>
-                <Input id="email" name="email" type="email" defaultValue={currentCustomer?.email} className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              <div className="space-y-1">
+                <label htmlFor="email" className="text-xs font-medium flex items-center gap-1 dark:text-gray-300"><Mail className="w-3 h-3" /> Email</label>
+                <Input id="email" name="email" type="email" defaultValue={currentCustomer?.email} className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
               </div>
-              {/* Category */}
-              <div className="space-y-2">
-                  <label htmlFor="category" className="text-sm font-medium dark:text-gray-300"> Categoria </label>
-                  <Select name="category" defaultValue={currentCustomer?.category || "pessoa_fisica"}>
-                      <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                          <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                          <SelectItem value="restaurante">Restaurante</SelectItem>
-                          <SelectItem value="evento">Evento</SelectItem>
-                          <SelectItem value="pessoa_fisica">Pessoa Física</SelectItem>
-                          <SelectItem value="outro">Outro</SelectItem>
-                      </SelectContent>
-                  </Select>
+
+              {/* Billing Info Row */}
+              <div className="space-y-1">
+                <label htmlFor="category" className="text-xs font-medium dark:text-gray-300"> Categoria </label>
+                <Select name="category" defaultValue={currentCustomer?.category || "pessoa_fisica"}>
+                  <SelectTrigger className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <SelectItem value="restaurante">Restaurante</SelectItem>
+                    <SelectItem value="evento">Evento</SelectItem>
+                    <SelectItem value="pessoa_fisica">Pessoa Física</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              {/* Billing Period */}
-              <div className="space-y-2">
-                  <label htmlFor="billing_period" className="text-sm font-medium dark:text-gray-300"> Período Faturamento </label>
-                  <Select
-                      name="billing_period"
-                      value={currentCustomer?.billing_period || "mensal"}
-                      onValueChange={handleBillingPeriodChange}
-                  >
-                      <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                          <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                          <SelectItem value="diario">Diário</SelectItem>
-                          <SelectItem value="semanal">Semanal</SelectItem>
-                          <SelectItem value="quinzenal">Quinzenal</SelectItem>
-                          <SelectItem value="mensal">Mensal</SelectItem>
-                      </SelectContent>
-                  </Select>
+
+              <div className="space-y-1">
+                <label htmlFor="billing_period" className="text-xs font-medium dark:text-gray-300"> Período Faturamento </label>
+                <Select
+                  name="billing_period"
+                  value={currentCustomer?.billing_period || "mensal"}
+                  onValueChange={handleBillingPeriodChange}
+                >
+                  <SelectTrigger className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <SelectItem value="diario">Diário</SelectItem>
+                    <SelectItem value="semanal">Semanal</SelectItem>
+                    <SelectItem value="quinzenal">Quinzenal</SelectItem>
+                    <SelectItem value="mensal">Mensal</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Conditional Payment Day/Term Input */}
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-1">
                 {currentCustomer?.billing_period === 'mensal' ? (
-                    <>
-                        <label htmlFor="payment_day_monthly" className="text-sm font-medium dark:text-gray-300"> Dia de Pagamento (Mensal)</label>
-                        <Input
-                            id="payment_day_monthly"
-                            name="payment_day_monthly"
-                            type="number"
-                            min="1"
-                            max="31"
-                            defaultValue={currentCustomer?.payment_day || ""}
-                            placeholder="Ex: 10 (Dia 10 do mês)"
-                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                    </>
+                  <>
+                    <label htmlFor="payment_day_monthly" className="text-xs font-medium dark:text-gray-300"> Dia Pagamento</label>
+                    <Input
+                      id="payment_day_monthly"
+                      name="payment_day_monthly"
+                      type="number"
+                      min="1"
+                      max="31"
+                      defaultValue={currentCustomer?.payment_day || ""}
+                      placeholder="Dia 10"
+                      className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </>
                 ) : currentCustomer?.billing_period === 'semanal' || currentCustomer?.billing_period === 'quinzenal' ? (
-                    <>
-                        <label htmlFor="payment_term_select" className="text-sm font-medium dark:text-gray-300"> Prazo de Pagamento</label>
-                        <Select
-                            name="payment_term"
-                            value={selectedPaymentTerm?.toString() || ""}
-                            onValueChange={(value) => setSelectedPaymentTerm(value ? parseInt(value, 10) : null)}
-                        >
-                            <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                <SelectValue placeholder="Selecione o prazo..." />
-                            </SelectTrigger>
-                            <SelectContent className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                {paymentTermOptions.length > 0 ? (
-                                    paymentTermOptions.map(option => (
-                                        <SelectItem key={option.value} value={option.value.toString()}>
-                                            {option.label}
-                                        </SelectItem>
-                                    ))
-                                ) : (
-                                    <SelectItem value={null} disabled>Nenhuma opção</SelectItem>
-                                )}
-                            </SelectContent>
-                        </Select>
-                    </>
-                 ) : currentCustomer?.billing_period === 'diario' ? (
-                     <p className="text-sm text-gray-500 dark:text-gray-400 pt-6">Pagamento diário (sem dia/prazo específico).</p>
-                 ) : (
-                    <>
-                       <label htmlFor="payment_day_monthly_default" className="text-sm font-medium dark:text-gray-300"> Dia de Pagamento (Mensal)</label>
-                       <Input
-                            id="payment_day_monthly_default"
-                            name="payment_day_monthly"
-                            type="number"
-                            min="1"
-                            max="31"
-                            defaultValue={currentCustomer?.payment_day || ""}
-                            placeholder="Ex: 10 (Dia 10 do mês)"
-                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                    </>
-                 )}
+                  <>
+                    <label htmlFor="payment_term_select" className="text-xs font-medium dark:text-gray-300"> Prazo </label>
+                    <Select
+                      name="payment_term"
+                      value={selectedPaymentTerm?.toString() || ""}
+                      onValueChange={(value) => setSelectedPaymentTerm(value ? parseInt(value, 10) : null)}
+                    >
+                      <SelectTrigger className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        {paymentTermOptions.length > 0 ? (
+                          paymentTermOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value.toString()}>
+                              {option.label}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value={null} disabled>Nenhuma opção</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </>
+                ) : (
+                  <div className="h-8" /> // Spacer
+                )}
               </div>
             </div>
 
-             {/* Address */}
-            <div className="space-y-2">
-              <label htmlFor="address" className="text-sm font-medium flex items-center gap-1 dark:text-gray-300"><MapPin className="w-4 h-4" /> Endereço</label>
-              <Input id="address" name="address" defaultValue={currentCustomer?.address} className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+            {/* Address */}
+            <div className="space-y-1">
+              <label htmlFor="address" className="text-xs font-medium flex items-center gap-1 dark:text-gray-300"><MapPin className="w-3 h-3" /> Endereço</label>
+              <Input id="address" name="address" defaultValue={currentCustomer?.address} className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
             </div>
 
             {/* Notes */}
-            <div className="space-y-2">
-              <label htmlFor="notes" className="text-sm font-medium dark:text-gray-300">Observações</label>
-              <Textarea id="notes" name="notes" defaultValue={currentCustomer?.notes} className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+            <div className="space-y-1">
+              <label htmlFor="notes" className="text-xs font-medium dark:text-gray-300">Observações</label>
+              <Textarea
+                id="notes"
+                name="notes"
+                defaultValue={currentCustomer?.notes}
+                className="min-h-[60px] max-h-[100px] dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
+              />
             </div>
 
             {/* Active Switch */}
@@ -839,23 +840,22 @@ export default function Customers() {
               <Switch
                 id="active"
                 name="active"
-                checked={currentCustomer ? currentCustomer.active : true}
+                defaultChecked={currentCustomer ? currentCustomer.active : true}
                 onCheckedChange={(checked) => {
-                    setCurrentCustomer(prev => ({...(prev || {}), active: checked }));
+                  setCurrentCustomer(prev => ({ ...(prev || {}), active: checked }));
                 }}
               />
-              <label htmlFor="active" className="text-sm font-medium dark:text-gray-300">
+              <label htmlFor="active" className="text-sm font-medium dark:text-gray-300 select-none cursor-pointer">
                 Cliente Ativo
               </label>
             </div>
 
-            {/* Footer Buttons */}
-            <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="dark:text-gray-300 dark:border-gray-600">
                 Cancelar
               </Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-                {currentCustomer ? "Salvar Alterações" : "Cadastrar Cliente"}
+                Salvar Alterações
               </Button>
             </DialogFooter>
           </form>

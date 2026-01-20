@@ -81,6 +81,7 @@ export default function IngredientEditor() {
   const [tacoSearchTerm, setTacoSearchTerm] = useState("");
   const [loadingTaco, setLoadingTaco] = useState(false); // ✅ Novo estado para loading TACO
   const [initialPrice, setInitialPrice] = useState(null); // Store initial price for comparison
+  const [itemType, setItemType] = useState("ingrediente"); // ingrediente ou embalagem
 
 
   const handleInputChange = (e) => {
@@ -144,61 +145,97 @@ export default function IngredientEditor() {
     }
   };
 
-  const loadCategories = async () => {
+  const loadCategories = async (forType = 'ingrediente') => {
     try {
-      console.log("🔍 Iniciando loadCategories com CategoryTree...");
+      console.log(`🔍 Iniciando loadCategories para tipo: ${forType}`);
       const categoryTreeData = await CategoryTree.list();
 
-      // 1. Filtrar apenas Ingredientes
-      const ingredientCats = categoryTreeData.filter(cat =>
-        (cat.type === "ingredient" || cat.type === "ingredientes") && cat.active
-      );
+      let filteredCats;
 
-      // 2. Criar mapa para lookup rápido por ID
-      const catMap = new Map();
-      ingredientCats.forEach(cat => catMap.set(cat.id, cat));
+      if (forType === 'embalagem') {
+        // Para embalagens, usar o novo tipo "embalagens" (aba separada)
+        filteredCats = categoryTreeData.filter(cat =>
+          cat.type === "embalagens" && cat.active
+        );
 
-      // 3. Função recursiva para gerar nome completo (Breadcrumbs)
-      const getFullPath = (cat) => {
-        if (!cat.parent_id || !catMap.has(cat.parent_id)) {
-          return cat.name;
+        // Se não encontrar nenhuma, fallback
+        if (filteredCats.length === 0) {
+          setCategories(['Embalagem']);
+          setCategoryOptions([{ value: 'Embalagem', label: 'Embalagem' }]);
+          return;
         }
-        const parent = catMap.get(cat.parent_id);
-        return `${getFullPath(parent)} > ${cat.name}`;
+      } else {
+        // Para ingredientes, filtrar tipo ingredientes
+        filteredCats = categoryTreeData.filter(cat =>
+          (cat.type === "ingredient" || cat.type === "ingredientes") && cat.active
+        );
+      }
+
+      // 2. Encontrar categorias raiz (nível 1) e construir hierarquia como no BulkRecipeCreator
+      const roots = filteredCats
+        .filter(c => c.level === 1 || !c.parent_id)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      // Função para achatar os descendentes de cada raiz
+      const buildDescendants = (cats, parentId, prefix) => {
+        let list = [];
+        const children = cats
+          .filter(c => c.parent_id === parentId)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        for (const child of children) {
+          const label = `${prefix} > ${child.name}`;
+          list.push({
+            value: label,
+            label: label,
+            originalName: child.name,
+            id: child.id
+          });
+          list = [...list, ...buildDescendants(cats, child.id, label)];
+        }
+        return list;
       };
 
-      // 4. Gerar lista de opções com nomes hierárquicos
-      let formattedCategories = ingredientCats.map(cat => ({
-        original: cat,
-        displayName: getFullPath(cat),
-        value: getFullPath(cat)
-      }));
+      // Construir todas as opções
+      let allOptions = [];
+      for (const root of roots) {
+        // O próprio raiz é uma opção
+        allOptions.push({
+          value: root.name,
+          label: root.name,
+          originalName: root.name,
+          id: root.id,
+          isRoot: true
+        });
+        // Adicionar descendentes
+        allOptions = [...allOptions, ...buildDescendants(filteredCats, root.id, root.name)];
+      }
 
-      // Ordenar alfabeticamente pelo nome exibido
-      formattedCategories.sort((a, b) => a.displayName.localeCompare(b.displayName));
-
-      const options = formattedCategories.map(item => ({
-        value: item.value,
-        label: item.displayName
-      }));
-
-
-
-      if (options.length === 0) {
+      if (allOptions.length === 0) {
         console.warn("⚠️ Nenhuma categoria encontrada. Usando padrões.");
-        const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos', 'Massas', 'Molhos', 'Outros'];
-        setCategories(defaultCategories);
-        setCategoryOptions(defaultCategories.map(c => ({ value: c, label: c })));
+        if (forType === 'embalagem') {
+          setCategories(['Embalagem']);
+          setCategoryOptions([{ value: 'Embalagem', label: 'Embalagem' }]);
+        } else {
+          const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos', 'Massas', 'Molhos', 'Outros'];
+          setCategories(defaultCategories);
+          setCategoryOptions(defaultCategories.map(c => ({ value: c, label: c })));
+        }
       } else {
-        setCategories(options.map(o => o.value));
-        setCategoryOptions(options);
+        setCategories(allOptions.map(o => o.value));
+        setCategoryOptions(allOptions);
       }
 
     } catch (err) {
       console.error("Erro ao carregar categorias:", err);
-      const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos', 'Massas', 'Molhos', 'Outros'];
-      setCategories(defaultCategories);
-      setCategoryOptions(defaultCategories.map(cat => ({ value: cat, label: cat })));
+      if (forType === 'embalagem') {
+        setCategories(['Embalagem']);
+        setCategoryOptions([{ value: 'Embalagem', label: 'Embalagem' }]);
+      } else {
+        const defaultCategories = ['Laticínios', 'Carnes', 'Vegetais', 'Frutas', 'Grãos', 'Temperos', 'Massas', 'Molhos', 'Outros'];
+        setCategories(defaultCategories);
+        setCategoryOptions(defaultCategories.map(cat => ({ value: cat, label: cat })));
+      }
     }
   };
 
@@ -297,7 +334,7 @@ export default function IngredientEditor() {
           title: "Erro ao carregar ingrediente",
           description: "O ingrediente que você tentou editar não existe mais ou está com ID inválido.",
         });
-        setTimeout(() => router.push('/ingredientes'), 2000);
+        setTimeout(() => router.push(itemType === 'embalagem' ? '/ingredientes?tab=embalagens' : '/ingredientes'), 2000);
         return;
       }
 
@@ -310,7 +347,7 @@ export default function IngredientEditor() {
           title: "Ingrediente não encontrado",
           description: "O ingrediente que você tentou editar não existe mais no banco de dados. Retornando para a lista...",
         });
-        setTimeout(() => router.push('/ingredientes'), 2000);
+        setTimeout(() => router.push(itemType === 'embalagem' ? '/ingredientes?tab=embalagens' : '/ingredientes'), 2000);
         return;
       }
 
@@ -405,16 +442,21 @@ export default function IngredientEditor() {
     const loadInitialData = async () => {
       setLoading(true);
       try {
-        // ✅ Carregar apenas dados essenciais (SEM TACO - lazy load)
+        // Obter ingredientId e type da URL usando window.location.search (client-side)
+        const urlParams = new URLSearchParams(window.location.search);
+        const ingredientId = urlParams.get('id');
+        const typeParam = urlParams.get('type');
+
+        // Definir tipo do item (ingrediente ou embalagem)
+        const currentType = typeParam === 'embalagem' ? 'embalagem' : 'ingrediente';
+        setItemType(currentType);
+
+        // ✅ Carregar dados essenciais com tipo correto
         await Promise.all([
           loadSuppliers(),
           loadBrands(),
-          loadCategories()
+          loadCategories(currentType)
         ]);
-
-        // Obter ingredientId da URL usando window.location.search (client-side)
-        const urlParams = new URLSearchParams(window.location.search);
-        const ingredientId = urlParams.get('id');
 
         if (ingredientId && ingredientId !== 'new') {
           setIsEditing(true);
@@ -422,6 +464,10 @@ export default function IngredientEditor() {
         } else {
           setIsEditing(false);
           resetFormForNewIngredient();
+          // Para embalagens, pré-selecionar categoria Embalagem
+          if (currentType === 'embalagem') {
+            setFormData(prev => ({ ...prev, category: 'Embalagem' }));
+          }
         }
       } catch (error) {
         setError('Erro ao carregar dados iniciais: ' + error.message);
@@ -470,15 +516,18 @@ export default function IngredientEditor() {
         supplier_code: formData.supplier_code,
         brand_id: formData.brand_id,
         taco_variations: formData.taco_variations,
+        item_type: itemType, // 'ingrediente' ou 'embalagem'
       };
+
+      const itemLabel = itemType === 'embalagem' ? 'embalagem' : 'ingrediente';
 
       let result;
       if (isEditing && currentIngredientId) {
-        // Atualizar ingrediente existente
+        // Atualizar item existente
         result = await Ingredient.update(currentIngredientId, ingredientDataToSave);
         toast({
-          title: "Ingrediente atualizado",
-          description: `O ingrediente "${formData.name}" foi atualizado com sucesso.`
+          title: `${itemType === 'embalagem' ? 'Embalagem atualizada' : 'Ingrediente atualizado'}`,
+          description: `${itemType === 'embalagem' ? 'A embalagem' : 'O ingrediente'} "${formData.name}" foi atualizado com sucesso.`
         });
       } else {
         // Criar novo ingrediente
@@ -511,8 +560,8 @@ export default function IngredientEditor() {
         }
 
         toast({
-          title: "Ingrediente criado",
-          description: `O ingrediente "${formData.name}" foi criado com sucesso.`
+          title: itemType === 'embalagem' ? "Embalagem criada" : "Ingrediente criado",
+          description: `${itemType === 'embalagem' ? 'A embalagem' : 'O ingrediente'} "${formData.name}" foi criado com sucesso.`
         });
       }
 
@@ -549,8 +598,9 @@ export default function IngredientEditor() {
         }
       }
 
-      // Redirecionar para a lista de ingredientes
-      router.push('/ingredientes');
+      // Redirecionar para a lista com a aba correta
+      const tabParam = itemType === 'embalagem' ? '?tab=embalagens' : '';
+      router.push(`/ingredientes${tabParam}`);
 
     } catch (err) {
       setError(err.message || "Erro desconhecido ao salvar.");
@@ -590,7 +640,7 @@ export default function IngredientEditor() {
         <div className="flex items-center mb-2">
           <Button
             variant="outline"
-            onClick={() => router.push('/ingredientes')}
+            onClick={() => router.push(itemType === 'embalagem' ? '/ingredientes?tab=embalagens' : '/ingredientes')}
             size="sm"
             className="h-8 text-xs border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
           >
@@ -600,10 +650,16 @@ export default function IngredientEditor() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">
-            {isEditing ? `Editar Ingrediente: ${formData.name}` : 'Novo Ingrediente'}
+            {isEditing
+              ? `Editar ${itemType === 'embalagem' ? 'Embalagem' : 'Ingrediente'}: ${formData.name}`
+              : itemType === 'embalagem' ? 'Nova Embalagem' : 'Novo Ingrediente'
+            }
           </h1>
           <p className="text-gray-600 mt-1 text-xs">
-            Gerencie os detalhes do seu ingrediente consolidado.
+            {itemType === 'embalagem'
+              ? 'Gerencie os detalhes da sua embalagem.'
+              : 'Gerencie os detalhes do seu ingrediente consolidado.'
+            }
           </p>
         </div>
       </div>
@@ -619,60 +675,119 @@ export default function IngredientEditor() {
       {/* Formulário principal */}
       <form onSubmit={handleSave} className="space-y-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4 h-9 bg-gradient-to-r from-slate-100 to-slate-50">
-            <TabsTrigger value="general" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md">
-              <CircleCheckBig className="h-3 w-3" />
-              <span className="hidden sm:inline">Dados Gerais</span>
-              <span className="sm:hidden">Dados</span>
-            </TabsTrigger>
-            <TabsTrigger value="taco" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md">
-              <Package className="h-3 w-3" />
-              <span className="hidden sm:inline">Variações TACO</span>
-              <span className="sm:hidden">TACO</span>
-            </TabsTrigger>
-            <TabsTrigger value="preview" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-md">
-              <Eye className="h-3 w-3" />
-              Preview
-            </TabsTrigger>
-          </TabsList>
+          {itemType !== 'embalagem' && (
+            <TabsList className="grid w-full grid-cols-3 mb-4 h-9 bg-gradient-to-r from-slate-100 to-slate-50">
+              <TabsTrigger value="general" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+                <CircleCheckBig className="h-3 w-3" />
+                <span className="hidden sm:inline">Dados Gerais</span>
+                <span className="sm:hidden">Dados</span>
+              </TabsTrigger>
+
+              <TabsTrigger value="taco" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+                <Package className="h-3 w-3" />
+                <span className="hidden sm:inline">Variações TACO</span>
+                <span className="sm:hidden">TACO</span>
+              </TabsTrigger>
+              <TabsTrigger value="preview" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+                <Eye className="h-3 w-3" />
+                Preview
+              </TabsTrigger>
+            </TabsList>
+          )}
 
           <TabsContent value="general" className="space-y-4 mt-0">
-            <Card className="shadow-sm">
-              <CardHeader className="pb-2 pt-4 px-4">
-                <CardTitle className="text-base">Informações do Ingrediente</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 px-4 pb-4">
-                {/* Nome Principal e Comercial */}
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <Label htmlFor="name" className="text-xs font-medium">Nome Principal *</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Ex: Muçarela"
-                      required
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-3">
+                <div>
+                  <Label htmlFor="name" className="text-xs font-medium">Nome Principal *</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder={itemType === 'embalagem' ? 'Ex: Marmita 750ml' : 'Ex: Muçarela'}
+                    required
+                    className="mt-1 h-8 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Fornecedor e Categoria */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {/* Fornecedor Principal - Combobox Inteligente */}
+                <div>
+                  <Label className="text-xs font-medium">Fornecedor Principal</Label>
+                  <Popover open={openSupplierCombobox} onOpenChange={setOpenSupplierCombobox}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openSupplierCombobox}
+                        className="w-full justify-between mt-1 h-8 text-sm"
+                      >
+                        <span className="truncate">
+                          {formData.main_supplier || "Selecione um fornecedor"}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
+                        <CommandEmpty>
+                          <div className="py-2 text-center text-xs text-muted-foreground">
+                            Nenhum fornecedor encontrado.
+                          </div>
+                        </CommandEmpty>
+                        <CommandGroup className="max-h-[200px] overflow-auto">
+                          {supplierOptions.map((supplier) => (
+                            <CommandItem
+                              key={supplier.value}
+                              value={supplier.value}
+                              onSelect={handleSupplierSelect}
+                              className="cursor-pointer text-xs"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-3 w-3",
+                                  formData.main_supplier === supplier.value ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <span className="truncate">{supplier.label}</span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
-                {/* Fornecedor e Categoria */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {/* Fornecedor Principal - Combobox Inteligente */}
-                  <div>
-                    <Label className="text-xs font-medium">Fornecedor Principal</Label>
-                    <Popover open={openSupplierCombobox} onOpenChange={setOpenSupplierCombobox}>
+                {/* Categoria - Combobox Inteligente (ReadOnly se TACO) */}
+                <div>
+                  <Label className="text-xs font-medium flex items-center gap-2">
+                    Categoria
+                    {isCategoryReadOnly && <Badge variant="secondary" className="text-[10px] px-1 h-4">Auto (TACO)</Badge>}
+                  </Label>
+                  {isCategoryReadOnly ? (
+                    <div className="mt-1">
+                      <Input
+                        value={formData.category}
+                        readOnly
+                        className="bg-gray-100 h-8 text-sm"
+                        placeholder="Categoria será preenchida..."
+                      />
+                    </div>
+                  ) : (
+                    <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           role="combobox"
-                          aria-expanded={openSupplierCombobox}
+                          aria-expanded={openCategoryCombobox}
                           className="w-full justify-between mt-1 h-8 text-sm"
                         >
                           <span className="truncate">
-                            {formData.main_supplier || "Selecione um fornecedor"}
+                            {formData.category || "Selecione uma categoria"}
                           </span>
                           <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
                         </Button>
@@ -682,246 +797,184 @@ export default function IngredientEditor() {
                           <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
                           <CommandEmpty>
                             <div className="py-2 text-center text-xs text-muted-foreground">
-                              Nenhum fornecedor encontrado.
+                              Nenhuma categoria encontrada.
                             </div>
                           </CommandEmpty>
                           <CommandGroup className="max-h-[200px] overflow-auto">
-                            {supplierOptions.map((supplier) => (
+                            {categoryOptions.map((category) => (
                               <CommandItem
-                                key={supplier.value}
-                                value={supplier.value}
-                                onSelect={handleSupplierSelect}
+                                key={category.value}
+                                value={category.value}
+                                onSelect={handleCategorySelect}
                                 className="cursor-pointer text-xs"
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-3 w-3",
-                                    formData.main_supplier === supplier.value ? "opacity-100" : "opacity-0"
+                                    formData.category === category.value ? "opacity-100" : "opacity-0"
                                   )}
                                 />
-                                <span className="truncate">{supplier.label}</span>
+                                {category.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
                         </Command>
                       </PopoverContent>
                     </Popover>
-                  </div>
-
-                  {/* Categoria - Combobox Inteligente (ReadOnly se TACO) */}
-                  <div>
-                    <Label className="text-xs font-medium flex items-center gap-2">
-                      Categoria
-                      {isCategoryReadOnly && <Badge variant="secondary" className="text-[10px] px-1 h-4">Auto (TACO)</Badge>}
-                    </Label>
-                    {isCategoryReadOnly ? (
-                      <div className="mt-1">
-                        <Input
-                          value={formData.category}
-                          readOnly
-                          className="bg-gray-100 h-8 text-sm"
-                          placeholder="Categoria será preenchida..."
-                        />
-                      </div>
-                    ) : (
-                      <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={openCategoryCombobox}
-                            className="w-full justify-between mt-1 h-8 text-sm"
-                          >
-                            <span className="truncate">
-                              {formData.category || "Selecione uma categoria"}
-                            </span>
-                            <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                          <Command>
-                            <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
-                            <CommandEmpty>
-                              <div className="py-2 text-center text-xs text-muted-foreground">
-                                Nenhuma categoria encontrada.
-                              </div>
-                            </CommandEmpty>
-                            <CommandGroup className="max-h-[200px] overflow-auto">
-                              {categoryOptions.map((category) => (
-                                <CommandItem
-                                  key={category.value}
-                                  value={category.value}
-                                  onSelect={handleCategorySelect}
-                                  className="cursor-pointer text-xs"
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-3 w-3",
-                                      formData.category === category.value ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  {category.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    )}
-                  </div>
+                  )}
                 </div>
+              </div>
 
-                {/* Unidade, Preços */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium">Unidade de Compra *</Label>
-                    <Select
-                      value={formData.unit}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, unit: value }))}
-                    >
-                      <SelectTrigger className="mt-1 h-8 text-sm">
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kg">Quilograma (kg)</SelectItem>
-                        <SelectItem value="g">Grama (g)</SelectItem>
-                        <SelectItem value="l">Litro (l)</SelectItem>
-                        <SelectItem value="ml">Mililitro (ml)</SelectItem>
-                        <SelectItem value="unidade">Unidade</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="current_price" className="text-xs font-medium">Preço Atual (R$)</Label>
-                    <Input
-                      id="current_price"
-                      name="current_price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.current_price}
-                      onChange={handleInputChange}
-                      placeholder="0.00"
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Marca, Código Fornecedor, Data */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {/* Marca - Combobox Inteligente */}
-                  <div>
-                    <Label className="text-xs font-medium">Marca</Label>
-                    <Popover open={openBrandCombobox} onOpenChange={setOpenBrandCombobox}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={openBrandCombobox}
-                          className="w-full justify-between mt-1 h-8 text-sm"
-                        >
-                          <span className="truncate">
-                            {formData.brand || "Selecione uma marca"}
-                          </span>
-                          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0" align="start">
-                        <Command>
-                          <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
-                          <CommandEmpty>
-                            <div className="py-2 text-center text-xs text-muted-foreground">
-                              Nenhuma marca encontrada.
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Digite para criar uma nova marca
-                              </p>
-                            </div>
-                          </CommandEmpty>
-                          <CommandGroup className="max-h-[200px] overflow-auto">
-                            {brandOptions.map((brand) => (
-                              <CommandItem
-                                key={brand.value}
-                                value={brand.value}
-                                onSelect={handleBrandSelect}
-                                className="cursor-pointer"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    formData.brand === brand.value ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {brand.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  {/* Código do Fornecedor - Somente Leitura (vem do cadastro) */}
-                  <div>
-                    <Label htmlFor="supplier_code" className="text-xs font-medium">Código do Fornecedor</Label>
-                    <Input
-                      id="supplier_code"
-                      name="supplier_code"
-                      value={formData.supplier_code}
-                      readOnly
-                      placeholder="Definido no cadastro do fornecedor"
-                      className="bg-gray-100 mt-1 h-8 text-sm cursor-not-allowed"
-                    />
-                    <p className="text-[10px] text-gray-500 mt-1">
-                      Este código vem do cadastro em "Fornecedores e Serviços"
-                    </p>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="last_update" className="text-xs font-medium">Última Atualização</Label>
-                    <Input
-                      id="last_update"
-                      name="last_update"
-                      type="date"
-                      value={formData.last_update}
-                      onChange={handleInputChange}
-                      className="mt-1 h-8 text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Observações */}
+              {/* Unidade, Preços */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="notes" className="text-xs font-medium">Observações</Label>
-                  <Textarea
-                    id="notes"
-                    name="notes"
-                    value={formData.notes}
+                  <Label className="text-xs font-medium">Unidade de Compra *</Label>
+                  <Select
+                    value={formData.unit}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, unit: value }))}
+                  >
+                    <SelectTrigger className="mt-1 h-8 text-sm">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="kg">Quilograma (kg)</SelectItem>
+                      <SelectItem value="g">Grama (g)</SelectItem>
+                      <SelectItem value="l">Litro (l)</SelectItem>
+                      <SelectItem value="ml">Mililitro (ml)</SelectItem>
+                      <SelectItem value="unidade">Unidade</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="current_price" className="text-xs font-medium">Preço Atual (R$)</Label>
+                  <Input
+                    id="current_price"
+                    name="current_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.current_price}
                     onChange={handleInputChange}
-                    placeholder="Observações sobre o ingrediente"
-                    rows={2}
-                    className="mt-1 resize-none text-xs"
+                    placeholder="0.00"
+                    className="mt-1 h-8 text-sm"
                   />
+                </div>
+              </div>
+
+              {/* Marca, Código Fornecedor, Data */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Marca - Combobox Inteligente */}
+                <div>
+                  <Label className="text-xs font-medium">Marca</Label>
+                  <Popover open={openBrandCombobox} onOpenChange={setOpenBrandCombobox}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openBrandCombobox}
+                        className="w-full justify-between mt-1 h-8 text-sm"
+                      >
+                        <span className="truncate">
+                          {formData.brand || "Selecione uma marca"}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Buscar..." className="h-8 text-xs" />
+                        <CommandEmpty>
+                          <div className="py-2 text-center text-xs text-muted-foreground">
+                            Nenhuma marca encontrada.
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Digite para criar uma nova marca
+                            </p>
+                          </div>
+                        </CommandEmpty>
+                        <CommandGroup className="max-h-[200px] overflow-auto">
+                          {brandOptions.map((brand) => (
+                            <CommandItem
+                              key={brand.value}
+                              value={brand.value}
+                              onSelect={handleBrandSelect}
+                              className="cursor-pointer"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.brand === brand.value ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {brand.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
-                {/* Switch Ativo */}
-                <div className="flex items-center space-x-3 p-3 rounded-lg border bg-gradient-to-r from-slate-50 to-white">
-                  <Switch
-                    id="active"
-                    checked={formData.active}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
-                    className={`scale-90 ${formData.active ? 'data-[state=checked]:bg-emerald-500' : 'data-[state=unchecked]:bg-gray-300'}`}
+                {/* Código do Fornecedor - Somente Leitura (vem do cadastro) */}
+                <div>
+                  <Label htmlFor="supplier_code" className="text-xs font-medium">Código do Fornecedor</Label>
+                  <Input
+                    id="supplier_code"
+                    name="supplier_code"
+                    value={formData.supplier_code}
+                    readOnly
+                    placeholder="Definido no cadastro do fornecedor"
+                    className="bg-gray-100 mt-1 h-8 text-sm cursor-not-allowed"
                   />
-                  <div className="flex flex-col">
-                    <Label htmlFor="active" className="text-xs font-medium cursor-pointer">
-                      Ingrediente ativo
-                    </Label>
-                    <span className={`text-[10px] font-medium ${formData.active ? 'text-emerald-600' : 'text-gray-400'}`}>
-                      {formData.active ? '✓ Visível no sistema' : '✗ Oculto do sistema'}
-                    </span>
-                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1">
+                    Este código vem do cadastro em "Fornecedores e Serviços"
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+
+                <div>
+                  <Label htmlFor="last_update" className="text-xs font-medium">Última Atualização</Label>
+                  <Input
+                    id="last_update"
+                    name="last_update"
+                    type="date"
+                    value={formData.last_update}
+                    onChange={handleInputChange}
+                    className="mt-1 h-8 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Observações */}
+              <div>
+                <Label htmlFor="notes" className="text-xs font-medium">Observações</Label>
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  placeholder="Observações sobre o ingrediente"
+                  rows={2}
+                  className="mt-1 resize-none text-xs"
+                />
+              </div>
+
+              {/* Switch Ativo */}
+              <div className="flex items-center space-x-3 p-3 rounded-lg border bg-gradient-to-r from-slate-50 to-white">
+                <Switch
+                  id="active"
+                  checked={formData.active}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
+                  className={`scale-90 ${formData.active ? 'data-[state=checked]:bg-emerald-500' : 'data-[state=unchecked]:bg-gray-300'}`}
+                />
+                <div className="flex flex-col">
+                  <Label htmlFor="active" className="text-xs font-medium cursor-pointer">
+                    Ingrediente ativo
+                  </Label>
+                  <span className={`text-[10px] font-medium ${formData.active ? 'text-emerald-600' : 'text-gray-400'}`}>
+                    {formData.active ? '✓ Visível no sistema' : '✗ Oculto do sistema'}
+                  </span>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="taco" className="space-y-4 mt-0">
@@ -1046,7 +1099,7 @@ export default function IngredientEditor() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push('/ingredientes')}
+            onClick={() => router.push(itemType === 'embalagem' ? '/ingredientes?tab=embalagens' : '/ingredientes')}
             className="w-full sm:w-auto h-8 text-xs border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
             disabled={saving}
           >
@@ -1057,7 +1110,10 @@ export default function IngredientEditor() {
             disabled={saving || loading}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 w-full sm:w-auto h-8 text-xs shadow-md hover:shadow-lg transition-all"
           >
-            {saving ? "Salvando..." : (isEditing ? "Atualizar Ingrediente" : "Criar Ingrediente")}
+            {saving ? "Salvando..." : (isEditing
+              ? (itemType === 'embalagem' ? "Atualizar Embalagem" : "Atualizar Ingrediente")
+              : (itemType === 'embalagem' ? "Criar Embalagem" : "Criar Ingrediente")
+            )}
           </Button>
         </div>
       </form >

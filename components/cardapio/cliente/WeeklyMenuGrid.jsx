@@ -5,14 +5,7 @@ import { format, addDays, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { renderFormattedRecipeName } from '@/lib/textHelpers';
 import { useLocationSelection } from '@/hooks/cardapio/useLocationSelection';
-
-const dayNames = {
-  1: "Segunda-feira",
-  2: "Terça-feira", 
-  3: "Quarta-feira",
-  4: "Quinta-feira",
-  5: "Sexta-feira"
-};
+import { useAvailableDays, DAY_NAMES_FULL } from '@/hooks/useAvailableDays';
 
 export default function WeeklyMenuGrid({
   currentDate,
@@ -26,8 +19,11 @@ export default function WeeklyMenuGrid({
   locations,
   getAllClientIds
 }) {
-  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
   const locationSelection = useLocationSelection(getAllClientIds());
+
+  // Hook centralizado para dias disponíveis
+  const availableDays = useAvailableDays();
 
   // Log para debug
   console.log('📊 [WeeklyMenuGrid] Props recebidas:', {
@@ -46,36 +42,46 @@ export default function WeeklyMenuGrid({
   // Função para obter clientes desmarcados de uma receita
   const getUncheckedClients = (item) => {
     if (!item || !item.locations || !locations) return [];
-    
+
     return locations.filter(location => {
       const isSelected = locationSelection.isLocationSelected(item.locations, location.id);
       return !isSelected; // Retorna apenas os NÃO selecionados
     });
   };
 
+  // Determinar número de colunas do grid
+  const getGridCols = () => {
+    const numDays = availableDays.length;
+    if (numDays <= 3) return 'repeat(3, 1fr)';
+    if (numDays === 4) return 'repeat(4, 1fr)';
+    if (numDays === 5) return 'repeat(5, 1fr)';
+    if (numDays === 6) return 'repeat(6, 1fr)';
+    return 'repeat(7, 1fr)';
+  };
+
   return (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'repeat(5, 1fr)', 
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: getGridCols(),
       gap: '12px',
       minHeight: 'auto',
       padding: '0',
       width: '100%',
       overflow: 'visible'
     }}>
-      {[1, 2, 3, 4, 5].map(day => {
-        const dayDate = addDays(weekStart, day - 1);
+      {availableDays.map(day => {
+        const dayDate = addDays(weekStart, day);
         const dayItems = weeklyMenu?.menu_data[day] || {};
 
-        console.log(`📅 [WeeklyMenuGrid] Dia ${day} (${dayNames[day]}):`, {
+        console.log(`📅 [WeeklyMenuGrid] Dia ${day} (${DAY_NAMES_FULL[day]}):`, {
           temDados: !!weeklyMenu?.menu_data?.[day],
           categorias: Object.keys(dayItems).length,
           dayItems
         });
 
         return (
-          <div key={day} style={{ 
-            border: '2px solid #000', 
+          <div key={day} style={{
+            border: '2px solid #000',
             padding: '8px',
             display: 'flex',
             flexDirection: 'column',
@@ -89,7 +95,7 @@ export default function WeeklyMenuGrid({
               marginBottom: '8px',
               flexShrink: 0
             }}>
-              <h2 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0', textAlign: 'center' }}>{dayNames[day].toUpperCase().replace('-FEIRA', '')} - {format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
+              <h2 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0', textAlign: 'center' }}>{DAY_NAMES_FULL[day].toUpperCase().replace('-FEIRA', '')} - {format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
             </div>
 
             <div style={{ flex: 1, overflow: 'visible' }}>
@@ -155,21 +161,21 @@ export default function WeeklyMenuGrid({
                 const filteredItems = getFilteredItemsForClient(items, categoryId, selectedCustomer?.id);
                 return filteredItems.length > 0;
               }) && (
-                <div style={{ 
-                  textAlign: 'center', 
-                  color: '#999', 
-                  fontSize: '10px',
-                  marginTop: '20px'
-                }}>
-                  <p>
-                    {!selectedCustomer || selectedCustomer.id === 'all'
-                      ? 'Nenhum item cadastrado'
-                      : 'Sem itens para este cliente'
-                    }
-                  </p>
-                  <p>neste dia</p>
-                </div>
-              )}
+                  <div style={{
+                    textAlign: 'center',
+                    color: '#999',
+                    fontSize: '10px',
+                    marginTop: '20px'
+                  }}>
+                    <p>
+                      {!selectedCustomer || selectedCustomer.id === 'all'
+                        ? 'Nenhum item cadastrado'
+                        : 'Sem itens para este cliente'
+                      }
+                    </p>
+                    <p>neste dia</p>
+                  </div>
+                )}
             </div>
           </div>
         );

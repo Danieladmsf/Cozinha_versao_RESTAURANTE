@@ -490,7 +490,10 @@ export default function Categories() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(category)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(category);
+                    }}
                     className="h-8 w-8 text-gray-500 hover:text-red-600"
                   >
                     <Trash2 className="h-4 w-4" />

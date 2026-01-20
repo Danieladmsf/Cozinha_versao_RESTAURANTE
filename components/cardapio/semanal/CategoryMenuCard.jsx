@@ -43,6 +43,7 @@ export default function CategoryMenuCard({
   onAddMenuItem,
   onRemoveMenuItem,
   recipes,
+  categories,
   menuHelpers,
   menuInterface,
   noteActions,
@@ -60,22 +61,22 @@ export default function CategoryMenuCard({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all mb-4">
-      <div 
-        className="py-2 px-3 border-b border-gray-200" 
+      <div
+        className="py-2 px-3 border-b border-gray-200"
         style={headerStyle}
       >
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <div 
-              className="w-4 h-4 rounded-full mr-2 shadow-sm" 
+            <div
+              className="w-4 h-4 rounded-full mr-2 shadow-sm"
               style={{ backgroundColor: categoryColor }}
             />
             <h3 className="text-base font-semibold text-gray-800">{category.name}</h3>
           </div>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onToggleLocationVisibility}
             className="text-gray-600 hover:bg-white/30 hover:text-gray-800 p-1"
           >
@@ -87,28 +88,28 @@ export default function CategoryMenuCard({
           </Button>
         </div>
       </div>
-      
+
       <div className="p-3">
         <div className="space-y-3">
           {items.map((item, itemIndex) => {
             const isOpen = menuInterface.isDropdownOpen(category.id, itemIndex);
             const currentSearchTerm = menuInterface.getSearchTerm(category.id, itemIndex);
-            const filteredRecipes = menuHelpers.filterRecipesBySearch(recipes, category.name, currentSearchTerm);
+            const filteredRecipes = menuHelpers.filterRecipesBySearch(recipes, category.name, currentSearchTerm, categories);
 
             return (
-              <div 
-                key={itemIndex} 
+              <div
+                key={itemIndex}
                 className="space-y-2 p-2 rounded border border-gray-100 hover:border-gray-200 transition-all"
               >
                 <div className="flex items-center gap-2">
-                  <Popover 
+                  <Popover
                     open={isOpen}
                     onOpenChange={(open) => handleOpenChange(itemIndex, open)}
                   >
                     <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        role="combobox" 
+                      <Button
+                        variant="outline"
+                        role="combobox"
                         aria-expanded={isOpen}
                         className="w-full justify-between h-9 border-gray-200 hover:border-gray-300 bg-white text-sm"
                       >
@@ -124,13 +125,13 @@ export default function CategoryMenuCard({
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    
+
                     <PopoverContent className="p-0 w-[400px]" align="start">
                       <Command shouldFilter={false}>
                         <div className="flex items-center border-b px-3 py-2">
                           <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                          <CommandInput 
-                            placeholder="Digite para buscar..." 
+                          <CommandInput
+                            placeholder="Digite para buscar..."
                             value={currentSearchTerm}
                             onValueChange={(value) => {
                               menuInterface.updateSearchTerm(category.id, itemIndex, value);
@@ -148,7 +149,7 @@ export default function CategoryMenuCard({
                           >
                             Limpar seleção
                           </CommandItem>
-                          
+
                           {filteredRecipes.length === 0 ? (
                             <CommandEmpty>Nenhuma receita encontrada</CommandEmpty>
                           ) : (
@@ -173,8 +174,8 @@ export default function CategoryMenuCard({
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="icon"
                         className="shrink-0 hover:bg-gray-100 h-9 w-9 rounded-lg"
                       >
@@ -182,12 +183,12 @@ export default function CategoryMenuCard({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => {
                           noteActions.startAddingNote(
-                            category.id, 
-                            itemIndex, 
-                            currentDayIndex, 
+                            category.id,
+                            itemIndex,
+                            currentDayIndex,
                             item.recipe_id
                           );
                         }}
@@ -196,8 +197,8 @@ export default function CategoryMenuCard({
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Adicionar observação
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="text-red-600 cursor-pointer" 
+                      <DropdownMenuItem
+                        className="text-red-600 cursor-pointer"
                         onClick={() => onRemoveMenuItem(itemIndex)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -215,9 +216,9 @@ export default function CategoryMenuCard({
 
         {items.length < 10 && (
           <div className="mt-3 pt-2 border-t border-gray-200">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="w-full border-dashed border-gray-300 hover:border-gray-400 h-9 rounded-lg text-sm"
               style={buttonStyle}
               onClick={onAddMenuItem}

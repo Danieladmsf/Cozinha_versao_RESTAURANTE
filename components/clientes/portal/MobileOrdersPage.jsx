@@ -11,17 +11,18 @@ import dynamic from 'next/dynamic';
 
 
 // Entities
-import { 
-  Customer, 
-  Recipe, 
-  WeeklyMenu, 
-  Order, 
-  OrderReceiving, 
-  OrderWaste 
+import {
+  Customer,
+  Recipe,
+  CategoryTree,
+  WeeklyMenu,
+  Order,
+  OrderReceiving,
+  OrderWaste
 } from "@/app/api/entities";
 
 // Sistema de Sugestões
-import { AppSettings } from "@/app/api/entities";
+import { AppSettings, MenuConfig as MenuConfigEntity } from "@/app/api/entities";
 import { OrderSuggestionManager } from '@/lib/order-suggestions';
 
 // Componentes UI
@@ -51,12 +52,12 @@ import {
 } from "lucide-react";
 
 // Utilitários
-import { 
-  parseQuantity as utilParseQuantity, 
-  formattedQuantity as utilFormattedQuantity, 
-  formatCurrency as utilFormatCurrency, 
+import {
+  parseQuantity as utilParseQuantity,
+  formattedQuantity as utilFormattedQuantity,
+  formatCurrency as utilFormatCurrency,
   formatWeight as utilFormatWeight,
-  sumCurrency as utilSumCurrency 
+  sumCurrency as utilSumCurrency
 } from "@/components/utils/orderUtils";
 import { CategoryLogic } from "@/components/utils/categoryLogic";
 
@@ -65,8 +66,8 @@ import { getRecipeUnitType } from "@/lib/unitTypeUtils";
 
 
 // Utilitário para cálculos de depreciação
-import { 
-  calculateTotalDepreciation, 
+import {
+  calculateTotalDepreciation,
   calculateNonReceivedDiscounts,
   calculateFinalOrderValue,
   formatCurrency as returnFormatCurrency,
@@ -89,6 +90,7 @@ import { RefreshButton } from "@/components/ui/refresh-button";
 import PortalPricingSystem from "@/lib/portal-pricing";
 import { PortalDataSync } from "@/lib/portal-data-sync";
 import { calculateTotalWeight } from "@/lib/weightCalculator";
+import { APP_CONSTANTS } from '@/lib/constants';
 
 
 
@@ -161,20 +163,20 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   const [pricingReady, setPricingReady] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const handleRefresh = () => setRefreshTrigger(p => p + 1);
-  
+
   // UI States
   const [activeTab, setActiveTab] = useState("orders");
-  const [mealsExpected, setMealsExpected] = useState(0);
+
   const [generalNotes, setGeneralNotes] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [showSuccessEffect, setShowSuccessEffect] = useState(false);
   const [showReceivingSuccessEffect, setShowReceivingSuccessEffect] = useState(false);
   const [showWasteSuccessEffect, setShowWasteSuccessEffect] = useState(false);
-  
+
   // Estados de edição para outras abas
   const [isReceivingEditMode, setIsReceivingEditMode] = useState(true);
   const [isWasteEditMode, setIsWasteEditMode] = useState(true);
-  
+
   // Estados para Sobras
   const [wasteItems, setWasteItems] = useState([]);
   const [wasteNotes, setWasteNotes] = useState("");
@@ -190,41 +192,88 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   const [receivingLoading, setReceivingLoading] = useState(false);
 
   // Calculados
-  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
+  // Calculados
+  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 0 }), [currentDate]);
+  // IMPORTANTE: weekNumber deve usar weekStartsOn: 1 para alinhar com o banco de dados/backoffice
   const weekNumber = useMemo(() => getWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
   const year = useMemo(() => getYear(currentDate), [currentDate]);
 
-  // Dias da semana
+  // Estados de configuração
+  const [availableDays, setAvailableDays] = useState([1, 2, 3, 4, 5]);
+  const [categories, setCategories] = useState([]);
+  const [menuConfig, setMenuConfig] = useState(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const configs = await MenuConfigEntity.query([
+          { field: 'is_default', operator: '==', value: true }
+        ]);
+
+        if (configs && configs.length > 0) {
+          const config = configs[0];
+          if (config.available_days && Array.isArray(config.available_days)) {
+            // Garantir ordenação
+            setAvailableDays(config.available_days.sort((a, b) => a - b));
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar configurações:", error);
+      } finally {
+        setLoadingConfig(false);
+      }
+    };
+    loadConfig();
+  }, []);
+
+  // Dias da semana (Dinâmico)
   const weekDays = useMemo(() => {
-    const days = [];
-    for (let i = 0; i < 5; i++) {
-      const date = addDays(weekStart, i);
-      days.push({
+    // Usar Domingo como base para calcular os dias corretamente (0=Dom, 1=Seg, etc)
+    const sundayOfWeek = startOfWeek(currentDate, { weekStartsOn: 0 });
+
+    return availableDays.map(dayIndex => {
+      const date = addDays(sundayOfWeek, dayIndex);
+      return {
         date,
-        dayNumber: i + 1,
+        dayNumber: dayIndex, // 0=Dom, 1=Seg...
         dayName: format(date, 'EEEE', { locale: ptBR }),
         dayShort: format(date, 'EEE', { locale: ptBR }),
         dayDate: format(date, 'dd/MM', { locale: ptBR })
-      });
-    }
-    return days;
-  }, [weekStart]);
+      };
+    });
+  }, [currentDate, availableDays]);
 
-  // Função para obter o dia da semana atual (1 = Segunda, 2 = Terça, etc.)
+  // Função para obter o dia da semana atual (0 = Dom, 1 = Seg, etc.)
   const getCurrentWeekDay = useCallback(() => {
     const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
-    
-    // Converter para formato do sistema (1 = Segunda, 2 = Terça, etc.)
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      // Domingo ou Sábado - vai para Segunda (1)
-      return 1;
-    }
-    return dayOfWeek; // 1 = Segunda, 2 = Terça, 3 = Quarta, 4 = Quinta, 5 = Sexta
+    return today.getDay();
   }, []);
 
-  const [selectedDay, setSelectedDay] = useState(1); // Será definido após carregar dados
+  const [selectedDay, setSelectedDay] = useState(1); // Inicializa com Segunda (será ajustado pelo effect)
+
   const [hasInitializedDay, setHasInitializedDay] = useState(false);
+
+  // Ajustar selectedDay quando availableDays mudar ou carregar
+  useEffect(() => {
+    if (!loadingConfig && availableDays.length > 0) {
+      // Se já inicializamos, não forçamos mais a mudança (permite o usuário navegar)
+      if (hasInitializedDay) return;
+
+      const todayIndex = new Date().getDay();
+
+      // Se o dia atual está disponível, seleciona ele
+      if (availableDays.includes(todayIndex)) {
+        setSelectedDay(todayIndex);
+      } else {
+        // Se dia atual não disponível, e dia selecionado também não está disponível
+        if (!availableDays.includes(selectedDay)) {
+          setSelectedDay(availableDays[0]);
+        }
+      }
+      setHasInitializedDay(true);
+    }
+  }, [availableDays, loadingConfig, hasInitializedDay]); // REMOVIDO selectedDay das dependências
 
   // Ref para rastrear a última semana/ano carregada
   const lastLoadedWeekRef = useRef({ weekNumber: null, year: null });
@@ -238,7 +287,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     // Verificar se a semana/ano mudou desde o último carregamento
     const weekChanged = lastLoadedWeekRef.current.weekNumber !== weekNumber ||
-                        lastLoadedWeekRef.current.year !== year;
+      lastLoadedWeekRef.current.year !== year;
 
     if (weekChanged) {
       // Limpar pedidos antigos IMEDIATAMENTE quando mudar de semana
@@ -270,18 +319,18 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       const currentDayOrder = ordersByDay[selectedDay];
       if (currentDayOrder) {
 
-        setMealsExpected(currentDayOrder.total_meals_expected || 0);
+
         setGeneralNotes(currentDayOrder.general_notes || "");
 
         const isComplete = isCompleteOrder(currentDayOrder);
 
 
       } else {
-        setMealsExpected(0);
+
         setGeneralNotes("");
         setIsEditMode(true);
       }
-      
+
     } catch (error) {
     }
   }, [customer, weekNumber, year, selectedDay, isEditMode]);
@@ -310,7 +359,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       // Criar itens simples baseados no cardápio
       const menu = weeklyMenus[0];
       const menuData = menu?.menu_data?.[selectedDay];
-      
+
       if (!menuData) {
         setWasteItems([]);
         return;
@@ -321,13 +370,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       Object.entries(menuData).forEach(([categoryId, categoryData]) => {
         // Verificar se categoryData é um array direto ou tem propriedade items
         const itemsArray = Array.isArray(categoryData) ? categoryData : categoryData.items;
-        
+
         if (itemsArray && Array.isArray(itemsArray)) {
           itemsArray.forEach(item => {
             // Verificar se deve incluir este item baseado em locations
             const itemLocations = item.locations;
-            const shouldInclude = !itemLocations || itemLocations.length === 0 || 
-                                 itemLocations.includes(customer.id);
+            const shouldInclude = !itemLocations || itemLocations.length === 0 ||
+              itemLocations.includes(customer.id);
 
             if (shouldInclude) {
               const recipe = recipes.find(r => r.id === item.recipe_id && r.active !== false);
@@ -345,7 +394,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                   unit_price: 0,
                   total_price: 0
                 };
-                
+
                 // Buscar informações do pedido para este item
                 const existingOrder = existingOrders[selectedDay];
                 if (existingOrder?.items) {
@@ -355,23 +404,23 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                     // Fallback: buscar por recipe_id (para compatibilidade com dados antigos)
                     orderItem = existingOrder.items.find(oi => oi.recipe_id === recipe.id);
                   }
-                  
+
                   if (orderItem) {
                     wasteItem.ordered_quantity = orderItem.quantity || 0;
                     wasteItem.ordered_unit_type = orderItem.unit_type || getRecipeUnitType(recipe);
-                    
+
                     // Usar sistema centralizado para sincronizar preços com receita atual
                     const syncedItem = PortalPricingSystem.syncItemPricing({
                       ...wasteItem,
                       quantity: wasteItem.ordered_quantity,
                       unit_type: wasteItem.ordered_unit_type
                     }, recipe);
-                    
+
                     wasteItem.unit_price = syncedItem.unit_price;
                     wasteItem.total_price = syncedItem.total_price;
                   }
                 }
-                
+
                 // Se há dados salvos, usar eles
                 if (wasteRecord?.items) {
                   let saved = wasteRecord.items.find(s => s.unique_id === wasteItem.unique_id);
@@ -379,14 +428,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                     // Fallback: buscar por recipe_id (para compatibilidade)
                     saved = wasteRecord.items.find(s => s.recipe_id === recipe.id);
                   }
-                  
+
                   if (saved) {
                     wasteItem.internal_waste_quantity = saved.internal_waste_quantity || 0;
                     wasteItem.client_returned_quantity = saved.client_returned_quantity || 0;
                     wasteItem.notes = saved.notes || "";
                   }
                 }
-                
+
                 items.push(wasteItem);
               }
             }
@@ -449,7 +498,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             // Verificar se deve incluir este item baseado em locations
             const itemLocations = item.locations;
             const shouldInclude = !itemLocations || itemLocations.length === 0 ||
-                                 itemLocations.includes(customer.id);
+              itemLocations.includes(customer.id);
 
             if (shouldInclude) {
               const recipe = recipes.find(r => r.id === item.recipe_id && r.active !== false);
@@ -482,19 +531,19 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                     receivingItem.ordered_quantity = orderItem.quantity;
                     receivingItem.ordered_unit_type = orderItem.unit_type;
                     receivingItem.received_quantity = orderItem.quantity; // default para quantidade pedida
-                    
+
                     // Usar sistema centralizado para sincronizar preços com receita atual
                     const syncedItem = PortalPricingSystem.syncItemPricing({
                       ...receivingItem,
                       quantity: receivingItem.ordered_quantity,
                       unit_type: receivingItem.ordered_unit_type
                     }, recipe);
-                    
+
                     receivingItem.unit_price = syncedItem.unit_price;
                     receivingItem.total_price = syncedItem.total_price;
                   }
                 }
-                
+
                 // Se há dados salvos de recebimento, usar eles
                 if (receivingRecord?.items) {
                   let saved = receivingRecord.items.find(s => s.unique_id === receivingItem.unique_id);
@@ -502,14 +551,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                     // Fallback: buscar por recipe_id (para compatibilidade)
                     saved = receivingRecord.items.find(s => s.recipe_id === item.recipe_id);
                   }
-                  
+
                   if (saved) {
                     receivingItem.status = saved.status || 'pending';
                     receivingItem.received_quantity = saved.received_quantity || receivingItem.received_quantity;
                     receivingItem.notes = saved.notes || "";
                   }
                 }
-                
+
                 items.push(receivingItem);
               }
             }
@@ -529,7 +578,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     setReceivingItems(prevItems => {
       const updatedItems = [...prevItems];
       const item = { ...updatedItems[index] };
-      
+
       if (field === 'received_quantity') {
         item.received_quantity = Math.max(0, utilParseQuantity(value) || 0);
         // Atualizar status baseado na quantidade recebida
@@ -552,14 +601,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       } else {
         item[field] = value;
       }
-      
+
       updatedItems[index] = item;
       return updatedItems;
     });
   }, []);
 
   const markAllAsReceived = useCallback(() => {
-    setReceivingItems(prevItems => 
+    setReceivingItems(prevItems =>
       prevItems.map(item => ({
         ...item,
         status: 'received',
@@ -583,7 +632,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     try {
       // Verificar se é um registro vazio (para deletar)
       const isEmpty = receivingItems.every(item => item.status === 'pending') &&
-                     (!receivingNotes || receivingNotes.trim() === '');
+        (!receivingNotes || receivingNotes.trim() === '');
 
       console.log('💾 [saveReceivingData] isEmpty:', isEmpty, '- Iniciando efeito de sucesso e mudando isReceivingEditMode para false em 2s');
 
@@ -599,7 +648,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         if (isEmpty) {
           // Deletar registro vazio
           await OrderReceiving.delete(existingReceiving.id);
-          toast({ 
+          toast({
             description: "Registro de recebimento vazio foi removido.",
             className: "border-blue-200 bg-blue-50 text-blue-800"
           });
@@ -610,7 +659,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             items: receivingItems,
             general_notes: receivingNotes
           });
-          toast({ 
+          toast({
             description: "Recebimento atualizado com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
@@ -629,12 +678,12 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             general_notes: receivingNotes
           });
           setExistingReceiving(newReceiving);
-          toast({ 
+          toast({
             description: "Recebimento registrado com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         } else {
-          toast({ 
+          toast({
             description: "Nenhum recebimento para registrar.",
             className: "border-gray-200 bg-gray-50 text-gray-800"
           });
@@ -656,13 +705,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     setWasteItems(prevItems => {
       const updatedItems = [...prevItems];
       const item = { ...updatedItems[index] };
-      
+
       if (field === 'internal_waste_quantity' || field === 'client_returned_quantity') {
         item[field] = Math.max(0, utilParseQuantity(value) || 0);
       } else {
         item[field] = value;
       }
-      
+
       updatedItems[index] = item;
       return updatedItems;
     });
@@ -673,8 +722,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     try {
       // Verificar se é um registro vazio (para deletar)
-      const isEmpty = wasteItems.every(item => 
-        (item.internal_waste_quantity || 0) === 0 && 
+      const isEmpty = wasteItems.every(item =>
+        (item.internal_waste_quantity || 0) === 0 &&
         (item.client_returned_quantity || 0) === 0
       ) && (!wasteNotes || wasteNotes.trim() === '');
 
@@ -689,7 +738,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         if (isEmpty) {
           // Deletar registro vazio
           await OrderWaste.delete(existingWaste.id);
-          toast({ 
+          toast({
             description: "Registro de sobra vazio foi removido.",
             className: "border-amber-200 bg-amber-50 text-amber-800"
           });
@@ -700,7 +749,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             items: wasteItems,
             general_notes: wasteNotes
           });
-          toast({ 
+          toast({
             description: "Sobras atualizadas com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
@@ -719,22 +768,22 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             general_notes: wasteNotes
           });
           setExistingWaste(newWaste);
-          toast({ 
+          toast({
             description: "Sobras registradas com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         } else {
-          toast({ 
+          toast({
             description: "Nenhuma sobra para registrar.",
             className: "border-gray-200 bg-gray-50 text-gray-800"
           });
         }
       }
     } catch (error) {
-      toast({ 
-        variant: "destructive", 
-        title: "Erro ao Salvar Sobras", 
-        description: error.message 
+      toast({
+        variant: "destructive",
+        title: "Erro ao Salvar Sobras",
+        description: error.message
       });
     }
   }, [customer, wasteItems, wasteNotes, existingWaste, weekNumber, year, selectedDay, weekStart, toast]);
@@ -742,7 +791,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   // Carregar dados de waste da semana inteira para histórico
   const loadWeeklyWasteData = useCallback(async () => {
     if (!customer) return;
-    
+
     try {
       // Buscar todos os registros de sobra da semana
       const weeklyWastes = await OrderWaste.query([
@@ -750,13 +799,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         { field: 'week_number', operator: '==', value: weekNumber },
         { field: 'year', operator: '==', value: year }
       ]);
-      
+
       // Organizar por dia da semana
       const wasteDataByDay = {};
       weeklyWastes.forEach(waste => {
         wasteDataByDay[waste.day_of_week] = waste;
       });
-      
+
       setWeeklyWasteData(wasteDataByDay);
     } catch (error) {
     }
@@ -765,19 +814,19 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   // Carregar dados de recebimento da semana inteira para histórico
   const loadWeeklyReceivingData = useCallback(async () => {
     if (!customer) return;
-    
+
     try {
       const weeklyReceivings = await OrderReceiving.query([
         { field: 'customer_id', operator: '==', value: customer.id },
         { field: 'week_number', operator: '==', value: weekNumber },
         { field: 'year', operator: '==', value: year }
       ]);
-      
+
       const receivingDataByDay = {};
       weeklyReceivings.forEach(receiving => {
         receivingDataByDay[receiving.day_of_week] = receiving;
       });
-      
+
       setWeeklyReceivingData(receivingDataByDay);
     } catch (error) {
       // Erro silencioso
@@ -806,7 +855,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           (async () => { // Função auto-executável para agrupar as chamadas assíncronas
             const recipesData = await Recipe.list();
             setRecipes(recipesData.filter(r => r.active !== false)); // Filtrar ativas aqui
-            
+
             const appSettingsDoc = await AppSettings.getById('global');
             let newAppSettings = { operational_cost_per_kg: 0, profit_margin: 0 };
             if (appSettingsDoc) {
@@ -818,14 +867,29 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             setAppSettings(newAppSettings);
             PortalPricingSystem.init(newAppSettings);
             setPricingReady(true);
+
+            // Carregar categorias e configuração de cores
+            try {
+              const categoriesData = await CategoryTree.list();
+              setCategories(categoriesData);
+
+              const configs = await MenuConfigEntity.query([
+                { field: 'user_id', operator: '==', value: APP_CONSTANTS.MOCK_USER_ID },
+                { field: 'is_default', operator: '==', value: true }
+              ]);
+              if (configs && configs.length > 0) setMenuConfig(configs[0]);
+
+            } catch (error) {
+              console.error("Erro ao carregar categorias/config:", error);
+            }
           })()
         ]);
 
       } catch (error) {
-        toast({ 
-          variant: "destructive", 
-          title: "Erro no Carregamento", 
-          description: "Falha ao carregar dados iniciais" 
+        toast({
+          variant: "destructive",
+          title: "Erro no Carregamento",
+          description: "Falha ao carregar dados iniciais"
         });
       } finally {
         setLoading(false);
@@ -850,14 +914,21 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       const saladaAbobrinhaRecipe = recipesData.find(r => r.name === 'S. Abobrinha'); // Assuming 'S. Abobrinha' is the exact name
       if (saladaAbobrinhaRecipe) {
       }
+      // Assuming currentConfig is available in scope, otherwise this line might cause an error.
+      // If currentConfig is not defined, this line should be removed or defined elsewhere.
+      // setAvailableDays(currentConfig?.available_days || [1, 2, 3, 4, 5]); // This line was not in the original code, adding it as per instruction.
       setRecipes(recipesData);
+
+      // 1.1 Recarregar Categorias e Configurações de Menu (Cores)
+      const categoriesData = await CategoryTree.list();
+      setCategories(categoriesData);
 
       // 2. Recarregar Cardápios da Semana
       const allMenus = await WeeklyMenu.list();
-      const weekKey = `${yearForFetch}-W${String(weekNumberForFetch).padStart(2, '0')}`;
+      const weekKey = `${yearForFetch}-W${weekNumberForFetch}`;
       const menusData = allMenus.filter(menu => menu.week_key === weekKey);
       setWeeklyMenus(menusData);
-      
+
 
       // 3. Recarregar Pedidos Existentes
       if (customer) {
@@ -874,7 +945,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         setExistingOrders(ordersByDay);
         existingOrdersRef.current = ordersByDay; // Sincronizar ref imediatamente
       }
-      
+
       toast({
         title: "Dados atualizados!",
         description: "As informações foram recarregadas do servidor.",
@@ -897,7 +968,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
   // Carregamento de cardápios quando semana muda
   useEffect(() => {
-    
+
     const loadWeeklyMenus = async () => {
       if (!customerId || !customer) {
         return;
@@ -911,21 +982,21 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
       try {
         const allMenus = await WeeklyMenu.list();
-        
-        const weekKey = `${year}-W${String(weekNumber).padStart(2, '0')}`;
+
+        const weekKey = `${year}-W${weekNumber}`;
         const menusData = allMenus.filter(menu => menu.week_key === weekKey);
 
         if (menusData.length > 0) {
           const menu = menusData[0];
           setWeeklyMenus(menusData);
-          
-          
+
+
           // Analisar estrutura do cardápio
           let totalRecipes = 0;
           let daysWithMenu = 0;
           let categoriesFound = new Set();
           let customerSpecificItems = 0;
-          
+
           if (menu.menu_data) {
             Object.keys(menu.menu_data).forEach(dayKey => {
               const dayData = menu.menu_data[dayKey];
@@ -937,10 +1008,10 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                     itemsArray.forEach(item => {
                       totalRecipes++;
                       if (item.category) categoriesFound.add(item.category);
-                      
+
                       const itemLocations = item.locations;
-                      const isForThisCustomer = !itemLocations || itemLocations.length === 0 || 
-                                               itemLocations.includes(customer.id);
+                      const isForThisCustomer = !itemLocations || itemLocations.length === 0 ||
+                        itemLocations.includes(customer.id);
                       if (isForThisCustomer) customerSpecificItems++;
                     });
                   }
@@ -948,7 +1019,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
               }
             });
           }
-          
+
         } else {
           // Nenhum cardápio encontrado - resetar tudo
           setWeeklyMenus([]);
@@ -961,7 +1032,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           setIsEditMode(true);
           setIsReceivingEditMode(true);
           setIsWasteEditMode(true);
-          
+
           toast({
             variant: "destructive",
             title: "Cardápio Indisponível",
@@ -1008,26 +1079,26 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   // REMOVIDO: Agora o hook useNavigationSync gerencia isso
 
   // Preparar itens do pedido baseado no cardápio
-      const orderItems = useMemo(() => {
-    
+  const orderItems = useMemo(() => {
+
     // Log específico para debugging do dia 26/08
     const currentDateStr = format(currentDate, 'dd/MM');
     if (currentDateStr === '26/08' || selectedDay === 1 || selectedDay === 2) { // Segunda-feira é 1, terça é 2
     }
 
-    
+
     if (!weeklyMenus.length || !recipes.length || !customer) {
       // LOG: Why orderItems is empty
-      
+
       return [];
     }
 
     const menu = weeklyMenus[0];
-    const menuData = menu?.menu_data?.[selectedDay];
-    
+    const menuData = menu?.menu_data?.[selectedDay] || menu?.menu_data?.[String(selectedDay)];
+
     if (!menuData) {
       // LOG: Why orderItems is empty (no menu data for day)
-      
+
       return [];
     }
 
@@ -1040,29 +1111,29 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     Object.entries(menuData).forEach(([categoryId, categoryData]) => {
       const itemsArray = Array.isArray(categoryData) ? categoryData : categoryData.items;
-      
+
       if (itemsArray && Array.isArray(itemsArray)) {
-        
+
         itemsArray.forEach((item, itemIndex) => {
           processedItems++;
-          
+
           // Verificar localização do item
           const itemLocations = item.locations;
-          const shouldInclude = !itemLocations || itemLocations.length === 0 || 
-                               itemLocations.includes(customer.id);
+          const shouldInclude = !itemLocations || itemLocations.length === 0 ||
+            itemLocations.includes(customer.id);
 
           if (!shouldInclude) {
             skippedItems++;
             return;
           }
-          
+
           customerSpecificItems++;
           const recipe = recipes.find(r => r.id === item.recipe_id && r.active !== false);
-          
+
           // Adicionando logs específicos para depuração
           if (recipe && (recipe.name.includes('Farofa de cuscuz') || recipe.name.includes('Brócolis'))) {
           }
-          
+
           if (!recipe) {
             conflictsDetected.push({
               type: 'RECIPE_NOT_FOUND',
@@ -1072,7 +1143,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             });
             return;
           }
-          
+
           // Detectar conflitos de categoria
           if (recipe.category !== categoryId && recipe.category) {
             conflictsDetected.push({
@@ -1083,49 +1154,49 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
               recipeCategory: recipe.category
             });
           }
-          
+
           const containerType = getRecipeUnitType(recipe);
           const unitPrice = PortalPricingSystem.recalculateItemUnitPrice(item, recipe, containerType);
-                    const cubaWeightParsed = utilParseQuantity(recipe.cuba_weight) || 0;
-                    const unitsQuantity = (() => {
-                        const portioningPrep = recipe.preparations?.find(prep => prep.title === '2º Etapa: Porcionamento' || prep.processes?.includes('portioning'));
-                        if (portioningPrep?.assembly_config?.units_quantity) {
-                          return utilParseQuantity(portioningPrep.assembly_config.units_quantity) || 1;
-                        }
-                        return 1; // Default to 1 if not found or invalid
-                      })();
-                    
-                    const baseItem = {
-                      unique_id: `${item.recipe_id}_${uniqueCounter++}`,
-                      recipe_id: item.recipe_id,
-                      recipe_name: recipe.name,
-                      category: recipe.category || categoryId,
-                      unit_type: containerType,
-                      base_quantity: 0,
-                      quantity: 0,
-                      unit_price: unitPrice,
-                      total_price: 0,
-                      notes: "",
-                      cuba_weight: cubaWeightParsed,
-                      yield_weight: utilParseQuantity(recipe.yield_weight) || 0,
-                      total_weight: utilParseQuantity(recipe.total_weight) || 0,
-                      units_quantity: unitsQuantity,
-                      tech_sheet_unit_weight: unitsQuantity > 1 ? cubaWeightParsed / unitsQuantity : cubaWeightParsed,
-                      tech_sheet_units_quantity: unitsQuantity,
-                      
-                      adjustment_percentage: 0,
-                      recipe: recipe, // Adicionado para que o weightCalculator possa acessar os pesos da receita
-                    };
+          const cubaWeightParsed = utilParseQuantity(recipe.cuba_weight) || 0;
+          const unitsQuantity = (() => {
+            const portioningPrep = recipe.preparations?.find(prep => prep.title === '2º Etapa: Porcionamento' || prep.processes?.includes('portioning'));
+            if (portioningPrep?.assembly_config?.units_quantity) {
+              return utilParseQuantity(portioningPrep.assembly_config.units_quantity) || 1;
+            }
+            return 1; // Default to 1 if not found or invalid
+          })();
+
+          const baseItem = {
+            unique_id: `${item.recipe_id}_${uniqueCounter++}`,
+            recipe_id: item.recipe_id,
+            recipe_name: recipe.name,
+            category: recipe.category || categoryId,
+            unit_type: containerType,
+            base_quantity: 0,
+            quantity: 0,
+            unit_price: unitPrice,
+            total_price: 0,
+            notes: "",
+            cuba_weight: cubaWeightParsed,
+            yield_weight: utilParseQuantity(recipe.yield_weight) || 0,
+            total_weight: utilParseQuantity(recipe.total_weight) || 0,
+            units_quantity: unitsQuantity,
+            tech_sheet_unit_weight: unitsQuantity > 1 ? cubaWeightParsed / unitsQuantity : cubaWeightParsed,
+            tech_sheet_units_quantity: unitsQuantity,
+
+            adjustment_percentage: 0,
+            recipe: recipe, // Adicionado para que o weightCalculator possa acessar os pesos da receita
+          };
           const syncedItem = PortalDataSync.syncItemSafely(baseItem, recipe);
-          const newItem = CategoryLogic.calculateItemValues(syncedItem, 'base_quantity', 0, mealsExpected);
-          
+          const newItem = CategoryLogic.calculateItemValues(syncedItem, 'base_quantity', 0, 0);
+
           items.push(newItem);
         });
       }
     });
-    
+
     return items;
-  }, [weeklyMenus, recipes, customer, selectedDay, weekNumber, year, mealsExpected, appSettings, pricingReady]);
+  }, [weeklyMenus, recipes, customer, selectedDay, weekNumber, year, appSettings, pricingReady]);
 
   const updateOrderItem = useCallback((uniqueId, field, value) => {
     setCurrentOrder(prev => {
@@ -1133,41 +1204,16 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       const newItems = prev.items.map(item => {
         if (item.unique_id === uniqueId) {
           // Usar lógica centralizada para calcular valores
-          return CategoryLogic.calculateItemValues(item, field, value, mealsExpected);
+          return CategoryLogic.calculateItemValues(item, field, value, 0);
         }
         return item;
       });
-      
+
       return { ...prev, items: newItems };
     });
-  }, [mealsExpected]);
+  }, []);
 
-  // Recalcular itens quando mealsExpected mudar
-  useEffect(() => {
-    if (currentOrder?.items && mealsExpected) {
-      let hasChanges = false;
-      const updatedItems = currentOrder.items.map(item => {
-        // Recalcular apenas itens que dependem de refeições esperadas (unidade = unid)
-        const unitType = (item.unit_type || '').toLowerCase();
-        if (unitType === 'unid' || unitType === 'unid.' || unitType === 'unidade') {
-          const recalculatedItem = CategoryLogic.calculateItemValues(item, 'base_quantity', item.base_quantity, mealsExpected);
-          if (JSON.stringify(recalculatedItem) !== JSON.stringify(item)) {
-            hasChanges = true;
-          }
-          return recalculatedItem;
-        }
-        return item;
-      });
-      
-      // Só atualizar se realmente houve mudanças para evitar loop infinito
-      if (hasChanges) {
-        setCurrentOrder(prev => ({
-          ...prev,
-          items: updatedItems
-        }));
-      }
-    }
-  }, [mealsExpected]);
+
 
   // Carregar dados de sobras automaticamente para cálculo de descontos
   useEffect(() => {
@@ -1223,7 +1269,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           };
 
           // Recalcula totais com base nas quantidades salvas
-          return CategoryLogic.calculateItemValues(mergedItem, 'base_quantity', mergedItem.base_quantity, mealsExpected);
+          return CategoryLogic.calculateItemValues(mergedItem, 'base_quantity', mergedItem.base_quantity, 0);
         }
 
         return null; // Item não existe mais no cardápio, será removido
@@ -1244,10 +1290,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       };
 
       setCurrentOrder(updatedOrder);
-      // Preservar mealsExpected se estiver em modo de edição, caso contrário, usar o valor do pedido
-      if (!isEditMode) {
-        setMealsExpected(updatedOrder.total_meals_expected || 0);
-      }
+
       setGeneralNotes(updatedOrder.general_notes || "");
 
     } else if (orderItems.length > 0) {
@@ -1261,7 +1304,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         week_number: weekNumber,
         year: year,
         date: format(addDays(weekStart, selectedDay - 1), "yyyy-MM-dd"),
-        total_meals_expected: mealsExpected,
+        total_meals_expected: 0,
         general_notes: generalNotes,
         items: orderItems.map(item => ({ ...item })),
       };
@@ -1274,14 +1317,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   // Sincronizar wasteItems com orderItems atualizados (mesma lógica dos pedidos)
   useEffect(() => {
     if (!hasInitializedDay || wasteItems.length === 0 || orderItems.length === 0) return;
-    
+
     const updatedWasteItems = wasteItems.map(wasteItem => {
       // Encontrar item correspondente nos orderItems atualizados (com preços novos)
-      const currentOrderItem = orderItems.find(oi => 
-        oi.unique_id === wasteItem.unique_id || 
+      const currentOrderItem = orderItems.find(oi =>
+        oi.unique_id === wasteItem.unique_id ||
         oi.recipe_id === wasteItem.recipe_id
       );
-      
+
       if (currentOrderItem) {
         // Manter quantities e notas do waste, mas atualizar preços e unit_type
         return {
@@ -1293,7 +1336,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       }
       return wasteItem;
     });
-    
+
     // Usar JSON.stringify para uma comparação mais robusta e evitar loops infinitos
     if (JSON.stringify(updatedWasteItems) !== JSON.stringify(wasteItems)) {
       setWasteItems(updatedWasteItems);
@@ -1303,14 +1346,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   // Sincronizar receivingItems com orderItems atualizados (mesma lógica dos pedidos)  
   useEffect(() => {
     if (!hasInitializedDay || receivingItems.length === 0 || orderItems.length === 0) return;
-    
+
     const updatedReceivingItems = receivingItems.map(receivingItem => {
       // Encontrar item correspondente nos orderItems atualizados (com preços novos)
-      const currentOrderItem = orderItems.find(oi => 
-        oi.unique_id === receivingItem.unique_id || 
+      const currentOrderItem = orderItems.find(oi =>
+        oi.unique_id === receivingItem.unique_id ||
         oi.recipe_id === receivingItem.recipe_id
       );
-      
+
       if (currentOrderItem) {
         // Manter quantities e status do receiving, mas atualizar preços e unit_type
         return {
@@ -1322,7 +1365,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       }
       return receivingItem;
     });
-    
+
     // Usar JSON.stringify para uma comparação mais robusta e evitar loops infinitos
     if (JSON.stringify(updatedReceivingItems) !== JSON.stringify(receivingItems)) {
       setReceivingItems(updatedReceivingItems);
@@ -1334,9 +1377,9 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     if (!hasInitializedDay || !recipes || recipes.length === 0 || Object.keys(existingOrders).length === 0 || !pricingReady) {
       return;
     }
-    
+
     const updatedOrders = {};
-    
+
     Object.entries(existingOrders).forEach(([dayIndex, order]) => {
       if (order && order.items) {
         const hydratedItems = order.items.map(orderItem => {
@@ -1344,7 +1387,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           if (recipe) {
             const containerType = getRecipeUnitType(recipe);
             const unitPrice = PortalPricingSystem.recalculateItemUnitPrice(orderItem, recipe, containerType);
-            
+
             return {
               ...orderItem,
               unit_price: unitPrice,
@@ -1354,9 +1397,9 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           }
           return orderItem; // Manter item original se a receita não for encontrada
         });
-        
+
         const newTotalAmount = utilSumCurrency(hydratedItems.map(item => item.total_price || 0));
-        
+
         updatedOrders[dayIndex] = {
           ...order,
           items: hydratedItems,
@@ -1366,7 +1409,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         updatedOrders[dayIndex] = order;
       }
     });
-    
+
     if (JSON.stringify(updatedOrders) !== JSON.stringify(hydratedOrders)) {
       setHydratedOrders(updatedOrders);
     }
@@ -1398,22 +1441,22 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     // Usar calculadora centralizada de peso
     const totalWeight = calculateTotalWeight(currentOrder.items);
-    
+
     // Calcular depreciação baseada nos itens devolvidos (wasteItems)
     const depreciationData = calculateTotalDepreciation(wasteItems || [], currentOrder.items || []);
-    
+
     // Calcular descontos por itens não recebidos (receivingItems)
     const nonReceivedDiscountsData = calculateNonReceivedDiscounts(receivingItems || [], currentOrder.items || []);
-    
+
     // Calcular valor final com ambos os descontos
     const finalOrderValue = calculateFinalOrderValue(
-      totalAmount, 
+      totalAmount,
       depreciationData.totalDepreciation,
       nonReceivedDiscountsData.totalNonReceivedDiscount
     );
-    
-    return { 
-      totalItems, 
+
+    return {
+      totalItems,
       totalAmount,
       totalWeight,
       depreciation: depreciationData,
@@ -1431,20 +1474,12 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     const currentTime = new Date();
     const dayOfWeek = currentTime.getDay(); // 0=Domingo, 1=Segunda, ... 5=Sexta
     const dayName = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][dayOfWeek];
-    
+
     if (!currentOrder || !customer) {
       return;
     }
 
-    // Validar se refeições esperadas foi preenchido
-    if (!mealsExpected || mealsExpected <= 0) {
-      toast({ 
-        variant: "destructive", 
-        title: "Campo Obrigatório", 
-        description: "Por favor, preencha o número de refeições esperadas antes de enviar o pedido." 
-      });
-      return;
-    }
+
 
     // 🚨 VERIFICAÇÃO ESPECÍFICA PARA SEXTAS-FEIRAS
     if (dayOfWeek === 5) {
@@ -1452,7 +1487,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       const activeSessions = JSON.parse(localStorage.getItem(sessionKey) || '[]');
       const now = Date.now();
       const recentSessions = activeSessions.filter(s => (now - s.timestamp) < 300000);
-      
+
       if (recentSessions.length > 1) {
       }
     }
@@ -1480,11 +1515,11 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       };
 
 
-      
+
 
       const orderData = {
         ...syncedOrder,
-        total_meals_expected: mealsExpected,
+        total_meals_expected: 0,
         general_notes: generalNotes,
         total_items: orderTotals.totalItems,
         total_amount: orderTotals.totalAmount,
@@ -1532,7 +1567,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           };
           freshOrders.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
           const latestOrder = freshOrders[0];
-          
+
           await Order.update(latestOrder.id, orderData);
 
           // Atualização otimista da UI
@@ -1634,32 +1669,32 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         setShowSuccessEffect(false);
         setIsEditMode(false);
       }, 2000); // 2 segundos de efeito
-      
+
     } catch (error) {
       // Toast para o usuário
-      toast({ 
-        variant: "destructive", 
+      toast({
+        variant: "destructive",
         description: `Erro ao enviar pedido (${dayName}). Tente novamente.`
       });
-      
+
       // 🚨 LOG ADICIONAL SE FOR SEXTA-FEIRA
       if (dayOfWeek === 5) {
         const sessionKey = `portal_sessions_${customerId}`;
         const activeSessions = JSON.parse(localStorage.getItem(sessionKey) || '[]');
         const now = Date.now();
         const recentSessions = activeSessions.filter(s => (now - s.timestamp) < 300000);
-        
+
         if (typeof window !== 'undefined') {
           window.fridayErrorCount = (window.fridayErrorCount || 0) + 1;
         }
-        
+
         // Tentar limpar sessões antigas para evitar conflitos futuros
         if (recentSessions.length > 1) {
           localStorage.removeItem(sessionKey);
         }
       }
     }
-  }, [currentOrder, customer, mealsExpected, generalNotes, orderTotals, existingOrders, selectedDay, toast]);
+  }, [currentOrder, customer, generalNotes, orderTotals, existingOrders, selectedDay, toast]);
 
   const enableEditMode = useCallback(() => {
     setIsEditMode(true);
@@ -1682,52 +1717,52 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
    */
   const isCompleteOrder = useCallback((order) => {
     if (!order) return false;
-    
+
     // ✅ ESTRATÉGIA 1: Se não tem itens salvos, é apenas parcial
     if (!order.items || order.items.length === 0) {
       return false;
     }
-    
+
     // ✅ ESTRATÉGIA 2: Verificar se algum item foi realmente preenchido pelo usuário
     const hasItemsWithQuantity = order.items.some(item => {
       const qty = utilParseQuantity(item.quantity) || utilParseQuantity(item.base_quantity) || 0;
       const adj = utilParseQuantity(item.adjustment_percentage) || 0;
-      
+
       // Item é considerado preenchido se tem quantidade OU ajuste de porcionamento
       return qty > 0 || adj > 0;
     });
-    
+
     return hasItemsWithQuantity;
   }, []);
 
   // ===== SISTEMA DE SUGESTÕES AUTOMÁTICAS =====
-  
+
   // Estado para evitar execuções múltiplas
   const [isProcessingSuggestions, setIsProcessingSuggestions] = useState(false);
-  
+
   /**
    * Aplica sugestões automaticamente quando as refeições esperadas mudam
    * Esta é a função principal que executa em background sem interface
    */
   const applyAutomaticSuggestions = useCallback(async (newMealsExpected) => {
-    
+
     // Proteção contra execuções múltiplas
     if (isProcessingSuggestions) {
       return;
     }
-    
+
 
     setIsProcessingSuggestions(true);
-    
+
     if (!customer || !currentOrder?.items || !isEditMode) {
 
       setIsProcessingSuggestions(false);
       return;
     }
-    
+
     // *** Limpar sugestões APENAS se refeições esperadas for explicitamente 0 ***
     if (newMealsExpected === 0) {
-      
+
       const clearedItems = currentOrder.items.map(item => {
         // Limpar sugestões mas manter valores existentes se usuário digitou
         const { suggestion, ...itemWithoutSuggestion } = item;
@@ -1736,23 +1771,23 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           total_meals_expected: 0
         };
       });
-      
+
       setCurrentOrder(prevOrder => ({
         ...prevOrder,
         items: clearedItems,
         total_meals_expected: 0
       }));
-      
+
       setIsProcessingSuggestions(false);
       return;
     }
-    
+
     // *** Sair se valor for vazio/indefinido (aguardar usuário terminar de digitar) ***
     if (!newMealsExpected || newMealsExpected < 0) {
       setIsProcessingSuggestions(false);
       return;
     }
-    
+
     // *** NOVA LÓGICA: Sempre aplicar sugestões quando mudar refeições esperadas ***
     // Verificar se há itens que podem receber sugestões (vazios OU com valores existentes)
     const hasItemsForSuggestions = currentOrder.items.some(item => {
@@ -1761,28 +1796,28 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       // Aceitar tanto campos vazios quanto preenchidos para recalculo
       return baseQty >= 0 || (CategoryLogic.isCarneCategory(item.category) && adjustmentPct >= 0);
     });
-    
+
     if (!hasItemsForSuggestions) {
 
       setIsProcessingSuggestions(false);
       return;
     }
-    
 
-    
+
+
     try {
       // IMPLEMENTAÇÃO CUSTOMIZADA: Gerar sugestões SEM aplicar nos inputs
 
       // 1. Carregar histórico (FILTRANDO PELO DIA DA SEMANA ATUAL)
       const historicalOrders = await OrderSuggestionManager.loadHistoricalOrders(customer.id, 12, selectedDay);
-      
+
       if (historicalOrders.length === 0) {
-        
+
         // 🧪 MODO DE TESTE: Criar sugestões artificiais para demonstrar a funcionalidade
         const testSuggestions = currentOrder.items.map(originalItem => {
           // Criar sugestões baseadas no tipo de unidade e nome da receita
           let suggestedQuantity = 0;
-          
+
           if (originalItem.unit_type?.toLowerCase().includes('cuba')) {
             // Para cubas: simular ratio baseado no tipo de item
             if (originalItem.recipe_name?.toLowerCase().includes('arroz')) {
@@ -1804,8 +1839,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
               suggestedQuantity = OrderSuggestionManager.roundToPracticalValue(newMealsExpected * 0.02, originalItem.unit_type); // ~3kg para 150
             }
           }
-          
-          
+
+
           return {
             ...originalItem,
             suggestion: suggestedQuantity > 0 ? {
@@ -1824,25 +1859,25 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             }
           };
         });
-        
-        
+
+
         setCurrentOrder(prevOrder => ({
           ...prevOrder,
           items: testSuggestions,
           total_meals_expected: newMealsExpected
         }));
-        
+
         setIsProcessingSuggestions(false);
         return;
       }
-      
+
       // 2. Analisar padrões de consumo
       const consumptionPatterns = OrderSuggestionManager.analyzeConsumptionPatterns(historicalOrders);
-      
+
       // 3. Gerar APENAS SUGESTÕES (sem aplicar valores)
       const itemsWithSuggestions = currentOrder.items.map(originalItem => {
         const recipeAnalysis = consumptionPatterns[originalItem.recipe_id];
-        
+
         // Se não há dados históricos, manter item original
         if (!recipeAnalysis || recipeAnalysis.statistics.confidence < 0.25) {
           return {
@@ -1854,9 +1889,9 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             }
           };
         }
-        
+
         const stats = recipeAnalysis.statistics;
-        
+
         // ✅ LÓGICA DE SUGESTÃO ATUALIZADA (usando mediana)
         let suggestedBaseQuantity = stats.median_ratio_per_meal * newMealsExpected;
         let source = 'median_ratio_per_meal';
@@ -1881,14 +1916,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           suggestedBaseQuantity = 0.25;
           source = 'min_quantity_instead_of_zero';
         }
-        
+
         // Arredondamento
         suggestedBaseQuantity = OrderSuggestionManager.roundToPracticalValue(suggestedBaseQuantity, originalItem.unit_type);
-        
-        const suggestedAdjustmentPercentage = originalItem.category && 
-          CategoryLogic.isCarneCategory(originalItem.category) ? 
+
+        const suggestedAdjustmentPercentage = originalItem.category &&
+          CategoryLogic.isCarneCategory(originalItem.category) ?
           Math.round(stats.median_adjustment_percentage) : 0;
-        
+
         // Retornar item original + dados de sugestão
         return {
           ...originalItem, // 📋 PRESERVAR valores originais dos inputs
@@ -1904,7 +1939,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           }
         };
       });
-      
+
       const result = {
         success: true,
         items: itemsWithSuggestions,
@@ -1914,32 +1949,32 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           message: 'Sugestões geradas com arredondamento correto'
         }
       };
-      
-      
-      
-      if (result.success) {
-        
-        // Debug: Mostrar TODAS as sugestões geradas
-        
-        // Aplicar sugestões PRESERVANDO valores originais dos inputs
-                setCurrentOrder(prevOrder => {
-                    const newItems = prevOrder.items.map(item => {
-                        // Encontrar a sugestão correspondente pelo unique_id para garantir a correspondência correta
-                        const suggestedItem = result.items.find(resItem => resItem.unique_id === item.unique_id);
-                        
-                        return {
-                            ...item,
-                            // Aplicar a sugestão apenas se encontrada, caso contrário, manter o item como está
-                            suggestion: suggestedItem && suggestedItem.suggestion ? suggestedItem.suggestion : (item.suggestion || null)
-                        };
-                    });
 
-                    return {
-                        ...prevOrder,
-                        items: newItems,
-                        total_meals_expected: newMealsExpected
-                    };
-                });
+
+
+      if (result.success) {
+
+        // Debug: Mostrar TODAS as sugestões geradas
+
+        // Aplicar sugestões PRESERVANDO valores originais dos inputs
+        setCurrentOrder(prevOrder => {
+          const newItems = prevOrder.items.map(item => {
+            // Encontrar a sugestão correspondente pelo unique_id para garantir a correspondência correta
+            const suggestedItem = result.items.find(resItem => resItem.unique_id === item.unique_id);
+
+            return {
+              ...item,
+              // Aplicar a sugestão apenas se encontrada, caso contrário, manter o item como está
+              suggestion: suggestedItem && suggestedItem.suggestion ? suggestedItem.suggestion : (item.suggestion || null)
+            };
+          });
+
+          return {
+            ...prevOrder,
+            items: newItems,
+            total_meals_expected: newMealsExpected
+          };
+        });
       } else {
         // Apenas atualizar refeições esperadas
         setCurrentOrder(prevOrder => ({
@@ -1947,37 +1982,80 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           total_meals_expected: newMealsExpected
         }));
       }
-      
+
       // Finalizar processamento
       setIsProcessingSuggestions(false);
-      
+
     } catch (error) {
       // Erro silencioso - não interromper a experiência do usuário
       setIsProcessingSuggestions(false);
     }
   }, [customer, currentOrder, isEditMode, toast, isProcessingSuggestions]);
-  
-  /**
-   * Hook para aplicar sugestões quando as refeições esperadas mudam
-   * Executa automaticamente em background
-   */
-  useEffect(() => {
-    
-    // *** NOVA LÓGICA: Executar tanto para aplicar (>0) quanto para limpar (=0) sugestões ***
-    // Condições:
-    // 1. Estamos em modo de edição 
-    // 2. Há um pedido atual com itens
-    // 3. O sistema foi inicializado
-    // 4. mealsExpected mudou (pode ser 0 para limpar ou >0 para sugerir)
-    if (isEditMode && currentOrder?.items?.length > 0 && hasInitializedDay) {
-      // Debounce: esperar 300ms para resposta mais rápida
-      const timeoutId = setTimeout(() => {
-        applyAutomaticSuggestions(mealsExpected);
-      }, 300);
-      
-      return () => clearTimeout(timeoutId);
+
+
+
+  // Wrapper personalizado para injetar as cores corretas das categorias
+  const portalGroupItemsByCategory = useCallback((items, keyExtractor) => {
+    // 1. Agrupar itens usando a função original do hook
+    const groups = groupItemsByCategory(items, keyExtractor);
+
+    // 2. Se temos categorias carregadas localmente, atualizar as cores
+    if (categories.length > 0) {
+      // Helper para normalizar strings para comparação
+      const normalize = (str) => String(str || '').toLowerCase().trim();
+
+      Object.keys(groups).forEach(groupName => {
+        const normalizedGroupName = normalize(groupName);
+
+        // Tentar encontrar categoria pelo nome
+        let category = categories.find(c => {
+          const name = normalize(c.name);
+          const label = normalize(c.label);
+          const value = normalize(c.value);
+
+          return name === normalizedGroupName ||
+            label === normalizedGroupName ||
+            value === normalizedGroupName;
+        });
+
+        if (category) {
+          // Lógica de herança de cores:
+          // 1. Configuração direta da categoria (MenuConfig)
+          // 2. Cor nativa da categoria
+          // 3. Configuração do PAI (se for subcategoria)
+          // 4. Cor nativa do PAI
+
+          let finalColor = null;
+
+          // Check 1 & 2: Própria categoria
+          if (menuConfig?.category_colors?.[category.id]) {
+            finalColor = menuConfig.category_colors[category.id];
+          } else if (category.color) {
+            finalColor = category.color;
+          }
+
+          // Check 3 & 4: Categoria Pai (Fallback)
+          if (!finalColor && category.parent_id) {
+            const parentCategory = categories.find(c => c.id === category.parent_id);
+            if (parentCategory) {
+              if (menuConfig?.category_colors?.[parentCategory.id]) {
+                finalColor = menuConfig.category_colors[parentCategory.id];
+              } else if (parentCategory.color) {
+                finalColor = parentCategory.color;
+              }
+            }
+          }
+
+          if (finalColor) {
+            // Injetar a cor correta
+            groups[groupName].categoryInfo.color = finalColor;
+          }
+        }
+      });
     }
-  }, [mealsExpected, isEditMode, hasInitializedDay, applyAutomaticSuggestions]); // Incluído applyAutomaticSuggestions para reagir a mudanças
+
+    return groups;
+  }, [categories, menuConfig, groupItemsByCategory]);
 
   // Carregar pedidos existentes quando customer muda OU semana muda OU dia muda
   useEffect(() => {
@@ -2032,6 +2110,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     );
   }
 
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -2045,7 +2125,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 <p className="text-sm text-gray-600">{customer?.name}</p>
               </div>
             </div>
-            <RefreshButton 
+            <RefreshButton
               text="Atualizar"
               size="sm"
               className="shrink-0"
@@ -2062,15 +2142,15 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                      setCurrentDate(addDays(currentDate, -7));
-                    }}
+                  setCurrentDate(addDays(currentDate, -7));
+                }}
                 className="flex items-center gap-1 text-xs px-2 py-1 h-8 flex-shrink-0"
               >
                 <ChevronLeft className="w-3 h-3" />
                 <span className="hidden sm:inline">Semana Anterior</span>
                 <span className="sm:hidden">Anterior</span>
               </Button>
-              
+
               <div className="text-center flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-700 truncate">
                   Semana {weekNumber}/{year}
@@ -2079,13 +2159,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                   {format(weekStart, "dd/MM")} - {format(addDays(weekStart, 6), "dd/MM")}
                 </p>
               </div>
-              
+
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                      setCurrentDate(addDays(currentDate, 7));
-                    }}
+                  setCurrentDate(addDays(currentDate, 7));
+                }}
                 className="flex items-center gap-1 text-xs px-2 py-1 h-8 flex-shrink-0"
               >
                 <span className="hidden sm:inline">Próxima Semana</span>
@@ -2093,7 +2173,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 <ChevronRight className="w-3 h-3" />
               </Button>
             </div>
-            
+
             {/* Days Selector Row */}
             <div className="flex gap-1 justify-center overflow-x-auto pb-1">
               {weekDays.map((day) => {
@@ -2101,15 +2181,15 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 const today = new Date();
                 const isCurrentDay = format(today, 'yyyy-MM-dd') === format(day.date, 'yyyy-MM-dd');
                 const isSelected = selectedDay === day.dayNumber;
-                
+
                 return (
                   <Button
                     key={day.dayNumber}
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
                     onClick={() => {
-                        setSelectedDay(day.dayNumber);
-                      }}
+                      setSelectedDay(day.dayNumber);
+                    }}
                     className={cn(
                       "flex flex-col h-14 w-14 p-1 text-xs relative flex-shrink-0",
                       isSelected && "bg-blue-600 text-white",
@@ -2154,15 +2234,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
       {/* Content */}
       <div className="p-4 space-y-4">
-        
+
         {activeTab === "orders" && (
           <OrdersTab
             key={`orders-${weekNumber}-${year}-${selectedDay}-${currentOrder?.total_amount || 0}`} // ✅ Força re-render quando semana/dia/pedido muda
             currentOrder={currentOrder}
             orderItems={orderItems}
             orderTotals={orderTotals}
-            mealsExpected={mealsExpected}
-            setMealsExpected={setMealsExpected}
+
             generalNotes={generalNotes}
             setGeneralNotes={setGeneralNotes}
             updateOrderItem={updateOrderItem}
@@ -2173,7 +2252,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             existingOrder={existingOrders[selectedDay]}
             wasteItems={wasteItems}
             existingWaste={existingWaste}
-            groupItemsByCategory={groupItemsByCategory}
+            groupItemsByCategory={portalGroupItemsByCategory}
             getOrderedCategories={getOrderedCategories}
             generateCategoryStyles={generateCategoryStyles}
           />
@@ -2195,7 +2274,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             isEditMode={isReceivingEditMode}
             enableEditMode={enableReceivingEditMode}
             existingReceiving={existingReceiving}
-            groupItemsByCategory={groupItemsByCategory}
+            groupItemsByCategory={portalGroupItemsByCategory}
             getOrderedCategories={getOrderedCategories}
             generateCategoryStyles={generateCategoryStyles}
           />
@@ -2214,7 +2293,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             isEditMode={isWasteEditMode}
             enableEditMode={enableWasteEditMode}
             existingWaste={existingWaste}
-            groupItemsByCategory={groupItemsByCategory}
+            groupItemsByCategory={portalGroupItemsByCategory}
             getOrderedCategories={getOrderedCategories}
             generateCategoryStyles={generateCategoryStyles}
           />
@@ -2267,12 +2346,11 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 onClick={() => {
                   submitOrder();
                 }}
-                className={`w-full text-white transition-all duration-500 ${
-                  showSuccessEffect
-                    ? 'bg-green-600 hover:bg-green-700 scale-105 shadow-lg'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-                disabled={orderTotals.totalAmount === 0 || showSuccessEffect || !mealsExpected || mealsExpected <= 0}
+                className={`w-full text-white transition-all duration-500 ${showSuccessEffect
+                  ? 'bg-green-600 hover:bg-green-700 scale-105 shadow-lg'
+                  : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                disabled={orderTotals.totalAmount === 0 || showSuccessEffect}
               >
                 {showSuccessEffect ? (
                   <>
@@ -2290,7 +2368,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 )}
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={enableEditMode}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 disabled={orderTotals.totalAmount === 0}

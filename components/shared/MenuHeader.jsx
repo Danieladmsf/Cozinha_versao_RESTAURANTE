@@ -1,22 +1,23 @@
 import React from 'react';
-import MenuWeekSelector from "@/components/shared/MenuWeekSelector";
+import WeekNavigator from "@/components/shared/WeekNavigator";
 import { getWeek, getYear } from "date-fns";
 
-const MenuHeader = ({ 
-  currentDate, 
-  onDateChange, 
-  rightContent = null 
+const MenuHeader = ({
+  currentDate,
+  onDateChange,
+  rightContent = null,
+  weekRange = 'workdays' // 'workdays' (Seg-Sex) | 'full' (Dom-Sáb)
 }) => {
   return (
     <div className="px-6 py-4">
       <div className="flex justify-center items-center relative">
         {/* Centered Week Navigation */}
-        <MenuWeekSelector 
+        <WeekNavigator
           currentDate={currentDate}
           onDateChange={onDateChange}
           weekNumber={getWeek(currentDate, { weekStartsOn: 1 })}
-          year={getYear(currentDate)}
-          compact={true}
+          weekRange={weekRange}
+          showCalendar={true}
         />
 
         {/* Additional content positioned on the right */}

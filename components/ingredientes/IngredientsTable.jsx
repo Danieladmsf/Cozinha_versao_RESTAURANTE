@@ -14,7 +14,7 @@ import PriceEditor from "./PriceEditor";
 import PriceHistoryViewer from "./PriceHistoryViewer";
 import PriceUpdateModal from "./PriceUpdateModal";
 
-export default function IngredientsTable({ ingredients, onDelete, updateIngredientPrice, updateIngredient }) {
+export default function IngredientsTable({ ingredients, onDelete, updateIngredientPrice, updateIngredient, itemType = 'ingrediente' }) {
   const router = useRouter();
   const [selectedIngredientForHistory, setSelectedIngredientForHistory] = useState(null);
   const [selectedIngredientForPriceUpdate, setSelectedIngredientForPriceUpdate] = useState(null);
@@ -84,23 +84,32 @@ export default function IngredientsTable({ ingredients, onDelete, updateIngredie
       : <ChevronDown className="w-3 h-3 text-slate-600" />;
   };
 
+  // Labels dinâmicas baseadas no tipo
+  const labels = {
+    singular: itemType === 'embalagem' ? 'Embalagem' : 'Ingrediente',
+    plural: itemType === 'embalagem' ? 'Embalagens' : 'Ingredientes',
+    nenhum: itemType === 'embalagem' ? 'Nenhuma embalagem encontrada' : 'Nenhum ingrediente encontrado',
+    adicionar: itemType === 'embalagem' ? 'Adicionar Embalagem' : 'Adicionar Ingrediente',
+    editorUrl: itemType === 'embalagem' ? '/ingredientes/editor?type=embalagem' : '/ingredientes/editor?type=ingrediente'
+  };
+
   if (ingredients.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Ingredientes (0)</CardTitle>
+          <CardTitle>Lista de {labels.plural} (0)</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
             <div className="flex flex-col items-center space-y-4">
               <Package className="w-16 h-16 text-gray-300" />
-              <div>Nenhum ingrediente encontrado</div>
+              <div>{labels.nenhum}</div>
               <Button
-                onClick={() => router.push("/ingredientes/editor")}
+                onClick={() => router.push(labels.editorUrl)}
                 className="mt-4"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Adicionar Ingrediente
+                {labels.adicionar}
               </Button>
             </div>
           </div>
@@ -118,7 +127,7 @@ export default function IngredientsTable({ ingredients, onDelete, updateIngredie
               <Package className="w-4 h-4 text-white" />
             </div>
             <CardTitle className="text-xl text-slate-700">
-              Lista de Ingredientes ({sortedIngredients.length.toLocaleString()})
+              Lista de {labels.plural} ({sortedIngredients.length.toLocaleString()})
             </CardTitle>
           </div>
         </CardHeader>

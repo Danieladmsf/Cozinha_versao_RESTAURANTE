@@ -1,19 +1,20 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import MenuHeader from '@/components/shared/MenuHeader';
 import SectionContainer from '@/components/shared/SectionContainer';
 import { useSobrasData } from '@/hooks/sobras/useSobrasData';
-import { 
+import {
   useSobrasInterface,
   useSobrasOperations,
   useSobrasHelpers
 } from '@/hooks/sobras';
+import { useAvailableDays } from '@/hooks/useAvailableDays';
 
 // Componentes UI separados
-import WeekDaySelector from './WeekDaySelector';
+import WeekDaySelector from '@/components/shared/WeekDaySelector';
 import CustomerSelector from './CustomerSelector';
 import SobrasWasteRegister from './SobrasWasteRegister';
 
@@ -22,7 +23,10 @@ export default function SobrasRegistroComponent() {
   const sobrasInterface = useSobrasInterface();
   const sobrasOperations = useSobrasOperations();
   const sobrasHelpers = useSobrasHelpers();
-  
+
+  // Hook centralizado para dias disponíveis
+  const availableDays = useAvailableDays();
+
   const {
     customers,
     recipes,
@@ -38,7 +42,7 @@ export default function SobrasRegistroComponent() {
     sobrasInterface.handleDateChange(newDate, loadWeekData);
   };
 
-  const getAvailableDays = () => [1, 2, 3, 4, 5]; // Segunda a sexta
+  const getAvailableDays = () => availableDays;
 
   const getMenuForDay = (day) => {
     if (!weeklyMenus || weeklyMenus.length === 0) return null;
@@ -49,7 +53,7 @@ export default function SobrasRegistroComponent() {
 
   const getWasteRecord = (customerId, dayIndex) => {
     if (!customerId || !wasteHistory) return null;
-    return wasteHistory.find(waste => 
+    return wasteHistory.find(waste =>
       waste.customer_id === customerId &&
       waste.day_of_week === dayIndex &&
       waste.week_number === sobrasHelpers.getWeekNumber(sobrasInterface.currentDate) &&
@@ -60,9 +64,9 @@ export default function SobrasRegistroComponent() {
   const handleWasteChange = async (wasteData, dayIndex, customerId) => {
     try {
       await sobrasOperations.saveWasteRecord(
-        wasteData, 
-        dayIndex, 
-        customerId, 
+        wasteData,
+        dayIndex,
+        customerId,
         sobrasInterface.currentDate
       );
       // Recarregar dados após salvar
@@ -89,7 +93,7 @@ export default function SobrasRegistroComponent() {
           {/* Sidebar de Clientes */}
           <div className="w-80 flex-shrink-0">
             <div className="sticky top-6">
-              <SectionContainer 
+              <SectionContainer
                 title="Clientes"
                 subtitle="Selecione um cliente"
                 variant="elevated"
@@ -105,24 +109,25 @@ export default function SobrasRegistroComponent() {
               </SectionContainer>
             </div>
           </div>
-          
+
           {/* Área Principal */}
           <div className="flex-1 space-y-6">
             {/* Header Section */}
-            <SectionContainer 
+            <SectionContainer
               variant="gradient"
               className="border-0 shadow-lg bg-gradient-to-r from-amber-100 to-orange-100"
             >
-              <MenuHeader 
+              <MenuHeader
                 currentDate={sobrasInterface.currentDate}
                 onDateChange={handleDateChange}
                 title="Registro de Sobras"
                 subtitle="Gerencie as sobras por semana"
+                weekRange={availableDays.some(d => d === 0 || d === 6) ? 'full' : 'workdays'}
               />
             </SectionContainer>
-            
+
             {/* Seletor de Dias Section */}
-            <SectionContainer 
+            <SectionContainer
               title="Navegação Semanal"
               variant="elevated"
               className="border-amber-200"
@@ -137,7 +142,7 @@ export default function SobrasRegistroComponent() {
 
             {/* Registro de Sobras Section */}
             {!sobrasInterface.selectedCustomer ? (
-              <SectionContainer 
+              <SectionContainer
                 title="Selecione um Cliente"
                 variant="elevated"
                 className="border-amber-200"
@@ -151,7 +156,7 @@ export default function SobrasRegistroComponent() {
                 </div>
               </SectionContainer>
             ) : (
-              <SectionContainer 
+              <SectionContainer
                 title={`Sobras - ${sobrasInterface.selectedCustomer.name}`}
                 subtitle={`${['', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'][sobrasInterface.currentDayIndex] || 'dia selecionado'}`}
                 variant="gradient"

@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Calendar, 
-  Users, 
-  FileText, 
-  Printer, 
-  ChevronLeft, 
+import {
+  Calendar,
+  Users,
+  FileText,
+  Printer,
+  ChevronLeft,
   ChevronRight,
   Filter,
   Search,
@@ -32,18 +32,22 @@ import { useCategoryDisplay } from "@/hooks/shared/useCategoryDisplay";
 import { useOrderConsolidation } from "@/hooks/cardapio/useOrderConsolidation";
 import { convertQuantityForKitchen } from "@/lib/cubaConversionUtils";
 
+// Componentes centralizados
+import WeekNavigator from '@/components/shared/WeekNavigator';
+import WeekDaySelector from '@/components/shared/WeekDaySelector';
+
 const ConsolidacaoPedidosComponent = () => {
   // Estados principais
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(1);
   const [loading, setLoading] = useState(true);
   const [printing, setPrinting] = useState(false);
-  
+
   // Dados
   const [customers, setCustomers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [recipes, setRecipes] = useState([]);
-  
+
   // Filtros
   const [selectedCustomer, setSelectedCustomer] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,15 +59,15 @@ const ConsolidacaoPedidosComponent = () => {
     }
     return false;
   });
-  
+
   // Hooks
   const { groupItemsByCategory, getOrderedCategories, generateCategoryStyles } = useCategoryDisplay();
-  
+
   // Calculados
   const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
   const weekNumber = useMemo(() => getWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
   const year = useMemo(() => getYear(currentDate), [currentDate]);
-  
+
   // Dias da semana
   const weekDays = useMemo(() => {
     const days = [];
@@ -86,7 +90,7 @@ const ConsolidacaoPedidosComponent = () => {
     const loadInitialData = async () => {
       try {
         setLoading(true);
-        
+
         // Carregar clientes, receitas e pedidos em paralelo
         const [customersData, recipesData, ordersData] = await Promise.all([
           Customer.list(),
@@ -96,11 +100,11 @@ const ConsolidacaoPedidosComponent = () => {
             { field: 'year', operator: '==', value: year }
           ])
         ]);
-        
+
         setCustomers(customersData);
         setRecipes(recipesData);
         setOrders(ordersData);
-        
+
       } catch (error) {
       } finally {
         setLoading(false);
@@ -115,9 +119,9 @@ const ConsolidacaoPedidosComponent = () => {
     return orders.filter(order => {
       const dayMatch = order.day_of_week === selectedDay;
       const customerMatch = selectedCustomer === "all" || order.customer_id === selectedCustomer;
-      const searchMatch = searchTerm === "" || 
+      const searchMatch = searchTerm === "" ||
         order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       return dayMatch && customerMatch && searchMatch;
     });
   }, [orders, selectedDay, selectedCustomer, searchTerm]);
@@ -132,7 +136,7 @@ const ConsolidacaoPedidosComponent = () => {
   const toggleKitchenFormat = () => {
     const newFormat = !kitchenFormat;
     setKitchenFormat(newFormat);
-    
+
     // Salvar preferência no localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('consolidacao-kitchen-format', newFormat.toString());
@@ -190,7 +194,7 @@ const ConsolidacaoPedidosComponent = () => {
                 Visualize pedidos consolidados por cliente e categoria
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Button
                 variant={kitchenFormat ? "default" : "outline"}
@@ -201,7 +205,7 @@ const ConsolidacaoPedidosComponent = () => {
                 <ChefHat className="w-4 h-4" />
                 {kitchenFormat ? "Formato Padrão" : "Formato Cozinha"}
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -219,55 +223,29 @@ const ConsolidacaoPedidosComponent = () => {
             </div>
           </div>
         </div>
-        
-        <div className="p-4">
-          {/* Navegação de semana */}
-          <div className="flex items-center justify-between mb-6">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek(-1)}
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Semana Anterior
-            </Button>
-            
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-800">
-                Semana {weekNumber}/{year}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {format(weekStart, "dd/MM")} - {format(addDays(weekStart, 6), "dd/MM/yyyy")}
-              </p>
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek(1)}
-              className="flex items-center gap-2"
-            >
-              Próxima Semana
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
 
-          {/* Seletor de dias */}
-          <div className="flex justify-center gap-2 mb-6">
-            {weekDays.map((day) => (
-              <Button
-                key={day.dayNumber}
-                variant={selectedDay === day.dayNumber ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedDay(day.dayNumber)}
-                className="flex flex-col h-16 w-16 p-1 text-xs"
-              >
-                <span className="font-medium">{day.dayShort}</span>
-                <span className="text-xs opacity-80">{day.dayDate}</span>
-              </Button>
-            ))}
-          </div>
+        <div className="p-4">
+          <Card className="print:hidden border-2 border-blue-200 shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50 mb-6">
+            <CardContent className="bg-white py-12">
+              {/* Bloco de Navegação e Seletor de Dias Unified */}
+              <div className="space-y-4 mb-6">
+                <WeekNavigator
+                  currentDate={currentDate}
+                  weekNumber={weekNumber}
+                  onNavigateWeek={navigateWeek}
+                  showCalendar={false}
+                  weekRange={menuConfig?.available_days?.some(d => d === 0 || d === 6) ? 'full' : 'workdays'}
+                />
+
+                <WeekDaySelector
+                  currentDate={weekStart}
+                  currentDayIndex={selectedDay}
+                  availableDays={menuConfig?.available_days || [1, 2, 3, 4, 5]}
+                  onDayChange={setSelectedDay}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Filtros */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -289,7 +267,7 @@ const ConsolidacaoPedidosComponent = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Buscar Cliente
@@ -305,7 +283,7 @@ const ConsolidacaoPedidosComponent = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex items-end">
               <Badge variant="secondary" className="h-fit">
                 {ordersByCustomer.length} cliente(s) com pedidos
@@ -319,22 +297,22 @@ const ConsolidacaoPedidosComponent = () => {
       <div className="space-y-4 print:space-y-12">
         {ordersByCustomer.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-              <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="font-semibold text-lg text-gray-700 mb-2">
-                Nenhum Pedido Encontrado
-              </h3>
-              <p className="text-gray-500 text-sm">
-                Não há pedidos para o dia selecionado com os filtros aplicados.
-              </p>
+            <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <h3 className="font-semibold text-lg text-gray-700 mb-2">
+              Nenhum Pedido Encontrado
+            </h3>
+            <p className="text-gray-500 text-sm">
+              Não há pedidos para o dia selecionado com os filtros aplicados.
+            </p>
           </div>
         ) : (
           ordersByCustomer.map((customerData) => {
             const consolidatedItems = consolidateCustomerItems(customerData.orders);
             const selectedDayInfo = weekDays.find(d => d.dayNumber === selectedDay);
-            
+
             return (
-              <div 
-                key={customerData.customer_id} 
+              <div
+                key={customerData.customer_id}
                 className="bg-white rounded-lg shadow-sm border p-4 print:p-8 print:break-after-page print:min-h-screen"
               >
                 {/* Header do cliente - compacto */}
@@ -372,11 +350,11 @@ const ConsolidacaoPedidosComponent = () => {
                             {categoryName}
                           </h2>
                         </div>
-                        
+
                         {/* Lista de itens */}
                         <div className="space-y-1 print:space-y-3 pl-3 print:pl-6">
                           {items.map((item, index) => (
-                            <div 
+                            <div
                               key={`${item.unique_id || item.recipe_id}_${index}`}
                               className="flex items-start gap-3 print:gap-6 text-sm print:text-lg"
                             >

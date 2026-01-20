@@ -93,7 +93,7 @@ export default function ClientMenuComponent() {
         menuInterface.currentDate,
         getCategoryColor
       );
-      
+
       toast({
         title: "Impressão",
         description: `Cardápio${customerId !== 'all' ? ' personalizado' : ''} enviado para impressão.`,
@@ -149,24 +149,25 @@ export default function ClientMenuComponent() {
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-1">Cardápio Semanal</h2>
                     <p className="text-sm text-gray-600">
-                      {selectedCustomer?.id === 'all' ? 
-                        'Visualização completa do cardápio' : 
+                      {selectedCustomer?.id === 'all' ?
+                        'Visualização completa do cardápio' :
                         `Cardápio personalizado para ${selectedCustomer?.name || 'cliente selecionado'}`
                       }
                     </p>
                   </div>
-                  
+
                   {/* Navegação centralizada */}
                   <div className="flex-1 flex justify-center">
-                    <MenuHeader 
+                    <MenuHeader
                       currentDate={menuInterface.currentDate}
                       onDateChange={handleDateChange}
+                      weekRange={menuConfig?.available_days?.some(d => d === 0 || d === 6) ? 'full' : 'workdays'}
                     />
                   </div>
-                  
+
                   {/* Botão de impressão à direita */}
                   <div>
-                    <Button 
+                    <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handlePrintCardapio(selectedCustomer?.id || 'all')}
@@ -178,7 +179,7 @@ export default function ClientMenuComponent() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Grid do cardápio */}
               <div className="p-4">
                 <WeeklyMenuGrid

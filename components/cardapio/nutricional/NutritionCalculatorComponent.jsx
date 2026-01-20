@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, startOfWeek, addDays } from "date-fns";
 import { ptBR } from 'date-fns/locale';
-import { 
-  SlidersHorizontal, 
-  Building2, 
-  Users, 
-  Utensils 
+import {
+  SlidersHorizontal,
+  Building2,
+  Users,
+  Utensils
 } from "lucide-react";
 import { useNutritionCalculator } from './NutritionCalculator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useAvailableDays, DAY_NAMES } from '@/hooks/useAvailableDays';
 
 // Nutrient configuration
 const nutrientConfig = {
@@ -37,8 +38,8 @@ const nutrientConfig = {
   }
 };
 
-export default function NutritionCalculatorComponent({ 
-  menu, 
+export default function NutritionCalculatorComponent({
+  menu,
   currentDayIndex = 1,
   selectedNutrients = {},
   expandedCategories = []
@@ -48,9 +49,12 @@ export default function NutritionCalculatorComponent({
   const [locations, setLocations] = useState([]);
   const [recipes, setRecipes] = useState([]);
 
+  // Hook centralizado para dias disponíveis
+  const availableDays = useAvailableDays();
+
   // Importar hook de cálculo nutricional
-  const { 
-    calculateDayNutrition, 
+  const {
+    calculateDayNutrition,
     calculateLocationNutrition,
     calculateRecipeNutrition
   } = useNutritionCalculator();
@@ -62,7 +66,7 @@ export default function NutritionCalculatorComponent({
         // Buscar dados necessários via SDK
         const customersData = await import('@/app/api/entities').then(m => m.Customer.list());
         const recipesData = await import('@/app/api/entities').then(m => m.Recipe.list());
-        
+
         // Filtrar clientes ativos
         const activeLocations = customersData
           .filter(c => c.active)
@@ -71,13 +75,13 @@ export default function NutritionCalculatorComponent({
             name: c.name,
             photo: c.photo
           }));
-        
+
         setLocations(activeLocations);
         setRecipes(recipesData.filter(r => r.active));
-        
-      } catch (error) {}
+
+      } catch (error) { }
     };
-    
+
     fetchData();
   }, []);
 
@@ -91,7 +95,7 @@ export default function NutritionCalculatorComponent({
   // Formatar valor nutricional
   const formatNutrientValue = (value, nutrientId) => {
     if (value === undefined || value === null) return "-";
-    
+
     const unit = nutrientConfig.nutrientUnits[nutrientId] || "";
     return `${parseFloat(value).toFixed(2)} ${unit}`;
   };
@@ -99,11 +103,13 @@ export default function NutritionCalculatorComponent({
   // Obter nome do dia da semana
   const getDayName = (dayNumber) => {
     const dayNames = {
+      0: "Domingo",
       1: "Segunda",
       2: "Terça",
       3: "Quarta",
       4: "Quinta",
-      5: "Sexta"
+      5: "Sexta",
+      6: "Sábado"
     };
     return dayNames[dayNumber] || "";
   };
@@ -137,8 +143,8 @@ export default function NutritionCalculatorComponent({
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="py-3 px-4 text-left font-semibold text-gray-600">Nutriente</th>
-                  {[1, 2, 3, 4, 5].map(day => {
-                    const dayDate = addDays(weekStart, day - 1);
+                  {availableDays.map(day => {
+                    const dayDate = addDays(weekStart, day);
                     return (
                       <th key={day} className="py-3 px-4 text-center font-medium">
                         <div className="flex flex-col items-center">
@@ -157,7 +163,7 @@ export default function NutritionCalculatorComponent({
                     <td className="py-3 px-4 font-medium bg-gray-50">
                       {nutrientConfig.nutrientNames[nutrientId] || nutrientId}
                     </td>
-                    {[1, 2, 3, 4, 5].map(day => {
+                    {availableDays.map(day => {
                       // Calcular nutrição total do dia
                       const dayNutrition = calculateDayNutrition(menu, day, recipes);
                       const nutrientValue = dayNutrition[nutrientId] || 0;
@@ -207,8 +213,8 @@ export default function NutritionCalculatorComponent({
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="py-3 px-4 text-left font-semibold text-gray-600">Nutriente</th>
-                  {[1, 2, 3, 4, 5].map(day => {
-                    const dayDate = addDays(weekStart, day - 1);
+                  {availableDays.map(day => {
+                    const dayDate = addDays(weekStart, day);
                     return (
                       <th key={day} className="py-3 px-4 text-center font-medium">
                         <div className="flex flex-col items-center">
@@ -227,7 +233,7 @@ export default function NutritionCalculatorComponent({
                     <td className="py-3 px-4 font-medium bg-gray-50">
                       {nutrientConfig.nutrientNames[nutrientId] || nutrientId}
                     </td>
-                    {[1, 2, 3, 4, 5].map(day => {
+                    {availableDays.map(day => {
                       // Calcular nutrição para o local específico
                       const locationNutrition = calculateLocationNutrition(
                         menu, day, selectedCustomer.id, recipes

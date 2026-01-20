@@ -16,7 +16,7 @@ export default function ProgramacaoPage() {
     const handleFocus = () => {
       setRefreshKey(prev => prev + 1);
     };
-    
+
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
@@ -28,7 +28,7 @@ export default function ProgramacaoPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <ClipboardList className="w-8 h-8 text-blue-600" />
-              Programação de Produção
+              Programação de Produção.
             </h1>
             <p className="text-gray-600 mt-1">Gerencie a programação e produção da cozinha</p>
           </div>

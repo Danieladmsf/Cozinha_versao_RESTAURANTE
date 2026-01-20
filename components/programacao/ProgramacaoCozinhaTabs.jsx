@@ -11,20 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Calendar,
-  Users,
   FileText,
   Printer,
-  ChevronLeft,
-  ChevronRight,
-  Filter,
   Search,
-  Download,
   Loader2,
-  Leaf,
-  Package2,
-  Utensils
+  Package2
 } from "lucide-react";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import PrintPreviewEditor from './PrintPreviewEditor';
 
@@ -36,13 +29,13 @@ import { useProgramacaoRealtimeData } from '@/hooks/programacao/useProgramacaoRe
 import { useOrderConsolidation } from "@/hooks/cardapio/useOrderConsolidation";
 import { convertQuantityForKitchen } from "@/lib/cubaConversionUtils";
 
-// Componentes das abas
-import SaladaTab from './tabs/SaladaTab';
-import AcougueTab from './tabs/AcougueTab';
-import EmbalagemTab from './tabs/EmbalagemTab';
+// Componentes de navegação centralizados
+import WeekNavigator from '@/components/shared/WeekNavigator';
+import WeekDaySelector from '@/components/shared/WeekDaySelector';
 
-// Componentes utilitários
-import { RealtimeIndicator } from './RealtimeIndicator';
+// Imports para abas dinâmicas
+import { CategoryTree, MenuConfig } from '@/app/api/entities';
+import { APP_CONSTANTS } from '@/lib/constants';
 
 // Função utilitária centralizada para formatação de quantidade
 export const formatQuantityForDisplay = (quantity, unitType, useKitchenFormat) => {
@@ -71,57 +64,57 @@ const ConsolidacaoContent = ({
   globalKitchenFormat,
   formatQuantityDisplay,
 }) => (
-    <>
-      {loading.orders ? (
-        <div className="text-center py-12">
-          <Loader2 className="w-8 h-8 mx-auto mb-4 text-blue-500 animate-spin" />
-          <p className="text-gray-600">Carregando pedidos...</p>
-        </div>
-      ) : (
-        <div className="space-y-4 print:space-y-12">
-          {ordersByCustomer.length === 0 ? (
-            <Card className="border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50 to-slate-100">
-              <CardContent className="p-8 text-center">
-                <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="font-semibold text-lg text-gray-700 mb-2">
-                  Nenhum Pedido Encontrado
-                </h3>
-                <p className="text-gray-500 text-sm">
-                  Não há pedidos para o dia selecionado com os filtros aplicados.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            // Ordenar empresas de acordo com a ordem salva
-            (() => {
-              // Criar array de pseudo-orders a partir de ordersByCustomer para extração
-              const pseudoOrders = ordersByCustomer.map(c => ({ customer_name: c.customer_name }));
-              const customerOrder = getCustomerOrder(pseudoOrders);
-              // Criar array lowercase para comparação case-insensitive
-              const customerOrderLower = customerOrder.map(c => c.toLowerCase());
+  <>
+    {loading.orders ? (
+      <div className="text-center py-12">
+        <Loader2 className="w-8 h-8 mx-auto mb-4 text-blue-500 animate-spin" />
+        <p className="text-gray-600">Carregando pedidos...</p>
+      </div>
+    ) : (
+      <div className="space-y-4 print:space-y-12">
+        {ordersByCustomer.length === 0 ? (
+          <Card className="border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50 to-slate-100">
+            <CardContent className="p-8 text-center">
+              <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="font-semibold text-lg text-gray-700 mb-2">
+                Nenhum Pedido Encontrado
+              </h3>
+              <p className="text-gray-500 text-sm">
+                Não há pedidos para o dia selecionado com os filtros aplicados.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          // Ordenar empresas de acordo com a ordem salva
+          (() => {
+            // Criar array de pseudo-orders a partir de ordersByCustomer para extração
+            const pseudoOrders = ordersByCustomer.map(c => ({ customer_name: c.customer_name }));
+            const customerOrder = getCustomerOrder(pseudoOrders);
+            // Criar array lowercase para comparação case-insensitive
+            const customerOrderLower = customerOrder.map(c => c.toLowerCase());
 
-              return [...ordersByCustomer].sort((a, b) => {
-                if (customerOrder.length === 0) return 0;
+            return [...ordersByCustomer].sort((a, b) => {
+              if (customerOrder.length === 0) return 0;
 
-                const lowerA = a.customer_name.toLowerCase();
-                const lowerB = b.customer_name.toLowerCase();
+              const lowerA = a.customer_name.toLowerCase();
+              const lowerB = b.customer_name.toLowerCase();
 
-                const indexA = customerOrderLower.indexOf(lowerA);
-                const indexB = customerOrderLower.indexOf(lowerB);
-                const posA = indexA === -1 ? 9999 : indexA;
-                const posB = indexB === -1 ? 9999 : indexB;
-                return posA - posB;
-              });
-            })().map((customerData) => {
-              const consolidatedItems = consolidateCustomerItems(customerData.orders);
-              const selectedDayInfo = weekDays.find(d => d.dayNumber === selectedDay);
+              const indexA = customerOrderLower.indexOf(lowerA);
+              const indexB = customerOrderLower.indexOf(lowerB);
+              const posA = indexA === -1 ? 9999 : indexA;
+              const posB = indexB === -1 ? 9999 : indexB;
+              return posA - posB;
+            });
+          })().map((customerData) => {
+            const consolidatedItems = consolidateCustomerItems(customerData.orders);
+            const selectedDayInfo = weekDays.find(d => d.dayNumber === selectedDay);
 
-              return (
-                <Card 
-                  key={customerData.customer_id} 
-                  className="print:break-after-page print:min-h-screen print:p-8 border-2 border-slate-200 shadow-lg bg-gradient-to-br from-white to-slate-50 hover:shadow-xl transition-shadow duration-200"
-                >
-                  <CardContent className="p-4 print:p-8">
+            return (
+              <Card
+                key={customerData.customer_id}
+                className="print:break-after-page print:min-h-screen print:p-8 border-2 border-slate-200 shadow-lg bg-gradient-to-br from-white to-slate-50 hover:shadow-xl transition-shadow duration-200"
+              >
+                <CardContent className="p-4 print:p-8">
                   <div className="mb-3 print:mb-12">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 pb-2 print:pb-6">
                       <div className="flex-1">
@@ -148,10 +141,10 @@ const ConsolidacaoContent = ({
                               {categoryName}
                             </h2>
                           </div>
-                          
+
                           <div className="space-y-1 print:space-y-3 pl-3 print:pl-6">
                             {items.map((item, index) => (
-                              <div 
+                              <div
                                 key={`${item.unique_id || item.recipe_id}_${index}`}
                                 className="flex items-start gap-3 print:gap-6 text-sm print:text-lg"
                               >
@@ -178,14 +171,14 @@ const ConsolidacaoContent = ({
                     <p>Cozinha Afeto - Gerado em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                     </p>
                   </div>
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
-        </div>
-      )}
-    </>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
+      </div>
+    )}
+  </>
 );
 
 const ProgramacaoCozinhaTabs = () => {
@@ -222,17 +215,143 @@ const ProgramacaoCozinhaTabs = () => {
   // Formato de cozinha sempre ativado (removido toggle)
   const globalKitchenFormat = true;
 
+  // ==== ESTADOS PARA ABAS DINÂMICAS ====
+  const [categories, setCategories] = useState([]);
+  const [menuConfig, setMenuConfig] = useState(null);
+  const [categoryMap, setCategoryMap] = useState({});
+  const [loadingConfig, setLoadingConfig] = useState(true);
+
+  // ==== CARREGAMENTO DE CATEGORIAS ====
+  useEffect(() => {
+    const loadConfigAndCategories = async () => {
+      try {
+        setLoadingConfig(true);
+        const mockUserId = APP_CONSTANTS?.MOCK_USER_ID || 'mock-user-id';
+
+        const [categoriesData, configData] = await Promise.all([
+          CategoryTree.list(),
+          MenuConfig.query([{ field: 'user_id', operator: '==', value: mockUserId }])
+        ]);
+
+        setCategories(categoriesData || []);
+        setMenuConfig(configData?.[0] || null);
+
+        // Criar mapa de subcategorias para categorias principais
+        const map = {};
+        if (categoriesData) {
+          categoriesData.forEach(cat => {
+            if (cat.level === 1) {
+              map[cat.id] = cat;
+              map[cat.name.toLowerCase()] = cat;
+            } else if (cat.parent_id) {
+              const parent = categoriesData.find(p => p.id === cat.parent_id);
+              if (parent) {
+                map[cat.id] = parent;
+                map[cat.name.toLowerCase()] = parent;
+              }
+            }
+          });
+        }
+        setCategoryMap(map);
+      } catch (error) {
+        console.error("Erro ao carregar configurações:", error);
+      } finally {
+        setLoadingConfig(false);
+      }
+    };
+    loadConfigAndCategories();
+  }, []);
+
+  // ==== COMPUTAR ABAS DINÂMICAS ====
+  const dynamicTabs = useMemo(() => {
+    // Usar apenas as categorias selecionadas para produção
+    const selectedTypes = menuConfig?.selected_main_categories || [];
+
+    console.log('🔍 [DynamicTabs] Debug:', {
+      selectedTypes,
+      categoriesCount: categories.length,
+      level1Categories: categories.filter(c => c.level === 1).map(c => ({ id: c.id, name: c.name, type: c.type })),
+      menuConfig
+    });
+
+    if (!selectedTypes.length || !categories.length) return [];
+
+    // Filtrar categorias que têm o type nos selecionados e são level 1
+    const productionCategories = categories.filter(c =>
+      c.level === 1 && selectedTypes.includes(c.type)
+    );
+
+    console.log('🔍 [DynamicTabs] productionCategories:', productionCategories.map(c => c.name));
+
+    // Ordenar: primeiro por tipo (ordem de seleção), depois por nome dentro de cada tipo
+    const orderedTabs = selectedTypes
+      .flatMap(type => productionCategories.filter(c => c.type === type)) // TODAS as categorias de cada tipo
+      .map(cat => ({
+        id: cat.id,
+        label: cat.name,
+        value: `tab-${cat.id}`,
+        type: cat.type
+      }));
+
+    console.log('🔍 [DynamicTabs] orderedTabs:', orderedTabs);
+    return orderedTabs;
+  }, [menuConfig, categories]);
+
+  // ==== FUNÇÃO PARA OBTER DADOS DE UMA ABA DINÂMICA ====
+  const getDynamicTabData = (targetTab) => {
+    if (!targetTab) return {};
+    const dayOrders = orders.filter(order => order.day_of_week === selectedDay);
+    const consolidatedData = {};
+
+    dayOrders.forEach(order => {
+      order.items?.forEach(item => {
+        const recipe = recipes.find(r => r.id === item.recipe_id);
+        if (!recipe) return;
+
+        // Resolver categoria principal
+        let mainCategory = null;
+        if (recipe.category_id && categoryMap[recipe.category_id]) {
+          mainCategory = categoryMap[recipe.category_id];
+        } else if (recipe.category && categoryMap[recipe.category.toLowerCase()]) {
+          mainCategory = categoryMap[recipe.category.toLowerCase()];
+        }
+
+        // Verificar se pertence à aba
+        if (mainCategory && mainCategory.id === targetTab.id) {
+          const recipeName = recipe.name;
+          const customerName = order.customer_name;
+
+          if (!consolidatedData[recipeName]) consolidatedData[recipeName] = {};
+          if (!consolidatedData[recipeName][customerName]) {
+            consolidatedData[recipeName][customerName] = {
+              quantity: 0,
+              unitType: item.unit_type || recipe.unit_type,
+              recipe_id: item.recipe_id,
+              items: []
+            };
+          }
+          consolidatedData[recipeName][customerName].quantity += item.quantity;
+          consolidatedData[recipeName][customerName].items.push({
+            recipeName, quantity: item.quantity,
+            unitType: item.unit_type || recipe.unit_type,
+            recipe_id: item.recipe_id, notes: item.notes || ''
+          });
+        }
+      });
+    });
+    return consolidatedData;
+  };
+
   // O hook useProgramacaoRealtimeData já gerencia os pedidos automaticamente
-  // Não é mais necessário carregar manualmente
 
   // Filtrar pedidos por dia e cliente
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
       const dayMatch = order.day_of_week === selectedDay;
       const customerMatch = selectedCustomer === "all" || order.customer_id === selectedCustomer;
-      const searchMatch = searchTerm === "" || 
+      const searchMatch = searchTerm === "" ||
         order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       return dayMatch && customerMatch && searchMatch;
     });
   }, [orders, selectedDay, selectedCustomer, searchTerm]);
@@ -497,8 +616,8 @@ const ProgramacaoCozinhaTabs = () => {
         console.log('📖 [getEmbalagemData] Receita encontrada:', recipe ? recipe.name : 'NÃO ENCONTRADA');
 
         if (recipe && !recipe.category?.toLowerCase().includes('salada') &&
-            !recipe.category?.toLowerCase().includes('carne') &&
-            !recipe.category?.toLowerCase().includes('açougue')) {
+          !recipe.category?.toLowerCase().includes('carne') &&
+          !recipe.category?.toLowerCase().includes('açougue')) {
           const recipeName = recipe.name;
           const quantity = item.quantity;
           const unitType = item.unit_type || recipe.unit_type;
@@ -621,9 +740,9 @@ const ProgramacaoCozinhaTabs = () => {
 
     // Calcular total de páginas para progresso
     const totalPages = (porEmpresaData?.length || 0) +
-                      (saladaData && Object.keys(saladaData).length > 0 ? 1 : 0) +
-                      (acougueData && Object.keys(acougueData).length > 0 ? 1 : 0) +
-                      (embalagemData && Object.keys(embalagemData).length > 0 ? 1 : 0);
+      (saladaData && Object.keys(saladaData).length > 0 ? 1 : 0) +
+      (acougueData && Object.keys(acougueData).length > 0 ? 1 : 0) +
+      (embalagemData && Object.keys(embalagemData).length > 0 ? 1 : 0);
 
     let currentPage = 0;
 
@@ -756,10 +875,10 @@ const ProgramacaoCozinhaTabs = () => {
                 <h2 style="font-size: ${h2Size}px; margin-bottom: ${baseFontSize * 0.5}px;">${index + 1}. ${nomeReceita.toUpperCase()}</h2>
                 <div class="clients-list" style="padding-left: ${baseFontSize}px;">
                   ${Object.entries(clientes).map(([customerName, dataCustomer]) => {
-                    const notesText = dataCustomer.items && dataCustomer.items.length > 0 && dataCustomer.items[0].notes
-                      ? dataCustomer.items[0].notes.trim()
-                      : '';
-                    return `
+      const notesText = dataCustomer.items && dataCustomer.items.length > 0 && dataCustomer.items[0].notes
+        ? dataCustomer.items[0].notes.trim()
+        : '';
+      return `
                     <div class="client-line" style="margin-bottom: ${baseFontSize * 0.4}px; gap: ${baseFontSize * 0.3}px;">
                       <span style="font-size: ${textSize}px;">${customerName.toUpperCase()}</span>
                       <span style="font-size: ${textSize}px;">→</span>
@@ -1484,91 +1603,31 @@ const ProgramacaoCozinhaTabs = () => {
 
   return (
     <div className="space-y-6 consolidacao-container">
-      <Card className="print:hidden border-2 border-blue-200 shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 border-b-2 border-blue-200">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-blue-800">
-                <FileText className="w-5 h-5" />
-                Consolidação de Pedidos
-              </CardTitle>
-              <p className="text-blue-700 mt-1 font-medium">
-                Visualize pedidos consolidados por cliente e categoria
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <RealtimeIndicator status={connectionStatus} />
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrint}
-                disabled={printing}
-                className="gap-2"
-              >
-                {printing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Printer className="w-4 h-4" />
-                )}
-                Imprimir
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="bg-white">
-          <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg border border-slate-200">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek(-1)}
-              className="flex items-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Semana Anterior
-            </Button>
-            
-            <div className="text-center bg-white p-3 rounded-lg border-2 border-blue-200 shadow-sm">
-              <h3 className="text-lg font-semibold text-blue-800">
-                Semana {weekNumber}/{year}
-              </h3>
-              <p className="text-sm text-blue-600">
-                {format(currentDate, "dd/MM")} - {format(addDays(currentDate, 4), "dd/MM/yyyy")}
-              </p>
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek(1)}
-              className="flex items-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
-            >
-              Próxima Semana
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+      {/* Navegação de Semana - Sem card separado, integrado ao layout */}
+      <div className="print:hidden">
+        <div className="space-y-6">
+          <div className="flex justify-center">
+            <WeekNavigator
+              currentDate={currentDate}
+              weekNumber={weekNumber}
+              onNavigateWeek={navigateWeek}
+              showCalendar={false}
+              weekRange={menuConfig?.available_days?.some(d => d === 0 || d === 6) ? 'full' : 'workdays'}
+            />
           </div>
 
-          <div className="flex justify-center gap-3 mb-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border border-emerald-200">
-            {weekDays.map((day) => (
-              <Button
-                key={day.dayNumber}
-                variant={selectedDay === day.dayNumber ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedDay(day.dayNumber)}
-                className={`flex flex-col h-16 w-16 p-1 text-xs transition-all duration-200 ${ 
-                  selectedDay === day.dayNumber 
-                    ? "bg-emerald-500 text-white border-emerald-600 shadow-lg transform scale-105" 
-                    : "border-emerald-300 text-emerald-700 hover:bg-emerald-100 hover:scale-105"
-                }`}
-              >
-                <span className="font-medium">{day.dayShort}</span>
-                <span className="text-xs opacity-80">{day.dayDate}</span>
-              </Button>
-            ))}
-          </div>
+          <WeekDaySelector
+            currentDate={currentDate}
+            currentDayIndex={selectedDay}
+            onDayChange={setSelectedDay}
+            availableDays={menuConfig?.available_days || [1, 2, 3, 4, 5]}
+          />
+        </div>
+      </div>
 
+      {/* Filtros de Cliente e Busca */}
+      <Card className="border-2 border-purple-200 shadow-lg">
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
             <div>
               <label className="block text-sm font-medium text-purple-700 mb-2">
@@ -1588,7 +1647,7 @@ const ProgramacaoCozinhaTabs = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-purple-700 mb-2">
                 Buscar Cliente
@@ -1604,97 +1663,109 @@ const ProgramacaoCozinhaTabs = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex items-end">
-              <Badge variant="secondary" className="h-fit bg-purple-100 text-purple-800 border border-purple-300">
-                {ordersByCustomer.length} cliente(s) com pedidos
-              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrint}
+                disabled={printing}
+                className="w-full h-10 gap-2 border-purple-300 text-purple-700 hover:bg-purple-100"
+              >
+                {printing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Printer className="w-4 h-4" />
+                )}
+                Imprimir
+              </Button>
             </div>
           </div>
 
           <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-200">
             <Tabs defaultValue="por-empresa" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4 bg-white border-2 border-orange-200 p-2 rounded-lg">
-                <TabsTrigger 
-                  value="por-empresa" 
+              <TabsList
+                className="grid w-full bg-white border-2 border-orange-200 p-2 rounded-lg"
+                style={{ gridTemplateColumns: `repeat(${1 + dynamicTabs.length}, 1fr)` }}
+              >
+                <TabsTrigger
+                  value="por-empresa"
                   className="flex items-center gap-2 data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:border-indigo-600 border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200"
                 >
                   <FileText className="w-4 h-4" />
                   Por Empresa
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="salada" 
-                  className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white data-[state=active]:border-green-600 border-2 border-transparent hover:border-green-300 hover:bg-green-50 transition-all duration-200"
-                >
-                  <Leaf className="w-4 h-4" />
-                  Salada
-                </TabsTrigger>
-                <TabsTrigger
-                  value="acougue"
-                  className="flex items-center gap-2 data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:border-red-600 border-2 border-transparent hover:border-red-300 hover:bg-red-50 transition-all duration-200"
-                >
-                  <Utensils className="w-4 h-4" />
-                  Açougue
-                </TabsTrigger>
-                <TabsTrigger
-                  value="embalagem"
-                  className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:border-blue-600 border-2 border-transparent hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
-                >
-                  <Package2 className="w-4 h-4" />
-                  Embalagem
-                </TabsTrigger>
+                {dynamicTabs.map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:border-blue-600 border-2 border-transparent hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                  >
+                    <Package2 className="w-4 h-4" />
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
               <TabsContent value="por-empresa" className="mt-6">
                 <ConsolidacaoContent
-                    loading={loading}
-                    ordersByCustomer={ordersByCustomer}
-                    consolidateCustomerItems={consolidateCustomerItems}
-                    weekDays={weekDays}
-                    selectedDay={selectedDay}
-                    globalKitchenFormat={globalKitchenFormat}
-                    formatQuantityDisplay={formatQuantityDisplay}
+                  loading={loading}
+                  ordersByCustomer={ordersByCustomer}
+                  consolidateCustomerItems={consolidateCustomerItems}
+                  weekDays={weekDays}
+                  selectedDay={selectedDay}
+                  globalKitchenFormat={globalKitchenFormat}
+                  formatQuantityDisplay={formatQuantityDisplay}
                 />
               </TabsContent>
 
-              <TabsContent value="salada" className="mt-6">
-                {activeTab === 'salada' && <SaladaTab
-                  currentDate={currentDate}
-                  selectedDay={selectedDay}
-                  weekNumber={weekNumber}
-                  year={year}
-                  weekDays={weekDays}
-                  orders={orders}
-                  recipes={recipes}
-                  globalKitchenFormat={globalKitchenFormat}
-                />}
-              </TabsContent>
-
-              <TabsContent value="acougue" className="mt-6">
-                {activeTab === 'acougue' && <AcougueTab
-                  currentDate={currentDate}
-                  selectedDay={selectedDay}
-                  weekNumber={weekNumber}
-                  year={year}
-                  weekDays={weekDays}
-                  orders={orders}
-                  recipes={recipes}
-                  globalKitchenFormat={globalKitchenFormat}
-                />}
-              </TabsContent>
-
-              <TabsContent value="embalagem" className="mt-6">
-                {activeTab === 'embalagem' && <EmbalagemTab
-                  currentDate={currentDate}
-                  selectedDay={selectedDay}
-                  weekNumber={weekNumber}
-                  year={year}
-                  weekDays={weekDays}
-                  orders={orders}
-                  recipes={recipes}
-                  globalKitchenFormat={globalKitchenFormat}
-                />}
-              </TabsContent>
+              {dynamicTabs.map((tab) => (
+                <TabsContent key={tab.value} value={tab.value} className="mt-6">
+                  {activeTab === tab.value && (
+                    <Card className="border-2 border-slate-200 shadow-lg bg-gradient-to-br from-white to-slate-50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl font-bold text-gray-800">
+                          {tab.label} - {weekDays.find(d => d.dayNumber === selectedDay)?.fullDate}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {(() => {
+                          const tabData = getDynamicTabData(tab);
+                          if (Object.keys(tabData).length === 0) {
+                            return (
+                              <div className="text-center py-8 text-gray-500">
+                                <Package2 className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                                <p>Nenhum item de {tab.label} para o dia selecionado.</p>
+                              </div>
+                            );
+                          }
+                          return Object.entries(tabData).map(([recipeName, customers], index) => (
+                            <div key={recipeName} className="border-b border-gray-200 pb-3 last:border-b-0">
+                              <h3 className="font-semibold text-lg text-gray-800 mb-2">
+                                {index + 1}. {recipeName.toUpperCase()}
+                              </h3>
+                              <div className="ml-4 space-y-1">
+                                {Object.entries(customers).map(([customerName, data]) => (
+                                  <div key={customerName} className="flex items-center gap-2 text-sm">
+                                    <span className="font-medium text-gray-700">{customerName.toUpperCase()}</span>
+                                    <span className="text-gray-400">→</span>
+                                    <span className="font-semibold text-blue-600">
+                                      {formatQuantityForDisplay(data.quantity, data.unitType, globalKitchenFormat)}
+                                      {data.items?.[0]?.notes && (
+                                        <span className="text-gray-500 italic ml-1">({data.items[0].notes})</span>
+                                      )}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+              ))}
             </Tabs>
           </div>
         </CardContent>

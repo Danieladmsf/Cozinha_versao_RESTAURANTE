@@ -34,7 +34,7 @@ export function useRecipeState() {
   const [groups, setGroups] = useState([]);
 
   // Estados de interface
-  const [activeTab, setActiveTab] = useState("ficha-tecnica");
+  const [activeTab, setActiveTab] = useState("dados-tecnicos");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
@@ -100,6 +100,8 @@ export function useRecipeState() {
     setPreparationsData([]);
     setGroups([]);
     setIsDirty(false);
+    setIsEditing(false);
+    setCurrentRecipeId(null);
   }, []);
 
   const resetModals = useCallback(() => {

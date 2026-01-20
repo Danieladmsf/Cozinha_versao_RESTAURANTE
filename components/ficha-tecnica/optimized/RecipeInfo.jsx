@@ -73,11 +73,7 @@ const RecipeInfo = ({
             <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-400"></span>
               Categoria
-              {recipe.category && !categories.all.find(cat => cat.value === recipe.category) && (
-                <span className="text-xs text-orange-500">
-                  (Categoria personalizada)
-                </span>
-              )}
+              {/* Removed custom category warning */}
             </Label>
             <Select
               value={recipe.category}

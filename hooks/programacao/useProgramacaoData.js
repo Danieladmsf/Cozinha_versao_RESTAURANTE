@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Order, Customer, Recipe } from "@/app/api/entities";
 import { getWeek, getYear, startOfWeek, addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAvailableDays } from '@/hooks/useAvailableDays';
 
 export const useProgramacaoData = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -12,23 +13,26 @@ export const useProgramacaoData = () => {
   const [orders, setOrders] = useState([]);
   const [ordersCache, setOrdersCache] = useState(new Map());
 
-  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
+  // Hook centralizado para dias disponíveis
+  const availableDays = useAvailableDays();
+
+  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 0 }), [currentDate]);
   const weekNumber = useMemo(() => getWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
   const year = useMemo(() => getYear(currentDate), [currentDate]);
 
   const weekDays = useMemo(() => {
-    return Array.from({ length: 5 }).map((_, i) => {
-      const date = addDays(weekStart, i);
+    return availableDays.map((dayIndex) => {
+      const date = addDays(weekStart, dayIndex);
       return {
         date,
-        dayNumber: i + 1,
+        dayNumber: dayIndex,
         dayName: format(date, 'EEEE', { locale: ptBR }),
         dayShort: format(date, 'EEE', { locale: ptBR }),
         dayDate: format(date, 'dd/MM', { locale: ptBR }),
         fullDate: format(date, 'dd/MM/yyyy', { locale: ptBR })
       };
     });
-  }, [weekStart]);
+  }, [weekStart, availableDays]);
 
   const loadInitialData = useCallback(async () => {
     setLoading(prev => ({ ...prev, initial: true }));
@@ -89,8 +93,8 @@ export const useProgramacaoData = () => {
     navigateWeek,
     loadOrdersForWeek,
     refreshData: () => {
-        setOrdersCache(new Map());
-        loadOrdersForWeek(weekNumber, year);
+      setOrdersCache(new Map());
+      loadOrdersForWeek(weekNumber, year);
     }
   };
 };

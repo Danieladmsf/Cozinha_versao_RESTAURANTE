@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   ShoppingCart,
   Calendar,
-  ChevronLeft, 
+  ChevronLeft,
   ChevronRight,
   RefreshCw,
   Printer,
@@ -19,6 +19,10 @@ import { ptBR } from "date-fns/locale";
 // Entities
 import { Order, Recipe, CategoryTree, MenuConfig } from "@/app/api/entities";
 import { APP_CONSTANTS } from "@/lib/constants";
+
+// Componentes centralizados
+import WeekNavigator from '@/components/shared/WeekNavigator';
+import WeekDaySelector from '@/components/shared/WeekDaySelector';
 
 // Componente de consolidação de ingredientes
 import IngredientesConsolidados from './lista-compras/IngredientesConsolidados';
@@ -37,20 +41,20 @@ const ListaComprasTabs = () => {
   const [recipes, setRecipes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [menuConfig, setMenuConfig] = useState(null);
-  
+
   // Calculados
-  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
-  const weekNumber = useMemo(() => getWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
+  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 0 }), [currentDate]);
+  const weekNumber = useMemo(() => getWeek(currentDate, { weekStartsOn: 0 }), [currentDate]);
   const year = useMemo(() => getYear(currentDate), [currentDate]);
-  
+
   // Dias da semana
   const weekDays = useMemo(() => {
     const days = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 7; i++) {
       const date = addDays(weekStart, i);
       days.push({
         date,
-        dayNumber: i + 1,
+        dayNumber: i, // 0=Domingo... 6=Sábado (para indexação)
         dayName: format(date, 'EEEE', { locale: ptBR }),
         dayShort: format(date, 'EEE', { locale: ptBR }),
         dayDate: format(date, 'dd/MM', { locale: ptBR }),
@@ -175,95 +179,60 @@ const ListaComprasTabs = () => {
             </div>
           </div>
         </CardHeader>
-        
-        <CardContent className="bg-white pt-6">
-          {/* Navegação de semana */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek(-1)}
-              className="flex items-center gap-2 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Semana Anterior
-            </Button>
 
-            <div className="text-center bg-white p-3 rounded-lg border-2 border-indigo-300 shadow-md">
-              <h3 className="text-lg font-semibold text-indigo-900">
-                Semana {weekNumber}/{year}
-              </h3>
-              <p className="text-sm text-indigo-600">
-                {format(weekStart, "dd/MM")} - {format(addDays(weekStart, 4), "dd/MM/yyyy")}
-              </p>
+        <CardContent className="bg-white pt-6">
+          {/* Navegação de semana e Seletor de Dias */}
+          <div className="mb-8">
+            <div className="flex justify-center mb-6">
+              <WeekNavigator
+                currentDate={currentDate}
+                weekNumber={weekNumber}
+                onNavigateWeek={navigateWeek}
+                showCalendar={false}
+                weekRange={menuConfig?.available_days?.some(d => d === 0 || d === 6) ? 'full' : 'workdays'}
+              />
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek(1)}
-              className="flex items-center gap-2 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
-            >
-              Próxima Semana
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Toggle: Dia Selecionado / Semana Inteira */}
-          <div className="flex justify-center gap-3 mb-4">
-            <Button
-              variant={!showWeekMode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowWeekMode(false)}
-              className={`gap-2 ${
-                !showWeekMode
-                  ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md"
-                  : "border-orange-300 text-orange-700 hover:bg-orange-50"
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              Dia Selecionado
-            </Button>
-
-            <Button
-              variant={showWeekMode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowWeekMode(true)}
-              className={`gap-2 ${
-                showWeekMode
-                  ? "bg-teal-600 text-white hover:bg-teal-700 shadow-md"
-                  : "border-teal-300 text-teal-700 hover:bg-teal-50"
-              }`}
-            >
-              <ShoppingCart className="w-4 h-4" />
-              Semana Inteira
-            </Button>
-          </div>
-
-          {/* Seleção de dias da semana (clicáveis) */}
-          <div className="flex justify-center gap-3 mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg border border-slate-200">
-            {weekDays.map((day) => (
+            {/* Toggle: Dia Selecionado / Semana Inteira */}
+            <div className="flex justify-center gap-3 mb-6">
               <Button
-                key={day.dayNumber}
-                variant={selectedDay === day.dayNumber && !showWeekMode ? "default" : "outline"}
+                variant={!showWeekMode ? "default" : "outline"}
                 size="sm"
-                onClick={() => {
-                  setSelectedDay(day.dayNumber);
-                  setShowWeekMode(false); // Automaticamente muda para modo dia
-                }}
-                disabled={showWeekMode}
-                className={`flex flex-col h-16 w-16 p-1 text-xs transition-all duration-200 ${
-                  selectedDay === day.dayNumber && !showWeekMode
-                    ? "bg-orange-500 text-white border-orange-600 shadow-lg transform scale-105"
-                    : showWeekMode
-                    ? "border-gray-300 text-gray-400 bg-white opacity-60"
-                    : "border-slate-300 text-slate-700 hover:bg-slate-100 hover:scale-105"
-                }`}
+                onClick={() => setShowWeekMode(false)}
+                className={`gap-2 ${!showWeekMode
+                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+                  : "border-blue-200 text-blue-700 hover:bg-blue-50"
+                  }`}
               >
-                <span className="font-medium">{day.dayShort}</span>
-                <span className="text-xs opacity-80">{day.dayDate}</span>
+                <Calendar className="w-4 h-4" />
+                Dia Selecionado
               </Button>
-            ))}
+
+              <Button
+                variant={showWeekMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowWeekMode(true)}
+                className={`gap-2 ${showWeekMode
+                  ? "bg-teal-600 text-white hover:bg-teal-700 shadow-md"
+                  : "border-teal-200 text-teal-700 hover:bg-teal-50"
+                  }`}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Semana Inteira
+              </Button>
+            </div>
+
+            <div className={`transition-all duration-300 ${showWeekMode ? 'opacity-50 grayscale' : ''}`}>
+              <WeekDaySelector
+                currentDate={currentDate}
+                currentDayIndex={selectedDay}
+                availableDays={menuConfig?.available_days || [1, 2, 3, 4, 5]}
+                onDayChange={(day) => {
+                  setSelectedDay(day);
+                  setShowWeekMode(false);
+                }}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

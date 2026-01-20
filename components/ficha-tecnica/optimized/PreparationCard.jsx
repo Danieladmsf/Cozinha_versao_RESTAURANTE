@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { processTypes } from "@/lib/recipeConstants";
-import IngredientTable from './IngredientTable';
+import IngredientTable from '../IngredientTable';
 
 const PreparationCard = ({
   prep,

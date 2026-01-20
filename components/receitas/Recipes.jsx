@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Recipe, Ingredient, Category, CategoryTree } from "@/app/api/entities";
+import { Recipe, Ingredient, Category, CategoryTree, CategoryType } from "@/app/api/entities";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -43,6 +43,9 @@ export default function Recipes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
+  const [activeType, setActiveType] = useState("receitas");
+  const [categoryTypes, setCategoryTypes] = useState([]);
+
   const [viewMode, setViewMode] = useState("grid");
   const [recipeCategories, setRecipeCategories] = useState([]);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
@@ -59,18 +62,63 @@ export default function Recipes() {
     loadRecipes();
     loadCategories();
     loadIngredients();
+    loadCategoryTypes();
+    // loadRecipeCategories will be called after categoryTypes are loaded or independently
+  }, []);
+
+  // Reload categories when activeType changes
+  useEffect(() => {
     loadRecipeCategories();
-  }, []);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Reset subcategory when main category changes
-  useEffect(() => {
+    // Reset active category when type switches
+    setActiveCategory("all");
     setActiveSubCategory(null);
-  }, [activeCategory]);
+  }, [activeType, fullCategoryTree]); // Re-run when type changes or tree loads
 
+  const loadCategoryTypes = async () => {
+    try {
+      const types = await CategoryType.list();
+      // Filter only relevant types if needed, or stick to 'receitas' and 'receitas_-_base'
+      // We accept 'receitas' and 'receitas_-_base' (mapped to Products)
+      const allowedTypes = ['receitas', 'receitas_-_base'];
+      const filteredTypes = types.filter(t => allowedTypes.includes(t.value));
+      setCategoryTypes(filteredTypes.sort((a, b) => (a.order || 0) - (b.order || 0)));
+    } catch (error) {
+      console.error("Error loading category types", error);
+    }
+  };
+
+  const loadRecipeCategories = async () => {
+    try {
+      // If fullCategoryTree is empty, we might need to fetch it first. 
+      // But usually it is fetched once. Let's make sure we have it.
+      let allCategories = fullCategoryTree;
+      if (allCategories.length === 0) {
+        allCategories = await CategoryTree.list();
+        setFullCategoryTree(allCategories);
+      }
+
+      const recipeCategories = allCategories
+        .filter(cat => cat.type === activeType && cat.active !== false && cat.level === 1) // Filter by activeType
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      if (recipeCategories.length > 0) {
+        const formattedCategories = recipeCategories.map(cat => ({
+          id: cat.id, name: cat.name, label: cat.name, value: cat.name,
+        }));
+        setRecipeCategories(formattedCategories);
+        return;
+      }
+
+      // Fallback only if type is 'receitas' and no tree data
+      if (activeType === 'receitas' && recipeCategories.length === 0) {
+        const categoryList = await Category.list();
+        // ... fallback logic if needed, but assuming CategoryTree is the source of truth now
+      }
+      setRecipeCategories([]);
+    } catch (error) {
+      // Error logic
+    }
+  };
 
   const loadRecipes = async () => {
     try {
@@ -115,30 +163,6 @@ export default function Recipes() {
       setCategories(recipeCategories);
     } catch (error) {
       // Silent error
-    }
-  };
-
-  const loadRecipeCategories = async () => {
-    try {
-      const allCategories = await CategoryTree.list();
-      setFullCategoryTree(allCategories);
-
-      const recipeCategories = allCategories
-        .filter(cat => cat.type === "receitas" && cat.active !== false && cat.level === 1) // Only level 1 for tabs
-        .sort((a, b) => (a.order || 0) - (b.order || 0));
-
-      if (recipeCategories.length > 0) {
-        const formattedCategories = recipeCategories.map(cat => ({
-          id: cat.id, name: cat.name, label: cat.name, value: cat.name,
-        }));
-        setRecipeCategories(formattedCategories);
-        return;
-      }
-      // Fallback logic remains same
-      const categoryList = await Category.list();
-      // ... existing fallback code ...
-    } catch (error) {
-      // ... existing fallback code ...
     }
   };
 
@@ -202,6 +226,28 @@ export default function Recipes() {
     }
   };
 
+  // Helper to find root category type
+  const getRootCategoryType = (categoryName) => {
+    if (!categoryName) return 'receitas'; // Default or unclassified
+    // Find node
+    let node = fullCategoryTree.find(c => c.name === categoryName);
+    if (!node) {
+      // Fallback: check legacy categories or assume 'receitas'
+      return 'receitas';
+    }
+
+    // Traverse up
+    const visited = new Set();
+    while (node && node.parent_id && !visited.has(node.id)) {
+      visited.add(node.id);
+      const parent = fullCategoryTree.find(c => c.id === node.parent_id);
+      if (parent) node = parent;
+      else break;
+    }
+
+    return node ? (node.type || 'receitas') : 'receitas';
+  };
+
   // Helper to get all descendant names
   const getDescendantNames = (categoryId) => {
     const children = fullCategoryTree.filter(c => c.parent_id === categoryId);
@@ -217,6 +263,12 @@ export default function Recipes() {
   const getFilteredRecipes = () => {
     let filtered = recipes;
 
+    // Filter by Active Type FIRST
+    filtered = filtered.filter(recipe => {
+      const type = getRootCategoryType(recipe.category);
+      return type === activeType;
+    });
+
     if (searchTerm) {
       filtered = filtered.filter(recipe =>
         (recipe.name && recipe.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -228,28 +280,21 @@ export default function Recipes() {
       let targetNames = [activeCategory];
       let targetCategoryIds = [];
 
-      // If we have an active subcategory, that is our precise target.
-      // If not, our target is the activeCategory TAB.
-
       if (activeSubCategory) {
         targetNames = [activeSubCategory.name];
         targetCategoryIds = [activeSubCategory.id];
       } else {
-        // Find the ID of the active tab category (matched by name)
         const rootCat = fullCategoryTree.find(c => c.name === activeCategory && c.level === 1);
         if (rootCat) {
           targetCategoryIds = [rootCat.id];
         }
       }
 
-      // Expand to include all descendants of the targets
       targetCategoryIds.forEach(id => {
         const descendants = getDescendantNames(id);
         targetNames = [...targetNames, ...descendants];
       });
 
-      // Also allow exact match on activeCategory string for backward compatibility
-      // But standard filtering should look into targetNames
       filtered = filtered.filter(recipe => targetNames.includes(recipe.category));
     }
 
@@ -329,24 +374,52 @@ export default function Recipes() {
           </motion.div>
 
           <div className="mb-6 space-y-4">
+
+            {/* Type Selector */}
+            {categoryTypes.length > 0 && (
+              <Tabs value={activeType} onValueChange={setActiveType} className="w-full mb-4">
+                <TabsList className="bg-gray-100 p-1">
+                  {categoryTypes.map(type => (
+                    <TabsTrigger
+                      key={type.id}
+                      value={type.value}
+                      className="min-w-[120px]"
+                    >
+                      {type.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            )}
+
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
-                <TabsList>
-                  <TabsTrigger value="all">Todas</TabsTrigger>
-                  {recipeCategories.map(category => ( // Changed from uniqueCategories to recipeCategories
-                    <TabsTrigger key={category.id} value={category.name} className="relative group">
+                <TabsList className="w-full justify-start border-b border-orange-200 bg-transparent p-0 h-auto space-x-1">
+                  <TabsTrigger
+                    value="all"
+                    className="rounded-t-lg border-t border-x border-b-0 border-transparent px-4 py-2 data-[state=active]:bg-orange-50 data-[state=active]:border-orange-200 data-[state=active]:text-orange-700 data-[state=active]:shadow-none relative -mb-[1px]"
+                  >
+                    Todas
+                  </TabsTrigger>
+                  {recipeCategories.map(category => (
+                    <TabsTrigger
+                      key={category.id}
+                      value={category.name}
+                      className="rounded-t-lg border-t border-x border-b-0 border-transparent px-4 py-2 relative group data-[state=active]:bg-orange-50 data-[state=active]:border-orange-200 data-[state=active]:text-orange-700 data-[state=active]:shadow-none -mb-[1px]"
+                    >
                       {category.name === "prato_principal" ? "Prato Principal" :
                         category.name === "entrada" ? "Entrada" :
                           category.name === "sobremesa" ? "Sobremesa" : category.name}
 
                       <span
-                        className="ml-2 p-1 rounded hover:bg-red-100 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
+                        className="ml-2 p-0.5 rounded-full hover:bg-red-100 text-gray-300 hover:text-red-600 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                         onClick={(e) => {
                           e.stopPropagation();
                           deleteCategory(category.name);
                         }}
+                        title="Excluir categoria"
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash className="h-3 w-3" />
                       </span>
                     </TabsTrigger>
                   ))}
@@ -385,15 +458,17 @@ export default function Recipes() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="flex flex-wrap gap-2 pt-2"
+                  className="bg-orange-50 border-x border-b border-orange-200 rounded-b-lg p-4 flex flex-wrap gap-2 -mt-4 pt-6 z-0 relative"
                 >
                   {subCategoriesToShow.map(cat => (
                     <Badge
                       key={cat.id}
-                      variant={activeSubCategory?.id === cat.id ? "default" : "outline"}
+                      variant="outline"
                       className={cn(
-                        "cursor-pointer hover:bg-amber-600 hover:text-white px-3 py-1 text-sm transition-colors",
-                        activeSubCategory?.id === cat.id ? "bg-amber-600 text-white" : "bg-white text-gray-700 border-gray-200"
+                        "cursor-pointer px-3 py-1.5 text-sm transition-all shadow-sm border",
+                        activeSubCategory?.id === cat.id
+                          ? "bg-amber-600 text-white border-amber-700 hover:bg-amber-700"
+                          : "bg-white text-orange-900 border-orange-200 hover:bg-white hover:border-orange-300 hover:shadow-md"
                       )}
                       onClick={() => handleSubCategoryClick(cat)}
                     >

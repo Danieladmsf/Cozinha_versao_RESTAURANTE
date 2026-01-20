@@ -18,7 +18,7 @@ export default function MenuMainPage() {
     const handleFocus = () => {
       setRefreshKey(prev => prev + 1);
     };
-    
+
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
@@ -28,16 +28,16 @@ export default function MenuMainPage() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sistema de Cardápio</h1>
-            <p className="text-gray-600 mt-1">Gerencie o cardápio semanal completo</p>
+            <h1 className="text-3xl font-bold text-gray-900">Ordem de Produção</h1>
+            <p className="text-gray-600 mt-1">Gerencie a produção semanal completa</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <RefreshButton 
+            <RefreshButton
               text="Atualizar Página"
               size="sm"
             />
-            <Button 
+            <Button
               variant="outline"
               size="sm"
               onClick={() => window.location.href = '/configurar-cardapio'}
@@ -52,13 +52,13 @@ export default function MenuMainPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="weekly">
-              Cardápio Semanal
+              Produção Semanal
             </TabsTrigger>
             <TabsTrigger value="nutrition">
               Tabela Nutricional
             </TabsTrigger>
             <TabsTrigger value="client">
-              Cardápio por Cliente
+              Produção por Cliente
             </TabsTrigger>
           </TabsList>
 

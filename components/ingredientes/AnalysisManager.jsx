@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Ingredient, PriceHistory, Category } from "@/app/api/entities";
 import { Supplier } from "@/app/api/entities";
 import { Brand } from "@/app/api/entities";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ import {
   ChevronsUpDown,
   X,
   Plus,
+  Package,
 } from "lucide-react";
 import {
   Command,
@@ -97,11 +99,13 @@ export default function AnalysisManager() {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("cards");
+  const [itemType, setItemType] = useState("ingrediente");
   const [suppliers, setSuppliers] = useState([]);
   const [brands, setBrands] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState("all");
   const [selectedBrand, setSelectedBrand] = useState("all");
   const [selectedIngredient, setSelectedIngredient] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
   const [chartType, setChartType] = useState("line");
   const [chartStyle, setChartStyle] = useState("default");
@@ -234,6 +238,22 @@ export default function AnalysisManager() {
     let ingredientsFilteredByCategory = ingredients;
     if (selectedCategory !== "all") {
       ingredientsFilteredByCategory = ingredientsFilteredByCategory.filter(ing => ing.category === selectedCategory);
+    }
+
+    // Filter by Item Type (Ingrediente vs Embalagem)
+    ingredientsFilteredByCategory = ingredientsFilteredByCategory.filter(ing => {
+      if (itemType === 'embalagem') {
+        return ing.item_type === 'embalagem';
+      }
+      return ing.item_type !== 'embalagem';
+    });
+
+    // Filter by Search Term
+    if (searchTerm) {
+      const lowerTerm = searchTerm.toLowerCase();
+      ingredientsFilteredByCategory = ingredientsFilteredByCategory.filter(ing =>
+        ing.name?.toLowerCase().includes(lowerTerm)
+      );
     }
 
     // Filter ingredients by history filters
@@ -401,7 +421,7 @@ export default function AnalysisManager() {
 
     setFilteredIngredients(processedIngredients);
 
-  }, [ingredients, priceHistory, dateRange, selectedCategory, selectedSupplier, selectedBrand, loading]);
+  }, [ingredients, priceHistory, dateRange, selectedCategory, selectedSupplier, selectedBrand, loading, itemType, searchTerm]);
 
 
   // Preparar dados para o gráfico
@@ -684,45 +704,61 @@ export default function AnalysisManager() {
 
   return (
     <div className="space-y-6">
+
+      {/* Item Type Tabs */}
+      <Tabs value={itemType} onValueChange={setItemType} className="w-full">
+        <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex bg-white p-1 rounded-lg shadow-sm border border-gray-200 gap-1 h-auto mb-8">
+          <TabsTrigger
+            value="ingrediente"
+            className="md:w-[140px] data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-md text-sm font-medium"
+          >
+            <Package className="w-4 h-4 mr-2" />
+            Ingredientes
+          </TabsTrigger>
+          <TabsTrigger
+            value="embalagem"
+            className="md:w-[140px] data-[state=active]:bg-amber-500 data-[state=active]:text-white rounded-md text-sm font-medium"
+          >
+            <Package className="w-4 h-4 mr-2" />
+            Embalagens
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {/* Header da Análise */}
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Análise Detalhada de Preços</h2>
-        <p className="text-gray-600">Acompanhamento detalhado da evolução dos preços dos ingredientes</p>
-      </div>
+
 
       {/* Filtros de Histórico */}
-      <div className="bg-white rounded-lg shadow p-6">
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
           <div>
-            <Label htmlFor="start-date" className="text-sm font-medium text-gray-700">Data inicial</Label>
+            <Label htmlFor="start-date" className="text-xs font-medium text-gray-700">Data inicial</Label>
             <DatePicker
               selected={dateRange.start}
               onChange={(date) => setDateRange(prev => ({ ...prev, start: date ? new Date(date + 'T12:00:00') : null }))}
-              placeholder="Selecionar data"
-              className="mt-1"
+              placeholder="Início"
+              className="mt-1 h-8 text-sm"
             />
           </div>
           <div>
-            <Label htmlFor="end-date" className="text-sm font-medium text-gray-700">Data final</Label>
+            <Label htmlFor="end-date" className="text-xs font-medium text-gray-700">Data final</Label>
             <DatePicker
               selected={dateRange.end}
               onChange={(date) => setDateRange(prev => ({ ...prev, end: date ? new Date(date + 'T12:00:00') : null }))}
-              placeholder="Selecionar data"
-              className="mt-1"
+              placeholder="Fim"
+              className="mt-1 h-8 text-sm"
             />
           </div>
           <div>
-            <Label htmlFor="supplier-filter" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="supplier-filter" className="text-xs font-medium text-gray-700">
               Fornecedor
-              <span className="ml-1 text-xs text-blue-600">(filtra histórico + ingredientes)</span>
             </Label>
             <Select value={selectedSupplier} onValueChange={setSelectedSupplier}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Selecionar fornecedor" />
+              <SelectTrigger className="mt-1 h-8 text-sm">
+                <SelectValue placeholder="Fornecedor" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os fornecedores</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {suppliers.sort((a, b) => a.label.localeCompare(b.label)).map(s => (
                   <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
                 ))}
@@ -730,38 +766,64 @@ export default function AnalysisManager() {
             </Select>
           </div>
           <div>
-            <Label htmlFor="brand-filter" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="brand-filter" className="text-xs font-medium text-gray-700">
               Marca
-              <span className="ml-1 text-xs text-blue-600">(filtra histórico + ingredientes)</span>
             </Label>
             <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Selecionar marca" />
+              <SelectTrigger className="mt-1 h-8 text-sm">
+                <SelectValue placeholder="Marca" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as marcas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 {brands.length > 0 ? (
                   brands.sort((a, b) => a.label.localeCompare(b.label)).map(b => (
                     <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
                   ))
                 ) : (
                   <SelectItem value="no-brands" disabled>
-                    Nenhuma marca encontrada
+                    Nenhuma
                   </SelectItem>
                 )}
               </SelectContent>
             </Select>
-            {brands.length === 0 && (
-              <p className="text-xs text-gray-500 mt-1">
-                Nenhuma marca encontrada no histórico ou ingredientes
-              </p>
-            )}
+          </div>
+
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full gap-2 h-8 text-xs bg-slate-50 border-slate-200">
+                  <Download className="h-3 w-3" />
+                  Exportar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={exportToPDF} className="cursor-pointer text-xs">
+                  <FileText className="h-3 w-3 mr-2" />
+                  PDF (Imprimir)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={exportToExcel} className="cursor-pointer text-xs">
+                  <FileSpreadsheet className="h-3 w-3 mr-2" />
+                  Excel (CSV)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
 
-      {/* Ações */}
-      <div className="flex justify-between items-center">
+      {/* Resumo de resultados */}
+      {/* Resumo de resultados e Busca */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-1">
+        <div className="relative w-full md:w-[300px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Buscar por nome..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8 h-9"
+          />
+        </div>
+
         <div className="text-sm text-gray-600">
           Mostrando {filteredIngredients.length} ingrediente{filteredIngredients.length !== 1 ? 's' : ''}
           {filteredIngredients.filter(ing => ing.has_history).length > 0 && (
@@ -770,24 +832,6 @@ export default function AnalysisManager() {
             </span>
           )}
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Exportar
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={exportToPDF} className="cursor-pointer">
-              <FileText className="h-4 w-4 mr-2" />
-              Exportar para PDF (Imprimir)
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={exportToExcel} className="cursor-pointer">
-              <FileSpreadsheet className="h-4 w-4 mr-2" />
-              Exportar para Excel (CSV)
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Visualizações */}

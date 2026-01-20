@@ -2,36 +2,44 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Order, Customer, Recipe } from "@/app/api/entities";
 import { getWeek, getYear, startOfWeek, addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAvailableDays } from '@/hooks/useAvailableDays';
 
 export const useProgramacaoRealtimeData = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState({ initial: true, orders: false });
-  const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connected' | 'syncing' | 'disconnected' | 'connecting'
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
   const [customers, setCustomers] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [orders, setOrders] = useState([]);
+
+  // Hook centralizado para dias disponíveis
+  const availableDays = useAvailableDays();
 
   // Refs para armazenar funções de unsubscribe
   const unsubscribeOrders = useRef(null);
   const unsubscribeCustomers = useRef(null);
   const unsubscribeRecipes = useRef(null);
 
-  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
+  // Começar a semana no domingo para suportar todos os dias
+  const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 0 }), [currentDate]);
   const weekNumber = useMemo(() => getWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
   const year = useMemo(() => getYear(currentDate), [currentDate]);
 
   const weekDays = useMemo(() => {
-    return Array.from({ length: 5 }).map((_, i) => {
+    // Gerar sempre os 7 dias da semana (Dom a Sáb)
+    const days = [];
+    for (let i = 0; i < 7; i++) {
       const date = addDays(weekStart, i);
-      return {
+      days.push({
         date,
-        dayNumber: i + 1,
+        dayNumber: i, // 0=Domingo... 6=Sábado
         dayName: format(date, 'EEEE', { locale: ptBR }),
         dayShort: format(date, 'EEE', { locale: ptBR }),
         dayDate: format(date, 'dd/MM', { locale: ptBR }),
         fullDate: format(date, 'dd/MM/yyyy', { locale: ptBR })
-      };
-    });
+      });
+    }
+    return days;
   }, [weekStart]);
 
   // Setup real-time listeners for customers and recipes (one time, don't change)

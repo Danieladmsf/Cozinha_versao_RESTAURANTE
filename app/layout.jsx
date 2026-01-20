@@ -49,10 +49,10 @@ export default function RootLayout({ children }) {
     { name: "Receitas", href: "/receitas", icon: ChefHat },
     { name: "Ficha Técnica", href: "/ficha-tecnica", icon: Clipboard },
     { name: "Análise de Receitas", href: "/analise-de-receitas", icon: TrendingUp },
-    { name: "Cardápio", href: "/cardapio", icon: Utensils },
+    { name: "Ordem de Produção", href: "/cardapio", icon: Utensils },
     { name: "Programação", href: "/programacao", icon: ClipboardList },
     { name: "Pedidos", href: "/pedidos", icon: ShoppingCart },
-    { name: "Ingredientes", href: "/ingredientes", icon: Package },
+    { name: "Insumos", href: "/ingredientes", icon: Package },
     { name: "Categorias", href: "/categorias", icon: Tag },
     { name: "Fornecedores e Serviços", href: "/fornecedores-e-servicos", icon: Building2 },
     { name: "Clientes", href: "/clientes", icon: Users },
@@ -97,22 +97,22 @@ export default function RootLayout({ children }) {
       <html lang="pt-BR">
         <head>
           <meta charSet="utf-8" />
-          <meta name="description" content="Portal do Cliente - Cozinha Afeto" />
-          <meta name="keywords" content="portal cliente, pedidos online, cozinha afeto" />
-          <meta name="author" content="Cozinha Afeto" />
+          <meta name="description" content="Portal do Cliente - Cozinha - Descontão" />
+          <meta name="keywords" content="portal cliente, pedidos online, cozinha descontão" />
+          <meta name="author" content="Cozinha - Descontão" />
           <meta name="robots" content="noindex, nofollow" />
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
           <meta name="theme-color" content="#3b82f6" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-          <meta property="og:title" content="Portal do Cliente - Cozinha Afeto" />
-          <meta property="og:description" content="Portal exclusivo para clientes da Cozinha Afeto" />
+          <meta property="og:title" content="Portal do Cliente - Cozinha - Descontão" />
+          <meta property="og:description" content="Portal exclusivo para clientes da Cozinha - Descontão" />
           <meta property="og:type" content="website" />
           <meta property="og:locale" content="pt_BR" />
           <link rel="preload" href="/logo-transparent.png" as="image" />
           <link rel="preload" href="/background-loading.jpg" as="image" />
-          <title>Portal do Cliente - Cozinha Afeto</title>
+          <title>Portal do Cliente - Cozinha - Descontão</title>
         </head>
         <body>
           <div className="portal-layout min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -131,22 +131,22 @@ export default function RootLayout({ children }) {
         <meta charSet="utf-8" />
         <meta name="description" content="Sistema de gestão completo para restaurantes - gerencie receitas, cardápios, pedidos, ingredientes e análise nutricional. Controle de estoque, custos e relatórios detalhados." />
         <meta name="keywords" content="gestão restaurante, sistema restaurante, controle estoque, receitas, cardápio, pedidos, ingredientes, análise nutricional, custos restaurante" />
-        <meta name="author" content="Cozinha Afeto" />
+        <meta name="author" content="Cozinha - Descontão" />
         <meta name="robots" content="index, follow" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="theme-color" content="#3b82f6" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta property="og:title" content="Cozinha Afeto - Sistema de Gestão para Restaurantes" />
+        <meta property="og:title" content="Cozinha - Descontão - Sistema de Gestão para Restaurantes" />
         <meta property="og:description" content="Sistema completo de gestão para restaurantes com controle de receitas, cardápios, pedidos e análise nutricional." />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="pt_BR" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Cozinha Afeto - Sistema de Gestão para Restaurantes" />
+        <meta name="twitter:title" content="Cozinha - Descontão - Sistema de Gestão para Restaurantes" />
         <meta name="twitter:description" content="Sistema completo de gestão para restaurantes com controle de receitas, cardápios, pedidos e análise nutricional." />
         <link rel="canonical" href="http://localhost:9000" />
-        <title>Cozinha Afeto - Sistema de Gestão para Restaurantes</title>
+        <title>Cozinha - Descontão - Sistema de Gestão para Restaurantes</title>
       </head>
       <body>
         <div className="flex h-full bg-gray-100 main-app-container">

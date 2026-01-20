@@ -8,7 +8,7 @@ import { processTypes, defaultConfig, validationRules } from '@/lib/recipeConsta
  */
 export function useRecipeConfig() {
   const { toast } = useToast();
-  
+
   const [config, setConfig] = useState(defaultConfig);
   const [configSaving, setConfigSaving] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,11 +34,11 @@ export function useRecipeConfig() {
     try {
       const response = await fetch('/api/category-types');
       const types = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(types.error || 'Erro ao carregar tipos');
       }
-      
+
       setCategoryTypes(types || []);
       return { success: true, types };
     } catch (error) {
@@ -59,11 +59,11 @@ export function useRecipeConfig() {
       // Buscar configuração do usuário atual via API
       const response = await fetch('/api/user');
       const userData = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(userData.error || 'Erro ao carregar usuário');
       }
-      
+
       if (userData?.recipe_config) {
         const categoryType = userData.recipe_config.selected_category_type || 'refeicoes';
         setSelectedCategoryType(categoryType);
@@ -78,9 +78,9 @@ export function useRecipeConfig() {
   // Salvar configuração no banco de dados
   const saveConfiguration = useCallback(async (categoryType) => {
     setConfigSaving(true);
-    
+
     try {
-      
+
       // Atualizar configuração do usuário via API
       const response = await fetch('/api/user', {
         method: 'PUT',
@@ -95,22 +95,22 @@ export function useRecipeConfig() {
           }
         })
       });
-      
+
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Erro ao salvar configuração');
       }
-      
+
       setSelectedCategoryType(categoryType);
       updateConfig('selected_category_type', categoryType);
-      
-      
+
+
       toast({
         title: "Configurações salvas",
         description: "Suas preferências foram atualizadas com sucesso."
       });
-      
+
       return { success: true };
     } catch (error) {
       toast({
@@ -159,8 +159,12 @@ export function useRecipeConfig() {
 
       // Preparar dados da receita para salvamento (sanitizar undefined values)
       const recipeToSave = {
+        ...recipeData, // Spread first to capture extra fields
+
+        // Explicit fields overwrite base fields if needed
         name: recipeData.name || '',
         name_complement: recipeData.name_complement || '',
+        type: recipeData.type || 'receitas',
         category: recipeData.category || '',
         prep_time: parseFloat(recipeData.prep_time) || 0,
         total_weight: parseFloat(recipeData.total_weight) || 0,
@@ -169,15 +173,18 @@ export function useRecipeConfig() {
         total_cost: parseFloat(recipeData.total_cost) || 0,
         cost_per_kg_raw: parseFloat(recipeData.cost_per_kg_raw) || 0,
         cost_per_kg_yield: parseFloat(recipeData.cost_per_kg_yield) || 0,
-        cuba_cost: parseFloat(recipeData.cuba_cost) || 0, // NOVO: Campo do custo da cuba
-        portion_cost: parseFloat(recipeData.portion_cost) || 0, // NOVO: Campo do custo da porção
+        cuba_cost: parseFloat(recipeData.cuba_cost) || 0,
+        portion_cost: parseFloat(recipeData.portion_cost) || 0,
         active: recipeData.active !== undefined ? recipeData.active : true,
         instructions: recipeData.instructions || '',
-        preparations: preparationsData || []
+        preparations: preparationsData || [], // Ensure this overwrites stale state
+        dependencies: recipeData.dependencies || []
       };
 
       // Recursively remove undefined values to prevent Firebase errors
       const sanitizedRecipe = removeUndefined(recipeToSave);
+
+      console.log('🔴 [DEBUG SAVE] PAYLOAD TO FIREBASE:', JSON.stringify(sanitizedRecipe, null, 2));
 
       console.log('🟠 [useRecipeConfig] Receita sanitizada (preparations):', JSON.stringify(sanitizedRecipe.preparations.map(p => ({
         id: p.id,
@@ -186,11 +193,11 @@ export function useRecipeConfig() {
       })), null, 2));
 
       let result;
-      
+
       if (recipeData.id) {
         // Atualizar receita existente
         result = await Recipe.update(recipeData.id, sanitizedRecipe);
-        
+
         toast({
           title: "Receita atualizada",
           description: `"${recipeData.name}" foi atualizada com sucesso.`
@@ -198,7 +205,7 @@ export function useRecipeConfig() {
       } else {
         // Criar nova receita
         result = await Recipe.create(sanitizedRecipe);
-        
+
         toast({
           title: "Receita criada",
           description: `"${recipeData.name}" foi criada com sucesso.`
@@ -206,14 +213,14 @@ export function useRecipeConfig() {
       }
 
       return { success: true, recipe: result, preparations: preparationsData };
-      
+
     } catch (error) {
       toast({
         title: "Erro ao salvar",
         description: "Não foi possível salvar a receita: " + error.message,
         variant: "destructive"
       });
-      
+
       return { success: false, error };
     } finally {
       setConfigSaving(false);
@@ -228,12 +235,12 @@ export function useRecipeConfig() {
   // Validar configuração
   const validateConfig = useCallback((configData) => {
     const errors = [];
-    
+
     // Adicionar validações específicas aqui
     if (!configData.selectedCategory) {
       errors.push('Categoria deve ser selecionada');
     }
-    
+
     return {
       isValid: errors.length === 0,
       errors
@@ -258,7 +265,7 @@ export function useRecipeConfig() {
         loadUserConfiguration()
       ]);
     };
-    
+
     initializeConfig();
   }, [loadCategoryTypes, loadUserConfiguration]);
 
@@ -269,7 +276,7 @@ export function useRecipeConfig() {
     loading,
     categoryTypes,
     selectedCategoryType,
-    
+
     // Ações
     updateConfig,
     saveConfiguration,
@@ -277,12 +284,12 @@ export function useRecipeConfig() {
     resetConfig,
     loadCategoryTypes,
     loadUserConfiguration,
-    
+
     // Utilitários
     validateConfig,
     getProcessTypes,
     getValidationRules,
-    
+
     // Setters
     setSelectedCategoryType
   };

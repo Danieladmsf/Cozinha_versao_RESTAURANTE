@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Brand } from "@/app/api/entities";
+import { Brand, Ingredient } from "@/app/api/entities";
 import { formatCapitalize } from "@/lib/textUtils";
 import { Supplier } from "@/app/api/entities";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Package } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Star, StarOff, Pencil, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
@@ -46,6 +48,8 @@ export default function BrandsManager() {
     active: true,
     preferred: false
   });
+  const [activeTab, setActiveTab] = useState("ingrediente");
+  const [ingredients, setIngredients] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -54,8 +58,13 @@ export default function BrandsManager() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const brandsData = await Brand.list();
+      setLoading(true);
+      const [brandsData, ingredientsData] = await Promise.all([
+        Brand.list(),
+        Ingredient.list()
+      ]);
       setBrands(brandsData || []);
+      setIngredients(ingredientsData || []);
     } catch (error) {
       toast({
         title: "Erro",
@@ -158,26 +167,60 @@ export default function BrandsManager() {
 
   const filteredBrands = brands.filter(brand =>
     brand.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    brand.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     brand.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Filter by Usage (Tabs)
+  const brandsUsedInIngredients = new Set(ingredients.filter(i => i.item_type !== 'embalagem').map(i => i.brand));
+  const brandsUsedInIngredientsIds = new Set(ingredients.filter(i => i.item_type !== 'embalagem').map(i => i.brand_id));
+
+  const brandsUsedInPackaging = new Set(ingredients.filter(i => i.item_type === 'embalagem').map(i => i.brand));
+  const brandsUsedInPackagingIds = new Set(ingredients.filter(i => i.item_type === 'embalagem').map(i => i.brand_id));
+
+  const finalFilteredBrands = filteredBrands.filter(brand => {
+    const isUsedInIng = brandsUsedInIngredientsIds.has(brand.id) || brandsUsedInIngredients.has(brand.name);
+    const isUsedInPkg = brandsUsedInPackagingIds.has(brand.id) || brandsUsedInPackaging.has(brand.name);
+    const isUnused = !isUsedInIng && !isUsedInPkg;
+
+    if (activeTab === 'embalagem') {
+      return isUsedInPkg || isUnused;
+    }
+    return isUsedInIng || isUnused;
+  });
+
   return (
     <div className="space-y-6">
-      {/* Header das Marcas */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold">Gestão de Marcas</h3>
-          <p className="text-sm text-gray-500">Gerencie as marcas e seus fornecedores</p>
-        </div>
 
-        <div className="flex gap-3">
-          <div className="relative">
+      {/* Header das Marcas e Tabs */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
+          <TabsList className="grid w-full grid-cols-2 md:inline-flex bg-white p-1 rounded-lg shadow-sm border border-gray-200 gap-1 h-auto">
+            <TabsTrigger
+              value="ingrediente"
+              className="flex-1 md:flex-none data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-md text-sm font-medium"
+            >
+              <Package className="w-4 h-4 mr-2" />
+              Ingredientes
+            </TabsTrigger>
+            <TabsTrigger
+              value="embalagem"
+              className="flex-1 md:flex-none data-[state=active]:bg-amber-500 data-[state=active]:text-white rounded-md text-sm font-medium"
+            >
+              <Package className="w-4 h-4 mr-2" />
+              Embalagens
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        <div className="flex gap-3 w-full md:w-auto justify-end">
+          <div className="relative w-full md:w-[250px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               placeholder="Buscar marcas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 w-[250px]"
+              className="pl-8 w-full"
             />
           </div>
           <Button
@@ -185,7 +228,7 @@ export default function BrandsManager() {
               resetForm();
               setIsDialogOpen(true);
             }}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nova Marca
@@ -196,7 +239,7 @@ export default function BrandsManager() {
       {/* Lista de Marcas */}
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Marcas ({filteredBrands.length})</CardTitle>
+          <CardTitle>Lista de Marcas ({finalFilteredBrands.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -210,7 +253,7 @@ export default function BrandsManager() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredBrands.map((brand) => (
+                {finalFilteredBrands.map((brand) => (
                   <TableRow key={brand.id}>
                     <TableCell className="font-medium font-mono">{formatCapitalize(brand.name)}</TableCell>
                     <TableCell className="font-mono">

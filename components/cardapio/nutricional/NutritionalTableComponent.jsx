@@ -135,7 +135,7 @@ export default function NutritionalTableComponent() {
       }
 
       setIsSelectingNutrients(false);
-      
+
       toast({
         title: "Configuração salva",
         description: "Suas preferências de nutrientes foram salvas com sucesso.",
@@ -173,7 +173,7 @@ export default function NutritionalTableComponent() {
             mode="single"
             selected={currentDate}
             onSelect={onDateChange}
-            disabled={(date) => 
+            disabled={(date) =>
               date > new Date() || date < new Date(2020, 0, 1)
             }
             initialFocus
@@ -193,12 +193,12 @@ export default function NutritionalTableComponent() {
             Selecione os nutrientes que deseja exibir na tabela nutricional
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {Object.entries(nutrientConfig.nutrientCategories).map(([category, nutrients]) => {
             const allSelected = nutrients.every(id => selectedNutrients[id]);
             const someSelected = nutrients.some(id => selectedNutrients[id]);
-            
+
             return (
               <div key={category} className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -220,8 +220,8 @@ export default function NutritionalTableComponent() {
                         checked={selectedNutrients[nutrientId] || false}
                         onCheckedChange={() => toggleNutrient(nutrientId)}
                       />
-                      <label 
-                        className="text-sm cursor-pointer" 
+                      <label
+                        className="text-sm cursor-pointer"
                         onClick={() => toggleNutrient(nutrientId)}
                       >
                         {nutrientConfig.nutrientNames?.[nutrientId] || nutrientId}
@@ -239,12 +239,12 @@ export default function NutritionalTableComponent() {
             <RotateCcw className="h-4 w-4 mr-2" />
             Restaurar Padrões
           </Button>
-          
+
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setIsSelectingNutrients(false)}>
               Cancelar
             </Button>
-            
+
             <Button onClick={saveUserNutrients}>
               <Save className="h-4 w-4 mr-2" />
               Salvar
@@ -261,9 +261,10 @@ export default function NutritionalTableComponent() {
         <div className="space-y-6">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-4">
-            <MenuHeader 
+            <MenuHeader
               currentDate={currentDate}
               onDateChange={handleDateChange}
+              weekRange={menuConfig?.available_days?.some(d => d === 0 || d === 6) ? 'full' : 'workdays'}
               rightContent={
                 <Button
                   variant="outline"
@@ -288,7 +289,7 @@ export default function NutritionalTableComponent() {
               </div>
             </div>
             <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200/50 overflow-hidden shadow-sm">
-              <NutritionCalculatorComponent 
+              <NutritionCalculatorComponent
                 menu={weeklyMenu}
                 currentDayIndex={currentDayIndex}
                 selectedNutrients={selectedNutrients}

@@ -17,6 +17,7 @@ const RecipeRow = ({
   prep,
   onUpdateRecipe,
   onRemoveRecipe,
+  readOnly = false,
 }) => {
   const processes = prep.processes || [];
   const hasProcess = (processName) => processes.includes(processName);
@@ -38,10 +39,10 @@ const RecipeRow = ({
   // Verificar se é apenas processo de receita (sem outros processos)
   const isRecipeOnly = useMemo(() => {
     return hasProcess('recipe') &&
-           !hasProcess('defrosting') &&
-           !hasProcess('cleaning') &&
-           !hasProcess('cooking') &&
-           !hasProcess('portioning');
+      !hasProcess('defrosting') &&
+      !hasProcess('cleaning') &&
+      !hasProcess('cooking') &&
+      !hasProcess('portioning');
   }, [prep.processes]);
 
   // Calcular o peso final da receita (yield_weight)
@@ -170,8 +171,8 @@ const RecipeRow = ({
         case 'portioning':
           // 2 ou 3 colunas dependendo se tem outros processos
           const isPortioningOnly = !hasProcess('defrosting') &&
-                                   !hasProcess('cleaning') &&
-                                   !hasProcess('cooking');
+            !hasProcess('cleaning') &&
+            !hasProcess('cooking');
 
           if (isPortioningOnly) {
             // 3 colunas: Peso Bruto, Pós Porcionamento, Perda
@@ -261,9 +262,10 @@ const RecipeRow = ({
             type="text"
             value={recipe.used_weight || ''}
             onChange={(e) => updateRecipeField('used_weight', e.target.value)}
+            disabled={!!recipe.origin_id || readOnly} // READ-ONLY para Matrix ou se a etapa for read-only
             placeholder="0,000"
-            className="w-28 h-9 text-center text-sm bg-purple-50 border-purple-200 mx-auto"
-            title="Peso desta receita usado nesta etapa"
+            className={`w-28 h-9 text-center text-sm mx-auto ${recipe.origin_id || readOnly ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-purple-50 border-purple-200'}`}
+            title={recipe.origin_id ? "Valor sincronizado da Matriz (leitura)" : "Peso desta receita usado nesta etapa"}
           />
         </TableCell>
       ) : (
@@ -273,23 +275,28 @@ const RecipeRow = ({
 
       {/* Rendimento - sempre 100% para receitas */}
       <TableCell className="text-center px-4 py-2">
-        <Badge variant="default" className="bg-purple-600">
-          100%
+        <Badge variant={recipe.origin_id ? "outline" : "default"} className={recipe.origin_id ? "border-purple-300 text-purple-700 bg-purple-50" : "bg-purple-600"}>
+          {recipe.origin_id ? "MATRIZ" : "100%"}
         </Badge>
       </TableCell>
 
       {/* Ações */}
       <TableCell className="px-4 py-2">
         <div className="flex gap-1 justify-end">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onRemoveRecipe(prepIndex, recipeIndex)}
-            className="h-7 w-7 rounded-full hover:bg-red-50"
-            title="Remover receita"
-          >
-            <Trash2 className="h-3 w-3 text-red-500" />
-          </Button>
+          {!recipe.origin_id && !readOnly && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onRemoveRecipe(prepIndex, recipeIndex)}
+              className="h-7 w-7 rounded-full hover:bg-red-50"
+              title="Remover receita"
+            >
+              <Trash2 className="h-3 w-3 text-red-500" />
+            </Button>
+          )}
+          {(recipe.origin_id || readOnly) && (
+            <span className="text-xs text-gray-400 italic">Locked</span>
+          )}
         </div>
       </TableCell>
     </TableRow>

@@ -4,11 +4,12 @@ import { createPageUrl } from "@/utils";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
-  Home,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+import Image from "next/image";
 
 export default function SidebarNav({
   navigation,
@@ -34,11 +35,26 @@ export default function SidebarNav({
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-4 border-b">
           {(!sidebarCollapsed || isHovering) ? (
-            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-800 bg-clip-text text-transparent truncate">
-              Cozinha e Afeto
-            </h1>
+            <div className="relative h-44 w-44 mx-auto -my-6 flex items-center justify-center">
+              <Image
+                src="/logo-descontao-nobg.png"
+                alt="Cozinha - Descontão"
+                width={160}
+                height={160}
+                className="object-contain"
+                priority
+              />
+            </div>
           ) : (
-            <Home className="h-4 w-4 text-blue-600 mx-auto" />
+            <div className="relative h-14 w-14 mx-auto -my-1">
+              <Image
+                src="/logo-descontao-nobg.png"
+                alt="Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
           )}
 
           <div className="flex items-center gap-2">
@@ -110,7 +126,7 @@ export default function SidebarNav({
         <div className="p-4 border-t text-center">
           {(!sidebarCollapsed || isHovering) && (
             <div className="text-xs text-gray-500">
-              Cozinha e Afeto © 2024
+              Cozinha - Descontão © 2024
             </div>
           )}
         </div>

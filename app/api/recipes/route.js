@@ -18,6 +18,7 @@ export async function GET(request) {
     const excludeId = searchParams.get('excludeId');
     const activeOnly = searchParams.get('activeOnly') === 'true';
     const validOnly = searchParams.get('validOnly') === 'true';
+    const type = searchParams.get('type');
 
     if (id) {
       // Get single recipe by ID
@@ -37,6 +38,23 @@ export async function GET(request) {
     } else {
       // Get all recipes
       let recipes = await Recipe.getAll();
+
+      // DEBUG: Logar tipos únicos para entender o problema
+      const uniqueTypes = [...new Set(recipes.map(r => r.type))];
+      console.log('--- TIPOS EXISTENTES NO DB ---');
+      console.log(uniqueTypes);
+      console.log('------------------------------');
+
+      if (searchParams.get('debugTypes') === 'true') {
+        return Response.json({ types: uniqueTypes });
+      }
+
+      if (searchParams.get('debugSamples') === 'true') {
+        const samples = recipes
+          .filter(r => (r.name || '').toLowerCase().includes('arroz') || (r.name || '').includes('MD'))
+          .map(r => ({ id: r.id, name: r.name, type: r.type }));
+        return Response.json({ samples });
+      }
 
       // Aplicar filtros se fornecidos
       if (search || excludeId || activeOnly || validOnly) {
@@ -64,6 +82,11 @@ export async function GET(request) {
             }
           }
 
+          // Filtrar por tipo (ex: receitas_-_base)
+          if (type && recipe.type !== type) {
+            return false;
+          }
+
           // Busca por termo (nome, categoria ou complemento) - ignorando acentos
           if (search) {
             const term = removeAccents(search.toLowerCase());
@@ -72,8 +95,8 @@ export async function GET(request) {
             const recipeComplement = removeAccents(recipe.name_complement?.toLowerCase() || '');
 
             return recipeName.includes(term) ||
-                   recipeCategory.includes(term) ||
-                   recipeComplement.includes(term);
+              recipeCategory.includes(term) ||
+              recipeComplement.includes(term);
           }
 
           return true;
@@ -96,20 +119,20 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const data = await request.json();
-    
-    
+
+
     // Create new recipe
     const savedRecipe = await Recipe.create(data);
-    
-    
-    return Response.json({ 
-      success: true, 
-      data: savedRecipe 
+
+
+    return Response.json({
+      success: true,
+      data: savedRecipe
     });
   } catch (error) {
-    return Response.json({ 
-      success: false, 
-      error: error.message 
+    return Response.json({
+      success: false,
+      error: error.message
     }, { status: 500 });
   }
 }
@@ -118,29 +141,29 @@ export async function PUT(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
-      return Response.json({ 
-        success: false, 
-        error: 'Recipe ID is required' 
+      return Response.json({
+        success: false,
+        error: 'Recipe ID is required'
       }, { status: 400 });
     }
-    
+
     const data = await request.json();
-    
-    
+
+
     // Update recipe
     const updatedRecipe = await Recipe.update(id, data);
-    
-    
-    return Response.json({ 
-      success: true, 
-      data: updatedRecipe 
+
+
+    return Response.json({
+      success: true,
+      data: updatedRecipe
     });
   } catch (error) {
-    return Response.json({ 
-      success: false, 
-      error: error.message 
+    return Response.json({
+      success: false,
+      error: error.message
     }, { status: 500 });
   }
 }
@@ -149,27 +172,27 @@ export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
-      return Response.json({ 
-        success: false, 
-        error: 'Recipe ID is required' 
+      return Response.json({
+        success: false,
+        error: 'Recipe ID is required'
       }, { status: 400 });
     }
-    
-    
+
+
     // Delete recipe
     await Recipe.delete(id);
-    
-    
-    return Response.json({ 
-      success: true, 
-      message: 'Recipe deleted successfully' 
+
+
+    return Response.json({
+      success: true,
+      message: 'Recipe deleted successfully'
     });
   } catch (error) {
-    return Response.json({ 
-      success: false, 
-      error: error.message 
+    return Response.json({
+      success: false,
+      error: error.message
     }, { status: 500 });
   }
 }

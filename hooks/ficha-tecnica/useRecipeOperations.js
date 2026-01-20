@@ -20,6 +20,11 @@ export function useRecipeOperations() {
   }, []);
 
   // Operações de preparação
+  /* 
+   * Adiciona uma nova preparação à lista.
+   * CORREÇÃO: Removida lógica de auto-populate que causava duplicação ao adicionar etapas de montagem.
+   * A adição de itens à montagem deve ser explícita pelo usuário.
+   */
   const addPreparation = useCallback((preparationsData, setPreparationsData, newPreparation) => {
     const newPrep = {
       id: String(Date.now()),
@@ -49,9 +54,44 @@ export function useRecipeOperations() {
     });
   }, []);
 
+  /*
+   * Remove uma preparação e limpa referências em montagens.
+   * CORREÇÃO: Robustez na comparação de IDs (string vs number).
+   */
   const removePreparation = useCallback((preparationsData, setPreparationsData, prepId) => {
-    setPreparationsData(prev => prev.filter(prep => prep.id !== prepId));
-    
+    setPreparationsData(prev => {
+      // Verificação de segurança
+      if (!prepId) {
+        console.error('Tentativa de remover preparação sem ID!');
+        return prev;
+      }
+
+      const targetId = String(prepId);
+
+      // 1. Filtrar removendo a preparação alvo (comparaão segura de string)
+      const remainingPreps = prev.filter(prep => String(prep.id) !== targetId);
+
+      // Se nada foi removido (ou tudo?), algo está errado.
+      if (remainingPreps.length === prev.length) {
+        console.warn('Nenhuma preparação foi removida com o ID:', targetId);
+      }
+
+      // 2. Remover referências em sub-componentes (Montagem)
+      return remainingPreps.map(prep => {
+        if (prep.sub_components && prep.sub_components.length > 0) {
+          const filteredSubComponents = prep.sub_components.filter(sc => String(sc.source_id) !== targetId);
+
+          if (filteredSubComponents.length !== prep.sub_components.length) {
+            return {
+              ...prep,
+              sub_components: filteredSubComponents
+            };
+          }
+        }
+        return prep;
+      });
+    });
+
     toast({
       title: "Processo removido",
       description: "O processo foi removido com sucesso.",
@@ -159,7 +199,7 @@ export function useRecipeOperations() {
           total_cost: subComponent.total_cost || 0,
           ...subComponent
         };
-        
+
         newPreparations[prepIndex].sub_components = [
           ...(newPreparations[prepIndex].sub_components || []),
           newSubComponent
@@ -221,6 +261,7 @@ export function useRecipeOperations() {
       // CORRIGIDO: Normalizar campos de peso vazios em ingredientes (Firestore omite strings vazias)
       const normalizedPreparations = (recipe.preparations || []).map(prep => ({
         ...prep,
+        id: prep.id || String(Date.now() + Math.random()), // Garante ID único
         notes: prep.notes || [], // Preservar notas
         ingredients: (prep.ingredients || []).map(ing => ({
           ...ing,
