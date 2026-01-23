@@ -67,23 +67,11 @@ const AssemblySubComponents = ({
         <div className="flex flex-col items-center gap-4">
           <Layers className="h-10 w-10 text-indigo-500" />
           <h3 className="text-lg font-medium text-indigo-800">
-            Adicione Componentes de Montagem
+            Componentes de Montagem
           </h3>
           <p className="text-indigo-600 max-w-md mx-auto">
-            Clique no botão abaixo para incluir etapas anteriores ou receitas externas
-            nesta montagem.
+            Os componentes serão adicionados automaticamente a partir das etapas anteriores.
           </p>
-          {onAddComponent && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onAddComponent}
-              className={`border-dashed transition-all duration-200 text-sm ${addComponentClassName}`}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {addComponentLabel}
-            </Button>
-          )}
         </div>
       </div>
     );
@@ -156,17 +144,6 @@ const AssemblySubComponents = ({
         <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
           <div className="bg-indigo-50 px-3 py-2 border-b flex items-center justify-between">
             <h5 className="font-semibold text-indigo-800 text-sm">Componentes da Montagem</h5>
-            {onAddComponent && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onAddComponent}
-                className={`border-dashed transition-all duration-200 h-7 text-xs ${addComponentClassName}`}
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                {addComponentLabel}
-              </Button>
-            )}
           </div>
 
           <table className="w-full text-xs">
@@ -213,7 +190,10 @@ const AssemblySubComponents = ({
 
                   <td className="px-3 py-2 text-center">
                     <span className="font-semibold text-indigo-600">
-                      {sc.percentage.toFixed(1).replace('.', ',')}%
+                      {(sc.isPackaging || (preparationsData.find(p => p.id === sc.source_id)?.processes?.includes('packaging')))
+                        ? '-'
+                        : `${sc.percentage.toFixed(1).replace('.', ',')}%`
+                      }
                     </span>
                   </td>
 
@@ -307,10 +287,40 @@ const AssemblySubComponents = ({
                     />
                   </div>
 
-                  <div className="h-9 px-2 flex items-center justify-center bg-indigo-100/70 rounded-md w-full">
-                    <span className="text-sm font-bold text-indigo-800">
-                      {String((totalAssemblyWeight * (parseNumericValue(assemblyConfig.units_quantity) || 1)).toFixed(3)).replace('.', ',')}
-                    </span>
+                  <div className="h-9 relative w-full">
+                    <Input
+                      type="text"
+                      // Display: SEMPRE mostra a soma real dos componentes.
+                      // O uso da key força o re-render visual quando a soma muda (escala aplicada).
+                      key={`total-${totalAssemblyWeight}-${assemblyConfig.units_quantity}`}
+                      defaultValue={String((totalAssemblyWeight * (parseNumericValue(assemblyConfig.units_quantity) || 1)).toFixed(3)).replace('.', ',')}
+                      onBlur={(e) => {
+                        const newTotalWeight = parseNumericValue(e.target.value);
+                        // Compara com o peso atual REAL (soma dos componentes)
+                        const currentTotalWeight = totalAssemblyWeight * (parseNumericValue(assemblyConfig.units_quantity) || 1);
+
+                        // Registra o valor no config apenas para log, mas a lógica de escala manda
+                        onAssemblyConfigChange('total_weight', String(newTotalWeight).replace('.', ','));
+
+                        // Se houver mudança significativa e valores válidos
+                        if (newTotalWeight > 0 && currentTotalWeight > 0 && Math.abs(newTotalWeight - currentTotalWeight) > 0.001) {
+                          const scaleFactor = newTotalWeight / currentTotalWeight;
+
+                          const updatedComponents = subComponents.map(sc => {
+                            const currentWeight = parseNumericValue(sc.assembly_weight_kg);
+                            const newWeight = currentWeight * scaleFactor;
+
+                            return {
+                              ...sc,
+                              assembly_weight_kg: String(newWeight.toFixed(3)).replace('.', ',')
+                            };
+                          });
+
+                          onUpdateSubComponents(updatedComponents);
+                        }
+                      }}
+                      className="h-9 text-sm text-center font-bold text-indigo-800 bg-indigo-100/70 border-indigo-200 w-full"
+                    />
                   </div>
 
                   <div className="h-9 px-2 flex items-center justify-center bg-green-100/70 rounded-md w-full">

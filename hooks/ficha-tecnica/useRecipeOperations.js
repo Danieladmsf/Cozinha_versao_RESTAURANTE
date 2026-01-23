@@ -22,8 +22,8 @@ export function useRecipeOperations() {
   // Operações de preparação
   /* 
    * Adiciona uma nova preparação à lista.
-   * CORREÇÃO: Removida lógica de auto-populate que causava duplicação ao adicionar etapas de montagem.
-   * A adição de itens à montagem deve ser explícita pelo usuário.
+   * AUTO-POPULATE: Ao adicionar uma etapa, ela é automaticamente incluída nas montagens existentes.
+   * Ao adicionar uma montagem, todas as etapas anteriores são incluídas como sub_components.
    */
   const addPreparation = useCallback((preparationsData, setPreparationsData, newPreparation) => {
     const newPrep = {
@@ -37,7 +37,60 @@ export function useRecipeOperations() {
       ...newPreparation
     };
 
-    setPreparationsData(prev => [...prev, newPrep]);
+    // Verificar se a nova etapa é uma montagem
+    const isAssembly = newPrep.processes?.includes('assembly');
+
+    setPreparationsData(prev => {
+      let updatedPreparations = [...prev];
+
+      console.log('🔄 [AUTO-POPULATE] Nova etapa:', newPrep.title);
+      console.log('🔄 [AUTO-POPULATE] É montagem?', isAssembly);
+      console.log('🔄 [AUTO-POPULATE] Montagens existentes:', updatedPreparations.filter(p => p.processes?.includes('assembly')).map(p => p.title));
+
+      if (isAssembly) {
+        // Se for montagem: adicionar todas as etapas anteriores (não-montagem) como sub_components
+        const previousSteps = updatedPreparations.filter(p => !p.processes?.includes('assembly'));
+        console.log('🔄 [AUTO-POPULATE] Montagem criada - adicionando etapas anteriores:', previousSteps.map(p => p.title));
+
+        newPrep.sub_components = previousSteps.map(step => ({
+          id: String(Date.now() + Math.random()),
+          name: step.title,
+          type: 'preparation',
+          source_id: step.id,
+          assembly_weight_kg: 0,
+          origin_id: step.id // Marca como item de matriz (bloqueado)
+        }));
+      } else {
+        // Se NÃO for montagem: adicionar esta etapa em todas as montagens existentes
+        const assemblies = updatedPreparations.filter(p => p.processes?.includes('assembly'));
+        console.log('🔄 [AUTO-POPULATE] Etapa normal - adicionando em montagens:', assemblies.map(p => p.title));
+
+        updatedPreparations = updatedPreparations.map(prep => {
+          if (prep.processes?.includes('assembly')) {
+            // Adicionar a nova etapa como sub_component da montagem
+            const newSubComponent = {
+              id: String(Date.now() + Math.random()),
+              name: newPrep.title,
+              type: 'preparation',
+              source_id: newPrep.id,
+              assembly_weight_kg: 0,
+              origin_id: newPrep.id // Marca como item de matriz (bloqueado)
+            };
+
+            console.log('🔄 [AUTO-POPULATE] Adicionando sub_component em:', prep.title);
+
+            return {
+              ...prep,
+              sub_components: [...(prep.sub_components || []), newSubComponent]
+            };
+          }
+          return prep;
+        });
+      }
+
+      return [...updatedPreparations, newPrep];
+    });
+
     return newPrep;
   }, []);
 
@@ -76,19 +129,27 @@ export function useRecipeOperations() {
         console.warn('Nenhuma preparação foi removida com o ID:', targetId);
       }
 
-      // 2. Remover referências em sub-componentes (Montagem)
-      return remainingPreps.map(prep => {
-        if (prep.sub_components && prep.sub_components.length > 0) {
-          const filteredSubComponents = prep.sub_components.filter(sc => String(sc.source_id) !== targetId);
+      // 2. Remover referências em sub-componentes (Montagem) E Renumerar etapas
+      return remainingPreps.map((prep, index) => {
+        let updatedPrep = { ...prep };
 
-          if (filteredSubComponents.length !== prep.sub_components.length) {
-            return {
-              ...prep,
-              sub_components: filteredSubComponents
-            };
+        // 2.1 Renumerar Título (Fix "Buraco" na sequência)
+        // Se o título seguir o padrão "Xº Etapa: ...", atualiza para o novo índice
+        if (updatedPrep.title && /^\d+º Etapa:/.test(updatedPrep.title)) {
+          const nameContent = updatedPrep.title.replace(/^\d+º Etapa:\s*/, '');
+          updatedPrep.title = `${index + 1}º Etapa: ${nameContent}`;
+        }
+
+        // 2.2 Limpar sub-componentes
+        if (updatedPrep.sub_components && updatedPrep.sub_components.length > 0) {
+          const filteredSubComponents = updatedPrep.sub_components.filter(sc => String(sc.source_id) !== targetId);
+
+          if (filteredSubComponents.length !== updatedPrep.sub_components.length) {
+            updatedPrep.sub_components = filteredSubComponents;
           }
         }
-        return prep;
+
+        return updatedPrep;
       });
     });
 

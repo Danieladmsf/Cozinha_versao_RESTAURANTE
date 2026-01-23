@@ -51,13 +51,16 @@ const IngredientRow = ({
         // Se só tem cocção, usar weight_pre_cooking ou weight_raw
         initialWeight = parseNumericValue(ingredient.weight_pre_cooking) ||
           parseNumericValue(ingredient.weight_raw);
-      } else if (hasProcess('portioning')) {
-        initialWeight = parseNumericValue(ingredient.weight_raw);
+      } else if (hasProcess('portioning') || hasProcess('packaging')) {
+        initialWeight = parseNumericValue(ingredient.weight_raw) || parseNumericValue(ingredient.quantity);
       }
 
       // Determinar peso final - SEMPRE o último processo da cadeia
       if (hasProcess('portioning')) {
         finalWeight = parseNumericValue(ingredient.weight_portioned);
+      } else if (hasProcess('packaging')) {
+        // Para embalagem, o peso final é igual ao inicial (perda zero)
+        finalWeight = parseNumericValue(ingredient.weight_raw) || parseNumericValue(ingredient.quantity);
       } else if (hasProcess('cooking')) {
         finalWeight = parseNumericValue(ingredient.weight_cooked);
       } else if (hasProcess('cleaning')) {
@@ -231,7 +234,11 @@ const IngredientRow = ({
                 onChange={(e) => updateIngredientField('weight_raw', e.target.value)}
                 disabled={readOnly || ingredient.locked}
                 className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder="0,000"
+                placeholder={(() => {
+                  // If purely cleaning (no defrost), raw is the start, so 0,000 is fine?
+                  // actually if it's the start, 0,000 is correct.
+                  return "0,000";
+                })()}
               />
             </TableCell>
           )}
@@ -274,8 +281,14 @@ const IngredientRow = ({
               onChange={(e) => updateIngredientField('weight_pre_cooking', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-              placeholder="0,000"
-              title="Peso antes da cocção"
+              placeholder={(() => {
+                // Inferred Previous Weight Logic for Placeholder
+                const prev = parseNumericValue(ingredient.weight_clean) ||
+                  parseNumericValue(ingredient.weight_thawed) ||
+                  parseNumericValue(ingredient.weight_raw);
+                return prev > 0 ? prev.toFixed(3) : "0,000";
+              })()}
+              title="Peso antes da cocção (Automático se vazio)"
             />
           </TableCell>
           <TableCell className="px-4 py-2">
@@ -330,9 +343,13 @@ const IngredientRow = ({
       )}
 
       <TableCell className="text-center px-4 py-2">
-        <Badge variant="default">
-          {calculatedValues.yieldPercentage.toFixed(1)}%
-        </Badge>
+        {hasProcess('packaging') ? (
+          <span className="text-gray-400 font-medium">-</span>
+        ) : (
+          <Badge variant="default">
+            {calculatedValues.yieldPercentage.toFixed(1)}%
+          </Badge>
+        )}
       </TableCell>
 
       <TableCell className="px-4 py-2">

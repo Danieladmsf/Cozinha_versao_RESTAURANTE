@@ -35,6 +35,7 @@ const ProcessCreatorModalComponent = ({
   // Effect to sync tab with context type if modal re-opens
   useEffect(() => {
     if (isOpen) {
+      console.log('[ProcessCreatorModal] contextType:', contextType, '-> activeTab:', contextType === 'receitas_-_base' ? 'products' : 'processes');
       setActiveTab(contextType === 'receitas_-_base' ? 'products' : 'processes');
     }
   }, [contextType, isOpen]);
@@ -54,13 +55,26 @@ const ProcessCreatorModalComponent = ({
       return;
     }
 
-    const prepCount = preparationsLength;
+    // Calular próximo número de etapa baseado no maior existente
+    let nextStepNumber = preparationsLength + 1;
+    if (preparationsData && preparationsData.length > 0) {
+      const numbers = preparationsData.map(p => {
+        const match = p.title?.match(/^(\d+)º Etapa:/);
+        return match ? parseInt(match[1], 10) : 0;
+      });
+      const maxNumber = Math.max(...numbers, 0);
+      // Se o máximo for maior ou igual ao tamanho (ex: deletou do meio), usa max + 1
+      if (maxNumber >= preparationsLength) {
+        nextStepNumber = maxNumber + 1;
+      }
+    }
+
     const processLabels = selectedProcesses
       .map(id => processTypes[id]?.label || id)
       .join(' + ');
 
     const newPreparation = {
-      title: `${prepCount + 1}º Etapa: ${processLabels}`,
+      title: `${nextStepNumber}º Etapa: ${processLabels}`,
       processes: selectedProcesses,
       ingredients: [],
       instructions: "",
@@ -82,7 +96,28 @@ const ProcessCreatorModalComponent = ({
     if (isRecipeProcess) {
       options = { openRecipeSelector: true };
     } else if (isAssemblyOrPortioning) {
-      options = { openAssemblySelector: true };
+      // 1. Encontrar todas as etapas anteriores válidas (não assembly/portioning)
+      const existingSteps = preparationsData || [];
+      const validPreviousSteps = existingSteps.filter(p =>
+        !p.processes.includes('portioning') &&
+        !p.processes.includes('assembly') &&
+        p.title // Garantir que tem título
+      );
+
+      // 2. Criar sub-componentes baseados nessas etapas
+      const initialSubComponents = validPreviousSteps.map(step => ({
+        id: String(Date.now() + Math.random()),
+        name: step.title,
+        type: 'preparation',
+        source_id: step.id,
+        assembly_weight_kg: 0,
+        yield_weight: step.total_yield_weight_prep || 0,
+        total_cost: step.total_cost_prep || 0
+      }));
+
+      newPreparation.sub_components = initialSubComponents;
+      // Não abre o seletor manual, pois já populamos automaticamente
+      options = {};
     } else {
       options = { openIngredientSelector: true };
     }
@@ -92,9 +127,28 @@ const ProcessCreatorModalComponent = ({
     onClose();
   }, [selectedProcesses, preparationsLength, onAddPreparation, onClose]);
 
-  const handleSelectRecipe = useCallback(async (recipeData) => {
+  const handleSelectRecipe = useCallback(async (recipeDataOrArray) => {
     if (activeTab === "products") {
-      handleSelectProductRecipe(recipeData);
+      // Normalize to array
+      const recipesToImport = Array.isArray(recipeDataOrArray) ? recipeDataOrArray : [recipeDataOrArray];
+
+      // Calculate base index from existing titles
+      let baseNumber = 0;
+      if (preparationsData && preparationsData.length > 0) {
+        const numbers = preparationsData.map(p => {
+          const match = p.title?.match(/^(\d+)º Etapa:/);
+          return match ? parseInt(match[1], 10) : 0;
+        });
+        baseNumber = Math.max(...numbers, 0);
+      }
+
+      // Loop properly through ALL items
+      for (let i = 0; i < recipesToImport.length; i++) {
+        // Calculate the specific step number for this item in the batch
+        const targetStepNumber = baseNumber + 1 + i;
+
+        await handleSelectProductRecipe(recipesToImport[i], { forceStepNumber: targetStepNumber });
+      }
       return;
     }
 
@@ -103,18 +157,49 @@ const ProcessCreatorModalComponent = ({
       // REFATORADO: Usar serviço centralizado de import
       const { importRecipeAsPreparation } = await import('@/lib/services/recipeImportService');
 
-      const { preparation, parentInfo } = await importRecipeAsPreparation(
-        recipeData.id,
-        { prepIndex: preparationsLength }
-      );
+      // Normalize to array
+      const recipesToImport = Array.isArray(recipeDataOrArray) ? recipeDataOrArray : [recipeDataOrArray];
 
-      // Adicionar preparação estruturada
-      // Para receitas importadas, geralmente já vem com ingredientes, então TALVEZ não precise abrir o modal.
-      // Mas se o usuário quiser adicionar algo extra...
-      // Nesse caso (Receita Importada), melhor NÃO abrir modal automático, pois já vem povoada.
-      onAddPreparation(preparation);
+      console.warn('[ProcessCreator] handleSelectRecipe START', {
+        isArray: Array.isArray(recipeDataOrArray),
+        count: recipesToImport.length,
+        currentPreparationsCount: preparationsData.length,
+        existingTitles: preparationsData.map(p => p.title)
+      });
 
-      console.log('[ProcessCreator] Receita importada com sucesso:', parentInfo.name);
+      // Calculate base index from existing titles to ensure continuity
+      let baseNumber = 0;
+      if (preparationsData && preparationsData.length > 0) {
+        const numbers = preparationsData.map(p => {
+          const match = p.title?.match(/^(\d+)º Etapa:/);
+          return match ? parseInt(match[1], 10) : 0;
+        });
+        baseNumber = Math.max(...numbers, 0);
+      }
+
+      for (let i = 0; i < recipesToImport.length; i++) {
+        const recipeData = recipesToImport[i];
+
+        // Calculate next number: max existing + 1 + current iteration loop
+        // We subtract 1 because importRecipeAsPreparation ADDS 1 internally to the passed index.
+        // baseNumber is the MAX existing (e.g. 1).
+        // If i=0: target is 2. indexForService should be 1 (since service does +1).
+        const targetStepNumber = baseNumber + 1 + i;
+        const indexForService = targetStepNumber - 1;
+
+        const { preparation, parentInfo } = await importRecipeAsPreparation(
+          recipeData.id,
+          { prepIndex: indexForService }
+        );
+
+        // FORCE TITLE UPDATE to ensure sequential numbering matches the loop
+        // This overrides any potential issue in the service or default assignment
+        preparation.title = `${targetStepNumber}º Etapa: ${parentInfo.name}`;
+
+        // Adicionar preparação estruturada
+        onAddPreparation(preparation);
+        console.log(`[ProcessCreator] Importando ${i + 1}/${recipesToImport.length}: ${preparation.title}`);
+      }
 
     } catch (error) {
       console.error("Erro ao importar receita:", error);
@@ -124,9 +209,9 @@ const ProcessCreatorModalComponent = ({
       setSelectedProcesses([]);
       onClose();
     }
-  }, [preparationsLength, onAddPreparation, onClose, activeTab]);
+  }, [preparationsLength, preparationsData, onAddPreparation, onClose, activeTab]);
 
-  const handleSelectProductRecipe = async (recipeData) => {
+  const handleSelectProductRecipe = async (recipeData, options = {}) => {
     // Logic for "Produtos" tab: Import structure
     setLoading(true);
     try {
@@ -163,14 +248,11 @@ const ProcessCreatorModalComponent = ({
         let stepTitles = [];
 
         validPreparations.forEach((prep, index) => {
-          // 1. Create a "Section Header" ingredient to separate steps visually
-          // Cycle between green and orange themes
-          const theme = index % 2 === 0 ? 'green' : 'orange';
-
+          // 1. Header Ingredient REMOVED per user request (redundant)
+          /*
           const headerIngredient = {
             id: String(Date.now() + Math.random()),
             name: prep.title || `ETAPA ${index + 1}`,
-            // Empty values for calculation fields so it appears as a label row
             current_price: 0,
             weight_raw: 0,
             weight_cooked: 0,
@@ -179,6 +261,7 @@ const ProcessCreatorModalComponent = ({
             ingredient_id: null
           };
           consolidatedIngredients.push(headerIngredient);
+          */
 
           // Accumulate processes
           if (prep.processes) {
@@ -247,7 +330,21 @@ const ProcessCreatorModalComponent = ({
 
         const prepCount = preparationsLength;
         const newPreparation = {
-          title: `${prepCount + 1}º Etapa: ${recipeData.name}`,
+          title: `${(() => {
+            // Use explicit override if provided (for batch imports)
+            if (options.forceStepNumber) {
+              return options.forceStepNumber;
+            }
+
+            let nextNum = preparationsLength + 1;
+            if (preparationsData?.length > 0) {
+              const nums = preparationsData.map(p => { const m = p.title?.match(/^(\d+)º Etapa:/); return m ? parseInt(m[1]) : 0; });
+              const max = Math.max(...nums, 0);
+              if (max >= preparationsLength) nextNum = max + 1;
+            }
+            return nextNum;
+          })()
+            }º Etapa: ${recipeData.name}`,
           processes: finalProcesses,
           ingredients: consolidatedIngredients,
           instructions: `Importado de: ${recipeData.name}. Etapas consolidadas: ${stepTitles.join(', ')}.`,
@@ -290,7 +387,16 @@ const ProcessCreatorModalComponent = ({
     }));
 
     const newPreparation = {
-      title: `${prepCount + 1}º Etapa: Porcionamento`,
+      title: `${(() => {
+        let nextNum = preparationsLength + 1;
+        if (preparationsData?.length > 0) {
+          const nums = preparationsData.map(p => { const m = p.title?.match(/^(\d+)º Etapa:/); return m ? parseInt(m[1]) : 0; });
+          const max = Math.max(...nums, 0);
+          if (max >= preparationsLength) nextNum = max + 1;
+        }
+        return nextNum;
+      })()
+        }º Etapa: Porcionamento`,
       processes: ['portioning'],
       ingredients: [],
       sub_components: initialSubComponents, // JA INICIA COM OS ITENS
@@ -311,14 +417,23 @@ const ProcessCreatorModalComponent = ({
     const prepCount = preparationsLength;
 
     const newPreparation = {
-      title: `${prepCount + 1}º Etapa: Embalagem`,
+      title: `${(() => {
+        let nextNum = preparationsLength + 1;
+        if (preparationsData?.length > 0) {
+          const nums = preparationsData.map(p => { const m = p.title?.match(/^(\d+)º Etapa:/); return m ? parseInt(m[1]) : 0; });
+          const max = Math.max(...nums, 0);
+          if (max >= preparationsLength) nextNum = max + 1;
+        }
+        return nextNum;
+      })()
+        }º Etapa: Embalagem`,
       processes: ['packaging'],
       ingredients: [],
       instructions: "Embalagem do produto",
       assembly_config: undefined
     };
 
-    onAddPreparation(newPreparation);
+    onAddPreparation(newPreparation, { openPackagingSelector: true, deferCreation: true });
     onClose();
   }, [preparationsLength, onAddPreparation, onClose]);
 
@@ -333,14 +448,23 @@ const ProcessCreatorModalComponent = ({
     if (processId === 'cooking') defaultInstruction = "Processo de cocção.";
 
     const newPreparation = {
-      title: `${prepCount + 1}º Etapa: ${processLabel}`,
+      title: `${(() => {
+        let nextNum = preparationsLength + 1;
+        if (preparationsData?.length > 0) {
+          const nums = preparationsData.map(p => { const m = p.title?.match(/^(\d+)º Etapa:/); return m ? parseInt(m[1]) : 0; });
+          const max = Math.max(...nums, 0);
+          if (max >= preparationsLength) nextNum = max + 1;
+        }
+        return nextNum;
+      })()
+        }º Etapa: ${processLabel}`,
       processes: [processId],
       ingredients: [],
       instructions: defaultInstruction,
       assembly_config: undefined
     };
 
-    onAddPreparation(newPreparation, { openIngredientSelector: true });
+    onAddPreparation(newPreparation, { openIngredientSelector: true, deferCreation: true });
     setShowSimpleProcessSelector(false);
     onClose();
   }, [preparationsLength, onAddPreparation, onClose]);
@@ -351,190 +475,127 @@ const ProcessCreatorModalComponent = ({
     <>
       {!showRecipeSelector && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-2 mb-4">
               <CookingPot className="w-5 h-5" />
               <h3 className="text-lg font-semibold">Criar Nova Etapa de Processo</h3>
             </div>
 
-            {/* Conditional Mode rendering based on contextType */}
+            {/* ÚNICO MODO: Botões de Ação */}
+            <div className="space-y-4">
+              {/* Main View */}
+              {!showSimpleProcessSelector ? (
+                <div className="py-4">
 
-            {/* MODE: RECEITAS (PROCESSES) */}
-            {(contextType === 'receitas' || activeTab === 'processes') && (
-              <div className="space-y-4">
-                <Label className="text-sm font-medium mb-2 block">
-                  Selecione os Processos Desejados
-                </Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {Object.values(processTypes)
-                    .sort((a, b) => a.order - b.order)
-                    .map(process => {
-                      const isSelected = selectedProcesses.includes(process.id);
-
-                      // Map icons based on process id
-                      let Icon = Layers;
-                      if (process.id === 'defrosting') Icon = ThermometerSnowflake;
-                      if (process.id === 'cleaning') Icon = Droplets;
-                      if (process.id === 'cooking') Icon = Flame;
-                      if (process.id === 'portioning') Icon = Layers;
-                      if (process.id === 'assembly') Icon = Layers;
-                      if (process.id === 'packaging') Icon = Package;
-                      if (process.id === 'recipe') Icon = CookingPot;
-
-                      if (process.id === 'packaging') return null; // removido a pedido
-
-                      return (
-                        <div
-                          key={process.id}
-                          onClick={() => handleProcessToggle(process.id, !isSelected)}
-                          className={`
-                            cursor-pointer relative p-3 rounded-lg border-2 transition-all duration-200
-                            flex flex-col items-center justify-center gap-2 text-center
-                            ${isSelected
-                              ? `border-${process.color}-500 bg-${process.color}-50`
-                              : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}
-                          `}
-                        >
-                          <Icon
-                            className={`w-6 h-6 ${isSelected ? `text-${process.color}-600` : `text-${process.color}-500 opacity-70`}`}
-                          />
-                          <span className={`text-sm font-medium ${isSelected ? `text-${process.color}-700` : 'text-gray-600'}`}>
-                            {process.label}
-                          </span>
-
-                          {isSelected && (
-                            <div className={`absolute top-2 right-2 w-2 h-2 rounded-full bg-${process.color}-500`}></div>
-                          )}
-                        </div>
-                      );
-                    })}
-                </div>
-
-                <div className="bg-sky-50 p-3 rounded-md border border-sky-100 mt-4">
-                  <p className="text-xs text-sky-700">
-                    {selectedProcesses.length === 1 && selectedProcesses[0] === 'recipe'
-                      ? 'Ao clicar em "Criar Etapa", você poderá selecionar uma receita existente'
-                      : 'As colunas na tabela seguirão a ordem: Descongelamento → Limpeza → Cocção → Porcionamento'}
-                  </p>
-                </div>
-
-                <div className="flex gap-3 mt-6">
-                  <Button variant="outline" onClick={onClose} className="flex-1">
-                    Cancelar
-                  </Button>
                   <Button
-                    onClick={handleCreateProcess}
-                    disabled={selectedProcesses.length === 0}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setShowRecipeSelector(true)}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center gap-2"
                   >
-                    {selectedProcesses.length === 1 && selectedProcesses[0] === 'recipe'
-                      ? 'Selecionar Receita'
-                      : 'Criar Etapa'}
+                    <CookingPot className="w-4 h-4" />
+                    Selecionar Receita
                   </Button>
-                </div>
-              </div>
-            )}
 
-            {/* MODE: PRODUTOS (PRODUCTS) */}
-            {(contextType === 'receitas_-_base' || activeTab === 'products') && (
-              <div className="space-y-4">
-                {/* Main View */}
-                {!showSimpleProcessSelector ? (
-                  <div className="py-4">
-
-                    <Button
-                      onClick={() => setShowRecipeSelector(true)}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center gap-2"
-                    >
-                      <CookingPot className="w-4 h-4" />
-                      Selecionar Receita
-                    </Button>
-
-                    <Button
-                      onClick={() => setShowSimpleProcessSelector(true)}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 mt-3"
-                    >
-                      <Layers className="w-4 h-4" />
-                      Adicionar Ingrediente
-                    </Button>
-
-                    <Button
-                      onClick={() => handleCreatePackagingStep()}
-                      className="w-full bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center gap-2 mt-3"
-                    >
-                      <Package className="w-4 h-4" />
-                      Adicionar Embalagem
-                    </Button>
-
-                    <Button
-                      onClick={handleCreatePortioningStep}
-                      className="w-full bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center gap-2 mt-3"
-                    >
-                      <Package className="w-4 h-4" />
-                      Finalizar com Porcionamento
-                    </Button>
-
-                  </div>
-                ) : (
-                  // Sub-selection View
-                  <div className="py-4 space-y-4">
-                    <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-indigo-600" />
-                      Selecione os Processos Desejados
-                    </Label>
-
-                    <div className="space-y-2 pl-1">
-                      {[
-                        processTypes.defrosting,
-                        processTypes.cleaning,
-                        processTypes.cooking
-                      ].map(process => (
-                        <label key={process.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer border border-transparent hover:border-gray-200 transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={selectedProcesses.includes(process.id)}
-                            onChange={(e) => handleProcessToggle(process.id, e.target.checked)}
-                            className="rounded border-gray-300 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
-                          />
-                          <span className={`text-${process.color}-600 font-medium`}>
-                            {process.label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-
-                    <div className="flex gap-3 pt-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setShowSimpleProcessSelector(false);
-                          setSelectedProcesses([]);
-                        }}
-                        className="flex-1"
-                      >
-                        Voltar
-                      </Button>
-                      <Button
-                        onClick={handleCreateProcess}
-                        disabled={selectedProcesses.length === 0}
-                        className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
-                      >
-                        Criar Etapa
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-
-
-                <div className="flex gap-3 mt-6">
-                  <Button variant="outline" onClick={onClose} className="flex-1">
-                    Cancelar
+                  <Button
+                    onClick={() => setShowSimpleProcessSelector(true)}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 mt-3"
+                  >
+                    <Layers className="w-4 h-4" />
+                    Adicionar Ingrediente
                   </Button>
-                  {/* Logic for Products confirms implicitly when a recipe is selected */}
+
+                  <Button
+                    onClick={() => handleCreatePackagingStep()}
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center gap-2 mt-3"
+                  >
+                    <Package className="w-4 h-4" />
+                    Adicionar Embalagem
+                  </Button>
+
+                  <Button
+                    onClick={handleCreatePortioningStep}
+                    className="w-full bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center gap-2 mt-3"
+                  >
+                    <Package className="w-4 h-4" />
+                    Finalizar com Porcionamento
+                  </Button>
+
                 </div>
+              ) : (
+                // Sub-selection View (Grid filtrado para ingredientes)
+                <div className="py-4 space-y-4">
+                  <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-indigo-600" />
+                    Selecione os Processos Desejados
+                  </Label>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {Object.values(processTypes)
+                      .filter(p => ['defrosting', 'cleaning', 'cooking'].includes(p.id))
+                      .sort((a, b) => a.order - b.order)
+                      .map(process => {
+                        const isSelected = selectedProcesses.includes(process.id);
+
+                        // Map icons
+                        let Icon = Layers;
+                        if (process.id === 'defrosting') Icon = ThermometerSnowflake;
+                        if (process.id === 'cleaning') Icon = Droplets;
+                        if (process.id === 'cooking') Icon = Flame;
+
+                        return (
+                          <div
+                            key={process.id}
+                            onClick={() => handleProcessToggle(process.id, !isSelected)}
+                            className={`
+                              cursor-pointer relative p-3 rounded-lg border-2 transition-all duration-200
+                              flex flex-col items-center justify-center gap-2 text-center
+                              ${isSelected
+                                ? `border-${process.color}-500 bg-${process.color}-50`
+                                : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}
+                            `}
+                          >
+                            <Icon
+                              className={`w-6 h-6 ${isSelected ? `text-${process.color}-600` : `text-${process.color}-500 opacity-70`}`}
+                            />
+                            <span className={`text-sm font-medium ${isSelected ? `text-${process.color}-700` : 'text-gray-600'}`}>
+                              {process.label}
+                            </span>
+
+                            {isSelected && (
+                              <div className={`absolute top-2 right-2 w-2 h-2 rounded-full bg-${process.color}-500`}></div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowSimpleProcessSelector(false);
+                        setSelectedProcesses([]);
+                      }}
+                      className="flex-1"
+                    >
+                      Voltar
+                    </Button>
+                    <Button
+                      onClick={handleCreateProcess}
+                      disabled={selectedProcesses.length === 0}
+                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      Criar Etapa
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 mt-6">
+                <Button variant="outline" onClick={onClose} className="flex-1">
+                  Cancelar
+                </Button>
               </div>
-            )}
+            </div>
 
             {/* Modal de seleção de receitas */}
           </div>

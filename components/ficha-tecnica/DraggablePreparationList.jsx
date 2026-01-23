@@ -17,6 +17,7 @@ const DraggablePreparationList = ({
     onDirty,
     isProduct,
     onOpenIngredientModal,
+    onOpenPackagingModal,
     onOpenRecipeModal,
     onOpenProcessEditModal, // New prop
     onSyncPreparation, // New prop
@@ -67,7 +68,7 @@ const DraggablePreparationList = ({
     const toggleCardExpansion = (prepId) => {
         setExpandedCards(prev => ({
             ...prev,
-            [prepId]: prev[prepId] === undefined ? false : !prev[prepId]
+            [prepId]: !prev[prepId]
         }));
     };
 
@@ -349,7 +350,7 @@ const DraggablePreparationList = ({
                             </div>
                         ) : (
                             preparations.map((prep, index) => {
-                                const isExpanded = expandedCards[prep.id] !== false;
+                                const isExpanded = !!expandedCards[prep.id];
                                 const isEditingThisTitle = editingTitle === index;
 
                                 return (
@@ -441,6 +442,7 @@ const DraggablePreparationList = ({
                                                                         prep={prep}
                                                                         prepIndex={index}
                                                                         onOpenIngredientModal={onOpenIngredientModal}
+                                                                        onOpenPackagingModal={onOpenPackagingModal}
                                                                         onOpenRecipeModal={onOpenRecipeModal}
                                                                         onOpenAddAssemblyItemModal={onOpenAddAssemblyItemModal}
                                                                         isProduct={isProduct}

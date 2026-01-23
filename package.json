@@ -81,7 +81,8 @@
     "@types/d3-path": "^3.1.1",
     "@types/prop-types": "^15.7.15",
     "eslint": "^8.0.0",
-    "eslint-config-next": "^14.0.0"
+    "eslint-config-next": "^14.0.0",
+    "opencode-ai": "^1.1.31"
   },
   "engines": {
     "node": ">=20.19.1"

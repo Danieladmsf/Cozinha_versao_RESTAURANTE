@@ -36,7 +36,8 @@ import {
   Check,
   X,
   StickyNote,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Package2
 } from "lucide-react";
 import {
   Command,
@@ -84,6 +85,7 @@ import {
   calculateCubaCost,
   updatePreparationsMetrics
 } from "@/lib/recipeMetricsCalculator";
+import { highlightSearchTerm } from "@/lib/searchUtils";
 
 
 // Componentes organizados
@@ -95,7 +97,7 @@ import RecipeTechnicalPrintDialog from "./RecipeTechnicalPrintDialog";
 import RecipeCollectDialog from "./RecipeCollectDialog";
 import RecipeSimplePrintDialog from "./RecipeSimplePrintDialog";
 import DraggablePreparationList from "./DraggablePreparationList";
-
+import { IngredientSelectorContent } from "./IngredientSelectorContent";
 export default function RecipeTechnical() {
   const { toast } = useToast();
 
@@ -445,6 +447,10 @@ export default function RecipeTechnical() {
   const [ingredientModalOpen, setIngredientModalOpen] = useState(false);
   const [currentPrepIndexForIngredient, setCurrentPrepIndexForIngredient] = useState(null);
 
+  // Estados para modal de embalagens (Packaging)
+  const [packagingModalOpen, setPackagingModalOpen] = useState(false);
+  const [currentPrepIndexForPackaging, setCurrentPrepIndexForPackaging] = useState(null);
+
   // Estados para modal de receitas
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [currentPrepIndexForRecipe, setCurrentPrepIndexForRecipe] = useState(null);
@@ -720,51 +726,32 @@ export default function RecipeTechnical() {
         finalPreparationsData = freshMetrics.updatedPreparations;
       }
 
-      // AUTO-ESCALA: Aplicar escalonamento automÃ¡tico se houver etapa de assembly/portioning
+      // AUTO-ESCALA V2: Escalar cada etapa individualmente baseado no peso definido na montagem
       const finalAssemblyStep = finalPreparationsData.slice().reverse().find(p => p.processes?.some(pr => ['assembly', 'portioning'].includes(pr)));
 
       if (finalAssemblyStep && finalAssemblyStep.sub_components && finalAssemblyStep.sub_components.length > 0 && finalAssemblyStep.assembly_config) {
-        // Calcular peso alvo baseado na configuraÃ§Ã£o
-        const totalAssemblyWeight = finalAssemblyStep.sub_components.reduce((total, sc) => {
-          return total + (parseNumericValue(sc.assembly_weight_kg) || 0);
-        }, 0);
 
         const unitsQuantity = parseNumericValue(finalAssemblyStep.assembly_config.units_quantity) || 1;
-        const targetWeight = totalAssemblyWeight * unitsQuantity;
+        const weightFields = ['weight_frozen', 'weight_thawed', 'weight_raw', 'weight_clean', 'weight_pre_cooking', 'weight_cooked', 'weight_portioned'];
 
-        // Calcular peso REAL atual (baseado no rendimento das etapas anteriores)
-        let currentWeight = 0;
+        // Iterar sobre cada componente da montagem e escalar sua fonte individualmente
         finalAssemblyStep.sub_components.forEach(sc => {
-          if (sc.type === 'recipe') {
-            currentWeight += parseNumericValue(sc.used_weight || sc.yield_weight || 0);
-          } else {
+          // Peso ALVO deste componente (considerando quantidade de unidades na receita final)
+          const componentTargetWeight = (parseNumericValue(sc.assembly_weight_kg) || 0) * unitsQuantity;
+
+          if (componentTargetWeight <= 0) return;
+
+          if (sc.type !== 'recipe') {
+            // Se for ETAPA (Preparation)
             const sourcePrep = finalPreparationsData.find(p => p.id === sc.source_id);
+
             if (sourcePrep) {
-              currentWeight += sourcePrep.total_yield_weight_prep || 0;
-            }
-          }
-        });
+              // Calcular peso ATUAL da etapa
+              const currentPrepWeight = sourcePrep.total_yield_weight_prep || 0;
 
-        // Aplicar escala se necessÃ¡rio
-        if (currentWeight > 0 && targetWeight > 0 && Math.abs(targetWeight - currentWeight) > 0.001) {
-          const scalingFactor = targetWeight / currentWeight;
-          toast({
-            title: "Aplicando Auto-Escala",
-            description: `Fator: ${scalingFactor.toFixed(3)}x (${currentWeight.toFixed(3)}kg â†’ ${targetWeight.toFixed(3)}kg)`
-          });
+              if (currentPrepWeight > 0 && Math.abs(componentTargetWeight - currentPrepWeight) > 0.001) {
+                const scalingFactor = componentTargetWeight / currentPrepWeight;
 
-          const weightFields = ['weight_frozen', 'weight_thawed', 'weight_raw', 'weight_clean', 'weight_pre_cooking', 'weight_cooked', 'weight_portioned'];
-
-          // Escalar cada sub-component
-          finalAssemblyStep.sub_components.forEach(sc => {
-            // NÃƒO escalar assembly_weight_kg - ele Ã© o peso ALVO, nÃ£o o peso atual
-            // Escalar apenas os ingredientes/receitas da etapa anterior
-
-            if (sc.type !== 'recipe') {
-              // Escalar ingredientes da etapa anterior
-              const sourcePrep = finalPreparationsData.find(p => p.id === sc.source_id);
-
-              if (sourcePrep) {
                 // Escalar INGREDIENTES
                 if (sourcePrep.ingredients) {
                   sourcePrep.ingredients = sourcePrep.ingredients.map(ing => {
@@ -781,7 +768,7 @@ export default function RecipeTechnical() {
                   });
                 }
 
-                // Escalar RECEITAS
+                // Escalar RECEITAS internas da etapa
                 if (sourcePrep.recipes) {
                   sourcePrep.recipes = sourcePrep.recipes.map(recipe => {
                     const scaledRecipe = { ...recipe };
@@ -796,8 +783,13 @@ export default function RecipeTechnical() {
                 }
               }
             }
-          });
-        }
+          }
+        });
+
+        toast({
+          title: "Auto-Escala Aplicada",
+          description: "Os ingredientes foram ajustados individualmente."
+        });
       }
 
       const newMetrics = updateRecipeMetrics(finalPreparationsData, recipeDataToSave, recipeDataToSave);
@@ -1038,42 +1030,194 @@ export default function RecipeTechnical() {
     setIsDirty(true);
   };
 
+  // Ref para armazenar a preparação pendente de criação (aguardando itens)
+  const pendingPreparationRef = useRef(null);
+
   // FunÃ§Ã£o para adicionar preparaÃ§Ã£o do modal (usada pelo ProcessCreatorModal)
+  // Função para adicionar preparação do modal (usada pelo ProcessCreatorModal)
+  // AUTO-POPULATE: Ao adicionar uma etapa, ela é automaticamente incluída nas montagens existentes.
   const handleAddPreparationFromModal = useCallback((newPreparation, options = {}) => {
-    // Ensure ID exists
+    // Ensure ID exists and is unique
     const prepWithId = {
       ...newPreparation,
-      id: newPreparation.id || String(Date.now())
+      id: newPreparation.id || String(Date.now() + Math.random())
     };
 
-    setPreparationsData(prev => {
-      const updated = [...prev, prepWithId];
+    // DEFER CREATION LOGIC:
+    // Se a opção deferCreation estiver ativa, NÃO adicionamos a preparação ao estado ainda.
+    // Apenas guardamos no ref e abrimos o modal.
+    if (options.deferCreation) {
+      console.log('⏳ [DEFER] Deferindo criação da etapa:', prepWithId.title);
+      pendingPreparationRef.current = prepWithId;
 
-      // UX AUTOMATION: Abrir modal correspondente imediatamente após criar a etapa
+      setIsProcessCreatorOpen(false);
+      const targetIndex = preparationsData.length; // Virtual index for modal purposes (will be appended)
+
       if (options.openIngredientSelector) {
-        // Usa setTimeout para garantir que o estado atualize antes de abrir (embora o modal use prepIdx)
-        setTimeout(() => {
-          setCurrentPrepIndexForIngredient(updated.length - 1); // Define o índice da NOVA preparação
-          setIngredientModalOpen(true);
-        }, 100);
+        setCurrentPrepIndexForIngredient(targetIndex);
+        // Note: Ingredient Selector uses index to find prep, but here prep doesn't exist yet.
+        // We need to handle this in handleSelectMultipleIngredients by checking pendingPreparationRef.
+        setIngredientModalOpen(true);
       } else if (options.openRecipeSelector) {
-        setTimeout(() => {
-          setCurrentPrepIndexForRecipe(updated.length - 1);
-          setRecipeModalOpen(true);
-        }, 100);
+        setCurrentPrepIndexForRecipe(targetIndex);
+        setRecipeModalOpen(true);
       } else if (options.openAssemblySelector) {
-        setTimeout(() => {
-          setCurrentPrepIndexForAssembly(updated.length - 1); // Define índice para montagem
-          setIsAssemblyItemModalOpen(true);
-        }, 100);
+        setCurrentPrepIndexForAssembly(targetIndex);
+        setIsAssemblyItemModalOpen(true);
+      } else if (options.openPackagingSelector) {
+        setCurrentPrepIndexForPackaging(targetIndex);
+        setPackagingModalOpen(true);
+      }
+      return;
+    }
+
+    setPreparationsData(prev => {
+      let updatedPreparations = [...prev];
+      const nextIndex = updatedPreparations.length + 1;
+
+      // Fix Titulo Duplicado: Se o título sugerir que é uma "Xº Etapa" e estiver duplicado, ajusta.
+      // Isso é apenas um fallback visual, o ideal é o modal mandar certo, mas garante consistência.
+      if (prepWithId.title && prepWithId.title.match(/^\d+º Etapa:/)) {
+        // Se o título vier com número duplicado (ex: usuário deletou uma do meio e adicionou outra), 
+        // a lista re-ordena visualmente por índice no DraggablePreparationList, mas aqui garantimos o dado.
+        // Mas cuidado para não sobrescrever títulos customizados.
+        // Vamos confiar que o componente de lista corrige a visualização (linha 172 do DraggablePreparationList).
       }
 
-      return updated;
+      // Verificar se a nova etapa é uma montagem
+      const isAssembly = prepWithId.processes?.includes('assembly');
+
+      console.log('🔄 [AUTO-POPULATE MODAL] Nova etapa:', prepWithId.title);
+      console.log('🔄 [AUTO-POPULATE MODAL] É montagem?', isAssembly);
+
+      if (isAssembly) {
+        // Se for montagem: adicionar todas as etapas anteriores (não-montagem) como sub_components
+        const previousSteps = updatedPreparations.filter(p => !p.processes?.includes('assembly'));
+        console.log('🔄 [AUTO-POPULATE MODAL] Montagem criada - adicionando etapas anteriores:', previousSteps.map(p => p.title));
+
+        prepWithId.sub_components = previousSteps.map(step => ({
+          id: String(Date.now() + Math.random()),
+          name: step.title,
+          type: 'preparation',
+          source_id: step.id,
+          assembly_weight_kg: 0,
+          origin_id: step.id // Marca como item de matriz (bloqueado)
+        }));
+      } else {
+        // Se NÃO for montagem: adicionar esta etapa em todas as montagens existentes (e porcionamentos)
+        const assemblies = updatedPreparations.filter(p => p.processes?.includes('assembly') || p.processes?.includes('portioning'));
+        console.log('🔄 [AUTO-POPULATE MODAL] Etapa normal - adicionando em montagens/porcionamentos:', assemblies.map(p => p.title));
+
+        updatedPreparations = updatedPreparations.map(prep => {
+          if (prep.processes?.includes('assembly') || prep.processes?.includes('portioning')) {
+            // Adicionar a nova etapa como sub_component da montagem
+            const newSubComponent = {
+              id: String(Date.now() + Math.random()),
+              name: prepWithId.title,
+              type: 'preparation',
+              source_id: prepWithId.id,
+              assembly_weight_kg: 0,
+              // origin_id removido para permitir edição/remoção local
+            };
+
+            console.log('🔄 [AUTO-POPULATE MODAL] Adicionando sub_component em:', prep.title);
+
+            return {
+              ...prep,
+              sub_components: [...(prep.sub_components || []), newSubComponent]
+            };
+          }
+          return prep;
+        });
+      }
+
+      const updated = [...updatedPreparations, prepWithId];
+
+      // AUTO-SORT: Garantir que porcionamento/montagem sejam sempre os últimos
+      const regularSteps = updated.filter(p =>
+        !p.processes?.includes('assembly') && !p.processes?.includes('portioning')
+      );
+      const finalSteps = updated.filter(p =>
+        p.processes?.includes('assembly') || p.processes?.includes('portioning')
+      );
+
+      console.log('🔄 [AUTO-SORT] Reorganizando:', {
+        regular: regularSteps.length,
+        final: finalSteps.length
+      });
+
+      const sorted = [...regularSteps, ...finalSteps];
+
+      // AUTO-RENAME: Renumerar os títulos para manter sequência correta
+      const renumbered = sorted.map((prep, index) => {
+        const stepNumber = index + 1;
+        // Só renumera se o título seguir o padrão "Xº Etapa: ..."
+        if (prep.title && prep.title.match(/^\d+º Etapa:/)) {
+          const titleWithoutNumber = prep.title.replace(/^\d+º Etapa:/, '').trim();
+          return {
+            ...prep,
+            title: `${stepNumber}º Etapa: ${titleWithoutNumber}`
+          };
+        }
+        return prep;
+      });
+
+      console.log('🔢 [AUTO-RENAME] Títulos renumerados');
+
+      return renumbered;
     });
 
     setIsDirty(true);
     setIsProcessCreatorOpen(false);
-  }, []);
+
+    // UX AUTOMATION: Abrir modal correspondente imediatamente após criar a etapa (Synchronous)
+    const targetIndex = preparationsData.length;
+
+    if (options.openIngredientSelector) {
+      setCurrentPrepIndexForIngredient(targetIndex);
+      setIngredientModalOpen(true);
+    } else if (options.openRecipeSelector) {
+      setCurrentPrepIndexForRecipe(targetIndex);
+      setRecipeModalOpen(true);
+    } else if (options.openAssemblySelector) {
+      setCurrentPrepIndexForAssembly(targetIndex);
+      setIsAssemblyItemModalOpen(true);
+    } else if (options.openPackagingSelector) {
+      setCurrentPrepIndexForPackaging(targetIndex);
+      setPackagingModalOpen(true);
+    }
+
+  }, [preparationsData.length]); // Added dependency on length to ensure accuracy
+
+  // Check and remove empty pending step
+  // This function is no longer needed with the deferred creation logic
+  // const checkAndRemovePendingStep = (index) => {
+  //   if (index === null || index === undefined) return;
+
+  //   // Só prosseguir se o índice fechado for o mesmo que acabou de ser criado
+  //   if (pendingCreationStepIndexRef.current !== index) return;
+
+  //   // Resetar ref
+  //   pendingCreationStepIndexRef.current = null;
+
+  //   setPreparationsData(prev => {
+  //     const prep = prev[index];
+  //     // Se a preparação existir e estiver vazia (sem ingredientes/receitas)
+  //     if (prep && (!prep.ingredients || prep.ingredients.length === 0)) {
+  //       // REMOVER A PREPARAÇÃO
+  //       console.log("Creation cancelled, removing empty step:", index);
+  //       toast({
+  //         title: "Criação cancelada",
+  //         description: "Etapa removida por estar vazia.",
+  //         variant: "secondary"
+  //       });
+  //       const newPreps = [...prev];
+  //       newPreps.splice(index, 1);
+  //       return newPreps;
+  //     }
+  //     return prev;
+  //   });
+  // };
 
   // ==== HANDLERS DE INGREDIENTES ====
   const handleOpenIngredientModal = (prepIndex) => {
@@ -1083,8 +1227,30 @@ export default function RecipeTechnical() {
   };
 
   const handleCloseIngredientModal = () => {
+    // If pending creation was active, clearing it implies cancel
+    if (pendingPreparationRef.current) {
+      console.log("Creation cancelled, clearing pending preparation.");
+      pendingPreparationRef.current = null;
+    }
     setIngredientModalOpen(false);
     setCurrentPrepIndexForIngredient(null);
+    clearIngredientSearch();
+  };
+
+  const handleOpenPackagingModal = (prepIndex) => {
+    setCurrentPrepIndexForPackaging(prepIndex);
+    setPackagingModalOpen(true);
+    clearIngredientSearch();
+  };
+
+  const handleClosePackagingModal = () => {
+    // If pending creation was active, clearing it implies cancel
+    if (pendingPreparationRef.current) {
+      console.log("Creation cancelled, clearing pending preparation.");
+      pendingPreparationRef.current = null;
+    }
+    setPackagingModalOpen(false);
+    setCurrentPrepIndexForPackaging(null);
     clearIngredientSearch();
   };
 
@@ -1097,11 +1263,63 @@ export default function RecipeTechnical() {
   };
 
   const handleCloseRecipeModal = () => {
+    // If pending creation was active, clearing it implies cancel
+    if (pendingPreparationRef.current) {
+      console.log("Creation cancelled, clearing pending preparation.");
+      pendingPreparationRef.current = null;
+    }
     setRecipeModalOpen(false);
     setCurrentPrepIndexForRecipe(null);
   };
 
   const handleSelectRecipe = async (recipe) => {
+    // CHECK DEFERRAL FIRST
+    if (pendingPreparationRef.current) {
+      // We are in deferred creation mode.
+      // 1. Build the new preparation with the imported recipe
+      const pendingPrep = pendingPreparationRef.current;
+
+      try {
+        // Import logic reuse?
+        // Need to import recipe items into the PENDING prep.
+        const { importRecipeAsPreparation } = await import('@/lib/services/recipeImportService');
+
+        // Index is basically length of data (since we are appending)
+        const { preparation } = await importRecipeAsPreparation(
+          recipe.id,
+          { prepIndex: preparationsData.length }
+        );
+
+        // Merge imported ingredients into pending prep
+        const finalizedPrep = {
+          ...pendingPrep,
+          ingredients: [...pendingPrep.ingredients, ...preparation.ingredients],
+          source_recipe_id: preparation.source_recipe_id,
+          source_recipe_name: preparation.source_recipe_name
+        };
+
+        // NOW create the step using standard flow (but without options to avoid recursion loop)
+        // We can reused handleAddPreparationFromModal or setPreparationsData directly.
+        // Reuse handleAddPreparationFromModal but force NO deferral options.
+        // Wait, handleAddPreparationFromModal does logic for assembly auto-populate. Good to reuse.
+        handleAddPreparationFromModal(finalizedPrep, { deferCreation: false });
+
+        toast({
+          title: "Etapa Criada",
+          description: "Receita selecionada e etapa adicionada com sucesso.",
+        });
+
+      } catch (err) {
+        console.error(err);
+        toast({ title: "Erro", description: "Falha ao importar receita deferred.", variant: "destructive" });
+      }
+
+      pendingPreparationRef.current = null;
+      handleCloseRecipeModal();
+      return;
+    }
+
+
     if (currentPrepIndexForRecipe !== null) {
       const prepIndex = currentPrepIndexForRecipe;
       handleCloseRecipeModal();
@@ -1233,32 +1451,80 @@ export default function RecipeTechnical() {
   };
 
   const handleSelectIngredient = (ingredient) => {
-    if (currentPrepIndexForIngredient !== null) {
-      // Fechar modal imediatamente para evitar mÃºltiplas chamadas
-      const prepIndex = currentPrepIndexForIngredient;
-      handleCloseIngredientModal();
+    // Determine active index (Ingredient OR Packaging)
+    const prepIndex = currentPrepIndexForIngredient !== null ? currentPrepIndexForIngredient : currentPrepIndexForPackaging;
 
-      // Verificar se o ingrediente jÃ¡ existe na preparaÃ§Ã£o
-      const currentPrep = preparationsData[prepIndex];
-      const ingredientExists = currentPrep?.ingredients?.some(
-        ing => ing.ingredient_id === ingredient.id || ing.name === ingredient.name || ing.id === ingredient.id
-      );
+    if (prepIndex !== null) {
+      // Fechar modal imediatamente para evitar mÃºltiplas chamadas se for um único
+      // Mas para múltiplas chamadas manteremos aberto ou fecharemos depois?
+      // O IngredientSelectorContent chama onSelect e espera fechar.
+      // Vamos manter a lógica de fechar, mas talvez o caller (handleSelectMultipleIngredients) controle isso.
+      // O handleSelectIngredient foi feito para single select. Vamos adaptá-lo ou usar outro.
+      // Vamos usar handleSelectMultipleIngredients que chama a lógica interna de adição sem fechar o modal a cada item.
 
-      if (ingredientExists) {
-        toast({
-          title: "Ingrediente jÃ¡ existe",
-          description: `"${ingredient.name}" jÃ¡ foi adicionado a esta preparaÃ§Ã£o.`,
-          variant: "destructive"
-        });
-        return;
+      // REFACTORED: Logic extracted to addIngredientToState to be reused
+      addIngredientToState(prepIndex, ingredient);
+    }
+  };
+
+  const addIngredientToState = (prepIndex, ingredient) => {
+    // Verificar se o ingrediente jÃ¡ existe na preparaÃ§Ã£o
+    const currentPrep = preparationsData[prepIndex];
+    const ingredientExists = currentPrep?.ingredients?.some(
+      ing => ing.ingredient_id === ingredient.id || ing.name === ingredient.name || ing.id === ingredient.id
+    );
+
+    if (ingredientExists) {
+      toast({
+        title: "Ingrediente jÃ¡ existe",
+        description: `"${ingredient.name}" jÃ¡ foi adicionado a esta preparaÃ§Ã£o.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Criar um novo ingrediente com ID Ãºnico para evitar duplicatas
+    const newIngredient = {
+      ...ingredient,
+      id: `${ingredient.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // ID Ãºnico robusto
+      ingredient_id: ingredient.id, // Manter referÃªncia ao ingrediente original
+      // Inicializar campos de peso como strings
+      weight_frozen: '',
+      weight_thawed: '',
+      weight_raw: '',
+      weight_clean: '',
+      weight_pre_cooking: '',
+      weight_cooked: '',
+      weight_portioned: '',
+      current_price: String(ingredient.current_price || '').replace('.', ','),
+      quantity: ingredient.quantity || 1 // Ensure quantity is set, default to 1
+    };
+
+    setPreparationsData(prev => {
+      const newPreparations = [...prev];
+      if (newPreparations[prepIndex]) {
+        newPreparations[prepIndex] = {
+          ...newPreparations[prepIndex],
+          ingredients: [...(newPreparations[prepIndex].ingredients || []), newIngredient]
+        };
       }
+      return newPreparations;
+    });
+    setIsDirty(true);
+  };
 
-      // Criar um novo ingrediente com ID Ãºnico para evitar duplicatas
-      const newIngredient = {
+  const handleSelectMultipleIngredients = (selectedItems) => {
+    // CHECK DEFERRAL FIRST
+    if (pendingPreparationRef.current) {
+      // We are in deferred creation mode.
+      const pendingPrep = pendingPreparationRef.current;
+
+      // Transform selectedItems to ingredients format
+      const newIngredients = selectedItems.map(ingredient => ({
         ...ingredient,
-        id: `${ingredient.id}_${Date.now()}`, // ID Ãºnico baseado no timestamp
-        ingredient_id: ingredient.id, // Manter referÃªncia ao ingrediente original
-        // Inicializar campos de peso como strings
+        id: `${ingredient.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        ingredient_id: ingredient.id,
+        quantity: ingredient.quantity || 1, // Ensure quantity is set
         weight_frozen: '',
         weight_thawed: '',
         weight_raw: '',
@@ -1267,26 +1533,51 @@ export default function RecipeTechnical() {
         weight_cooked: '',
         weight_portioned: '',
         current_price: String(ingredient.current_price || '').replace('.', ',')
+      }));
+
+      const finalizedPrep = {
+        ...pendingPrep,
+        ingredients: [...pendingPrep.ingredients, ...newIngredients]
       };
 
-      // Adicionar ingrediente com implementaÃ§Ã£o direta para evitar problemas no hook
-      setPreparationsData(prev => {
-        const newPreparations = [...prev];
-        if (newPreparations[prepIndex]) {
-          newPreparations[prepIndex] = {
-            ...newPreparations[prepIndex],
-            ingredients: [...(newPreparations[prepIndex].ingredients || []), newIngredient]
-          };
-        }
-        return newPreparations;
-      });
-      setIsDirty(true);
+      // Add step to list
+      handleAddPreparationFromModal(finalizedPrep, { deferCreation: false });
 
       toast({
-        title: "Ingrediente adicionado",
-        description: `"${ingredient.name}" foi adicionado Ã  preparaÃ§Ã£o.`
+        title: "Etapa Criada",
+        description: `${newIngredients.length} itens adicionados com sucesso.`,
       });
+
+      pendingPreparationRef.current = null;
+
+      // Close modals
+      handleCloseIngredientModal();
+      handleClosePackagingModal();
+      return;
     }
+
+    const prepIndex = currentPrepIndexForIngredient ?? currentPrepIndexForPackaging;
+
+    if (prepIndex !== null) {
+      let addedCount = 0;
+      selectedItems.forEach(item => {
+        // Check existence logic is inside addIngredientToState but calling it in loop acts async on state?
+        // setPreparationsData updates based on prev, so it is safe to call multiple times in loop.
+        addIngredientToState(prepIndex, item);
+        addedCount++;
+      });
+
+      if (addedCount > 0) {
+        toast({
+          title: "Itens adicionados",
+          description: `${addedCount} itens foram adicionados à preparação.`
+        });
+      }
+    }
+
+    // Close modals
+    handleCloseIngredientModal();
+    handleClosePackagingModal();
   };
 
   // Handler para quando uma receita Ã© selecionada na busca
@@ -1368,7 +1659,22 @@ export default function RecipeTechnical() {
     // Receitas antigas sem tipo são consideradas como RECIPE
     const itemType = recipe.type || RECIPE_TYPES.RECIPE;
     return itemType === currentType;
-  }).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR'));
+  });
+
+  // Função para destacar o termo buscado em azul
+  const highlightMatch = (text) => {
+    const { before, match, after, hasMatch } = highlightSearchTerm(text, searchQueryRecipe);
+
+    if (!hasMatch) return text;
+
+    return (
+      <>
+        {before}
+        <span className="text-blue-600 font-semibold">{match}</span>
+        {after}
+      </>
+    );
+  };
 
   // ==== RENDER PRINCIPAL ====
 
@@ -1443,7 +1749,7 @@ export default function RecipeTechnical() {
                                 >
                                   <CookingPot className="h-4 w-4 text-gray-400" />
                                   <div className="flex-1">
-                                    <div className="font-medium text-sm">{recipe.name}</div>
+                                    <div className="font-medium text-sm">{highlightMatch(recipe.name)}</div>
                                     {recipe.category && (
                                       <div className="text-xs text-gray-500">{recipe.category}</div>
                                     )}
@@ -1723,6 +2029,7 @@ export default function RecipeTechnical() {
                     onDirty={setIsDirty}
                     isProduct={recipeData.type === RECIPE_TYPES.PRODUCT}
                     onOpenIngredientModal={handleOpenIngredientModal}
+                    onOpenPackagingModal={handleOpenPackagingModal}
                     onOpenRecipeModal={handleOpenRecipeModal}
                     onOpenProcessEditModal={handleOpenProcessEditModal}
                     onSyncPreparation={handleSyncPreparation} // Nova Prop
@@ -1855,120 +2162,53 @@ export default function RecipeTechnical() {
 
         {/* Modal Unificado de Seleção de Itens (Ingredientes ou Receitas) */}
         <Dialog
-          open={ingredientModalOpen || recipeModalOpen}
+          open={ingredientModalOpen || recipeModalOpen || packagingModalOpen}
           onOpenChange={(open) => {
             if (!open) {
               setIngredientModalOpen(false);
               setRecipeModalOpen(false);
+              setPackagingModalOpen(false);
             }
           }}
         >
           <DialogContent className="sm:max-w-2xl h-[80vh] flex flex-col p-0 gap-0">
-            {/* Cabeçalho Customizado com Abas */}
+            {/* Cabeçalho Customizado Dinâmico */}
             <div className="px-6 pt-6 pb-2">
               <DialogHeader className="mb-4">
-                <DialogTitle>Adicionar Item</DialogTitle>
+                <DialogTitle>
+                  {ingredientModalOpen ? 'Adicionar Ingrediente' :
+                    packagingModalOpen ? 'Adicionar Embalagem' :
+                      recipeModalOpen ? 'Selecionar Receita' : 'Adicionar Item'}
+                </DialogTitle>
               </DialogHeader>
-
-              <Tabs
-                value={recipeModalOpen ? 'recipes' : 'ingredients'}
-                onValueChange={(val) => {
-                  if (val === 'recipes') {
-                    setCurrentPrepIndexForRecipe(currentPrepIndexForIngredient); // Sincroniza índice
-                    setRecipeModalOpen(true);
-                    setIngredientModalOpen(false);
-                  } else {
-                    setCurrentPrepIndexForIngredient(currentPrepIndexForRecipe); // Sincroniza índice
-                    setIngredientModalOpen(true);
-                    setRecipeModalOpen(false);
-                  }
-                }}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="ingredients" className="flex items-center gap-2">
-                    <Search className="h-4 w-4" />
-                    Ingredientes
-                  </TabsTrigger>
-                  <TabsTrigger value="recipes" className="flex items-center gap-2">
-                    <CookingPot className="h-4 w-4" />
-                    Receitas
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
             </div>
 
             <div className="flex-1 overflow-hidden p-6 pt-2">
-              {/* Conteúdo da Aba Ingredientes */}
+              {/* Conteúdo Contextual Direto (Sem Abas) */}
+
+              {/* Contexto: Ingredientes */}
               {ingredientModalOpen && (
-                <div className="h-full flex flex-col space-y-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      type="text"
-                      placeholder="Buscar ingrediente..."
-                      value={ingredientModalSearchTerm}
-                      onChange={(e) => handleIngredientSearchChange(e.target.value)}
-                      className="pl-10"
-                      autoFocus
-                    />
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto border rounded-lg">
-                    {ingredientsLoading ? (
-                      <div className="p-4 text-center text-gray-500 flex items-center justify-center gap-2 h-full">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Carregando ingredientes...
-                      </div>
-                    ) : filteredIngredients.length === 0 ? (
-                      <div className="p-4 text-center text-gray-500 h-full flex items-center justify-center">
-                        {ingredientModalSearchTerm.trim() ? 'Nenhum ingrediente encontrado' : 'Digite para buscar ingredientes'}
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-gray-100">
-                        {filteredIngredients.map(ingredient => (
-                          <div
-                            key={ingredient.id}
-                            className="p-3 hover:bg-gray-50 cursor-pointer transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSelectIngredient(ingredient);
-                            }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <div className="font-medium text-sm">{ingredient.name}</div>
-                                {ingredient.brand && (
-                                  <div className="text-xs text-gray-500">Marca: {ingredient.brand}</div>
-                                )}
-                                {ingredient.category && (
-                                  <div className="text-xs text-gray-500">Categoria: {ingredient.category}</div>
-                                )}
-                              </div>
-                              <div className="text-right">
-                                {ingredient.current_price && (
-                                  <div className="text-sm font-medium text-green-600">
-                                    {formatCurrency(ingredient.current_price)}/{ingredient.unit || 'kg'}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex justify-end pt-2">
-                    <Button variant="outline" onClick={handleCloseIngredientModal}>
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
+                <IngredientSelectorContent
+                  ingredients={availableIngredients || []}
+                  mode="ingredients"
+                  onSelect={handleSelectMultipleIngredients}
+                  onCancel={handleCloseIngredientModal}
+                  isLoading={ingredientsLoading}
+                />
               )}
 
-              {/* Conteúdo da Aba Receitas */}
+              {/* Contexto: Embalagens */}
+              {packagingModalOpen && (
+                <IngredientSelectorContent
+                  ingredients={availableIngredients || []}
+                  mode="packaging"
+                  onSelect={handleSelectMultipleIngredients}
+                  onCancel={handleClosePackagingModal}
+                  isLoading={ingredientsLoading}
+                />
+              )}
+
+              {/* Contexto: Receitas */}
               {recipeModalOpen && (
                 <RecipeSelectorContent
                   onSelectRecipe={(recipe) => {

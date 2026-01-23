@@ -49,14 +49,24 @@ export async function GET(request) {
       ingredients = ingredients.filter(ing => ing.active !== false);
     }
 
-    // Filtrar por busca se especificado
+    // Filtrar por busca se especificado (apenas no nome, ordenado por posição)
     if (search) {
-      const searchTerm = search.toLowerCase();
-      ingredients = ingredients.filter(ing =>
-        ing.name?.toLowerCase().includes(searchTerm) ||
-        ing.brand?.toLowerCase().includes(searchTerm) ||
-        ing.category?.toLowerCase().includes(searchTerm)
-      );
+      const searchTerm = search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      // Filtrar apenas por nome do ingrediente
+      ingredients = ingredients.filter(ing => {
+        const name = (ing.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return name.includes(searchTerm);
+      });
+
+      // Ordenar por posição do match (mais próximo do início = primeiro)
+      ingredients.sort((a, b) => {
+        const nameA = (a.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const nameB = (b.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const posA = nameA.indexOf(searchTerm);
+        const posB = nameB.indexOf(searchTerm);
+        return posA - posB;
+      });
     }
 
 
@@ -74,11 +84,11 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const ingredientData = await request.json();
-    
+
     const newIngredient = await Ingredient.create(ingredientData);
-    
+
     return NextResponse.json(newIngredient, { status: 201 });
-    
+
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to create ingredient', details: error.message },

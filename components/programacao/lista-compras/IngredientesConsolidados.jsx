@@ -93,17 +93,40 @@ const IngredientesConsolidados = ({
     return extractAllIngredientsWithoutConsolidation(filteredOrders, recipes);
   }, [filteredOrders, recipes, dataVersion]);
 
-  // ✅ ATUALIZADO: Agrupar ingredientes por categoria e consolidar DENTRO de cada categoria
+  // ✅ ATUALIZADO: Agrupar ingredientes por CATEGORIA DO INGREDIENTE (Hortifruti, Despensa, etc)
   const ingredientesPorCategoria = useMemo(() => {
-    const activeCategories = getActiveCategories;
+    // Para lista de compras, o ideal é agrupar pelo TIPO DE INGREDIENTE (onde comprar)
+    // e não pelo setor de produção (Receita).
 
-    console.log('🔍 DEBUG ingredientesPorCategoria:', {
-      totalIngredientesSemConsolidar: ingredientesSemConsolidacao.length,
-      activeCategories: activeCategories?.length || 0,
-      primeiroIngrediente: ingredientesSemConsolidacao[0]
+    // 1. Obter todas as categorias únicas dos ingredientes
+    const categorias = {};
+
+    // 2. Agrupar ingredientes
+    ingredientesSemConsolidacao.forEach(ingrediente => {
+      // Usar a categoria do PRÓPRIO ingrediente (Hortifruti, Laticínios...)
+      // Fallback para 'Outros' se não tiver
+      const categoriaNome = ingrediente.category || 'Outros';
+
+      // Normalizar chave
+      const categoriaId = categoriaNome.toLowerCase().replace(/\s+/g, '_');
+
+      if (!categorias[categoriaId]) {
+        categorias[categoriaId] = {
+          id: categoriaId,
+          name: categoriaNome,
+          ingredientes: []
+        };
+      }
+
+      categorias[categoriaId].ingredientes.push(ingrediente);
     });
 
-    // Helper para consolidar ingredientes duplicados dentro de uma categoria
+    console.log('🔍 DEBUG ingredientesPorCategoria (Refatorado):', {
+      totalCategorias: Object.keys(categorias).length,
+      categorias: Object.keys(categorias)
+    });
+
+    // 3. Helper para consolidar ingredientes duplicados DENTRO de cada categoria
     const consolidarDentroDeCategoria = (ingredientes) => {
       const consolidated = {};
 
@@ -111,22 +134,30 @@ const IngredientesConsolidados = ({
         const key = `${ing.name}_${ing.unit}`.toLowerCase();
 
         if (consolidated[key]) {
-          consolidated[key].quantity += ing.quantity;
-          consolidated[key].weight += ing.weight;
+          consolidated[key].totalQuantity += ing.quantity;
+          consolidated[key].totalWeight += ing.weight;
           consolidated[key].usedInRecipes += 1;
+
           if (!consolidated[key].recipes.includes(ing.recipe)) {
             consolidated[key].recipes.push(ing.recipe);
+          }
+          // Manter categorias de receita para referência
+          if (ing.recipeCategory && !consolidated[key].recipeCategories?.includes(ing.recipeCategory)) {
+            if (!consolidated[key].recipeCategories) consolidated[key].recipeCategories = [];
+            consolidated[key].recipeCategories.push(ing.recipeCategory);
           }
         } else {
           consolidated[key] = {
             name: ing.name,
             unit: ing.unit,
-            quantity: ing.quantity,
-            weight: ing.weight,
+            totalQuantity: ing.quantity, // Usar totalQuantity para consistência
+            totalWeight: ing.weight,    // Usar totalWeight
             recipes: [ing.recipe],
+            recipeCategories: [ing.recipeCategory || 'Outros'],
             usedInRecipes: 1,
-            totalQuantity: ing.quantity,
-            totalWeight: ing.weight
+            // Manter propriedades originais
+            quantity: ing.quantity,
+            weight: ing.weight
           };
         }
       });
@@ -134,85 +165,46 @@ const IngredientesConsolidados = ({
       return Object.values(consolidated).sort((a, b) => a.name.localeCompare(b.name));
     };
 
-    // ✅ FALLBACK: Se não há categorias configuradas, agrupar por categorias das receitas
-    if (!activeCategories || activeCategories.length === 0) {
-      console.warn('⚠️ Sem categorias ativas - usando fallback');
+    // 4. Consolidar e limpar
+    const categoriasFinais = {};
 
-      const categoriasFallback = {};
+    // Ordem preferencial de exibição (opcional, pode vir de config depois)
+    const ordemPreferencial = ['hortifruti', 'carnes', 'bovinos', 'aves', 'suínos', 'pescados', 'laticínios', 'frios', 'conguelados', 'mercearia', 'despensa', 'temperos', 'embalagens', 'limpeza', 'outros'];
 
-      // Agrupar por categoria SEM consolidar
-      ingredientesSemConsolidacao.forEach(ingrediente => {
-        const categoriaReceita = ingrediente.recipeCategory || 'Outros';
+    // Ordenar chaves
+    const chavesOrdenadas = Object.keys(categorias).sort((a, b) => {
+      const idxA = ordemPreferencial.indexOf(a);
+      const idxB = ordemPreferencial.indexOf(b);
 
-        if (!categoriasFallback[categoriaReceita]) {
-          categoriasFallback[categoriaReceita] = {
-            name: categoriaReceita,
-            ingredientes: []
-          };
-        }
-        categoriasFallback[categoriaReceita].ingredientes.push(ingrediente);
-      });
-
-      // Consolidar dentro de cada categoria
-      Object.keys(categoriasFallback).forEach(catName => {
-        categoriasFallback[catName].ingredientes = consolidarDentroDeCategoria(
-          categoriasFallback[catName].ingredientes
-        );
-      });
-
-      console.log('✅ Categorias fallback criadas:', Object.keys(categoriasFallback));
-
-      return categoriasFallback;
-    }
-
-    const categorias = {};
-
-    // Inicializar categorias ativas
-    activeCategories.forEach(cat => {
-      categorias[cat.id] = {
-        name: cat.name,
-        ingredientes: []
-      };
+      // Se ambos estiverem na lista, ordena pela lista
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      // Se apenas A estiver na lista, vem primeiro
+      if (idxA !== -1) return -1;
+      // Se apenas B estiver na lista, vem primeiro
+      if (idxB !== -1) return 1;
+      // Se nenhum, ordem alfabética
+      return categorias[a].name.localeCompare(categorias[b].name);
     });
 
-    // Agrupar ingredientes por categoria SEM consolidar
-    ingredientesSemConsolidacao.forEach(ingrediente => {
-      const categoriaReceita = ingrediente.recipeCategory;
-
-      if (!categoriaReceita) return;
-
-      // Encontrar a categoria correspondente no CategoryTree
-      const categoria = activeCategories.find(cat => cat.name === categoriaReceita);
-
-      if (categoria && categorias[categoria.id]) {
-        categorias[categoria.id].ingredientes.push(ingrediente);
+    chavesOrdenadas.forEach(catId => {
+      const dados = categorias[catId];
+      if (dados.ingredientes.length > 0) {
+        categoriasFinais[catId] = {
+          name: dados.name,
+          ingredientes: consolidarDentroDeCategoria(dados.ingredientes)
+        };
       }
     });
 
-    // Consolidar ingredientes DENTRO de cada categoria
-    Object.keys(categorias).forEach(catId => {
-      categorias[catId].ingredientes = consolidarDentroDeCategoria(
-        categorias[catId].ingredientes
-      );
-    });
-
-    // Filtrar categorias vazias
-    const categoriasComIngredientes = {};
-    Object.entries(categorias).forEach(([catId, catData]) => {
-      if (catData.ingredientes.length > 0) {
-        categoriasComIngredientes[catId] = catData;
-      }
-    });
-
-    return categoriasComIngredientes;
-  }, [ingredientesSemConsolidacao, getActiveCategories]);
+    return categoriasFinais;
+  }, [ingredientesSemConsolidacao]);
 
   // Calcular estatísticas
   const estatisticas = useMemo(() => {
     const totalIngredientes = ingredientesConsolidados.length;
     const totalCategorias = Object.keys(ingredientesPorCategoria).length;
     const pesoTotal = ingredientesConsolidados.reduce((total, ing) => total + ing.totalWeight, 0);
-    
+
     return {
       totalIngredientes,
       totalCategorias,
@@ -313,93 +305,93 @@ const IngredientesConsolidados = ({
 
             {/* Aba 1: Por Categoria */}
             <TabsContent value="por-categoria">
-          <div className="space-y-8">
-            {/* ✅ ATUALIZADO: Categorias na ordem do cardápio */}
-            {Object.entries(ingredientesPorCategoria).map(([catId, catData], categoryIndex) => {
-              // Definir cores alternadas para cada categoria
-              const categoryColors = [
-                { bg: 'bg-blue-50', border: 'border-blue-300', header: 'bg-blue-100', text: 'text-blue-900', hover: 'hover:bg-blue-100' },
-                { bg: 'bg-purple-50', border: 'border-purple-300', header: 'bg-purple-100', text: 'text-purple-900', hover: 'hover:bg-purple-100' },
-                { bg: 'bg-orange-50', border: 'border-orange-300', header: 'bg-orange-100', text: 'text-orange-900', hover: 'hover:bg-orange-100' },
-                { bg: 'bg-teal-50', border: 'border-teal-300', header: 'bg-teal-100', text: 'text-teal-900', hover: 'hover:bg-teal-100' },
-                { bg: 'bg-pink-50', border: 'border-pink-300', header: 'bg-pink-100', text: 'text-pink-900', hover: 'hover:bg-pink-100' },
-              ];
-              const colors = categoryColors[categoryIndex % categoryColors.length];
+              <div className="space-y-8">
+                {/* ✅ ATUALIZADO: Categorias na ordem do cardápio */}
+                {Object.entries(ingredientesPorCategoria).map(([catId, catData], categoryIndex) => {
+                  // Definir cores alternadas para cada categoria
+                  const categoryColors = [
+                    { bg: 'bg-blue-50', border: 'border-blue-300', header: 'bg-blue-100', text: 'text-blue-900', hover: 'hover:bg-blue-100' },
+                    { bg: 'bg-purple-50', border: 'border-purple-300', header: 'bg-purple-100', text: 'text-purple-900', hover: 'hover:bg-purple-100' },
+                    { bg: 'bg-orange-50', border: 'border-orange-300', header: 'bg-orange-100', text: 'text-orange-900', hover: 'hover:bg-orange-100' },
+                    { bg: 'bg-teal-50', border: 'border-teal-300', header: 'bg-teal-100', text: 'text-teal-900', hover: 'hover:bg-teal-100' },
+                    { bg: 'bg-pink-50', border: 'border-pink-300', header: 'bg-pink-100', text: 'text-pink-900', hover: 'hover:bg-pink-100' },
+                  ];
+                  const colors = categoryColors[categoryIndex % categoryColors.length];
 
-              return (
-                <div key={catId} className={`rounded-lg border-2 ${colors.border} ${colors.bg} p-4 shadow-md`}>
-                  {/* Nome da categoria */}
-                  <div className="mb-4">
-                    <h3 className={`text-lg font-bold ${colors.text} mb-3 border-b-2 ${colors.border} pb-2`}>
-                      {catData.name.toUpperCase()}
-                    </h3>
-                  </div>
+                  return (
+                    <div key={catId} className={`rounded-lg border-2 ${colors.border} ${colors.bg} p-4 shadow-md`}>
+                      {/* Nome da categoria */}
+                      <div className="mb-4">
+                        <h3 className={`text-lg font-bold ${colors.text} mb-3 border-b-2 ${colors.border} pb-2`}>
+                          {catData.name.toUpperCase()}
+                        </h3>
+                      </div>
 
-                  {/* Tabela de ingredientes */}
-                  <div className="overflow-x-auto rounded-lg">
-                    <table className={`w-full border-2 ${colors.border} bg-white`}>
-                      <thead>
-                        <tr className={colors.header}>
-                          <th className={`border ${colors.border} px-4 py-3 text-left font-bold ${colors.text}`}>
-                            INGREDIENTE
-                          </th>
-                          <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                            QUANTIDADE TOTAL
-                          </th>
-                          <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                            UNIDADE
-                          </th>
-                          <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                            PESO TOTAL (kg)
-                          </th>
-                          <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                            RECEITAS
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {catData.ingredientes.map((ingrediente, index) => (
-                          <tr key={`${ingrediente.name}_${index}`} className={`${colors.hover} transition-colors`}>
-                            <td className={`border ${colors.border} px-4 py-2 font-semibold text-gray-800`}>
-                              {ingrediente.name}
-                            </td>
-                            <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>
-                              {ingrediente.totalQuantity.toFixed(3)}
-                            </td>
-                            <td className={`border ${colors.border} px-4 py-2 text-center text-gray-700`}>
-                              {ingrediente.unit}
-                            </td>
-                            <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>
-                              {ingrediente.totalWeight.toFixed(3)}
-                            </td>
-                            <td className={`border ${colors.border} px-4 py-2 text-center text-sm text-gray-600`}>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <span className="cursor-help underline decoration-dotted">
-                                      {ingrediente.usedInRecipes} receitas
-                                    </span>
-                                  </TooltipTrigger>
-                                  <TooltipContent className="max-w-xs bg-slate-800 text-white p-3">
-                                    <p className="font-semibold mb-2">Receitas que usam {ingrediente.name}:</p>
-                                    <ul className="list-disc list-inside space-y-1">
-                                      {ingrediente.recipes?.map((recipe, idx) => (
-                                        <li key={idx} className="text-sm">{recipe}</li>
-                                      ))}
-                                    </ul>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                      {/* Tabela de ingredientes */}
+                      <div className="overflow-x-auto rounded-lg">
+                        <table className={`w-full border-2 ${colors.border} bg-white`}>
+                          <thead>
+                            <tr className={colors.header}>
+                              <th className={`border ${colors.border} px-4 py-3 text-left font-bold ${colors.text}`}>
+                                INGREDIENTE
+                              </th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
+                                QUANTIDADE TOTAL
+                              </th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
+                                UNIDADE
+                              </th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
+                                PESO TOTAL (kg)
+                              </th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
+                                RECEITAS
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {catData.ingredientes.map((ingrediente, index) => (
+                              <tr key={`${ingrediente.name}_${index}`} className={`${colors.hover} transition-colors`}>
+                                <td className={`border ${colors.border} px-4 py-2 font-semibold text-gray-800`}>
+                                  {ingrediente.name}
+                                </td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>
+                                  {ingrediente.totalQuantity.toFixed(3)}
+                                </td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center text-gray-700`}>
+                                  {ingrediente.unit}
+                                </td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>
+                                  {ingrediente.totalWeight.toFixed(3)}
+                                </td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center text-sm text-gray-600`}>
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span className="cursor-help underline decoration-dotted">
+                                          {ingrediente.usedInRecipes} receitas
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="max-w-xs bg-slate-800 text-white p-3">
+                                        <p className="font-semibold mb-2">Receitas que usam {ingrediente.name}:</p>
+                                        <ul className="list-disc list-inside space-y-1">
+                                          {ingrediente.recipes?.map((recipe, idx) => (
+                                            <li key={idx} className="text-sm">{recipe}</li>
+                                          ))}
+                                        </ul>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </TabsContent>
 
             {/* Aba 2: Ordem Alfabética */}

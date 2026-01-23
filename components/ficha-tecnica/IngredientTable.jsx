@@ -11,6 +11,7 @@ const IngredientTable = ({
   prep,
   prepIndex,
   onOpenIngredientModal,
+  onOpenPackagingModal,
   onOpenRecipeModal,
   onOpenAddAssemblyItemModal,
   onUpdatePreparation,
@@ -73,6 +74,13 @@ const IngredientTable = ({
   const orderedActiveProcesses = ['defrosting', 'cleaning', 'cooking', 'portioning']
     .filter(p => hasProcess(p));
 
+  // Verificar se é apenas processo de embalagem
+  const isPackagingOnly = hasProcess('packaging') &&
+    !hasProcess('defrosting') &&
+    !hasProcess('cleaning') &&
+    !hasProcess('cooking') &&
+    !hasProcess('portioning');
+
   // Verificar se é apenas processo de receita
   const isRecipeOnly = hasProcess('recipe') &&
     !hasProcess('defrosting') &&
@@ -90,62 +98,6 @@ const IngredientTable = ({
         <p className="text-gray-500 mb-3">
           {isRecipeOnly ? 'Nenhuma receita adicionada ainda' : 'Nenhum ingrediente ou receita adicionado ainda'}
         </p>
-        {/* HIDE BUTTONS IF READ ONLY */}
-        {/* HIDE BUTTONS IF READ ONLY OR USER REQUESTED HIDDEN INITIAL STATE
-            O usuário solicitou remover estes botões pois o modal abre automaticamente.
-         */}
-        {/*
-        {!isReadOnly && !isRecipeOnly && (!isProduct || hasProcess('defrosting') || hasProcess('cleaning') || hasProcess('cooking') || hasProcess('packaging')) && (
-          <div className="flex gap-2 justify-center">
-            {hasProcess('packaging') ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onOpenIngredientModal(prepIndex)}
-                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <Package className="h-4 w-4 mr-2" />
-                Adicionar Embalagem
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onOpenIngredientModal(prepIndex)}
-                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Ingrediente
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onOpenRecipeModal(prepIndex)}
-                  className="text-purple-600 border-purple-200 hover:bg-purple-50"
-                >
-                  <CookingPot className="h-4 w-4 mr-2" />
-                  Adicionar Receita
-                </Button>
-              </>
-            )}
-          </div>
-        )}
-
-        {!isReadOnly && isRecipeOnly && (
-          <div className="flex gap-2 justify-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenRecipeModal(prepIndex)}
-              className="text-purple-600 border-purple-200 hover:bg-purple-50"
-            >
-              <CookingPot className="h-4 w-4 mr-2" />
-              Selecionar Receita
-            </Button>
-          </div>
-        )}
-        */}
       </div>
     );
   }
@@ -159,7 +111,32 @@ const IngredientTable = ({
       if (currentSection.header || currentSection.items.length > 0) {
         sections.push(currentSection);
       }
-      currentSection = { header: ing, items: [] };
+
+      // FIX: Robust redundant header detection
+      // If the header name consists ONLY of generic process names, numbers, and symbols, hide it.
+      const nameUC = ing.name?.toUpperCase() || '';
+
+      // Keywords that are considered "generic" for headers
+      const genericKeywords = [
+        'ETAPA', 'LIMPEZA', 'COCÇÃO', 'DESCONGELAMENTO', 'RECEITA',
+        'PORCIONAMENTO', 'EMBALAGEM', 'MONTAGEM'
+      ];
+
+      // Remove numbers, symbols, and generic keywords
+      let refinedName = nameUC;
+      // 1. Remove "Xº" or "X"
+      refinedName = refinedName.replace(/\d+º?/g, '');
+      // 2. Remove symbols
+      refinedName = refinedName.replace(/[+:\-\s]/g, '');
+      // 3. Remove generic keywords
+      genericKeywords.forEach(keyword => {
+        refinedName = refinedName.replaceAll(keyword, '');
+      });
+
+      // If nothing substantial remains, it's a redundant header
+      const isRedundant = refinedName.trim().length === 0;
+
+      currentSection = { header: isRedundant ? null : ing, items: [] };
     } else {
       currentSection.items.push({ data: ing, originalIndex: index });
     }
@@ -185,7 +162,7 @@ const IngredientTable = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onOpenIngredientModal(prepIndex)}
+              onClick={() => onOpenPackagingModal(prepIndex)}
               className="border-dashed border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 transition-all duration-200"
             >
               <Package className="h-4 w-4 mr-2" />
@@ -278,20 +255,28 @@ const IngredientTable = ({
                       );
                     })
                   )}
-                  <TableHead colSpan="2" className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center border-b">
-                    Dados Rendimento
-                  </TableHead>
+                  {/* Hide Yield Group Header for Packaging */}
+                  {!isPackagingOnly && (
+                    <TableHead colSpan="2" className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center border-b">
+                      Dados Rendimento
+                    </TableHead>
+                  )}
+                  {isPackagingOnly && (
+                    <TableHead colSpan="2" className="px-4 py-2 bg-gray-50/50 font-medium text-gray-600 text-center border-b">
+                      Totais
+                    </TableHead>
+                  )}
                 </TableRow>
 
                 <TableRow>
                   <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-left whitespace-nowrap">
-                    Ingrediente
+                    {isPackagingOnly ? 'Item' : 'Ingrediente'}
                   </TableHead>
                   <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center whitespace-nowrap">
-                    Preço/kg (Bruto)
+                    {isPackagingOnly ? 'Preço Unit.' : 'Preço/kg (Bruto)'}
                   </TableHead>
                   <TableHead className="px-4 py-2 bg-emerald-50/50 font-medium text-emerald-600 text-center whitespace-nowrap">
-                    Custo Limpo/kg
+                    {isPackagingOnly ? 'Custo' : 'Custo Limpo/kg'}
                   </TableHead>
 
                   {isRecipeOnly ? (
@@ -363,7 +348,7 @@ const IngredientTable = ({
                   )}
 
                   <TableHead className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center whitespace-nowrap">
-                    Rendimento(%)              </TableHead>
+                    {isPackagingOnly ? '-' : 'Rendimento(%)'}              </TableHead>
                   <TableHead className="px-4 py-2 bg-purple-50/50 font-medium text-purple-600 text-center">
                     Ações
                   </TableHead>

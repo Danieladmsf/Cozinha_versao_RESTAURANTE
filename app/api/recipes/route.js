@@ -83,24 +83,43 @@ export async function GET(request) {
           }
 
           // Filtrar por tipo (ex: receitas_-_base)
-          if (type && recipe.type !== type) {
+          // Se type for especificado, filtra. Se não, inclui receitas sem tipo também.
+          if (type && recipe.type !== type && recipe.type !== null && recipe.type !== undefined) {
+            // Se o tipo foi especificado mas não é null, verifica match
+            if (recipe.type !== type) {
+              return false;
+            }
+          } else if (type && recipe.type !== type) {
             return false;
           }
 
-          // Busca por termo (nome, categoria ou complemento) - ignorando acentos
+          // Busca apenas no NOME da receita - ignorando acentos
           if (search) {
             const term = removeAccents(search.toLowerCase());
             const recipeName = removeAccents(recipe.name?.toLowerCase() || '');
-            const recipeCategory = removeAccents(recipe.category?.toLowerCase() || '');
-            const recipeComplement = removeAccents(recipe.name_complement?.toLowerCase() || '');
 
-            return recipeName.includes(term) ||
-              recipeCategory.includes(term) ||
-              recipeComplement.includes(term);
+            // Busca apenas no nome
+            return recipeName.includes(term);
           }
 
           return true;
         });
+
+        // Se houver termo de busca, ordenar por posição do match (mais próximo do início = primeiro)
+        if (search) {
+          const term = removeAccents(search.toLowerCase());
+
+          recipes.sort((a, b) => {
+            const nameA = removeAccents(a.name?.toLowerCase() || '');
+            const nameB = removeAccents(b.name?.toLowerCase() || '');
+
+            const posA = nameA.indexOf(term);
+            const posB = nameB.indexOf(term);
+
+            // Ordenar por posição (menor posição = mais relevante)
+            return posA - posB;
+          });
+        }
       }
 
       return Response.json({

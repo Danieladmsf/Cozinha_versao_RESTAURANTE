@@ -1183,6 +1183,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             units_quantity: unitsQuantity,
             tech_sheet_unit_weight: unitsQuantity > 1 ? cubaWeightParsed / unitsQuantity : cubaWeightParsed,
             tech_sheet_units_quantity: unitsQuantity,
+            tech_sheet_container_type: containerType, // Explicit container type from Tech Sheet
 
             adjustment_percentage: 0,
             recipe: recipe, // Adicionado para que o weightCalculator possa acessar os pesos da receita
@@ -2087,25 +2088,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   if (loading) {
     return (
       // Container principal
-      <div className="fixed top-0 left-0 w-full h-full bg-black">
-        {/* Camada 1: Nova imagem de fundo, sem desfoque */}
+      <div className="fixed top-0 left-0 w-full h-full bg-white">
+        {/* Camada 1: Imagem completa como fundo */}
         <img
-          src="/background-loading.jpg"
-          alt=""
+          src="/splash-bendito.png"
+          alt="Carregando..."
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Camada 2: Conteúdo centralizado */}
-        <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
-          {/* Wrapper para aplicar o deslocamento vertical */}
-          <div className="transform translate-y-12 text-center">
-            {/* Logo com fundo transparente */}
-            <img
-              src="/logo-transparent.png"
-              alt="Cozinha & Afeto"
-              className="w-auto h-auto max-w-[450px] md:max-w-[750px] mx-auto"
-            />
-          </div>
-        </div>
+        {/* Removed overlay logo as the background image is now the full splash screen */}
       </div>
     );
   }

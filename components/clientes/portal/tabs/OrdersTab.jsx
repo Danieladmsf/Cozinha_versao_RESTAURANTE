@@ -179,7 +179,7 @@ const OrdersTab = ({
                                   return (
                                     <>
                                       <span className="text-purple-600 text-[9px]">
-                                        (Contém, {item.tech_sheet_units_quantity} {unitText} de {utilFormatWeight(item.tech_sheet_unit_weight)}){weightInfo}
+                                        (Contém, {item.tech_sheet_units_quantity} {item.tech_sheet_container_type || unitText} de {utilFormatWeight(item.tech_sheet_unit_weight)}){weightInfo}
                                       </span>
                                       <br />
                                     </>
