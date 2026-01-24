@@ -54,7 +54,7 @@ const HistoryTab = ({
           }
           return item;
         }) : [];
-        
+
         const dayWeight = calculateTotalWeight(syncedItems);
         totalWeight += dayWeight;
 
@@ -76,8 +76,8 @@ const HistoryTab = ({
     const averageMealCost = totalMeals > 0 ? finalTotalAmount / totalMeals : 0;
     const totalDiscounts = totalDepreciation + totalNonReceivedDiscount;
 
-    return { 
-      totalMeals, 
+    return {
+      totalMeals,
       originalTotalAmount,
       totalDepreciation,
       totalNonReceivedDiscount,
@@ -122,7 +122,7 @@ const HistoryTab = ({
           }
           return item;
         }) : [];
-        
+
         const dayWeight = calculateTotalWeight(syncedItems);
         totalWeight += dayWeight;
 
@@ -144,8 +144,8 @@ const HistoryTab = ({
     const averageMealCost = totalMeals > 0 ? finalTotalAmount / totalMeals : 0;
     const totalDiscounts = totalDepreciation + totalNonReceivedDiscount;
 
-    return { 
-      totalMeals, 
+    return {
+      totalMeals,
       originalTotalAmount,
       totalDepreciation,
       totalNonReceivedDiscount,
@@ -290,7 +290,7 @@ const HistoryTab = ({
                 <p className="text-lg font-semibold text-gray-800">{utilFormatCurrency(cumulativeTotals.finalTotalAmount)}</p>
                 {cumulativeTotals.hasDiscounts && (
                   <p className="text-xs text-gray-500">
-                    Original: {utilFormatCurrency(cumulativeTotals.originalTotalAmount)} | Descontos: -{utilFormatCurrency(cumulativeTotals.totalDiscounts)}
+                    Original: {utilFormatCurrency(cumulativeTotals.originalTotalAmount)} | Quebra: -{utilFormatCurrency(cumulativeTotals.totalDiscounts)}
                   </p>
                 )}
               </div>
@@ -344,7 +344,7 @@ const HistoryTab = ({
                 <p className="text-lg font-semibold text-gray-800">{utilFormatCurrency(weeklyTotals.finalTotalAmount)}</p>
                 {weeklyTotals.hasDiscounts && (
                   <p className="text-xs text-gray-500">
-                    Original: {utilFormatCurrency(weeklyTotals.originalTotalAmount)} | Total de Descontos: -{utilFormatCurrency(weeklyTotals.totalDiscounts)}
+                    Original: {utilFormatCurrency(weeklyTotals.originalTotalAmount)} | Total de Quebra: -{utilFormatCurrency(weeklyTotals.totalDiscounts)}
                   </p>
                 )}
               </div>
@@ -356,7 +356,7 @@ const HistoryTab = ({
       {/* Lista de pedidos por dia */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Detalhes por Dia</h3>
-        
+
         {weekDays.map((day) => {
           const dayIndex = day.dayNumber;
           const order = existingOrders[dayIndex];
@@ -378,16 +378,16 @@ const HistoryTab = ({
                       </div>
                     </div>
                   </div>
-                  
+
                   {order && (
                     <div className="text-right">
                       {/* Calcular os valores uma vez para reutilização */}
                       {(() => {
                         const originalDayAmount = utilSumCurrency(order.items ? order.items.map(item => item.total_price || 0) : (order.total_amount || 0));
-                        
+
                         const wasteDataForDay = existingWasteData[dayIndex];
                         const receivingDataForDay = existingReceivingData[dayIndex];
-                        
+
                         let depreciationAmount = 0;
                         if (wasteDataForDay && wasteDataForDay.items && order.items) {
                           const depreciationData = calculateTotalDepreciation(wasteDataForDay.items, order.items);
@@ -429,26 +429,26 @@ const HistoryTab = ({
                               <p className="text-gray-600">Valor Bruto:</p>
                               <p className="font-semibold">{utilFormatCurrency(originalDayAmount)}</p>
                             </div>
-                            
+
                             {depreciationAmount > 0 && (
                               <div className="flex justify-between">
-                                <p className="text-gray-600">Devolução:</p>
+                                <p className="text-gray-600">Quebra:</p>
                                 <p className="font-semibold text-red-600">-{utilFormatCurrency(depreciationAmount)}</p>
                               </div>
                             )}
-                            
+
                             {nonReceivedDiscountAmount > 0 && (
                               <div className="flex justify-between">
                                 <p className="text-gray-600">Não recebido:</p>
                                 <p className="font-semibold text-red-600">-{utilFormatCurrency(nonReceivedDiscountAmount)}</p>
                               </div>
                             )}
-                            
+
                             <div className="flex justify-between border-t pt-2">
                               <p className="text-gray-600 font-bold whitespace-nowrap">Total Líquido:</p>
                               <p className="font-bold text-sm">{utilFormatCurrency(finalDayAmount)}</p>
                             </div>
-                            
+
                             {order.total_items && (
                               <p className="text-xs text-gray-500 mt-1">{utilFormattedQuantity(order.total_items)} itens pedidos</p>
                             )}
@@ -458,7 +458,7 @@ const HistoryTab = ({
                     </div>
                   )}
                 </div>
-                
+
                 {order?.general_notes && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <p className="text-sm text-gray-600"><strong>Observações:</strong> {order.general_notes}</p>
@@ -497,7 +497,7 @@ const HistoryTab = ({
                   {weeklyTotals.hasDiscounts && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-green-700">Desconto Total:</span>
+                        <span className="text-green-700">Quebra Total:</span>
                         <span className="font-semibold">-{utilFormatCurrency(weeklyTotals.totalDiscounts)}</span>
                       </div>
                       <div className="flex justify-between border-t pt-2">

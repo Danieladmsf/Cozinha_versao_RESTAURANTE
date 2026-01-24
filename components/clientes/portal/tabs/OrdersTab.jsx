@@ -306,33 +306,6 @@ const OrdersTab = ({
         );
       })}
 
-      {/* Aviso sobre Devoluções */}
-      <Card className="border-amber-200 bg-amber-50">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-white text-xs font-bold">!</span>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-amber-800 mb-1">Valor Pode Ser Alterado</h3>
-              <p className="text-sm text-amber-700">
-                Se você devolver itens para a cozinha na aba "Sobras", o valor final será reduzido com 25% de depreciação sobre os itens devolvidos.
-              </p>
-              {orderTotals.depreciation?.hasReturns && (
-                <div className="mt-2 p-2 bg-amber-100 rounded border border-amber-200">
-                  <p className="text-xs font-medium text-amber-800 mb-1">Devoluções Registradas:</p>
-                  {orderTotals.depreciation.returnedItems.map((item, index) => (
-                    <div key={index} className="text-xs text-amber-700">
-                      • {item.recipe_name}: {utilFormattedQuantity(item.returned_quantity)} {item.unit_type}
-                      <span className="text-red-600 ml-1">(-{utilFormatCurrency(item.depreciation_value)})</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Resumo do Pedido */}
       <Card className="border-blue-200">
@@ -352,7 +325,7 @@ const OrdersTab = ({
               {(orderTotals.depreciationAmount > 0 || orderTotals.nonReceivedDiscountAmount > 0) && (
                 <div className="mt-2">
                   {orderTotals.depreciationAmount > 0 && (
-                    <p className="text-xs text-red-600">Devolução (25%): -{utilFormatCurrency(orderTotals.depreciationAmount)}</p>
+                    <p className="text-xs text-red-600">Quebra (25%): -{utilFormatCurrency(orderTotals.depreciationAmount)}</p>
                   )}
                   {orderTotals.nonReceivedDiscountAmount > 0 && (
                     <p className="text-xs text-orange-600">Não recebido (100%): -{utilFormatCurrency(orderTotals.nonReceivedDiscountAmount)}</p>

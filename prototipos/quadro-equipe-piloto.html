@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Equipe</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .actions {
+      display: flex;
+      gap: .75rem;
+    }
+
+    button {
+      padding: .6rem 1.1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .primary {
+      background: #6366f1;
+      color: #fff;
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      min-width: 160px;
+    }
+
+    .stat strong {
+      font-size: 1.8rem;
+      display: block;
+    }
+
+    .stat span {
+      font-size: .8rem;
+      opacity: .7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .sector {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .sector header {
+      padding: .9rem 1.2rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sector header h3 {
+      font-size: .95rem;
+      font-weight: 600;
+    }
+
+    .sector header span {
+      font-size: .75rem;
+      opacity: .7;
+    }
+
+    .sector-body {
+      padding: 1rem;
+    }
+
+    .employee {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: .7rem .9rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: .6rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: grab;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #6366f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 600;
+    }
+
+    .info {
+      flex: 1;
+    }
+
+    .info strong {
+      display: block;
+      font-size: .9rem;
+    }
+
+    .info span {
+      font-size: .75rem;
+      opacity: .7;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    @media (max-width:768px) {
+      header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Gestão de Equipe</h1>
+    <div class="actions">
+      <button class="secondary">Relatórios</button>
+      <button class="primary" onclick="openModal()">Novo Colaborador</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats">
+      <div class="stat"><strong>22</strong><span>Colaboradores ativos</span></div>
+      <div class="stat"><strong>5</strong><span>Padaria</span></div>
+      <div class="stat"><strong>6</strong><span>Rotisseria</span></div>
+      <div class="stat"><strong>3</strong><span>Picadinho</span></div>
+      <div class="stat"><strong>2</strong><span>Gerência</span></div>
+      <div class="stat"><strong>2</strong><span>Expedição</span></div>
+      <div class="stat"><strong>1</strong><span>Limpeza</span></div>
+      <div class="stat"><strong>3</strong><span>Extras</span></div>
+    </section>
+
+    <section class="grid">
+      <!-- PADARIA -->
+      <div class="sector" id="padaria">
+        <header>
+          <h3>Padaria</h3><span>5 colaboradores</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e1">
+            <div class="avatar">RE</div>
+            <div class="info"><strong>Regina</strong><span>Líder</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e2">
+            <div class="avatar">LE</div>
+            <div class="info"><strong>Letícia</strong><span>Aux. Padaria</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e3">
+            <div class="avatar">FR</div>
+            <div class="info"><strong>Francisca</strong><span>Aux. Padaria</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e4">
+            <div class="avatar">AN</div>
+            <div class="info"><strong>Andreison</strong><span>Padeiro</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e5">
+            <div class="avatar">VI</div>
+            <div class="info"><strong>Viviane</strong><span>Aux. Padaria</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- ROTISSERIA -->
+      <div class="sector" id="rotisseria">
+        <header>
+          <h3>Rotisseria</h3><span>6 colaboradores</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e6">
+            <div class="avatar">DE</div>
+            <div class="info"><strong>Dejanira</strong><span>Cozinheira</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e7">
+            <div class="avatar">MA</div>
+            <div class="info"><strong>Marlene</strong><span>Cozinha Jr</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e8">
+            <div class="avatar">EL</div>
+            <div class="info"><strong>Elaine</strong><span>Cozinha Jr</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e9">
+            <div class="avatar">MA</div>
+            <div class="info"><strong>Maria</strong><span>Aux. Cozinha</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e10">
+            <div class="avatar">ER</div>
+            <div class="info"><strong>Erica</strong><span>Aux. de Cozinha</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e11">
+            <div class="avatar">MN</div>
+            <div class="info"><strong>Mansur</strong><span>Aux. Senior</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- PICADINHO -->
+      <div class="sector" id="picadinho">
+        <header>
+          <h3>Picadinho</h3><span>3 colaboradores</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e12">
+            <div class="avatar">EV</div>
+            <div class="info"><strong>Evelin</strong><span>Aux. de Cozinha</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e13">
+            <div class="avatar">GI</div>
+            <div class="info"><strong>Gisele</strong><span>Aux. de Cozinha</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e14">
+            <div class="avatar">LI</div>
+            <div class="info"><strong>Lidiane</strong><span>Aux. de Cozinha</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- GERÊNCIA -->
+      <div class="sector" id="gerencia">
+        <header>
+          <h3>Gerência</h3><span>2 colaboradores</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e15">
+            <div class="avatar">DA</div>
+            <div class="info"><strong>Daniel</strong><span>1º Gerente</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e16">
+            <div class="avatar">GA</div>
+            <div class="info"><strong>Gabriela</strong><span>2º Gerente</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- EXPEDIÇÃO -->
+      <div class="sector" id="expedicao">
+        <header>
+          <h3>Expedição</h3><span>2 colaboradores</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e17">
+            <div class="avatar">MU</div>
+            <div class="info"><strong>Maurício</strong><span>1º Expedição</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e18">
+            <div class="avatar">AL</div>
+            <div class="info"><strong>Alexandre</strong><span>Extra</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- LIMPEZA -->
+      <div class="sector" id="limpeza">
+        <header>
+          <h3>Limpeza</h3><span>1 colaborador</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e19">
+            <div class="avatar">VE</div>
+            <div class="info"><strong>Verinha</strong><span>Feiras</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- EXTRAS COZINHA -->
+      <div class="sector" id="extras">
+        <header>
+          <h3>Extras Cozinha</h3><span>3 colaboradores</span>
+        </header>
+        <div class="sector-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e20">
+            <div class="avatar">IL</div>
+            <div class="info"><strong>Ilda</strong><span>Cozinheira</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e21">
+            <div class="avatar">DN</div>
+            <div class="info"><strong>Denise</strong><span>Aux. de Cozinha</span></div>
+          </div>
+          <div class="employee" draggable="true" ondragstart="drag(event)" id="e22">
+            <div class="avatar">ER</div>
+            <div class="info"><strong>Erica</strong><span>Aux. Limpeza</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Novo Colaborador</h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <form>
+        <div class="form-group"><label>Nome</label><input type="text" placeholder="Nome completo"></div>
+        <div class="form-group"><label>Cargo</label><select>
+            <option>Selecione...</option>
+            <option>Líder</option>
+            <option>Gerente</option>
+            <option>Cozinheira</option>
+            <option>Aux. de Cozinha</option>
+            <option>Padeiro</option>
+            <option>Aux. Padaria</option>
+          </select></div>
+        <div class="form-group"><label>Setor</label><select>
+            <option>Selecione...</option>
+            <option>Padaria</option>
+            <option>Rotisseria</option>
+            <option>Picadinho</option>
+            <option>Limpeza</option>
+            <option>Gerência</option>
+            <option>Expedição</option>
+            <option>Extras</option>
+          </select></div>
+        <div class="form-group"><label>Salário</label><input type="text" placeholder="R$ 0,00"></div>
+        <div class="form-group"><label>Data de admissão</label><input type="date"></div>
+        <div class="modal-actions" style="margin-top:1rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+          <button type="button" class="secondary" onclick="closeModal()">Cancelar</button>
+          <button type="submit" class="primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Drag & Drop helpers
+    function allowDrop(ev) {
+      ev.preventDefault();
+      const body = ev.target.closest('.sector-body');
+      if (body) body.classList.add('drag-over');
+    }
+    function dragLeave(ev) {
+      const body = ev.target.closest('.sector-body');
+      if (body) body.classList.remove('drag-over');
+    }
+    function drag(ev) {
+      ev.dataTransfer.setData('text', ev.target.id);
+      ev.target.classList.add('dragging');
+    }
+    function drop(ev) {
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData('text');
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('dragging');
+      const target = ev.target.closest('.sector-body');
+      if (target) {
+        target.appendChild(el);
+        target.classList.remove('drag-over');
+        updateCounts();
+      }
+    }
+    // Update sector counts and total stats
+    function updateCounts() {
+      document.querySelectorAll('.sector').forEach(sec => {
+        const count = sec.querySelectorAll('.employee').length;
+        sec.querySelector('header span').textContent = `${count} colaborador${count !== 1 ? 'es' : ''}`;
+      });
+      const total = document.querySelectorAll('.employee').length;
+      const totalStat = document.querySelector('.stats .stat strong');
+      if (totalStat) totalStat.textContent = total;
+    }
+
+    // Modal handling
+    function openModal() { document.getElementById('modal').classList.add('active'); }
+    function closeModal() { document.getElementById('modal').classList.remove('active'); }
+    // Close modal when clicking outside content
+    document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+  </script>
+
+</body>
+
+</html>

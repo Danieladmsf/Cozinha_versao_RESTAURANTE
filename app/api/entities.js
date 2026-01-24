@@ -109,17 +109,17 @@ const createEntity = (collectionName) => {
         }
 
         const result = docSnap.exists() ? { ...docSnap.data(), id: docSnap.id } : null;
-        
+
         const queryTime = Date.now() - startTime;
         if (queryTime > 1000) {
           console.warn(`[${collectionName}.getById] Slow query: ${queryTime}ms for ID: ${id}`);
         }
-        
+
         return result;
       } catch (error) {
         const queryTime = Date.now() - startTime;
         console.error(`[${collectionName}.getById] Error after ${queryTime}ms:`, error.message);
-        
+
         if (error.message === 'Firestore timeout') {
           throw new Error(`Request timed out after ${queryTime}ms. Please try again.`);
         }
@@ -128,7 +128,7 @@ const createEntity = (collectionName) => {
     },
 
     // Alias for getById (for compatibility)
-    get: function(id) {
+    get: function (id) {
       return this.getById(id);
     },
 
@@ -138,7 +138,7 @@ const createEntity = (collectionName) => {
       const currentTime = new Date();
       const dayOfWeek = currentTime.getDay();
       const dayName = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][dayOfWeek];
-      
+
       console.log(`🆕 [${collectionName.toUpperCase()}.CREATE] Iniciando criação:`, {
         collection: collectionName,
         timestamp: currentTime.toISOString(),
@@ -150,18 +150,18 @@ const createEntity = (collectionName) => {
         customerId: data.customer_id || 'N/A',
         date: data.date || 'N/A'
       });
-      
+
       const startTime = Date.now();
-      
+
       try {
         const docData = {
           ...data,
           createdAt: currentTime,
           updatedAt: currentTime
         };
-        
+
         const docRef = await addDoc(collection(db, collectionName), docData);
-        
+
         const createTime = Date.now() - startTime;
         console.log(`✅ [${collectionName.toUpperCase()}.CREATE] Sucesso:`, {
           id: docRef.id,
@@ -169,7 +169,7 @@ const createEntity = (collectionName) => {
           isFriday: dayOfWeek === 5,
           collection: collectionName
         });
-        
+
         return { ...docData, id: docRef.id };
       } catch (error) {
         const errorTime = Date.now() - startTime;
@@ -207,7 +207,7 @@ const createEntity = (collectionName) => {
       const currentTime = new Date();
       const dayOfWeek = currentTime.getDay();
       const dayName = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][dayOfWeek];
-      
+
       console.log(`🔄 [${collectionName.toUpperCase()}.UPDATE] Iniciando atualização:`, {
         collection: collectionName,
         id: id,
@@ -220,18 +220,18 @@ const createEntity = (collectionName) => {
         customerId: data.customer_id || 'N/A',
         date: data.date || 'N/A'
       });
-      
+
       const startTime = Date.now();
-      
+
       try {
         const docRef = doc(db, collectionName, id);
         const updateData = {
           ...data,
           updatedAt: currentTime
         };
-        
+
         await updateDoc(docRef, updateData);
-        
+
         const updateTime = Date.now() - startTime;
         console.log(`✅ [${collectionName.toUpperCase()}.UPDATE] Sucesso:`, {
           id: id,
@@ -239,7 +239,7 @@ const createEntity = (collectionName) => {
           isFriday: dayOfWeek === 5,
           collection: collectionName
         });
-        
+
         return { id, ...updateData };
       } catch (error) {
         const errorTime = Date.now() - startTime;
@@ -264,22 +264,22 @@ const createEntity = (collectionName) => {
     delete: async (id) => {
       try {
         const docRef = doc(db, collectionName, id);
-        
+
         // Verificar se o documento existe antes de deletar
         const docSnapshot = await getDoc(docRef);
         if (!docSnapshot.exists()) {
           // Retornar sucesso se já foi excluído (idempotente)
           return { id, deleted: true, alreadyDeleted: true };
         }
-        
+
         await deleteDoc(docRef);
-        
+
         // Verificar se realmente foi deletado
         const verifyDoc = await getDoc(docRef);
         if (verifyDoc.exists()) {
           throw new Error(`Document was not deleted successfully`);
         }
-        
+
         return { id, deleted: true };
       } catch (error) {
         throw new Error(`Failed to delete document ${id} from ${collectionName}: ${error.message}`);
@@ -381,6 +381,7 @@ export const UserNutrientConfig = createEntity('UserNutrientConfig');
 export const VariableBill = createEntity('VariableBill');
 export const WeeklyMenu = createEntity('WeeklyMenu');
 export const AppSettings = createEntity('AppSettings');
+export const Employee = createEntity('Employee');
 
 // User entity
 export const UserEntity = createEntity('User');
@@ -390,7 +391,7 @@ import { auth } from '../../lib/firebase.js';
 
 export const User = {
   ...auth,
-  
+
   // Create user with specific ID
   createWithId: async (userId, userData) => {
     try {
@@ -400,16 +401,16 @@ export const User = {
         createdAt: new Date(),
         updatedAt: new Date()
       };
-      
+
       const docRef = doc(db, 'User', userId);
       await setDoc(docRef, newUserData);
-      
+
       return { id: userId, ...newUserData };
     } catch (error) {
       throw new Error('Falha ao criar usuário: ' + error.message);
     }
   },
-  
+
   // Get current user data - No authentication required
   me: async () => {
     return new Promise((resolve, reject) => {
@@ -427,7 +428,7 @@ export const User = {
   getMyUserData: async () => {
     try {
       const userId = 'mock-user-id'; // Em produção, pegar do usuário autenticado
-      
+
       const userData = await UserEntity.getById(userId);
       return userData;
     } catch (error) {
@@ -439,15 +440,15 @@ export const User = {
   updateMyUserData: async (userData) => {
     try {
       const userId = 'mock-user-id'; // Em produção, pegar do usuário autenticado
-      
-      
+
+
       // Primeiro, tenta buscar o usuário existente
       let existingUser = null;
       try {
         existingUser = await UserEntity.getById(userId);
       } catch (error) {
       }
-      
+
       if (existingUser) {
         // Se existe, atualiza usando update
         const updatedData = {
@@ -464,12 +465,12 @@ export const User = {
           createdAt: new Date(),
           updatedAt: new Date()
         };
-        
+
         // Usar setDoc ao invés de create para especificar o ID
         const docRef = doc(db, 'User', userId);
         await setDoc(docRef, newUserData);
       }
-      
+
       return {
         success: true,
         message: 'Dados do usuário salvos com sucesso no Firestore'

@@ -7,9 +7,9 @@ import { DecimalInput } from "@/components/ui/decimal-input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, AlertTriangle, Loader2, CheckCircle } from "lucide-react";
-import { 
+import {
   formattedQuantity as utilFormattedQuantity,
-  formatCurrency as utilFormatCurrency 
+  formatCurrency as utilFormatCurrency
 } from "@/components/utils/orderUtils";
 import { formatUnitTypeForDisplay } from "@/lib/unitTypeUtils";
 
@@ -33,7 +33,7 @@ const WasteTab = ({
       <Card>
         <CardContent className="p-8 text-center">
           <Loader2 className="w-8 h-8 mx-auto mb-4 text-amber-500 animate-spin" />
-          <p className="text-amber-600">Carregando dados de sobras...</p>
+          <p className="text-amber-600">Carregando dados de quebra...</p>
         </CardContent>
       </Card>
     );
@@ -46,7 +46,7 @@ const WasteTab = ({
           <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-amber-400" />
           <h3 className="font-semibold text-lg text-gray-700 mb-2">Nenhum Item Disponível</h3>
           <p className="text-gray-500 text-sm">
-            Não há itens disponíveis no cardápio para registrar sobras neste dia.
+            Não há itens disponíveis no cardápio para registrar quebra neste dia.
           </p>
         </CardContent>
       </Card>
@@ -63,7 +63,7 @@ const WasteTab = ({
               <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-amber-600 mb-2">Sobras Salvas!</h2>
+              <h2 className="text-2xl font-bold text-amber-600 mb-2">Quebra Salva!</h2>
               <p className="text-gray-600">Os dados foram salvos com sucesso</p>
               <div className="mt-4 flex items-center justify-center text-amber-600">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-600"></div>
@@ -83,8 +83,8 @@ const WasteTab = ({
                 <CheckCircle className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-amber-700">Sobras Salvas com Sucesso</h3>
-                <p className="text-sm text-amber-600">Este registro de sobras já foi processado e salvo. Use o botão abaixo para editar.</p>
+                <h3 className="font-semibold text-amber-700">Quebra Salva com Sucesso</h3>
+                <p className="text-sm text-amber-600">Este registro de quebra já foi processado e salvo. Use o botão abaixo para editar.</p>
               </div>
             </div>
           </CardContent>
@@ -98,13 +98,13 @@ const WasteTab = ({
         const { headerStyle } = generateCategoryStyles(categoryData.categoryInfo.color);
         return (
           <div key={categoryName} className="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-md transition-all duration-300">
-            <div 
-              className="py-4 px-6 relative border-b border-gray-100/50" 
+            <div
+              className="py-4 px-6 relative border-b border-gray-100/50"
               style={headerStyle}
             >
               <div className="flex items-center">
-                <div 
-                  className="w-5 h-5 rounded-full mr-3 shadow-sm border-2 border-white/30 ring-2 ring-white/20" 
+                <div
+                  className="w-5 h-5 rounded-full mr-3 shadow-sm border-2 border-white/30 ring-2 ring-white/20"
                   style={{ backgroundColor: categoryData.categoryInfo.color }}
                 />
                 <h3 className="text-lg font-semibold text-gray-800">{categoryName}</h3>
@@ -117,9 +117,8 @@ const WasteTab = ({
                     <tr className="border-b border-amber-100 bg-amber-50">
                       <th className="text-left p-2 text-xs font-medium text-amber-700">Item</th>
                       <th className="text-center p-2 text-xs font-medium text-amber-700">Pedido</th>
-                      <th className="text-center p-2 text-xs font-medium text-amber-700">Sobra Interna</th>
-                      <th className="text-center p-2 text-xs font-medium text-amber-700">Cliente Devolveu</th>
-                      <th className="text-center p-2 text-xs font-medium text-amber-700">Valor Devolução</th>
+                      <th className="text-center p-2 text-xs font-medium text-amber-700">Quebra</th>
+                      <th className="text-center p-2 text-xs font-medium text-amber-700">Valor Quebra</th>
                       <th className="text-left p-2 text-xs font-medium text-amber-700">Observações</th>
                     </tr>
                   </thead>
@@ -139,24 +138,6 @@ const WasteTab = ({
                           <td className="p-2 text-center">
                             <div className="text-xs font-medium text-amber-700">
                               {utilFormattedQuantity(item.ordered_quantity)} {item.ordered_unit_type}
-                            </div>
-                          </td>
-                          <td className="p-2">
-                            <div className="flex gap-1 items-center justify-center">
-                              <DecimalInput
-                                value={item.internal_waste_quantity === 0 ? '' : item.internal_waste_quantity || ''}
-                                onChange={(e) => {
-                                  if (isEditMode) {
-                                    updateWasteItem(globalIndex, 'internal_waste_quantity', e.target.value);
-                                  }
-                                }}
-                                className="text-center text-xs h-8 w-12 border-amber-300 focus:border-amber-500"
-                                placeholder="0"
-                                disabled={!isEditMode}
-                              />
-                              <div className="text-xs h-8 w-12 flex items-center justify-center font-medium text-gray-700">
-                                {formatUnitTypeForDisplay(item.ordered_unit_type || 'kg')}
-                              </div>
                             </div>
                           </td>
                           <td className="p-2">
@@ -210,12 +191,12 @@ const WasteTab = ({
       <Card className="border-amber-200">
         <CardContent className="p-4">
           <label className="block text-sm font-medium text-amber-700 mb-2">
-            Observações Gerais sobre as Sobras
+            Observações Gerais sobre a Quebra
           </label>
           <Textarea
             value={wasteNotes}
             onChange={(e) => isEditMode && setWasteNotes(e.target.value)}
-            placeholder="Observações gerais sobre as sobras do dia..."
+            placeholder="Observações gerais sobre a quebra do dia..."
             className="min-h-[80px] border-amber-300 focus:border-amber-500"
             rows={3}
             disabled={!isEditMode}
@@ -225,34 +206,33 @@ const WasteTab = ({
 
       {/* Botão de Salvar/Editar */}
       {isEditMode || showSuccessEffect ? (
-        <Button 
+        <Button
           onClick={saveWasteData}
-          className={`w-full text-white transition-all duration-500 ${
-            showSuccessEffect 
-              ? 'bg-green-600 hover:bg-green-700 scale-105 shadow-lg' 
-              : 'bg-amber-600 hover:bg-amber-700'
-          }`}
+          className={`w-full text-white transition-all duration-500 ${showSuccessEffect
+            ? 'bg-green-600 hover:bg-green-700 scale-105 shadow-lg'
+            : 'bg-amber-600 hover:bg-amber-700'
+            }`}
           disabled={showSuccessEffect}
         >
           {showSuccessEffect ? (
             <>
               <CheckCircle className="w-4 h-4 mr-2 animate-bounce" />
-              Sobras Salvas!
+              Quebra Salva!
             </>
           ) : (
             <>
               <Send className="w-4 h-4 mr-2" />
-              {existingWaste ? 'Atualizar Sobras' : 'Salvar Sobras'}
+              {existingWaste ? 'Atualizar Quebra' : 'Salvar Quebra'}
             </>
           )}
         </Button>
       ) : (
-        <Button 
+        <Button
           onClick={enableEditMode}
           className="w-full bg-amber-600 hover:bg-amber-700 text-white"
         >
           <Send className="w-4 h-4 mr-2" />
-          Editar Sobras
+          Editar Quebra
         </Button>
       )}
     </div>

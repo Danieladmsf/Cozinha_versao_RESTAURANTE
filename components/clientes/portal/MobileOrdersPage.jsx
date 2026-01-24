@@ -445,7 +445,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
       setWasteItems(items);
     } catch (error) {
-      toast({ variant: "destructive", description: "Erro ao carregar dados de sobras." });
+      toast({ variant: "destructive", description: "Erro ao carregar dados de quebra." });
     } finally {
       setWasteLoading(false);
     }
@@ -750,7 +750,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             general_notes: wasteNotes
           });
           toast({
-            description: "Sobras atualizadas com sucesso!",
+            description: "Quebra atualizada com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         }
@@ -769,7 +769,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           });
           setExistingWaste(newWaste);
           toast({
-            description: "Sobras registradas com sucesso!",
+            description: "Quebra registrada com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         } else {
@@ -782,7 +782,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro ao Salvar Sobras",
+        title: "Erro ao Salvar Quebra",
         description: error.message
       });
     }
@@ -2211,7 +2211,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
               </TabsTrigger>
               <TabsTrigger value="waste" className="flex items-center gap-1 text-xs p-1">
                 <AlertTriangle className="w-4 h-4" />
-                <span>Sobras</span>
+                <span>Quebra</span>
               </TabsTrigger>
               <TabsTrigger value="history" className="flex items-center gap-1 text-xs p-1">
                 <CircleDollarSign className="w-4 h-4" />
@@ -2316,7 +2316,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                   <div>
                     <div><span className="font-medium">Original:</span> {utilFormatCurrency(orderTotals.originalAmount)}</div>
                     {orderTotals.depreciationAmount > 0 && (
-                      <div className="text-red-600"><span className="font-medium">Devolução (25%):</span> -{utilFormatCurrency(orderTotals.depreciationAmount)}</div>
+                      <div className="text-red-600"><span className="font-medium">Quebra (25%):</span> -{utilFormatCurrency(orderTotals.depreciationAmount)}</div>
                     )}
                     {orderTotals.nonReceivedDiscountAmount > 0 && (
                       <div className="text-orange-600"><span className="font-medium">Não recebido (100%):</span> -{utilFormatCurrency(orderTotals.nonReceivedDiscountAmount)}</div>

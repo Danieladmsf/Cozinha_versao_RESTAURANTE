@@ -46,6 +46,7 @@ export default function RootLayout({ children }) {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Quadro de Equipe", href: "/quadro-de-equipe", icon: Users },
     { name: "Receitas", href: "/receitas", icon: ChefHat },
     { name: "Ficha Técnica", href: "/ficha-tecnica", icon: Clipboard },
     { name: "Análise de Receitas", href: "/analise-de-receitas", icon: TrendingUp },

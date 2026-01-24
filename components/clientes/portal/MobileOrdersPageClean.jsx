@@ -7,13 +7,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
 // Entities
-import { 
-  Customer, 
-  Recipe, 
-  WeeklyMenu, 
-  Order, 
-  OrderReceiving, 
-  OrderWaste 
+import {
+  Customer,
+  Recipe,
+  WeeklyMenu,
+  Order,
+  OrderReceiving,
+  OrderWaste
 } from "@/app/api/entities";
 
 // Componentes UI
@@ -42,11 +42,11 @@ import {
 } from "lucide-react";
 
 // Utilitários
-import { 
-  parseQuantity as utilParseQuantity, 
-  formattedQuantity as utilFormattedQuantity, 
-  formatCurrency as utilFormatCurrency, 
-  formatWeight as utilFormatWeight 
+import {
+  parseQuantity as utilParseQuantity,
+  formattedQuantity as utilFormattedQuantity,
+  formatCurrency as utilFormatCurrency,
+  formatWeight as utilFormatWeight
 } from "@/components/utils/orderUtils";
 
 import { useCategoryDisplay } from "@/hooks/shared/useCategoryDisplay";
@@ -59,7 +59,7 @@ import WasteTab from "./tabs/WasteTab";
 const MobileOrdersPage = ({ customerId }) => {
   const { toast } = useToast();
   const { groupItemsByCategory, getOrderedCategories, generateCategoryStyles } = useCategoryDisplay();
-  
+
   // Estados principais
   const [currentDate, setCurrentDate] = useState(new Date());
   const [customer, setCustomer] = useState(null);
@@ -68,12 +68,12 @@ const MobileOrdersPage = ({ customerId }) => {
   const [currentOrder, setCurrentOrder] = useState(null);
   const [existingOrders, setExistingOrders] = useState({});
   const [loading, setLoading] = useState(true);
-  
+
   // UI States
   const [activeTab, setActiveTab] = useState("orders");
   const [mealsExpected, setMealsExpected] = useState(0);
   const [generalNotes, setGeneralNotes] = useState("");
-  
+
   // Estados para Sobras
   const [wasteItems, setWasteItems] = useState([]);
   const [wasteNotes, setWasteNotes] = useState("");
@@ -112,7 +112,7 @@ const MobileOrdersPage = ({ customerId }) => {
   // Carregar pedidos existentes da semana
   const loadExistingOrders = useCallback(async () => {
     if (!customer) return;
-    
+
     try {
       const orders = await Order.query([
         { field: 'customer_id', operator: '==', value: customer.id },
@@ -127,7 +127,7 @@ const MobileOrdersPage = ({ customerId }) => {
       });
 
       setExistingOrders(ordersByDay);
-      
+
     } catch (error) {
       // Error handling
     }
@@ -154,7 +154,7 @@ const MobileOrdersPage = ({ customerId }) => {
       // Criar itens simples baseados no cardápio
       const menu = weeklyMenus[0];
       const menuData = menu?.menu_data?.[selectedDay];
-      
+
       if (!menuData) {
         setWasteItems([]);
         return;
@@ -174,7 +174,7 @@ const MobileOrdersPage = ({ customerId }) => {
                 client_returned_quantity: 0,
                 notes: ""
               };
-              
+
               // Se há dados salvos, usar eles
               if (wasteRecord?.items) {
                 const saved = wasteRecord.items.find(s => s.recipe_id === recipe.id);
@@ -184,7 +184,7 @@ const MobileOrdersPage = ({ customerId }) => {
                   wasteItem.notes = saved.notes || "";
                 }
               }
-              
+
               items.push(wasteItem);
             }
           });
@@ -193,7 +193,7 @@ const MobileOrdersPage = ({ customerId }) => {
 
       setWasteItems(items);
     } catch (error) {
-      toast({ variant: "destructive", description: "Erro ao carregar dados de sobras." });
+      toast({ variant: "destructive", description: "Erro ao carregar dados de quebra." });
     } finally {
       setWasteLoading(false);
     }
@@ -236,7 +236,7 @@ const MobileOrdersPage = ({ customerId }) => {
           received_quantity: orderItem.quantity, // default para quantidade pedida
           notes: ""
         };
-        
+
         // Se há dados salvos, usar eles
         if (receivingRecord?.items) {
           const saved = receivingRecord.items.find(s => s.recipe_id === orderItem.recipe_id);
@@ -246,7 +246,7 @@ const MobileOrdersPage = ({ customerId }) => {
             receivingItem.notes = saved.notes || "";
           }
         }
-        
+
         return receivingItem;
       });
 
@@ -262,7 +262,7 @@ const MobileOrdersPage = ({ customerId }) => {
     setReceivingItems(prevItems => {
       const updatedItems = [...prevItems];
       const item = { ...updatedItems[index] };
-      
+
       if (field === 'received_quantity') {
         item.received_quantity = Math.max(0, utilParseQuantity(value) || 0);
         // Atualizar status baseado na quantidade recebida
@@ -285,14 +285,14 @@ const MobileOrdersPage = ({ customerId }) => {
       } else {
         item[field] = value;
       }
-      
+
       updatedItems[index] = item;
       return updatedItems;
     });
   }, []);
 
   const markAllAsReceived = useCallback(() => {
-    setReceivingItems(prevItems => 
+    setReceivingItems(prevItems =>
       prevItems.map(item => ({
         ...item,
         status: 'received',
@@ -306,14 +306,14 @@ const MobileOrdersPage = ({ customerId }) => {
 
     try {
       // Verificar se é um registro vazio (para deletar)
-      const isEmpty = receivingItems.every(item => item.status === 'pending') && 
-                     (!receivingNotes || receivingNotes.trim() === '');
+      const isEmpty = receivingItems.every(item => item.status === 'pending') &&
+        (!receivingNotes || receivingNotes.trim() === '');
 
       if (existingReceiving) {
         if (isEmpty) {
           // Deletar registro vazio
           await OrderReceiving.delete(existingReceiving.id);
-          toast({ 
+          toast({
             description: "Registro de recebimento vazio foi removido.",
             className: "border-blue-200 bg-blue-50 text-blue-800"
           });
@@ -324,7 +324,7 @@ const MobileOrdersPage = ({ customerId }) => {
             items: receivingItems,
             general_notes: receivingNotes
           });
-          toast({ 
+          toast({
             description: "Recebimento atualizado com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
@@ -343,22 +343,22 @@ const MobileOrdersPage = ({ customerId }) => {
             general_notes: receivingNotes
           });
           setExistingReceiving(newReceiving);
-          toast({ 
+          toast({
             description: "Recebimento registrado com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         } else {
-          toast({ 
+          toast({
             description: "Nenhum recebimento para registrar.",
             className: "border-gray-200 bg-gray-50 text-gray-800"
           });
         }
       }
     } catch (error) {
-      toast({ 
-        variant: "destructive", 
-        title: "Erro ao Salvar Recebimento", 
-        description: error.message 
+      toast({
+        variant: "destructive",
+        title: "Erro ao Salvar Recebimento",
+        description: error.message
       });
     }
   }, [customer, receivingItems, receivingNotes, existingReceiving, weekNumber, year, selectedDay, weekStart, toast]);
@@ -367,13 +367,13 @@ const MobileOrdersPage = ({ customerId }) => {
     setWasteItems(prevItems => {
       const updatedItems = [...prevItems];
       const item = { ...updatedItems[index] };
-      
+
       if (field === 'internal_waste_quantity' || field === 'client_returned_quantity') {
         item[field] = Math.max(0, utilParseQuantity(value) || 0);
       } else {
         item[field] = value;
       }
-      
+
       updatedItems[index] = item;
       return updatedItems;
     });
@@ -384,8 +384,8 @@ const MobileOrdersPage = ({ customerId }) => {
 
     try {
       // Verificar se é um registro vazio (para deletar)
-      const isEmpty = wasteItems.every(item => 
-        (item.internal_waste_quantity || 0) === 0 && 
+      const isEmpty = wasteItems.every(item =>
+        (item.internal_waste_quantity || 0) === 0 &&
         (item.client_returned_quantity || 0) === 0
       ) && (!wasteNotes || wasteNotes.trim() === '');
 
@@ -393,7 +393,7 @@ const MobileOrdersPage = ({ customerId }) => {
         if (isEmpty) {
           // Deletar registro vazio
           await OrderWaste.delete(existingWaste.id);
-          toast({ 
+          toast({
             description: "Registro de sobra vazio foi removido.",
             className: "border-amber-200 bg-amber-50 text-amber-800"
           });
@@ -404,8 +404,8 @@ const MobileOrdersPage = ({ customerId }) => {
             items: wasteItems,
             general_notes: wasteNotes
           });
-          toast({ 
-            description: "Sobras atualizadas com sucesso!",
+          toast({
+            description: "Quebra atualizada com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         }
@@ -423,22 +423,22 @@ const MobileOrdersPage = ({ customerId }) => {
             general_notes: wasteNotes
           });
           setExistingWaste(newWaste);
-          toast({ 
-            description: "Sobras registradas com sucesso!",
+          toast({
+            description: "Quebra registrada com sucesso!",
             className: "border-green-200 bg-green-50 text-green-800"
           });
         } else {
-          toast({ 
+          toast({
             description: "Nenhuma sobra para registrar.",
             className: "border-gray-200 bg-gray-50 text-gray-800"
           });
         }
       }
     } catch (error) {
-      toast({ 
-        variant: "destructive", 
-        title: "Erro ao Salvar Sobras", 
-        description: error.message 
+      toast({
+        variant: "destructive",
+        title: "Erro ao Salvar Quebra",
+        description: error.message
       });
     }
   }, [customer, wasteItems, wasteNotes, existingWaste, weekNumber, year, selectedDay, weekStart, toast]);
@@ -452,7 +452,7 @@ const MobileOrdersPage = ({ customerId }) => {
 
       try {
         setLoading(true);
-        
+
         // Carregar cliente
         const customerData = await Customer.getById(customerId);
         setCustomer(customerData);
@@ -463,27 +463,27 @@ const MobileOrdersPage = ({ customerId }) => {
 
         // Carregar cardápios da semana
         const allMenus = await WeeklyMenu.list();
-        
+
         // Tentar buscar por week_number primeiro, depois por week_key
         let menusData = await WeeklyMenu.query([
           { field: 'week_number', operator: '==', value: weekNumber },
           { field: 'year', operator: '==', value: year }
         ]);
-        
+
         if (menusData.length === 0) {
           const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
           menusData = await WeeklyMenu.query([
             { field: 'week_key', operator: '==', value: weekKey }
           ]);
         }
-        
+
         setWeeklyMenus(menusData);
 
       } catch (error) {
-        toast({ 
-          variant: "destructive", 
-          title: "Erro no Carregamento", 
-          description: "Falha ao carregar dados iniciais" 
+        toast({
+          variant: "destructive",
+          title: "Erro no Carregamento",
+          description: "Falha ao carregar dados iniciais"
         });
       } finally {
         setLoading(false);
@@ -503,7 +503,7 @@ const MobileOrdersPage = ({ customerId }) => {
 
     const menu = weeklyMenus[0];
     const menuData = menu?.menu_data?.[selectedDay];
-    
+
     if (!menuData) {
       return [];
     }
@@ -514,8 +514,8 @@ const MobileOrdersPage = ({ customerId }) => {
         categoryData.items.forEach((item) => {
           // Verificar se deve incluir este item baseado em locations
           const itemLocations = item.locations;
-          const shouldInclude = !itemLocations || itemLocations.length === 0 || 
-                               itemLocations.includes(customer.id);
+          const shouldInclude = !itemLocations || itemLocations.length === 0 ||
+            itemLocations.includes(customer.id);
 
           if (shouldInclude) {
             const recipe = recipes.find(r => r.id === item.recipe_id && r.active !== false);
@@ -528,14 +528,14 @@ const MobileOrdersPage = ({ customerId }) => {
                   containerType = lastPrep.assembly_config.container_type.toLowerCase();
                 }
               }
-              
+
               // Se não encontrou, verificar se tem direto na receita
               if (!containerType || containerType === "cuba") {
                 if (recipe.container_type) {
                   containerType = recipe.container_type.toLowerCase();
                 }
               }
-              
+
               // Definir preço baseado no container_type
               let unitPrice = 0;
               if (containerType === "cuba" || containerType === "cuba-g" || containerType === "cuba-p") {
@@ -556,7 +556,7 @@ const MobileOrdersPage = ({ customerId }) => {
                   unitPrice = recipe.cuba_cost || 0;
                 }
               }
-              
+
               const newItem = {
                 recipe_id: item.recipe_id,
                 recipe_name: recipe.name,
@@ -569,14 +569,14 @@ const MobileOrdersPage = ({ customerId }) => {
                 cuba_weight: utilParseQuantity(recipe.cuba_weight) || 0,
                 adjustment_percentage: 0
               };
-              
+
               items.push(newItem);
             }
           }
         });
       }
     });
-    
+
     return items;
   }, [weeklyMenus, recipes, customer, selectedDay]);
 
@@ -584,10 +584,10 @@ const MobileOrdersPage = ({ customerId }) => {
   const updateOrderItem = useCallback((index, field, value) => {
     setCurrentOrder(prev => {
       if (!prev?.items) return prev;
-      
+
       const newItems = [...prev.items];
       const item = { ...newItems[index] };
-      
+
       if (field === 'quantity') {
         const quantity = utilParseQuantity(value);
         item.quantity = quantity;
@@ -602,7 +602,7 @@ const MobileOrdersPage = ({ customerId }) => {
         item.total_price = item.quantity * (item.unit_price || 0);
       } else if (field === 'unit_type') {
         item.unit_type = value;
-        
+
         // Lógica simples: buscar preço baseado na unidade selecionada
         const recipe = recipes.find(r => r.id === item.recipe_id);
         if (recipe) {
@@ -625,7 +625,7 @@ const MobileOrdersPage = ({ customerId }) => {
       } else {
         item[field] = value;
       }
-      
+
       newItems[index] = item;
       return { ...prev, items: newItems };
     });
@@ -649,7 +649,7 @@ const MobileOrdersPage = ({ customerId }) => {
   useEffect(() => {
     if (currentOrder && currentOrder.day_of_week !== selectedDay) {
       setCurrentOrder(null);
-      
+
       // Verificar se existe pedido salvo para este dia
       const existingOrder = existingOrders[selectedDay];
       if (existingOrder) {
@@ -686,10 +686,10 @@ const MobileOrdersPage = ({ customerId }) => {
   // Calcular totais
   const orderTotals = useMemo(() => {
     if (!currentOrder?.items) return { totalItems: 0, totalAmount: 0 };
-    
+
     const totalItems = currentOrder.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
     const totalAmount = currentOrder.items.reduce((sum, item) => sum + (item.total_price || 0), 0);
-    
+
     return { totalItems, totalAmount };
   }, [currentOrder]);
 
@@ -716,12 +716,12 @@ const MobileOrdersPage = ({ customerId }) => {
         }));
         toast({ description: "Pedido enviado com sucesso!" });
       }
-      
+
       // Reset form
       setCurrentOrder(null);
       setMealsExpected(0);
       setGeneralNotes("");
-      
+
     } catch (error) {
       toast({ variant: "destructive", description: "Erro ao enviar pedido. Tente novamente." });
     }
@@ -828,7 +828,7 @@ const MobileOrdersPage = ({ customerId }) => {
               </TabsTrigger>
               <TabsTrigger value="waste" className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
-                Sobras
+                Quebra
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -898,7 +898,7 @@ const MobileOrdersPage = ({ customerId }) => {
                 <span className="font-medium">Itens:</span> {orderTotals.totalItems}
               </div>
             </div>
-            <Button 
+            <Button
               onClick={submitOrder}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               disabled={orderTotals.totalItems === 0}
