@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Busca de Item VR Soft</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #f8f9fa;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .success {
+            color: #27ae60;
+        }
+
+        .error {
+            color: #c0392b;
+        }
+
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .highlight {
+            background-color: #f1c40f;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>🥥 Busca de Item VR Soft</h1>
+        <p>Utilize esta ferramenta para encontrar o item <strong>1855 - AGUA COCO 100% NATURAL</strong> no banco de
+            dados.</p>
+
+        <div
+            style="background: #eaf2f8; padding: 15px; border-radius: 6px; border-left: 5px solid #3498db; margin-bottom: 20px;">
+            <strong>Instruções:</strong>
+            <ol style="margin: 10px 0 0 20px; padding: 0;">
+                <li>Certifique-se de que a janela preta da API (`run_api.bat`) está aberta.</li>
+                <li>Clique no botão abaixo para iniciar a busca automática.</li>
+            </ol>
+        </div>
+
+        <button id="btnSearch" onclick="buscarItem()">🔍 Iniciar Busca Automática</button>
+        <div id="status" class="status">Pronto para buscar.</div>
+    </div>
+
+    <div class="card" id="loggingCard" style="display:none;">
+        <h3>📜 Log de Execução</h3>
+        <div id="logs"></div>
+    </div>
+
+    <div class="card" id="resultCard" style="display:none;">
+        <h2 style="color: #27ae60;">🎉 Item Encontrado!</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        const AUTH = btoa('admin:VrSoft@2026');
+        const HEADERS = {
+            'Authorization': `Basic ${AUTH}`,
+            'Content-Type': 'application/json'
+        };
+
+        function log(msg, type = 'info') {
+            const logs = document.getElementById('logs');
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'query') icon = '🔍';
+
+            div.innerHTML = `${icon} ${msg}`;
+            if (type === 'error') div.style.color = '#c0392b';
+
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+            document.getElementById('loggingCard').style.display = 'block';
+        }
+
+        async function buscarItem() {
+            const btn = document.getElementById('btnSearch');
+            const status = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const resultCard = document.getElementById('resultCard');
+
+            btn.disabled = true;
+            status.textContent = "⏳ Executando diagnósticos...";
+            document.getElementById('logs').innerHTML = '';
+            resultCard.style.display = 'none';
+            resultsDiv.innerHTML = '';
+
+            try {
+                // 1. Check Health
+                log("Verificando conexão com a API local...", "info");
+                try {
+                    const health = await fetch(`${API_URL}/health`, { headers: HEADERS });
+                    const healthData = await health.json();
+
+                    if (healthData.status === 'healthy') {
+                        log("Conexão com Banco de Dados: OK", "success");
+                    } else {
+                        log(`Conexão com Banco falhou: ${healthData.detail}`, "error");
+                        throw new Error("API online, mas sem acesso ao banco.");
+                    }
+                } catch (e) {
+                    log("Falha ao conectar na API. Ela está rodando?", "error");
+                    throw e;
+                }
+
+                // 2. Discover Tables
+                log("Mapeando tabelas do banco...", "info");
+                const tablesRes = await fetch(`${API_URL}/database/tables`, { headers: HEADERS });
+                const tables = await tablesRes.json();
+
+                log(`${tables.length} tabelas encontradas.`, "info");
+
+                // Filtra tabelas prováveis
+                const keywords = ['prod', 'item', 'merc', 'vend'];
+                const candidates = tables.filter(t => keywords.some(k => t.toLowerCase().includes(k)));
+
+                log(`Tabelas candidatas: ${candidates.join(', ')}`, "warning");
+
+                if (candidates.length === 0) {
+                    candidates.push('produtos'); // Fallback
+                }
+
+                // 3. Search Loop
+                let itemFound = null;
+
+                for (const table of candidates) {
+                    log(`Vasculhando tabela: <strong>${table}</strong>`, "query");
+
+                    // Estrategia 1: Codigo exato
+                    const q1 = `SELECT * FROM ${table} WHERE codigo = 1855 LIMIT 1`; // Assumindo coluna codigo
+                    // Estrategia 2: ID exato
+                    const q2 = `SELECT * FROM ${table} WHERE id = 1855 LIMIT 1`;
+                    // Estrategia 3: Descricao like
+                    const q3 = `SELECT * FROM ${table} WHERE descricao ILIKE '%AGUA COCO%' LIMIT 1`;
+                    // Estrategia 4: Nome like
+                    const q4 = `SELECT * FROM ${table} WHERE nome ILIKE '%AGUA COCO%' LIMIT 1`;
+
+                    // Vamos tentar queries genericas, se der erro de coluna, o catch pega
+                    const queries = [q1, q2, q3, q4];
+
+                    for (const q of queries) {
+                        try {
+                            const res = await fetch(`${API_URL}/query/execute`, {
+                                method: 'POST',
+                                headers: HEADERS,
+                                body: JSON.stringify({ query: q })
+                            });
+
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (Array.isArray(data) && data.length > 0) {
+                                    itemFound = { table, data: data[0] };
+                                    break;
+                                }
+                            }
+                        } catch (ignore) { }
+                    }
+
+                    if (itemFound) break;
+                }
+
+                if (itemFound) {
+                    log("ITEM ENCONTRADO!", "success");
+                    status.textContent = "✅ Sucesso! Item encontrado.";
+                    status.className = "status success";
+
+                    resultCard.style.display = 'block';
+
+                    // Formatar resultado
+                    let html = `<p>Tabela: <span class="highlight">${itemFound.table}</span></p>`;
+                    html += `<table border="1" style="border-collapse: collapse; width: 100%;">`;
+                    for (const [key, value] of Object.entries(itemFound.data)) {
+                        if (value !== null && value !== '') {
+                            html += `<tr><td style="padding: 5px; background: #eee;"><b>${key}</b></td><td style="padding: 5px;">${value}</td></tr>`;
+                        }
+                    }
+                    html += `</table>`;
+                    resultsDiv.innerHTML = html;
+
+                } else {
+                    log("Item não encontrado nas tabelas analisadas.", "error");
+                    status.textContent = "❌ Não encontrado.";
+                    status.className = "status error";
+                }
+
+            } catch (error) {
+                status.textContent = "Erro: " + error.message;
+                status.className = "status error";
+                log(error.message, "error");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

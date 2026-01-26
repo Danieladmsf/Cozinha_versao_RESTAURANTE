@@ -21,7 +21,8 @@ import {
     Lightbulb,
     Palmtree,
     Banknote,
-    MessageSquare
+    MessageSquare,
+    Clock
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Employee } from "@/app/api/entities";
@@ -80,8 +81,16 @@ const TeamBoardTab = () => {
         notes: '',
         show_salary: true,
         show_vacation: true,
-        show_notes: true
+        show_notes: true,
+        // Escala
+        work_start: '',
+        lunch_start: '',
+        lunch_end: '',
+        work_end: '',
+        work_days: []
     });
+
+    const DAYS_OF_WEEK = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
     // Carregar funcionários
     const loadEmployees = useCallback(async () => {
@@ -225,7 +234,12 @@ const TeamBoardTab = () => {
             notes: '',
             show_salary: true,
             show_vacation: true,
-            show_notes: true
+            show_notes: true,
+            work_start: '',
+            lunch_start: '',
+            lunch_end: '',
+            work_end: '',
+            work_days: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
         });
         setShowModal(true);
     };
@@ -244,7 +258,13 @@ const TeamBoardTab = () => {
             notes: employee.notes || '',
             show_salary: employee.show_salary !== false,
             show_vacation: employee.show_vacation !== false,
-            show_notes: employee.show_notes !== false
+            show_notes: employee.show_notes !== false,
+            // Escala
+            work_start: employee.work_start || '',
+            lunch_start: employee.lunch_start || '',
+            lunch_end: employee.lunch_end || '',
+            work_end: employee.work_end || '',
+            work_days: employee.work_days || []
         });
         setShowModal(true);
     };
@@ -273,7 +293,13 @@ const TeamBoardTab = () => {
                 notes: formData.notes || '',
                 show_salary: formData.show_salary,
                 show_vacation: formData.show_vacation,
-                show_notes: formData.show_notes
+                show_notes: formData.show_notes,
+                // Escala
+                work_start: formData.work_start,
+                lunch_start: formData.lunch_start,
+                lunch_end: formData.lunch_end,
+                work_end: formData.work_end,
+                work_days: formData.work_days
             };
 
             if (editingEmployee) {
@@ -325,6 +351,33 @@ const TeamBoardTab = () => {
             });
         } finally {
             setDeleting(null);
+        }
+    };
+
+    // Confirmar movimentação (efetivar no setor)
+    const handleConfirmMove = async (emp) => {
+        if (!confirm(`Deseja efetivar ${emp.name} neste setor e remover o lembrete de movimentação?`)) return;
+
+        try {
+            // Atualizar localmente
+            setEmployees(prev => prev.map(e =>
+                e.id === emp.id ? { ...e, original_sector: null } : e
+            ));
+
+            // Atualizar no banco
+            await Employee.update(emp.id, { original_sector: null });
+
+            toast({
+                title: "Movimentação efetivada",
+                description: "O lembrete foi removido com sucesso."
+            });
+        } catch (error) {
+            console.error('Erro ao efetivar movimentação:', error);
+            toast({
+                title: "Erro",
+                description: "Não foi possível efetivar a movimentação.",
+                variant: "destructive"
+            });
         }
     };
 
@@ -499,14 +552,20 @@ const TeamBoardTab = () => {
                                                     {/* Indicador de setor original se foi movimentado */}
                                                     {emp.original_sector && emp.original_sector !== emp.sector && (
                                                         <div
-                                                            className="text-xs mt-1 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1"
+                                                            className="text-xs mt-1 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 cursor-pointer hover:brightness-95 transition-all group/badge"
                                                             style={{
                                                                 backgroundColor: `${SECTORS.find(s => s.id === emp.original_sector)?.color}20`,
                                                                 color: SECTORS.find(s => s.id === emp.original_sector)?.color
                                                             }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleConfirmMove(emp);
+                                                            }}
+                                                            title="Clique para efetivar a movimentação e remover este lembrete"
                                                         >
                                                             <span>↩</span>
                                                             <span>Veio de: {SECTORS.find(s => s.id === emp.original_sector)?.name}</span>
+                                                            <X className="w-3 h-3 ml-1 opacity-0 group-hover/badge:opacity-100 transition-opacity" />
                                                         </div>
                                                     )}
                                                 </div>
@@ -736,8 +795,8 @@ const TeamBoardTab = () => {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                        <div className="flex justify-between items-center p-4 border-b">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
                             <h3 className="font-semibold text-lg">
                                 {editingEmployee ? 'Editar Colaborador' : 'Novo Colaborador'}
                             </h3>
@@ -746,165 +805,236 @@ const TeamBoardTab = () => {
                             </button>
                         </div>
 
-                        <div className="p-4 space-y-4">
-                            {/* Nome */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    <Users className="w-4 h-4 inline mr-1" />
-                                    Nome *
-                                </label>
-                                <Input
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Nome completo"
-                                />
-                            </div>
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                {/* Coluna 1: Dados Cadastrais */}
+                                <div className="space-y-4">
+                                    <h4 className="font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                                        <Users className="w-4 h-4 text-purple-600" />
+                                        Dados Pessoais
+                                    </h4>
 
-                            {/* Cargo */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    <Briefcase className="w-4 h-4 inline mr-1" />
-                                    Cargo
-                                </label>
-                                <select
-                                    value={formData.role}
-                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                    className="w-full h-10 px-3 border rounded-md text-sm"
-                                >
-                                    <option value="">Selecione...</option>
-                                    {ROLES.map(role => (
-                                        <option key={role} value={role}>{role}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Setor */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    <Building2 className="w-4 h-4 inline mr-1" />
-                                    Setor *
-                                </label>
-                                <select
-                                    value={formData.sector}
-                                    onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
-                                    className="w-full h-10 px-3 border rounded-md text-sm"
-                                >
-                                    <option value="">Selecione...</option>
-                                    {SECTORS.map(sector => (
-                                        <option key={sector.id} value={sector.id}>{sector.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Salário */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        <DollarSign className="w-4 h-4 inline mr-1" />
-                                        Salário (R$)
-                                    </label>
-                                    <label className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.show_salary}
-                                            onChange={(e) => setFormData({ ...formData, show_salary: e.target.checked })}
-                                            className="w-3.5 h-3.5 rounded border-gray-300"
-                                        />
-                                        Exibir
-                                    </label>
-                                </div>
-                                <Input
-                                    type="number"
-                                    value={formData.salary}
-                                    onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                                    placeholder="0.00"
-                                />
-                            </div>
-
-                            {/* Data de Admissão */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    <Calendar className="w-4 h-4 inline mr-1" />
-                                    Data de Admissão
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={formData.admission_date}
-                                    onChange={(e) => setFormData({ ...formData, admission_date: e.target.value })}
-                                />
-                            </div>
-
-                            {/* Férias */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        <Palmtree className="w-4 h-4 inline mr-1" />
-                                        Férias
-                                    </label>
-                                    <label className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.show_vacation}
-                                            onChange={(e) => setFormData({ ...formData, show_vacation: e.target.checked })}
-                                            className="w-3.5 h-3.5 rounded border-gray-300"
-                                        />
-                                        Exibir
-                                    </label>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
+                                    {/* Nome */}
                                     <div>
-                                        <label className="text-xs text-gray-500 mb-0.5 block">Início</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
                                         <Input
-                                            type="date"
-                                            value={formData.vacation_start}
-                                            onChange={(e) => setFormData({ ...formData, vacation_start: e.target.value })}
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            placeholder="Nome completo"
                                         />
                                     </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* Cargo */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
+                                            <select
+                                                value={formData.role}
+                                                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                                className="w-full h-10 px-3 border rounded-md text-sm"
+                                            >
+                                                <option value="">Selecione...</option>
+                                                {ROLES.map(role => (
+                                                    <option key={role} value={role}>{role}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Setor */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Setor *</label>
+                                            <select
+                                                value={formData.sector}
+                                                onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
+                                                className="w-full h-10 px-3 border rounded-md text-sm"
+                                            >
+                                                <option value="">Selecione...</option>
+                                                {SECTORS.map(sector => (
+                                                    <option key={sector.id} value={sector.id}>{sector.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Salário */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Salário (R$)</label>
+                                            <Input
+                                                type="number"
+                                                value={formData.salary}
+                                                onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                                                placeholder="0.00"
+                                            />
+                                            <label className="flex items-center gap-2 mt-1 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.show_salary}
+                                                    onChange={(e) => setFormData({ ...formData, show_salary: e.target.checked })}
+                                                    className="rounded text-purple-600"
+                                                />
+                                                <span className="text-xs text-gray-500">Exibir no cartão</span>
+                                            </label>
+                                        </div>
+
+                                        {/* Admissão */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Data de Admissão</label>
+                                            <Input
+                                                type="date"
+                                                value={formData.admission_date}
+                                                onChange={(e) => setFormData({ ...formData, admission_date: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Observações */}
                                     <div>
-                                        <label className="text-xs text-gray-500 mb-0.5 block">Término</label>
-                                        <Input
-                                            type="date"
-                                            value={formData.vacation_end}
-                                            onChange={(e) => setFormData({ ...formData, vacation_end: e.target.value })}
+                                        <div className="flex justify-between items-center mb-1">
+                                            <label className="block text-sm font-medium text-gray-700">Observações</label>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.show_notes}
+                                                    onChange={(e) => setFormData({ ...formData, show_notes: e.target.checked })}
+                                                    className="rounded text-purple-600"
+                                                />
+                                                <span className="text-xs text-gray-500">Exibir</span>
+                                            </label>
+                                        </div>
+                                        <Textarea
+                                            value={formData.notes}
+                                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                            placeholder="Anotações sobre o funcionário..."
+                                            rows={3}
                                         />
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Observações */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        <MessageSquare className="w-4 h-4 inline mr-1" />
-                                        Observações
-                                    </label>
-                                    <label className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.show_notes}
-                                            onChange={(e) => setFormData({ ...formData, show_notes: e.target.checked })}
-                                            className="w-3.5 h-3.5 rounded border-gray-300"
-                                        />
-                                        Exibir
-                                    </label>
+                                {/* Coluna 2: Férias e Escala */}
+                                <div className="space-y-6">
+                                    {/* Escala */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                                            <Clock className="w-4 h-4 text-purple-600" />
+                                            Escala de Trabalho
+                                        </h4>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">Hora de Início</label>
+                                                <Input
+                                                    type="time"
+                                                    value={formData.work_start}
+                                                    onChange={(e) => setFormData({ ...formData, work_start: e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">Saída</label>
+                                                <Input
+                                                    type="time"
+                                                    value={formData.work_end}
+                                                    onChange={(e) => setFormData({ ...formData, work_end: e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">Saída Almoço</label>
+                                                <Input
+                                                    type="time"
+                                                    value={formData.lunch_start}
+                                                    onChange={(e) => setFormData({ ...formData, lunch_start: e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">Volta Almoço</label>
+                                                <Input
+                                                    type="time"
+                                                    value={formData.lunch_end}
+                                                    onChange={(e) => setFormData({ ...formData, lunch_end: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-2">Dias Trabalhados</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {DAYS_OF_WEEK.map(day => (
+                                                    <label key={day} className={`
+                                                        cursor-pointer px-3 py-1.5 rounded text-xs border transition-colors
+                                                        ${formData.work_days.includes(day)
+                                                            ? 'bg-purple-100 border-purple-300 text-purple-700 font-medium'
+                                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}
+                                                    `}>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="hidden"
+                                                            checked={formData.work_days.includes(day)}
+                                                            onChange={(e) => {
+                                                                const checked = e.target.checked;
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    work_days: checked
+                                                                        ? [...prev.work_days, day]
+                                                                        : prev.work_days.filter(d => d !== day)
+                                                                }));
+                                                            }}
+                                                        />
+                                                        {day.substring(0, 3)}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Férias */}
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center border-b pb-2">
+                                            <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                                                <Palmtree className="w-4 h-4 text-purple-600" />
+                                                Férias
+                                            </h4>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.show_vacation}
+                                                    onChange={(e) => setFormData({ ...formData, show_vacation: e.target.checked })}
+                                                    className="rounded text-purple-600"
+                                                />
+                                                <span className="text-xs text-gray-500">Exibir</span>
+                                            </label>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">Início</label>
+                                                <Input
+                                                    type="date"
+                                                    value={formData.vacation_start}
+                                                    onChange={(e) => setFormData({ ...formData, vacation_start: e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-gray-600 mb-1">Término</label>
+                                                <Input
+                                                    type="date"
+                                                    value={formData.vacation_end}
+                                                    onChange={(e) => setFormData({ ...formData, vacation_end: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <Textarea
-                                    value={formData.notes}
-                                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                    placeholder="Anotações sobre o funcionário..."
-                                    rows={2}
-                                />
                             </div>
                         </div>
 
-                        <div className="flex gap-2 p-4 border-t">
-                            <Button variant="outline" className="flex-1" onClick={() => setShowModal(false)}>
+                        <div className="p-4 border-t bg-gray-50 flex justify-end gap-3 sticky bottom-0">
+                            <Button variant="outline" onClick={() => setShowModal(false)}>
                                 Cancelar
                             </Button>
-                            <Button className="flex-1" onClick={handleSave} disabled={saving}>
+                            <Button onClick={handleSave} disabled={saving} className="bg-purple-600 hover:bg-purple-700">
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         Salvando...
                                     </>
                                 ) : (

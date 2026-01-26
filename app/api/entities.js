@@ -370,6 +370,7 @@ export const NutritionFood = createEntity('NutritionFood');
 export const Order = createEntity('Order');
 export const OrderReceiving = createEntity('OrderReceiving');
 export const OrderWaste = createEntity('OrderWaste');
+export const OrderRupture = createEntity('OrderRupture');
 export const PriceHistory = createEntity('PriceHistory');
 export const Recipe = createEntity('Recipe');
 export const RecipeIngredient = createEntity('RecipeIngredient');

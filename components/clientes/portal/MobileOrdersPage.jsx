@@ -18,7 +18,8 @@ import {
   WeeklyMenu,
   Order,
   OrderReceiving,
-  OrderWaste
+  OrderWaste,
+  OrderRupture
 } from "@/app/api/entities";
 
 // Sistema de Sugestões
@@ -77,6 +78,7 @@ import {
 // Tab Components
 const OrdersTab = dynamic(() => import("./tabs/OrdersTab"), { ssr: false });
 const ReceivingTab = dynamic(() => import("./tabs/ReceivingTab"), { ssr: false });
+const RuptureTab = dynamic(() => import("./tabs/RuptureTab"), { ssr: false });
 const WasteTab = dynamic(() => import("./tabs/WasteTab"), { ssr: false });
 const HistoryTab = dynamic(() => import("./tabs/HistoryTab"), { ssr: false });
 
@@ -171,10 +173,12 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [showSuccessEffect, setShowSuccessEffect] = useState(false);
   const [showReceivingSuccessEffect, setShowReceivingSuccessEffect] = useState(false);
+  const [showRuptureSuccessEffect, setShowRuptureSuccessEffect] = useState(false);
   const [showWasteSuccessEffect, setShowWasteSuccessEffect] = useState(false);
 
   // Estados de edição para outras abas
   const [isReceivingEditMode, setIsReceivingEditMode] = useState(true);
+  const [isRuptureEditMode, setIsRuptureEditMode] = useState(true);
   const [isWasteEditMode, setIsWasteEditMode] = useState(true);
 
   // Estados para Sobras
@@ -190,6 +194,12 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   const [receivingNotes, setReceivingNotes] = useState("");
   const [existingReceiving, setExistingReceiving] = useState(null);
   const [receivingLoading, setReceivingLoading] = useState(false);
+
+  // Estados para Ruptura
+  const [ruptureItems, setRuptureItems] = useState([]);
+  const [ruptureNotes, setRuptureNotes] = useState("");
+  const [existingRupture, setExistingRupture] = useState(null);
+  const [ruptureLoading, setRuptureLoading] = useState(false);
 
   // Calculados
   // Calculados
@@ -573,6 +583,135 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       setReceivingLoading(false);
     }
   }, [customer, weeklyMenus, recipes, weekNumber, year, selectedDay, toast]);
+
+  // Funções para Ruptura
+  const loadRuptureData = useCallback(async () => {
+    if (!customer || !weeklyMenus.length || !recipes.length) return;
+
+    setRuptureLoading(true);
+    try {
+      // Buscar registro de ruptura existente
+      const existingRuptures = await OrderRupture.query([
+        { field: 'customer_id', operator: '==', value: customer.id },
+        { field: 'week_number', operator: '==', value: weekNumber },
+        { field: 'year', operator: '==', value: year },
+        { field: 'day_of_week', operator: '==', value: selectedDay }
+      ]);
+
+      const ruptureRecord = existingRuptures.length > 0 ? existingRuptures[0] : null;
+      setExistingRupture(ruptureRecord);
+      setRuptureNotes(ruptureRecord?.general_notes || "");
+
+      // Definir modo de edição
+      const newEditMode = !ruptureRecord;
+      setIsRuptureEditMode(newEditMode);
+
+      // Criar itens baseados no cardápio
+      const menu = weeklyMenus[0];
+      const menuData = menu?.menu_data?.[selectedDay];
+
+      // Usar ref para evitar dependência direta no state
+      const currentExistingOrders = existingOrdersRef.current;
+
+      if (!menuData) {
+        setRuptureItems([]);
+        return;
+      }
+
+      const items = [];
+      let uniqueCounter = 0;
+      Object.entries(menuData).forEach(([categoryId, categoryData]) => {
+        const itemsArray = Array.isArray(categoryData) ? categoryData : categoryData.items;
+
+        if (itemsArray && Array.isArray(itemsArray)) {
+          itemsArray.forEach(item => {
+            const recipe = recipes.find(r => r.id === item.recipe_id && r.active !== false);
+            if (recipe) {
+              const ruptureItem = {
+                unique_id: `${item.recipe_id}_${uniqueCounter++}`,
+                recipe_id: recipe.id,
+                recipe_name: recipe.name,
+                category: recipe.category || categoryId,
+                rupture_time: "",
+                expected_duration: "",
+                ordered_quantity: 0,
+                ordered_unit_type: "unid."
+              };
+
+              // Tentar pegar quantidade pedida do pedido existente
+              const existingOrder = currentExistingOrders[selectedDay];
+              if (existingOrder?.items) {
+                let orderItem = existingOrder.items.find(oi => oi.unique_id === ruptureItem.unique_id);
+                if (!orderItem) orderItem = existingOrder.items.find(oi => oi.recipe_id === recipe.id);
+                if (orderItem) {
+                  ruptureItem.ordered_quantity = orderItem.quantity;
+                  ruptureItem.ordered_unit_type = orderItem.unit_type;
+                }
+              }
+
+              if (ruptureRecord?.items) {
+                let saved = ruptureRecord.items.find(s => s.unique_id === ruptureItem.unique_id);
+                if (!saved) saved = ruptureRecord.items.find(s => s.recipe_id === recipe.id);
+                if (saved) {
+                  ruptureItem.rupture_time = saved.rupture_time || "";
+                  ruptureItem.expected_duration = saved.expected_duration || "";
+                }
+              }
+
+              items.push(ruptureItem);
+            }
+          });
+        }
+      });
+
+      setRuptureItems(items);
+    } catch (error) {
+      toast({ variant: "destructive", description: "Erro ao carregar dados de ruptura." });
+    } finally {
+      setRuptureLoading(false);
+    }
+  }, [customer, weeklyMenus, recipes, weekNumber, year, selectedDay, toast]);
+
+  const updateRuptureItem = useCallback((index, field, value) => {
+    setRuptureItems(prevItems => {
+      const updatedItems = [...prevItems];
+      const item = { ...updatedItems[index] };
+      item[field] = value;
+      updatedItems[index] = item;
+      return updatedItems;
+    });
+  }, []);
+
+  const saveRuptureData = useCallback(async () => {
+    if (!customer || ruptureItems.length === 0) return;
+    try {
+      const isEmpty = ruptureItems.every(item => (!item.rupture_time) && (!item.expected_duration)) && (!ruptureNotes);
+      setShowRuptureSuccessEffect(true);
+      setTimeout(() => {
+        setShowRuptureSuccessEffect(false);
+        setIsRuptureEditMode(false);
+      }, 2000);
+
+      if (existingRupture) {
+        if (isEmpty) {
+          await OrderRupture.delete(existingRupture.id);
+          setExistingRupture(null);
+        } else {
+          await OrderRupture.update(existingRupture.id, { items: ruptureItems, general_notes: ruptureNotes });
+        }
+      } else {
+        if (!isEmpty) {
+          const newRupture = await OrderRupture.create({
+            customer_id: customer.id, customer_name: customer.name, week_number: weekNumber, year: year, day_of_week: selectedDay,
+            date: format(addDays(weekStart, selectedDay - 1), "yyyy-MM-dd"), items: ruptureItems, general_notes: ruptureNotes
+          });
+          setExistingRupture(newRupture);
+        }
+      }
+    } catch (error) {
+      toast({ variant: "destructive", description: "Erro ao salvar ruptura" });
+    }
+  }, [customer, ruptureItems, ruptureNotes, existingRupture, weekNumber, year, selectedDay, weekStart, toast]);
 
   const updateReceivingItem = useCallback((index, field, value) => {
     setReceivingItems(prevItems => {
@@ -1198,6 +1337,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     return items;
   }, [weeklyMenus, recipes, customer, selectedDay, weekNumber, year, appSettings, pricingReady]);
+
+  // Carregar dados de ruptura
+  useEffect(() => {
+    if (activeTab === "rupture" && customer && weeklyMenus.length && recipes.length) {
+      loadRuptureData();
+    }
+  }, [activeTab, customer, selectedDay, weeklyMenus, recipes, loadRuptureData]);
 
   const updateOrderItem = useCallback((uniqueId, field, value) => {
     setCurrentOrder(prev => {
@@ -2199,7 +2345,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-12">
+            <TabsList className="grid w-full grid-cols-5 h-12">
               <TabsTrigger value="orders" className="flex items-center gap-1 text-xs p-1">
                 <ShoppingCart className="w-4 h-4" />
                 <span>Pedido</span>
@@ -2208,6 +2354,11 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 <Package className="w-4 h-4" />
                 <span className="hidden xs:inline">Recebimento</span>
                 <span className="xs:hidden">Receb.</span>
+              </TabsTrigger>
+              <TabsTrigger value="rupture" className="flex items-center gap-1 text-xs p-1">
+                <AlertTriangle className="w-4 h-4 rotate-180" />
+                <span className="hidden xs:inline">Ponto de Ruptura</span>
+                <span className="xs:hidden">Ruptura</span>
               </TabsTrigger>
               <TabsTrigger value="waste" className="flex items-center gap-1 text-xs p-1">
                 <AlertTriangle className="w-4 h-4" />
@@ -2264,6 +2415,25 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             isEditMode={isReceivingEditMode}
             enableEditMode={enableReceivingEditMode}
             existingReceiving={existingReceiving}
+            groupItemsByCategory={portalGroupItemsByCategory}
+            getOrderedCategories={getOrderedCategories}
+            generateCategoryStyles={generateCategoryStyles}
+          />
+        )}
+
+        {activeTab === "rupture" && (
+          <RuptureTab
+            key={`rupture-${weekNumber}-${year}-${selectedDay}`}
+            ruptureLoading={ruptureLoading}
+            ruptureItems={ruptureItems}
+            ruptureNotes={ruptureNotes}
+            setRuptureNotes={setRuptureNotes}
+            updateRuptureItem={updateRuptureItem}
+            saveRuptureData={saveRuptureData}
+            showSuccessEffect={showRuptureSuccessEffect}
+            isEditMode={isRuptureEditMode}
+            enableEditMode={() => setIsRuptureEditMode(true)}
+            existingRupture={existingRupture}
             groupItemsByCategory={portalGroupItemsByCategory}
             getOrderedCategories={getOrderedCategories}
             generateCategoryStyles={generateCategoryStyles}
