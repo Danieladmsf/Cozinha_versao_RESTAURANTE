@@ -635,7 +635,12 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                 rupture_time: "",
                 expected_duration: "",
                 ordered_quantity: 0,
-                ordered_unit_type: "unid."
+                ordered_unit_type: "unid.",
+                // Código VR para integração com API de vendas
+                // Tenta product_code ou external_code (removendo zeros à esquerda)
+                vr_product_code: recipe.product_code
+                  ? parseInt(recipe.product_code)
+                  : (recipe.external_code ? parseInt(recipe.external_code) : null)
               };
 
               // Tentar pegar quantidade pedida do pedido existente
@@ -2437,6 +2442,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             groupItemsByCategory={portalGroupItemsByCategory}
             getOrderedCategories={getOrderedCategories}
             generateCategoryStyles={generateCategoryStyles}
+            selectedDay={selectedDay}
+            weekStart={weekStart}
           />
         )}
 
@@ -2510,7 +2517,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
                   ? 'bg-green-600 hover:bg-green-700 scale-105 shadow-lg'
                   : 'bg-blue-600 hover:bg-blue-700'
                   }`}
-                disabled={orderTotals.totalAmount === 0 || showSuccessEffect}
+                disabled={showSuccessEffect}
               >
                 {showSuccessEffect ? (
                   <>
@@ -2531,7 +2538,6 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
               <Button
                 onClick={enableEditMode}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                disabled={orderTotals.totalAmount === 0}
               >
                 <Send className="w-4 h-4 mr-2" />
                 Editar Pedido
