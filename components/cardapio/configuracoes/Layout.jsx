@@ -1,9 +1,11 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Grid, GripVertical } from "lucide-react";
+import { Grid, GripVertical, Plus, Trash2, Pencil, Check, FolderPlus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const LayoutTab = ({
   categories,
@@ -14,233 +16,342 @@ const LayoutTab = ({
   categoryColors,
   fixedDropdowns,
   categoryOrder,
+  categoryGroups,
   getFilteredCategories,
   toggleCategoryActive,
   toggleExpandedCategory,
   updateFixedDropdowns,
-  setCategoryOrder
+  setCategoryOrder,
+  setCategoryGroups
 }) => {
-  console.log('LayoutTab: Props received - categories:', categories);
-  console.log('LayoutTab: Props received - categoryTree:', categoryTree);
-  console.log('LayoutTab: Props received - selectedMainCategories:', selectedMainCategories);
-  console.log('LayoutTab: Props received - categoryOrder:', categoryOrder);
+  const [editingGroupId, setEditingGroupId] = React.useState(null);
+  const [editingName, setEditingName] = React.useState("");
+
+  const allFilteredCategories = getFilteredCategories();
+
+  // Filtra categorias que já foram usadas como abas (group.name === cat.name ou group contém cat.id)
+  // Para evitar duplicação na lista da direita
+  const usedCategoryIds = (categoryGroups || []).flatMap(group => {
+    // Se o grupo foi criado a partir de uma categoria, o ID original pode estar no nome ou items
+    // Uma forma simples: verificar se existe uma categoria com o mesmo nome que o grupo
+    const matchingCat = allFilteredCategories.find(c => c.name === group.name);
+    return matchingCat ? [matchingCat.id] : [];
+  });
+
+  const filteredCategories = allFilteredCategories.filter(cat => !usedCategoryIds.includes(cat.id));
+
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
-    const items = Array.from(categoryOrder);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const { source, destination, type, draggableId } = result;
 
-    setCategoryOrder(items);
-  };
-
-  const getCategoryOrderPosition = (categoryId) => {
-    const currentOrder = categoryOrder.filter(id => 
-      getFilteredCategories().some(cat => cat.id === id)
-    );
-    const position = currentOrder.indexOf(categoryId);
-    return position !== -1 ? position + 1 : 1;
-  };
-
-  const updateCategoryOrder = (categoryId, newOrder) => {
-    const numValue = parseInt(newOrder) || 1;
-    const clampedValue = Math.max(1, Math.min(getFilteredCategories().length, numValue));
-    
-    const updatedOrder = [...categoryOrder];
-    const currentIndex = updatedOrder.indexOf(categoryId);
-    if (currentIndex !== -1) {
-      updatedOrder.splice(currentIndex, 1);
+    // 1. Reordering GROUPS
+    if (type === "group" && destination.droppableId === "all-groups") {
+      const newGroups = Array.from(categoryGroups || []);
+      const [removed] = newGroups.splice(source.index, 1);
+      newGroups.splice(destination.index, 0, removed);
+      setCategoryGroups(newGroups);
+      return;
     }
-    
-    updatedOrder.splice(clampedValue - 1, 0, categoryId);
-    setCategoryOrder(updatedOrder);
+
+    // 2. Creating a NEW TAB (Group) from a Category
+    if (type === "category" && destination.droppableId === "create-tab-zone") {
+      const categoryId = draggableId;
+      const category = filteredCategories.find(c => c.id === categoryId);
+
+      if (category) {
+        // Create new group based on category
+        // Find children to populate items
+        const children = categoryTree.filter(c => c.parent_id === category.id);
+        const childrenIds = children.map(c => c.id);
+
+        const newGroup = {
+          id: `group-${category.id}-${Date.now()}`,
+          name: category.name, // Default to category name
+          items: childrenIds
+        };
+
+        setCategoryGroups([...(categoryGroups || []), newGroup]);
+      }
+      return;
+    }
+
+    // 3. Reordering CATEGORIES 
+    // Case A: Moving within the same list (reordering items in a group)
+    if (source.droppableId === destination.droppableId) {
+      // If reordering inside the "Available Categories" list (source-categories) - usually disabled or just reorder array
+      // Only handle reordering INSIDE A GROUP
+      const groupIndex = categoryGroups.findIndex(g => g.id === source.droppableId);
+      if (groupIndex !== -1) {
+        const newGroups = [...categoryGroups];
+        const group = newGroups[groupIndex];
+        const newItems = Array.from(group.items);
+        const [removed] = newItems.splice(source.index, 1);
+        newItems.splice(destination.index, 0, removed);
+
+        newGroups[groupIndex] = { ...group, items: newItems };
+        setCategoryGroups(newGroups);
+      }
+      return;
+    }
+
+    // Case B: Moving specific category TO a group (from Available list OR another group)
+    // Find Source (Group or List)
+    const sourceGroupIndex = categoryGroups.findIndex(g => g.id === source.droppableId);
+    const destGroupIndex = categoryGroups.findIndex(g => g.id === destination.droppableId);
+
+    // If dropping into "create-tab-zone" handled above (but only if type=category). 
+    // If dragging FROM group to create-tab-zone, it's weird. Assuming dragging from available list.
+
+    if (destGroupIndex !== -1) {
+      // Destination is a Group
+      let itemId = draggableId;
+
+      // Remove from Source Group if applicable
+      if (sourceGroupIndex !== -1) {
+        const sourceGroup = categoryGroups[sourceGroupIndex];
+        const newSourceItems = sourceGroup.items.filter(id => id !== itemId);
+        // We need to update state immediately for source? No, we batch update.
+      }
+
+      // Add to Dest Group
+      const newGroups = [...categoryGroups];
+
+      // If source was a group, remove item from it
+      if (sourceGroupIndex !== -1) {
+        const sGroup = newGroups[sourceGroupIndex];
+        // Note: draggableId might be 'category-ID' or just 'ID'. Assuming 'ID'.
+        // Wait, Draggable draggableId usually needs to be string.
+        // In the list below, I use category.id.
+
+        const newSItems = Array.from(sGroup.items);
+        newSItems.splice(source.index, 1);
+        newGroups[sourceGroupIndex] = { ...sGroup, items: newSItems };
+      }
+
+      // Add to destination
+      const dGroup = newGroups[destGroupIndex];
+      const newDItems = Array.from(dGroup.items);
+
+      // If coming from Available List, itemId is just the category ID.
+      // We need to ensure we don't duplicate if already there?
+      if (!newDItems.includes(itemId)) {
+        newDItems.splice(destination.index, 0, itemId);
+      } else {
+        // Just reorder if already exists? But we handled same-list reorder above.
+        // If implicit duplicate, ignore?
+      }
+
+      newGroups[destGroupIndex] = { ...dGroup, items: newDItems };
+      setCategoryGroups(newGroups);
+    }
+  };
+
+  const removeGroup = (groupId) => {
+    const newGroups = categoryGroups.filter(g => g.id !== groupId);
+    setCategoryGroups(newGroups);
+  };
+
+  const startEditing = (group) => {
+    setEditingGroupId(group.id);
+    setEditingName(group.name);
+  };
+
+  const saveGroupName = () => {
+    if (editingGroupId && editingName.trim()) {
+      const newGroups = categoryGroups.map(g =>
+        g.id === editingGroupId ? { ...g, name: editingName.trim() } : g
+      );
+      setCategoryGroups(newGroups);
+      setEditingGroupId(null);
+      setEditingName("");
+    }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Grid className="h-5 w-5" />
-          Configurações das Categorias
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-gray-500 mb-4">
-          Configure ordem, ativação e todas as propriedades das categorias em uma única tabela:
-        </p>
+    <div className="space-y-6">
+      <DragDropContext onDragEnd={handleDragEnd}>
 
-        {selectedMainCategories.length === 0 && (
-          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-sm text-yellow-800">
-              ⚠️ Nenhum tipo de categoria selecionado. Vá para a aba "Categorias" para selecionar os tipos que devem aparecer no cardápio.
-            </p>
-          </div>
-        )}
+        {/* Container Principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {getFilteredCategories().length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="mb-2">Nenhuma categoria disponível</p>
-            <p className="text-sm">Selecione tipos de categoria na aba "Categorias" primeiro</p>
-          </div>
-        ) : (
-          <div className="border rounded-lg overflow-hidden overflow-x-auto">
-            <table className="w-full min-w-[700px]">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
-                    Ordem
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categoria
-                  </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                    Ativa
-                  </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                    Expandida
-                  </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                    Dropdowns Fixos
-                  </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
-                    <GripVertical className="h-4 w-4 mx-auto" title="Arraste para reordenar" />
-                  </th>
-                </tr>
-              </thead>
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="categories-table">
+          {/* Esquerda: Abas Existentes (Tabs) */}
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GripVertical className="h-5 w-5" />
+                  Abas Configuradas
+                </CardTitle>
+                <p className="text-sm text-gray-500 font-normal">
+                  Arraste categorias da lista ao lado para a área pontilhada abaixo para criar novas abas.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+
+                {/* Groups List */}
+                <Droppable droppableId="all-groups" type="group">
                   {(provided) => (
-                    <tbody
-                      className="bg-white divide-y divide-gray-200"
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                    >
-                      {categoryOrder.filter(categoryId => {
-                        console.log('LayoutTab: Filtering categoryId:', categoryId);
-                        const category = categoryTree.find(c => c.id === categoryId);
-                        console.log('LayoutTab: Category found for filter:', category);
-                        if (!category) return false;
-                        if (selectedMainCategories.length === 0) return true;
-                        const mainCategory = categories.find(cat => cat.value === category.type);
-                        if (!mainCategory) return false;
-                        return selectedMainCategories.includes(mainCategory.value);
-                      }).map((categoryId, index) => {
-                        const category = categoryTree.find(c => c.id === categoryId);
-                        if (!category) return null;
-                        
-                        return (
-                          <Draggable key={category.id} draggableId={category.id} index={index}>
-                            {(provided) => (
-                              <tr 
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}
-                              >
-                                <td className="px-3 py-3 text-center">
-                                  <Input
-                                    type="number"
-                                    min="1"
-                                    max={getFilteredCategories().length}
-                                    className="w-16 mx-auto text-center text-sm"
-                                    value={getCategoryOrderPosition(category.id)}
-                                    onChange={(e) => updateCategoryOrder(category.id, e.target.value)}
-                                  />
-                                </td>
-                                
-                                <td className="px-4 py-3">
-                                  <div className="flex items-center gap-3">
-                                    <div 
-                                      className="w-4 h-4 rounded-full border"
-                                      style={{ 
-                                        backgroundColor: categoryColors[category.id] || category.color || '#808080',
-                                        opacity: activeCategories[category.id] ? 1 : 0.5 
-                                      }}
-                                    />
-                                    <span className={`font-medium ${activeCategories[category.id] ? 'text-gray-900' : 'text-gray-400'}`}>
-                                      {category.name}
+                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
+                      {categoryGroups && categoryGroups.map((group, groupIndex) => (
+                        <Draggable key={group.id} draggableId={group.id} index={groupIndex}>
+                          {(provided) => (
+                            <div {...provided.innerRef} {...provided.draggableProps} className="border rounded-lg bg-white shadow-sm p-0 overflow-hidden">
+                              {/* Group Header */}
+                              <div className="flex items-center justify-between p-3 bg-gray-50 border-b">
+                                <div className="flex items-center gap-2 flex-1">
+                                  <div {...provided.dragHandleProps}>
+                                    <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+                                  </div>
+                                  {editingGroupId === group.id ? (
+                                    <div className="flex items-center gap-2 flex-1">
+                                      <Input
+                                        value={editingName}
+                                        onChange={(e) => setEditingName(e.target.value)}
+                                        className="h-8 text-sm"
+                                        autoFocus
+                                      />
+                                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={saveGroupName}>
+                                        <Check className="h-4 w-4 text-green-600" />
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <span className="font-medium text-sm flex items-center gap-2">
+                                      {group.name}
+                                      <Button size="icon" variant="ghost" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => startEditing(group)}>
+                                        <Pencil className="h-3 w-3 text-gray-400" />
+                                      </Button>
                                     </span>
-                                  </div>
-                                </td>
-                                
-                                <td className="px-3 py-3 text-center">
-                                  <Switch
-                                    checked={activeCategories[category.id]}
-                                    onCheckedChange={() => toggleCategoryActive(category.id)}
-                                    className={`${activeCategories[category.id] 
-                                      ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' 
-                                      : 'bg-red-100 border-red-300'
-                                    }`}
-                                  />
-                                </td>
-                                
-                                <td className="px-3 py-3 text-center">
-                                  <Switch
-                                    checked={expandedCategories.includes(category.id)}
-                                    onCheckedChange={() => toggleExpandedCategory(category.id)}
-                                    className={`${expandedCategories.includes(category.id) 
-                                      ? 'data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500' 
-                                      : 'bg-gray-200 border-gray-300'
-                                    }`}
-                                    disabled={!activeCategories[category.id]}
-                                  />
-                                </td>
-                                
-                                <td className="px-3 py-3 text-center">
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    max="10"
-                                    className="w-16 mx-auto text-center"
-                                    value={fixedDropdowns[category.id] || 0}
-                                    onChange={(e) => updateFixedDropdowns(category.id, e.target.value)}
-                                    disabled={!activeCategories[category.id]}
-                                  />
-                                </td>
-                                
-                                <td className="px-3 py-3 text-center">
-                                  <div 
-                                    {...provided.dragHandleProps}
-                                    className="cursor-grab hover:text-blue-600 inline-flex"
-                                    title="Arraste para reordenar"
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs">{group.items.length} itens</Badge>
+                                  <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => removeGroup(group.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* Items inside Group */}
+                              <Droppable droppableId={group.id} type="category">
+                                {(provided, snapshot) => (
+                                  <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className={`p-2 min-h-[50px] transition-colors ${snapshot.isDraggingOver ? 'bg-blue-50' : ''}`}
                                   >
-                                    <GripVertical className="h-4 w-4" />
+                                    {group.items.length === 0 && (
+                                      <p className="text-xs text-center text-gray-400 py-2">
+                                        Dê um nome para a aba (ex: "Confeitária") e os itens devem aparecer aqui.
+                                      </p>
+                                    )}
+                                    <div className="space-y-1">
+                                      {group.items.map((itemId, index) => {
+                                        const cat = categories.find(c => c.id === itemId) || categoryTree.find(c => c.id === itemId);
+                                        if (!cat) return null;
+                                        return (
+                                          <Draggable key={itemId} draggableId={itemId} index={index}>
+                                            {(provided) => (
+                                              <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                className="flex items-center gap-2 p-2 bg-white border rounded text-sm group"
+                                              >
+                                                <Grid className="h-3 w-3 text-gray-300" />
+                                                <span>{cat.name}</span>
+                                              </div>
+                                            )}
+                                          </Draggable>
+                                        );
+                                      })}
+                                      {provided.placeholder}
+                                    </div>
                                   </div>
-                                </td>
-                              </tr>
-                            )}
-                          </Draggable>
-                        );
-                      })}
+                                )}
+                              </Droppable>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
                       {provided.placeholder}
-                    </tbody>
+                    </div>
                   )}
                 </Droppable>
-              </DragDropContext>
-            </table>
-          </div>
-        )}
 
-        {/* Legenda */}
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-lg text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-400 rounded"></div>
-            <span><strong>Ordem:</strong> Posição no cardápio</span>
+                {/* Zone to Create New Tab */}
+                <Droppable droppableId="create-tab-zone" type="category">
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`
+                                    border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center gap-2 transition-colors
+                                    ${snapshot.isDraggingOver ? 'border-primary bg-primary/5' : 'border-gray-300 bg-gray-50/50'}
+                                `}
+                    >
+                      <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                        <FolderPlus className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <h3 className="font-medium text-gray-900">Arraste uma Categoria aqui</h3>
+                      <p className="text-sm text-gray-500 max-w-xs">
+                        Para criar uma nova aba (ex: "Confeitária"). Os itens da categoria serão adicionados automaticamente.
+                      </p>
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </CardContent>
+            </Card>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span><strong>Ativa:</strong> Aparece no cardápio</span>
+
+          {/* Direita: Categorias Disponíveis */}
+          <div className="space-y-4">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle className="text-base">Categorias Disponíveis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Droppable droppableId="source-categories" type="category" isDropDisabled={true}>
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
+                      {filteredCategories.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500 text-sm">
+                          Nenhuma categoria encontrada. Verifique os filtros na aba Categorias.
+                        </div>
+                      ) : (
+                        filteredCategories.map((cat, index) => (
+                          <Draggable key={cat.id} draggableId={cat.id} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`
+                                                        flex items-center justify-between p-3 rounded border 
+                                                        ${snapshot.isDragging ? 'bg-blue-50 border-blue-200 shadow-md' : 'bg-white border-gray-200 hover:border-blue-200'}
+                                                    `}
+                              >
+                                <span className="font-medium text-sm">{cat.name}</span>
+                                <Badge variant="secondary" className="text-[10px]">
+                                  Nível {cat.level}
+                                </Badge>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </CardContent>
+            </Card>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span><strong>Expandida:</strong> Locais visíveis</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gray-400 rounded"></div>
-            <span><strong>Dropdowns:</strong> Quantidade fixa</span>
-          </div>
+
         </div>
-      </CardContent>
-    </Card>
+      </DragDropContext>
+    </div>
   );
 };
 

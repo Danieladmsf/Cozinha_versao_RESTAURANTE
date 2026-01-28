@@ -17,6 +17,7 @@ import {
 } from "@/components/utils/orderUtils";
 import { useVRSalesApi } from "@/hooks/useVRSalesApi";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { OrderSuggestionManager } from "@/lib/order-suggestions";
 
 import { addDays, format, isFuture, isSameDay } from 'date-fns';
 

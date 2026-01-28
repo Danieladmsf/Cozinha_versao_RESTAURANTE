@@ -691,6 +691,25 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     if (!customer || ruptureItems.length === 0) return;
     try {
       const isEmpty = ruptureItems.every(item => (!item.rupture_time) && (!item.expected_duration)) && (!ruptureNotes);
+
+      // ✅ NOVO: Salvar ajustes de ruptura nas receitas
+      // Para cada item que teve ruptura confirmada (tem rupture_time), calcular e salvar multiplicador
+      for (const item of ruptureItems) {
+        if (item.rupture_time && item.recipe_id) {
+          // Calcular multiplicador: se previsto 2 dias mas durou 1, multiplica por 2
+          const expectedDays = item.expected_duration || 1;
+          // Estimar dias reais baseado na hora de ruptura vs hora esperada
+          // Se tem rupture_time, assume que rompeu. Por simplicidade, usar 1 dia menos que o esperado.
+          const estimatedActualDays = Math.max(0.5, expectedDays - 1); // Mínimo 0.5 dias
+          const multiplier = OrderSuggestionManager.calculateRuptureMultiplier(expectedDays, estimatedActualDays);
+
+          if (multiplier > 1.0) {
+            console.log(`📊 [saveRuptureData] Salvando ajuste de ruptura para ${item.recipe_name}: ${multiplier.toFixed(2)}x`);
+            await OrderSuggestionManager.updateRecipeAdjustment(item.recipe_id, 'rupture', multiplier);
+          }
+        }
+      }
+
       setShowRuptureSuccessEffect(true);
       setTimeout(() => {
         setShowRuptureSuccessEffect(false);
@@ -870,6 +889,22 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         (item.internal_waste_quantity || 0) === 0 &&
         (item.client_returned_quantity || 0) === 0
       ) && (!wasteNotes || wasteNotes.trim() === '');
+
+      // ✅ NOVO: Salvar ajustes de quebra nas receitas
+      // Para cada item que teve quebra, calcular e salvar fator de redução
+      for (const item of wasteItems) {
+        const totalWaste = (item.internal_waste_quantity || 0) + (item.client_returned_quantity || 0);
+        const orderedQty = item.ordered_quantity || 0;
+
+        if (totalWaste > 0 && orderedQty > 0 && item.recipe_id) {
+          const wasteFactor = OrderSuggestionManager.calculateWasteMultiplier(orderedQty, totalWaste);
+
+          if (wasteFactor < 1.0) {
+            console.log(`📊 [saveWasteData] Salvando ajuste de quebra para ${item.recipe_name}: ${wasteFactor.toFixed(2)}x`);
+            await OrderSuggestionManager.updateRecipeAdjustment(item.recipe_id, 'waste', wasteFactor);
+          }
+        }
+      }
 
       // Sempre ativar efeito de sucesso no início
       setShowWasteSuccessEffect(true);
@@ -1906,41 +1941,17 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     setIsProcessingSuggestions(true);
 
-    if (!customer || !currentOrder?.items || !isEditMode) {
+    if (!customer || !currentOrder?.items) {
 
       setIsProcessingSuggestions(false);
       return;
     }
 
-    // *** Limpar sugestões APENAS se refeições esperadas for explicitamente 0 ***
-    if (newMealsExpected === 0) {
+    // *** REMOVIDO: A dependência de mealsExpected foi eliminada a pedido do usuário ***
+    // Agora as sugestões são carregadas baseadas na mediana histórica diretamente.
+    // A função será chamada ao carregar a página, não mais ao editar.
 
-      const clearedItems = currentOrder.items.map(item => {
-        // Limpar sugestões mas manter valores existentes se usuário digitou
-        const { suggestion, ...itemWithoutSuggestion } = item;
-        return {
-          ...itemWithoutSuggestion,
-          total_meals_expected: 0
-        };
-      });
-
-      setCurrentOrder(prevOrder => ({
-        ...prevOrder,
-        items: clearedItems,
-        total_meals_expected: 0
-      }));
-
-      setIsProcessingSuggestions(false);
-      return;
-    }
-
-    // *** Sair se valor for vazio/indefinido (aguardar usuário terminar de digitar) ***
-    if (!newMealsExpected || newMealsExpected < 0) {
-      setIsProcessingSuggestions(false);
-      return;
-    }
-
-    // *** NOVA LÓGICA: Sempre aplicar sugestões quando mudar refeições esperadas ***
+    // *** NOVA LÓGICA: Sempre aplicar sugestões quando há itens ***
     // Verificar se há itens que podem receber sugestões (vazios OU com valores existentes)
     const hasItemsForSuggestions = currentOrder.items.some(item => {
       const baseQty = utilParseQuantity(item.base_quantity) || 0;
@@ -2044,29 +2055,20 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
         const stats = recipeAnalysis.statistics;
 
-        // ✅ LÓGICA DE SUGESTÃO ATUALIZADA (usando mediana)
-        let suggestedBaseQuantity = stats.median_ratio_per_meal * newMealsExpected;
-        let source = 'median_ratio_per_meal';
+        // ✅ LÓGICA DE SUGESTÃO ATUALIZADA (usando mediana DIRETO, sem multiplicar por refeições)
+        let suggestedBaseQuantity = stats.median_base_quantity;
+        let source = 'median_quantity_direct';
 
-        // Fallback para mediana da quantidade base
-        if (suggestedBaseQuantity < 0.1 && stats.median_base_quantity > 0) {
-          suggestedBaseQuantity = stats.median_base_quantity;
-          source = 'median_quantity';
+        // Fallback para média se mediana for zero
+        if (suggestedBaseQuantity === 0 && stats.avg_base_quantity > 0) {
+          suggestedBaseQuantity = stats.avg_base_quantity;
+          source = 'avg_quantity_fallback';
         }
 
-        // Validação de sanidade com média
-        if (stats.avg_base_quantity > 0 && suggestedBaseQuantity > 0) {
-          const ratio = suggestedBaseQuantity / stats.avg_base_quantity;
-          if (ratio < 0.4 || ratio > 2.5) {
-            suggestedBaseQuantity = stats.median_base_quantity;
-            source = 'median_quantity_after_sanity_check';
-          }
-        }
-
-        // Não sugerir 0 se houver histórico
-        if (suggestedBaseQuantity < 0.125 && stats.avg_base_quantity > 0) {
+        // Validação de segurança mínima
+        if (suggestedBaseQuantity < 0.125 && stats.avg_base_quantity > 0.25) {
           suggestedBaseQuantity = 0.25;
-          source = 'min_quantity_instead_of_zero';
+          source = 'min_quantity_fix';
         }
 
         // Arredondamento
@@ -2225,6 +2227,19 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     setShowWasteSuccessEffect(false);
     // Nota: isReceivingEditMode e isWasteEditMode são controlados por loadReceivingData e loadWasteData
   }, [weekNumber, year, selectedDay]);
+
+  // ✅ AUTO-CARREGAR SUGESTÕES quando o pedido é populado
+  useEffect(() => {
+    // Verificar se temos customer, items, e se ainda não processamos sugestões para esse conjunto
+    if (customer && currentOrder?.items?.length > 0 && !isProcessingSuggestions) {
+      // Verificar se algum item já tem sugestão (para não reprocessar infinitamente)
+      const hasAnySuggestion = currentOrder.items.some(item => item.suggestion?.has_suggestion);
+      if (!hasAnySuggestion) {
+        console.log('📊 [AUTO-SUGGESTIONS] Disparando carregamento automático de sugestões...');
+        applyAutomaticSuggestions(0); // Passa 0 pois mealsExpected não é mais usado
+      }
+    }
+  }, [customer?.id, currentOrder?.items?.length]); // Depende de customer ID e tamanho de items
 
   if (!customerId) {
     return (

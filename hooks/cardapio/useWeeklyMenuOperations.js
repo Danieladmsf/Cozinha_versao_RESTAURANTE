@@ -49,20 +49,21 @@ export const useWeeklyMenuOperations = () => {
     }
   }, []);
 
-  const updateMenuItem = useCallback(async (weeklyMenu, dayIndex, categoryId, itemIndex, newItem) => {
+  const updateMenuItem = useCallback(async (weeklyMenu, mealType = 'almoco', dayIndex, categoryId, itemIndex, newItem) => {
     try {
 
       const updatedMenu = { ...weeklyMenu };
       if (!updatedMenu.menu_data) updatedMenu.menu_data = {};
-      if (!updatedMenu.menu_data[dayIndex]) updatedMenu.menu_data[dayIndex] = {};
-      if (!updatedMenu.menu_data[dayIndex][categoryId]) updatedMenu.menu_data[dayIndex][categoryId] = [];
+      if (!updatedMenu.menu_data[mealType]) updatedMenu.menu_data[mealType] = {};
+      if (!updatedMenu.menu_data[mealType][dayIndex]) updatedMenu.menu_data[mealType][dayIndex] = {};
+      if (!updatedMenu.menu_data[mealType][dayIndex][categoryId]) updatedMenu.menu_data[mealType][dayIndex][categoryId] = [];
 
-      const items = [...updatedMenu.menu_data[dayIndex][categoryId]];
+      const items = [...updatedMenu.menu_data[mealType][dayIndex][categoryId]];
       items[itemIndex] = { ...items[itemIndex], ...newItem };
-      updatedMenu.menu_data[dayIndex][categoryId] = items;
+      updatedMenu.menu_data[mealType][dayIndex][categoryId] = items;
 
       const result = await WeeklyMenuEntity.update(updatedMenu.id, { menu_data: updatedMenu.menu_data });
-      
+
       toast({
         title: "Item atualizado",
         description: "O item do menu foi atualizado com sucesso.",
@@ -79,33 +80,34 @@ export const useWeeklyMenuOperations = () => {
     }
   }, [toast]);
 
-  const addMenuItem = useCallback(async (weeklyMenu, dayIndex, categoryId, createWeeklyMenuFn, getActiveLocationIds = null) => {
+  const addMenuItem = useCallback(async (weeklyMenu, mealType = 'almoco', dayIndex, categoryId, createWeeklyMenuFn, getActiveLocationIds = null) => {
     try {
 
       let currentMenu = weeklyMenu;
-      
+
       if (!currentMenu) {
         currentMenu = await createWeeklyMenuFn();
       }
 
       const updatedMenu = { ...currentMenu };
       if (!updatedMenu.menu_data) updatedMenu.menu_data = {};
-      if (!updatedMenu.menu_data[dayIndex]) updatedMenu.menu_data[dayIndex] = {};
-      if (!updatedMenu.menu_data[dayIndex][categoryId]) updatedMenu.menu_data[dayIndex][categoryId] = [];
+      if (!updatedMenu.menu_data[mealType]) updatedMenu.menu_data[mealType] = {};
+      if (!updatedMenu.menu_data[mealType][dayIndex]) updatedMenu.menu_data[mealType][dayIndex] = {};
+      if (!updatedMenu.menu_data[mealType][dayIndex][categoryId]) updatedMenu.menu_data[mealType][dayIndex][categoryId] = [];
 
       // Selecionar todos os locais ativos por padrão para facilitar o uso
       const defaultLocations = getActiveLocationIds ? getActiveLocationIds() : [];
-      
-      
+
+
       const newItem = {
         recipe_id: null,
         locations: defaultLocations
       };
 
-      updatedMenu.menu_data[dayIndex][categoryId].push(newItem);
+      updatedMenu.menu_data[mealType][dayIndex][categoryId].push(newItem);
 
       const result = await WeeklyMenuEntity.update(updatedMenu.id, { menu_data: updatedMenu.menu_data });
-      
+
       toast({
         title: "Item adicionado",
         description: "O novo item foi adicionado ao menu.",
@@ -117,17 +119,21 @@ export const useWeeklyMenuOperations = () => {
     }
   }, []);
 
-  const removeMenuItem = useCallback(async (weeklyMenu, dayIndex, categoryId, itemIndex) => {
+  const removeMenuItem = useCallback(async (weeklyMenu, mealType = 'almoco', dayIndex, categoryId, itemIndex) => {
     try {
       if (!weeklyMenu) return null;
 
       const updatedMenu = { ...weeklyMenu };
-      const items = [...(updatedMenu.menu_data[dayIndex]?.[categoryId] || [])];
+      const mealData = updatedMenu.menu_data?.[mealType] || {};
+      const items = [...(mealData[dayIndex]?.[categoryId] || [])];
       items.splice(itemIndex, 1);
-      updatedMenu.menu_data[dayIndex][categoryId] = items;
+
+      if (!updatedMenu.menu_data[mealType]) updatedMenu.menu_data[mealType] = {};
+      if (!updatedMenu.menu_data[mealType][dayIndex]) updatedMenu.menu_data[mealType][dayIndex] = {};
+      updatedMenu.menu_data[mealType][dayIndex][categoryId] = items;
 
       await WeeklyMenuEntity.update(updatedMenu.id, { menu_data: updatedMenu.menu_data });
-      
+
       toast({
         title: "Item removido",
         description: "O item foi removido do menu.",

@@ -69,9 +69,9 @@ export const useMenuData = (currentDate) => {
 
   // Verifica se cache é válido
   const isCacheValid = () => {
-    return globalCache.lastLoaded && 
-           (Date.now() - globalCache.lastLoaded) < CACHE_DURATION &&
-           globalCache.categories;
+    return globalCache.lastLoaded &&
+      (Date.now() - globalCache.lastLoaded) < CACHE_DURATION &&
+      globalCache.categories;
   };
 
   // Carregamento inicial com cache inteligente
@@ -146,13 +146,13 @@ export const useMenuData = (currentDate) => {
   const loadMenuConfig = async () => {
     try {
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
-      
+
       // Primeiro tenta carregar do cache local se existir e for recente
       const cachedConfig = localStorage.getItem('menuConfig');
       if (cachedConfig) {
         try {
           const parsedConfig = JSON.parse(cachedConfig);
-          
+
           // Verificar se cache tem formato antigo (camelCase)
           if (parsedConfig.categoryColors && !parsedConfig.category_colors) {
             // Migrar cache antigo para novo formato
@@ -166,7 +166,7 @@ export const useMenuData = (currentDate) => {
               category_order: parsedConfig.categoryOrder || [],
               selected_main_categories: parsedConfig.selectedMainCategories || []
             };
-            
+
             // Remover campos antigos
             delete migratedConfig.categoryColors;
             delete migratedConfig.activeCategories;
@@ -175,20 +175,20 @@ export const useMenuData = (currentDate) => {
             delete migratedConfig.availableDays;
             delete migratedConfig.categoryOrder;
             delete migratedConfig.selectedMainCategories;
-            
+
             localStorage.setItem('menuConfig', JSON.stringify(migratedConfig));
             return migratedConfig;
           }
-          
-          // Usar cache se disponível e no formato correto
-          if (parsedConfig && Object.keys(parsedConfig).length > 0 && parsedConfig.category_colors !== undefined) {
+
+          // Usar cache se disponível e no formato correto (incluindo category_groups)
+          if (parsedConfig && Object.keys(parsedConfig).length > 0 && parsedConfig.category_colors !== undefined && parsedConfig.category_groups !== undefined) {
             return parsedConfig;
           }
         } catch (e) {
           // Cache inválido, continua para carregar do banco
         }
       }
-      
+
       const configs = await MenuConfig.query([
         { field: 'user_id', operator: '==', value: mockUserId },
         { field: 'is_default', operator: '==', value: true }
@@ -196,10 +196,10 @@ export const useMenuData = (currentDate) => {
 
       if (configs && configs.length > 0) {
         const config = configs[0];
-        
+
         // Atualizar cache com dados do banco
         localStorage.setItem('menuConfig', JSON.stringify(config));
-        
+
         return config;
       }
       return null;
@@ -281,7 +281,7 @@ export const useMenuData = (currentDate) => {
     try {
       const configData = await loadMenuConfig();
       setMenuConfig(configData);
-      
+
       // Notificar outras instâncias
       notifyCacheUpdate('menuConfig', configData);
     } catch (error) {
@@ -301,7 +301,7 @@ export const useMenuData = (currentDate) => {
         lastLoaded: null
       };
       weeklyMenuCache.clear();
-      
+
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
       const configs = await MenuConfig.query([
         { field: 'user_id', operator: '==', value: mockUserId },
@@ -310,14 +310,14 @@ export const useMenuData = (currentDate) => {
 
       if (configs && configs.length > 0) {
         const config = configs[0];
-        
+
         // Atualizar cache e estado
         localStorage.setItem('menuConfig', JSON.stringify(config));
         setMenuConfig(config);
-        
+
         // Notificar outras instâncias
         notifyCacheUpdate('menuConfig', config);
-        
+
         return config;
       } else {
         return null;

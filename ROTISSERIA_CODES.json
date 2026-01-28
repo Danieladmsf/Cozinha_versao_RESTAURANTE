@@ -1,0 +1,962 @@
+[
+  {
+    "code": "93583",
+    "name": "ASS.FRANGO BENDITO INTEIRO"
+  },
+  {
+    "code": "2893",
+    "name": "ASS.FRANGO METADE BENDITO UNIDADE"
+  },
+  {
+    "code": "7041",
+    "name": "BOLO BANANA BENDITO KG"
+  },
+  {
+    "code": "7068",
+    "name": "BOLO CENOURA COBERTURA CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "6856",
+    "name": "BOLO COCO BENDITO KG"
+  },
+  {
+    "code": "7102",
+    "name": "BOLO DE CHURROS CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "7121",
+    "name": "BOLO FUBA  BENDITO KG"
+  },
+  {
+    "code": "7119",
+    "name": "BOLO FUBA C/ GOIABADA BENDITO KG"
+  },
+  {
+    "code": "7120",
+    "name": "BOLO FUBA C/MILHO BENDITO KG"
+  },
+  {
+    "code": "7132",
+    "name": "BOLO LARANJA BEDNITO KG"
+  },
+  {
+    "code": "7267",
+    "name": "BOLO LEITE NINHO VALSA BENDITO KG"
+  },
+  {
+    "code": "7141",
+    "name": "BOLO LIMAO C COBERTURA BENDITO KG"
+  },
+  {
+    "code": "7567",
+    "name": "BOLO MACA BENDITO KG"
+  },
+  {
+    "code": "7265",
+    "name": "BOLO NINHO C/OURO BRC BENDITO  KG"
+  },
+  {
+    "code": "7197",
+    "name": "BOLO NOZES BENDITO KG"
+  },
+  {
+    "code": "7200",
+    "name": "BOLO PISCINA CENOURA BENDITO KG"
+  },
+  {
+    "code": "7213",
+    "name": "BOLO RECH.BRIGADEIRO C/LEITE NINHO BENDITO KG"
+  },
+  {
+    "code": "7241",
+    "name": "BOLO RECHEADO BRIGADEIRO BENDITO  KG"
+  },
+  {
+    "code": "7245",
+    "name": "BOLO RECHEADO DOCE LEITE C/AMEIXA BENDITO KG"
+  },
+  {
+    "code": "7254",
+    "name": "BOLO RECHEADO LEITE NINHO ABACAXI BENDITO  KG"
+  },
+  {
+    "code": "7260",
+    "name": "BOLO RECHEADO LEITE NINHO C/MORANGO BENDITO KG"
+  },
+  {
+    "code": "7302",
+    "name": "BRIGADEIRAO BENDITO KG"
+  },
+  {
+    "code": "6590",
+    "name": "BROA DE  ERVA DOCE KG"
+  },
+  {
+    "code": "6643",
+    "name": "BROA DE FUBA C/GOTAS DE CHOCOLATE KG"
+  },
+  {
+    "code": "6939",
+    "name": "COLOMBA FRUTA BENDITO KG"
+  },
+  {
+    "code": "9350",
+    "name": "COMBO SUSHI KANI/HOTHOLL/CALIFORNIA BENDITO UN"
+  },
+  {
+    "code": "8915",
+    "name": "COOKIES BAUNILHA COM GOTAS KG"
+  },
+  {
+    "code": "7529",
+    "name": "COOKIES CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "4568",
+    "name": "COOKIES CHOCOLATE KG"
+  },
+  {
+    "code": "5766",
+    "name": "CROUTONS  FABRICACAO PROPRIA KG"
+  },
+  {
+    "code": "7530",
+    "name": "DOGUINHO BENDITO KG"
+  },
+  {
+    "code": "7315",
+    "name": "ESFIRRA CALABRESA BENDITO KG"
+  },
+  {
+    "code": "7355",
+    "name": "ESFIRRA CARNE BENDITO KG"
+  },
+  {
+    "code": "7348",
+    "name": "ESFIRRA CARNE, BROCOLIS E QUEIJO BENDITO KG"
+  },
+  {
+    "code": "7381",
+    "name": "ESFIRRA FRANGO BENDITO KG"
+  },
+  {
+    "code": "7385",
+    "name": "ESFIRRA PRESUNTO E QUEIJO BENDITO KG"
+  },
+  {
+    "code": "7386",
+    "name": "ESFIRRA QUEIJO BENDITO KG"
+  },
+  {
+    "code": "7327",
+    "name": "F. PROPRIA SEQUILHOS KG"
+  },
+  {
+    "code": "103",
+    "name": "F.PROPRIA BOLO FUBA C/ ERVA DOCE KG"
+  },
+  {
+    "code": "3669",
+    "name": "F.PROPRIA BOLO RECHEADO LEITE NINHO C/MORANGO KG"
+  },
+  {
+    "code": "6818",
+    "name": "F.PROPRIA CHIPS KG"
+  },
+  {
+    "code": "7333",
+    "name": "F.PROPRIA ESFIRRA ABERTA UN"
+  },
+  {
+    "code": "6915",
+    "name": "F.PROPRIA ESFIRRA BRCOLIS QJO E BACON KG"
+  },
+  {
+    "code": "508",
+    "name": "F.PROPRIA FORROZINHO GOTAS CHOCOLATE KG"
+  },
+  {
+    "code": "104255",
+    "name": "F.PROPRIA LANCHE PEITO PERU C/MUSSARELA KG"
+  },
+  {
+    "code": "104256",
+    "name": "F.PROPRIA LANCHE PRESUNTO E QUEIJO KG"
+  },
+  {
+    "code": "104254",
+    "name": "F.PROPRIA LANCHE SALAME COM QUEIJO PRATO KG"
+  },
+  {
+    "code": "1589",
+    "name": "F.PROPRIA LUA DE MEL DOCE LEITE POLVILHADA COM NINHO  KG"
+  },
+  {
+    "code": "759",
+    "name": "F.PROPRIA PAO  DE CALABREZA KG"
+  },
+  {
+    "code": "515",
+    "name": "F.PROPRIA PAO BISNAGUINHA  FP KG"
+  },
+  {
+    "code": "544",
+    "name": "F.PROPRIA PAO CASEIRINHO  KG"
+  },
+  {
+    "code": "1663",
+    "name": "F.PROPRIA PAO DE MILHO KG"
+  },
+  {
+    "code": "523",
+    "name": "F.PROPRIA PAO HAMBURGUER KG"
+  },
+  {
+    "code": "2079",
+    "name": "F.PROPRIA ROCAMBOLE DOCE LEITE KG"
+  },
+  {
+    "code": "2072",
+    "name": "F.PROPRIA ROCAMBOLE GOIABADA KG"
+  },
+  {
+    "code": "2923",
+    "name": "F.PROPRIA ROCAMBOLE LEITE NINHO KG"
+  },
+  {
+    "code": "643",
+    "name": "F.PROPRIA ROSCA CASEIRA COCO KG"
+  },
+  {
+    "code": "6231",
+    "name": "F.PROPRIA ROSCA CASEIRA NINHO KG"
+  },
+  {
+    "code": "235",
+    "name": "F.PROPRIA ROSCA CREME C/ GOIABADA"
+  },
+  {
+    "code": "164",
+    "name": "F.PROPRIA ROSCA RECHEADA COCO KG"
+  },
+  {
+    "code": "6228",
+    "name": "F.PROPRIA ROSQUINHA COCO  KG"
+  },
+  {
+    "code": "511",
+    "name": "F.PROPRIA ROSQUINHA DE LEITE NINHO  KG"
+  },
+  {
+    "code": "7195",
+    "name": "F.PROPRIA SALGADO DE  CALABRESA ASSADO KG"
+  },
+  {
+    "code": "4052",
+    "name": "F.PROPRIA SONHO CREME  KG"
+  },
+  {
+    "code": "93445",
+    "name": "F.PROPRIA TORTA DE FRANGO KG"
+  },
+  {
+    "code": "7395",
+    "name": "FORROZINHO COCADA BENDITO KG"
+  },
+  {
+    "code": "101883",
+    "name": "FP BROA DE FUBA KG"
+  },
+  {
+    "code": "7398",
+    "name": "GELATINA COLORIDA BENDITO KG"
+  },
+  {
+    "code": "7411",
+    "name": "HOT DOG BENDITO KG"
+  },
+  {
+    "code": "7399",
+    "name": "HOT DOG COM MOSTARDA BENDITO KG"
+  },
+  {
+    "code": "7421",
+    "name": "LANCHE PATE FRANGO RICOTA BENDITO KG"
+  },
+  {
+    "code": "7433",
+    "name": "LUA DE MEL DOCE C/NINHO BENDITO  KG"
+  },
+  {
+    "code": "7434",
+    "name": "LUA DE MEL DOCE LEITE C/NINHO BENDITO KG"
+  },
+  {
+    "code": "7435",
+    "name": "LUA DE MEL LEITE CONDENSADO BENDITO KG"
+  },
+  {
+    "code": "7436",
+    "name": "MANJAR BENDITO KG"
+  },
+  {
+    "code": "7437",
+    "name": "MARIA MOLE BENDITO KG"
+  },
+  {
+    "code": "7455",
+    "name": "MINI PUDIM BENDITO 100G"
+  },
+  {
+    "code": "102365",
+    "name": "PADARIA TABUA DE FRIOS  KG"
+  },
+  {
+    "code": "6944",
+    "name": "PANETTONE FRUTA BENDITO  KG"
+  },
+  {
+    "code": "7473",
+    "name": "PAO  DE CALABREZA BENDITO KG"
+  },
+  {
+    "code": "7096",
+    "name": "PAO ABOBORA BENDITO KG"
+  },
+  {
+    "code": "7190",
+    "name": "PAO AZEITONA BENDITO  KG"
+  },
+  {
+    "code": "6948",
+    "name": "PAO BATATA BENDITO KG"
+  },
+  {
+    "code": "7306",
+    "name": "PAO BATATA DOCE BENDITO KG"
+  },
+  {
+    "code": "6949",
+    "name": "PAO BISNAGUINHA BENDITO  KG"
+  },
+  {
+    "code": "6950",
+    "name": "PAO BRIOCHE BENDITO  KG"
+  },
+  {
+    "code": "6954",
+    "name": "PAO BRIOCHE CALABRESA BENDITO KG"
+  },
+  {
+    "code": "5580",
+    "name": "PAO CASEIRAO 250 GR"
+  },
+  {
+    "code": "7569",
+    "name": "PAO CASEIRAO BENDITO 250GR"
+  },
+  {
+    "code": "6951",
+    "name": "PAO CASEIRINHO BENDITO  KG"
+  },
+  {
+    "code": "7309",
+    "name": "PAO CENOURINHA BENDITO KG"
+  },
+  {
+    "code": "6955",
+    "name": "PAO DE FRIOS BENDITO KG"
+  },
+  {
+    "code": "6956",
+    "name": "PAO DE LEITE BENDITO KG"
+  },
+  {
+    "code": "7308",
+    "name": "PAO DE LEMON PAPPER BENDITO KG"
+  },
+  {
+    "code": "6957",
+    "name": "PAO DE MILHO BENDITO KG"
+  },
+  {
+    "code": "6963",
+    "name": "PAO DONUTS CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "6964",
+    "name": "PAO DONUTS DOCE DE LEITE BENDITO KG"
+  },
+  {
+    "code": "6965",
+    "name": "PAO FOFINHO BENDITO KG"
+  },
+  {
+    "code": "95804",
+    "name": "PAO GRATINADO KG"
+  },
+  {
+    "code": "6966",
+    "name": "PAO HAMBURGUER BENDITO KG"
+  },
+  {
+    "code": "626",
+    "name": "PAO HOT DOG  KG"
+  },
+  {
+    "code": "6975",
+    "name": "PAO HOT DOG BENDITO  KG"
+  },
+  {
+    "code": "7030",
+    "name": "PAO HOT DOG BENDITO  KG"
+  },
+  {
+    "code": "7032",
+    "name": "PAO MANDIOQUINHA BENDITO KG"
+  },
+  {
+    "code": "3605",
+    "name": "PAO MANDIOQUINHA KG"
+  },
+  {
+    "code": "913",
+    "name": "PAO MINI BAGUETE KG"
+  },
+  {
+    "code": "7574",
+    "name": "PATE DE AZEITONA PRETA BENDITO KG"
+  },
+  {
+    "code": "7575",
+    "name": "PATE DE AZEITONA VERDE BENDITO KG"
+  },
+  {
+    "code": "7474",
+    "name": "PAVE CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "7475",
+    "name": "PAVE DE PESSEGO BENDITO KG"
+  },
+  {
+    "code": "7480",
+    "name": "PUDIM DE LEITE CONDENSADO BENDITO 400GR"
+  },
+  {
+    "code": "7478",
+    "name": "PUDIM DE LEITE CONDENSADO BENDITO KG"
+  },
+  {
+    "code": "7479",
+    "name": "PUDIM DE PADARIA BENDITO KG"
+  },
+  {
+    "code": "7481",
+    "name": "PUDIM LEITE COND.TRIANGULO BENDITO KG"
+  },
+  {
+    "code": "7549",
+    "name": "QUEIJADINHA BENDITO KG"
+  },
+  {
+    "code": "7482",
+    "name": "QUICHE 4 QUEIJO BENDITO 400GR"
+  },
+  {
+    "code": "7488",
+    "name": "QUICHE FRANGO C/REQUEIJAO BENDITO 400GR"
+  },
+  {
+    "code": "7930",
+    "name": "REF COPA LOMBO ACEBOLADA BENDITO"
+  },
+  {
+    "code": "7625",
+    "name": "REFEICAO CARNE PANELA BENDITO UN"
+  },
+  {
+    "code": "7660",
+    "name": "REFEICAO FEIJOADA BENDITO UN"
+  },
+  {
+    "code": "7673",
+    "name": "REFEICAO FILE FRANGO PARMEGIANA BENDITO UN"
+  },
+  {
+    "code": "9362",
+    "name": "REFEICAO ISCA DE  FRANGO A ACEBOLADA BENDITO UN"
+  },
+  {
+    "code": "8966",
+    "name": "REFEICAO ISCA DE  FRANGO A MILANESA BENDITO"
+  },
+  {
+    "code": "7768",
+    "name": "REFEICAO LAGARTO M.MADEIRA + BATATA ASSADA BENDITO"
+  },
+  {
+    "code": "7796",
+    "name": "REFEICAO MEDALHAO FRANGO BENDITO UN"
+  },
+  {
+    "code": "7874",
+    "name": "REFEICAO STROGONOFF CARNE BENDITO UN"
+  },
+  {
+    "code": "7875",
+    "name": "REFEICAO STROGONOFF FRANGO BENDITO UN"
+  },
+  {
+    "code": "7877",
+    "name": "REFEICAO TIRINHA CARNE CHINESA BENDITO UN"
+  },
+  {
+    "code": "7492",
+    "name": "ROCAMBOLE BRIGADEIRO BENDITO KG"
+  },
+  {
+    "code": "7494",
+    "name": "ROCAMBOLE GOIABADA BENDITO KG"
+  },
+  {
+    "code": "7495",
+    "name": "ROCAMBOLE LEITE NINHO BENDITO KG"
+  },
+  {
+    "code": "7496",
+    "name": "ROCAMBOLE PRESTIGIO BENDITO KG"
+  },
+  {
+    "code": "6979",
+    "name": "ROSCA C/ CREME E  FRUTAS BENDITO KG"
+  },
+  {
+    "code": "6982",
+    "name": "ROSCA CASEIRA COCO BENDITO KG"
+  },
+  {
+    "code": "6985",
+    "name": "ROSCA CASEIRA NINHO BENDITO KG"
+  },
+  {
+    "code": "6987",
+    "name": "ROSCA CREME C/ GOIABADA BENDITO KG"
+  },
+  {
+    "code": "6990",
+    "name": "ROSCA RECHEADA CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "6993",
+    "name": "ROSCA RECHEADA COCO BENDITO  KG"
+  },
+  {
+    "code": "6994",
+    "name": "ROSCA RECHEADA GOTAS CHOCOLATE BENDITO KG"
+  },
+  {
+    "code": "7003",
+    "name": "ROSQUINHA COCO BENDITO  KG"
+  },
+  {
+    "code": "7004",
+    "name": "ROSQUINHA DE LEITE NINHO BENDITO  KG"
+  },
+  {
+    "code": "7555",
+    "name": "ROSQUINHA SAMANTA BENDITO KG"
+  },
+  {
+    "code": "8321",
+    "name": "ROT.ESPAGUETE A BOLONHESA + POLPETONE RECHEADO BENDITO"
+  },
+  {
+    "code": "8945",
+    "name": "ROT.ISCA DE FRANGO A MILANESA BENDITO KG"
+  },
+  {
+    "code": "8479",
+    "name": "ROTISSERIA  MACARRAO PRIMAVERA BENDITO KG"
+  },
+  {
+    "code": "8023",
+    "name": "ROTISSERIA ARROZ A GREGA BENDITO KG"
+  },
+  {
+    "code": "8028",
+    "name": "ROTISSERIA ARROZ BRANCO BENDITO KG"
+  },
+  {
+    "code": "8037",
+    "name": "ROTISSERIA ARROZ CARRETEIRO BENDITO KG"
+  },
+  {
+    "code": "8048",
+    "name": "ROTISSERIA ARROZ TEMPERADO BENDITO KG"
+  },
+  {
+    "code": "8080",
+    "name": "ROTISSERIA BANANA BENDITO KG"
+  },
+  {
+    "code": "8093",
+    "name": "ROTISSERIA BATATA  DOCE ASSADA BENDITO KG"
+  },
+  {
+    "code": "8089",
+    "name": "ROTISSERIA BATATA ASSADA BENDITO KG"
+  },
+  {
+    "code": "8153",
+    "name": "ROTISSERIA BERINJELA PIZZAOLA BENDITO KG"
+  },
+  {
+    "code": "8166",
+    "name": "ROTISSERIA BOLINHO DE ARROZ BENDITO KG"
+  },
+  {
+    "code": "8172",
+    "name": "ROTISSERIA CABOTIA REFOGADA BENDITO KG"
+  },
+  {
+    "code": "8176",
+    "name": "ROTISSERIA CALDO DE MANDIOCA BENDITO KG"
+  },
+  {
+    "code": "8201",
+    "name": "ROTISSERIA CANELONE FRANGO COM REQUEIJAO BENDITO KG"
+  },
+  {
+    "code": "8204",
+    "name": "ROTISSERIA CANELONE PRE/QUEIJO E M.BRANCO BENDITO KG"
+  },
+  {
+    "code": "8221",
+    "name": "ROTISSERIA CAPONATA BERINJELA BENDITO KG"
+  },
+  {
+    "code": "8239",
+    "name": "ROTISSERIA COPA LOMBO A MILANESA BENDITO KG"
+  },
+  {
+    "code": "8237",
+    "name": "ROTISSERIA COPA LOMBO ACEBOLADO BENDITO KG"
+  },
+  {
+    "code": "8274",
+    "name": "ROTISSERIA COSTELINHA PORCO MOLHO BARBECUE BENDITO KG"
+  },
+  {
+    "code": "8281",
+    "name": "ROTISSERIA COUVE REFOGADA BENDITO KG"
+  },
+  {
+    "code": "8519",
+    "name": "ROTISSERIA COXINHA BUFALO WINGS KG"
+  },
+  {
+    "code": "8292",
+    "name": "ROTISSERIA CREME DE MILHO BENDITO KG"
+  },
+  {
+    "code": "93964",
+    "name": "ROTISSERIA CUPIM ASSADO MOLHO ALHO  KG"
+  },
+  {
+    "code": "8298",
+    "name": "ROTISSERIA DOBRADINHA BENDITO KG"
+  },
+  {
+    "code": "8307",
+    "name": "ROTISSERIA ESCONDIDINHO DE CARNE SECA BENDITO KG"
+  },
+  {
+    "code": "8309",
+    "name": "ROTISSERIA ESCONDIDINHO DE PERNIL BENDITO  KG"
+  },
+  {
+    "code": "8308",
+    "name": "ROTISSERIA ESCONDIDINHO FRANGO C/REQ.MANDIO.BENDITO KG"
+  },
+  {
+    "code": "8323",
+    "name": "ROTISSERIA FAROFA BENDITO KG"
+  },
+  {
+    "code": "8328",
+    "name": "ROTISSERIA FEIJAO BENDITO KG"
+  },
+  {
+    "code": "8336",
+    "name": "ROTISSERIA FEIJOADA BENDITO KG"
+  },
+  {
+    "code": "8345",
+    "name": "ROTISSERIA FILE FRANGO GRELHADO BENDITO KG"
+  },
+  {
+    "code": "8349",
+    "name": "ROTISSERIA FILE FRANGO PARMEGIANA BENDITO KG"
+  },
+  {
+    "code": "8361",
+    "name": "ROTISSERIA FILE SOBRECOXA ASSADA BENDITO KG"
+  },
+  {
+    "code": "9474",
+    "name": "ROTISSERIA FILE TILAPIA GRELHADA COM LEGUMES BENDITO KG"
+  },
+  {
+    "code": "8381",
+    "name": "ROTISSERIA FRANGO XADREZ BENDITO KG"
+  },
+  {
+    "code": "8386",
+    "name": "ROTISSERIA GELEIA DE PIMENTA BENDITO KG"
+  },
+  {
+    "code": "8385",
+    "name": "ROTISSERIA GELEIA DE PIMENTA C/ABACAXI BENDITO KG"
+  },
+  {
+    "code": "9124",
+    "name": "ROTISSERIA HOT HOLL BENDITO UN"
+  },
+  {
+    "code": "8390",
+    "name": "ROTISSERIA ISCA DE FRANGO ACEBOLADA BENDITO KG"
+  },
+  {
+    "code": "8391",
+    "name": "ROTISSERIA JILO FRITO BENDITO KG"
+  },
+  {
+    "code": "8393",
+    "name": "ROTISSERIA JOELHO PORCO ASSADO BENDITO KG"
+  },
+  {
+    "code": "8396",
+    "name": "ROTISSERIA LAGARTO AO MOLHO MADEIRA BENDITO KG"
+  },
+  {
+    "code": "8400",
+    "name": "ROTISSERIA LASANHA A BOLONHESA BENDITO  KG"
+  },
+  {
+    "code": "8401",
+    "name": "ROTISSERIA LASANHA A BOLONHESA MASSA FRESCA BENDITO KG"
+  },
+  {
+    "code": "8403",
+    "name": "ROTISSERIA LEGUMES BENDITO KG"
+  },
+  {
+    "code": "8409",
+    "name": "ROTISSERIA LINGUICA ASSADA BENDITO KG"
+  },
+  {
+    "code": "8416",
+    "name": "ROTISSERIA LINGUICA RECHEADA ASSADA BENDITO KG"
+  },
+  {
+    "code": "8424",
+    "name": "ROTISSERIA LINGUICINHA FINININHA BENDITO KG"
+  },
+  {
+    "code": "8439",
+    "name": "ROTISSERIA MACARRAO AO MOLHO BRANCO BENDITO KG"
+  },
+  {
+    "code": "93626",
+    "name": "ROTISSERIA MACARRAO C/BROCOLIS E BACON KG"
+  },
+  {
+    "code": "8442",
+    "name": "ROTISSERIA MACARRAO C/CALABRESA MOLHO ROSE BENDITO KG"
+  },
+  {
+    "code": "8326",
+    "name": "ROTISSERIA MACARRAO C/CHEDDAR E BACON"
+  },
+  {
+    "code": "8459",
+    "name": "ROTISSERIA MACARRAO ESPECIAL BENDITO KG"
+  },
+  {
+    "code": "8480",
+    "name": "ROTISSERIA MACARRONADA A BOLONHESA BENDITO KG"
+  },
+  {
+    "code": "8483",
+    "name": "ROTISSERIA MAIONESE BENDITO KG"
+  },
+  {
+    "code": "6857",
+    "name": "ROTISSERIA MAIONESE DE LEGUMES COM FRANGO"
+  },
+  {
+    "code": "8482",
+    "name": "ROTISSERIA MAIONESE DE LEGUMES COM FRANGO BENDITO KG"
+  },
+  {
+    "code": "8484",
+    "name": "ROTISSERIA MAMINHA ASSADA BENDITO KG"
+  },
+  {
+    "code": "8491",
+    "name": "ROTISSERIA MEDALHAO FRANGO BENDITO KG"
+  },
+  {
+    "code": "8497",
+    "name": "ROTISSERIA MIX LEGUMES ASSADO BENDITO KG"
+  },
+  {
+    "code": "8498",
+    "name": "ROTISSERIA MOLHO PIMENTA ARTESANAL BENDITO KG"
+  },
+  {
+    "code": "6960",
+    "name": "ROTISSERIA NHOQUE AO MOLHO SUGO BENDITO  KG"
+  },
+  {
+    "code": "8502",
+    "name": "ROTISSERIA NHOQUE DE BATATA C/ CARNE BENDITO KG"
+  },
+  {
+    "code": "8529",
+    "name": "ROTISSERIA PANQUECA DE CARNE AO POMODORO BENDITO KG"
+  },
+  {
+    "code": "8532",
+    "name": "ROTISSERIA PANQUECA DE FRANGO BENDITO KG"
+  },
+  {
+    "code": "8541",
+    "name": "ROTISSERIA PANQUECA FRANGO C REQUEIJAO BENDITO KG"
+  },
+  {
+    "code": "8544",
+    "name": "ROTISSERIA PANQUECA PRESUNTO E MUSSARELA BENDITO KG"
+  },
+  {
+    "code": "8545",
+    "name": "ROTISSERIA PANQUECA S/MOLHO CARNE BENDITO KG"
+  },
+  {
+    "code": "8551",
+    "name": "ROTISSERIA PATE ALHO BENDITO KG"
+  },
+  {
+    "code": "6835",
+    "name": "ROTISSERIA PATE GORGONZOLA KG"
+  },
+  {
+    "code": "8563",
+    "name": "ROTISSERIA PERNIL ACEBOLADO BENDITO  KG"
+  },
+  {
+    "code": "8571",
+    "name": "ROTISSERIA POLENTA AO MOLHO CARNE MOIDA BENDITO KG"
+  },
+  {
+    "code": "8598",
+    "name": "ROTISSERIA PURE DE BATATA BENDITO KG"
+  },
+  {
+    "code": "8633",
+    "name": "ROTISSERIA REPOLHO REFOGADO BENDITO KG"
+  },
+  {
+    "code": "8671",
+    "name": "ROTISSERIA SALADA BATATONESE BENDITO KG"
+  },
+  {
+    "code": "8963",
+    "name": "ROTISSERIA SALADA CEASER C/FRANGO BENDITO"
+  },
+  {
+    "code": "8690",
+    "name": "ROTISSERIA SALADA DE BATATA CURTINHA BENDITO KG"
+  },
+  {
+    "code": "8695",
+    "name": "ROTISSERIA SALADA DE BETERRABA BENDITO KG"
+  },
+  {
+    "code": "8702",
+    "name": "ROTISSERIA SALADA DE BROCOLIS C/COUVE FLOR BENDITO KG"
+  },
+  {
+    "code": "9391",
+    "name": "ROTISSERIA SALADA FRESH HONEY PERU BENDITO"
+  },
+  {
+    "code": "8789",
+    "name": "ROTISSERIA SALADA SUNOMONO BENDITOKG"
+  },
+  {
+    "code": "8834",
+    "name": "ROTISSERIA STROGONOFF DE CARNE BENDITO KG"
+  },
+  {
+    "code": "8837",
+    "name": "ROTISSERIA STROGONOFF DE FRANGO BENDITO KG"
+  },
+  {
+    "code": "9123",
+    "name": "ROTISSERIA SUSHI KANI C/CREAM CHEESE BENDITO UN"
+  },
+  {
+    "code": "8839",
+    "name": "ROTISSERIA TABULE BENDITO KG"
+  },
+  {
+    "code": "8847",
+    "name": "ROTISSERIA TIRINHA DE CARNE BENDITO KG"
+  },
+  {
+    "code": "8862",
+    "name": "ROTISSERIA TOMATE CONFIT BENDITO KG"
+  },
+  {
+    "code": "8523",
+    "name": "ROTISSERIA TULIPA BUFALO WINGS KG"
+  },
+  {
+    "code": "8874",
+    "name": "ROTISSERIA TUTU DE FEIJAO BENDITO KG"
+  },
+  {
+    "code": "8900",
+    "name": "ROTISSERIA YAKISSOBA BENDITO KG"
+  },
+  {
+    "code": "7499",
+    "name": "SONHO CREME BENDITO KG"
+  },
+  {
+    "code": "7500",
+    "name": "SONHO DOCE LEITE BENDITO KG"
+  },
+  {
+    "code": "7065",
+    "name": "SUI PROD.BANHA KG"
+  },
+  {
+    "code": "7075",
+    "name": "SUI PROD.TORRESMO FRITO KG"
+  },
+  {
+    "code": "93533",
+    "name": "TORRADA FABRICACAO PROPRIA KG"
+  },
+  {
+    "code": "7503",
+    "name": "TORTA DE FRANGO BENDITO KG"
+  },
+  {
+    "code": "7504",
+    "name": "TORTA DE FRIOS BENDITO KG"
+  }
+]

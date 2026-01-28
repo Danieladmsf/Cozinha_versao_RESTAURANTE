@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { 
-  Tabs, 
-  TabsList, 
-  TabsTrigger, 
-  TabsContent 
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent
 } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -46,8 +46,9 @@ export default function MenuSettingsComponent() {
     fixedDropdowns,
     availableDays,
     categoryOrder,
+    categoryGroups, // Novo
     clientCategorySettings,
-    
+
     // Setters
     setSelectedMainCategories,
     setActiveCategories,
@@ -56,8 +57,9 @@ export default function MenuSettingsComponent() {
     setFixedDropdowns,
     setAvailableDays,
     setCategoryOrder,
+    setCategoryGroups, // Novo
     setClientCategorySettings,
-    
+
     // Funções
     saveConfig,
     getFilteredCategories,
@@ -70,13 +72,13 @@ export default function MenuSettingsComponent() {
 
   const handleSave = async () => {
     const success = await saveConfig();
-    
+
     if (success) {
       toast({
         title: "Configurações salvas!",
         description: "As configurações do cardápio foram salvas com sucesso.",
       });
-      
+
       router.push('/cardapio');
     } else {
       toast({
@@ -123,8 +125,8 @@ export default function MenuSettingsComponent() {
                 </p>
               </div>
             </div>
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={saving}
               className="bg-blue-600 hover:bg-blue-700"
             >
@@ -181,11 +183,13 @@ export default function MenuSettingsComponent() {
               categoryColors={categoryColors}
               fixedDropdowns={fixedDropdowns}
               categoryOrder={categoryOrder}
+              categoryGroups={categoryGroups} // Novo
               getFilteredCategories={getFilteredCategories}
               toggleCategoryActive={toggleCategoryActive}
               toggleExpandedCategory={toggleExpandedCategory}
               updateFixedDropdowns={updateFixedDropdowns}
               setCategoryOrder={setCategoryOrder}
+              setCategoryGroups={setCategoryGroups} // Novo
             />
           </TabsContent>
 

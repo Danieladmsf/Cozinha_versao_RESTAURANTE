@@ -1,0 +1,1931 @@
+{
+  "data_fim": "2026-01-28",
+  "data_inicio": "2025-12-29",
+  "produtos": [
+    {
+      "codigo": 93583,
+      "nome": "ASS.FRANGO BENDITO INTEIRO ",
+      "numero_vendas": 8,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 79,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 2893,
+      "nome": "ASS.FRANGO METADE BENDITO UNIDADE",
+      "numero_vendas": 16,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 406,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 7041,
+      "nome": "BOLO BANANA BENDITO KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-19",
+      "quantidade_total": 2.714,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7068,
+      "nome": "BOLO CENOURA COBERTURA CHOCOLATE BENDITO KG",
+      "numero_vendas": 55,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 98.346,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 6856,
+      "nome": "BOLO COCO BENDITO KG",
+      "numero_vendas": 55,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 83.404,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7102,
+      "nome": "BOLO DE CHURROS CHOCOLATE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7121,
+      "nome": "BOLO FUBA  BENDITO KG",
+      "numero_vendas": 7,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 5.766,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 7119,
+      "nome": "BOLO FUBA C/ GOIABADA BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 10.442,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7120,
+      "nome": "BOLO FUBA C/MILHO BENDITO KG",
+      "numero_vendas": 20,
+      "primeira_venda": "2026-01-07",
+      "quantidade_total": 13.342,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 7132,
+      "nome": "BOLO LARANJA BEDNITO KG",
+      "numero_vendas": 48,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 48.066,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7267,
+      "nome": "BOLO LEITE NINHO VALSA BENDITO KG",
+      "numero_vendas": 8,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 3.2439999999999998,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7141,
+      "nome": "BOLO LIMAO C COBERTURA BENDITO KG",
+      "numero_vendas": 20,
+      "primeira_venda": "2026-01-07",
+      "quantidade_total": 11.716,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 7567,
+      "nome": "BOLO MACA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7265,
+      "nome": "BOLO NINHO C/OURO BRC BENDITO  KG",
+      "numero_vendas": 9,
+      "primeira_venda": "2026-01-10",
+      "quantidade_total": 4.136,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 7197,
+      "nome": "BOLO NOZES BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7200,
+      "nome": "BOLO PISCINA CENOURA BENDITO KG",
+      "numero_vendas": 8,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 4.298,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 7213,
+      "nome": "BOLO RECH.BRIGADEIRO C/LEITE NINHO BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 1.956,
+      "ultima_venda": "2026-01-09"
+    },
+    {
+      "codigo": 7241,
+      "nome": "BOLO RECHEADO BRIGADEIRO BENDITO  KG",
+      "numero_vendas": 7,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 1.96,
+      "ultima_venda": "2026-01-09"
+    },
+    {
+      "codigo": 7245,
+      "nome": "BOLO RECHEADO DOCE LEITE C/AMEIXA BENDITO KG",
+      "numero_vendas": 7,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 3.4059999999999997,
+      "ultima_venda": "2026-01-13"
+    },
+    {
+      "codigo": 7254,
+      "nome": "BOLO RECHEADO LEITE NINHO ABACAXI BENDITO  KG",
+      "numero_vendas": 19,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 9.56,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 7260,
+      "nome": "BOLO RECHEADO LEITE NINHO C/MORANGO BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 7.1,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7302,
+      "nome": "BRIGADEIRAO BENDITO KG",
+      "numero_vendas": 32,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 10.644,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 6590,
+      "nome": "BROA DE  ERVA DOCE KG",
+      "numero_vendas": 25,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 9.106,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 6643,
+      "nome": "BROA DE FUBA C/GOTAS DE CHOCOLATE KG",
+      "numero_vendas": 26,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 7.334,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 6939,
+      "nome": "COLOMBA FRUTA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 9350,
+      "nome": "COMBO SUSHI KANI/HOTHOLL/CALIFORNIA BENDITO UN",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-22",
+      "quantidade_total": 10,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8915,
+      "nome": "COOKIES BAUNILHA COM GOTAS KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-15",
+      "quantidade_total": 0.729,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7529,
+      "nome": "COOKIES CHOCOLATE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 4568,
+      "nome": "COOKIES CHOCOLATE KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 5766,
+      "nome": "CROUTONS  FABRICACAO PROPRIA KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7530,
+      "nome": "DOGUINHO BENDITO KG",
+      "numero_vendas": 22,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 17.096,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7315,
+      "nome": "ESFIRRA CALABRESA BENDITO KG ",
+      "numero_vendas": 31,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 24.87,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7355,
+      "nome": "ESFIRRA CARNE BENDITO KG ",
+      "numero_vendas": 31,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 23.253999999999998,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7348,
+      "nome": "ESFIRRA CARNE, BROCOLIS E QUEIJO BENDITO KG ",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7381,
+      "nome": "ESFIRRA FRANGO BENDITO KG ",
+      "numero_vendas": 34,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 28.398,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7385,
+      "nome": "ESFIRRA PRESUNTO E QUEIJO BENDITO KG ",
+      "numero_vendas": 35,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 27.458000000000002,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7386,
+      "nome": "ESFIRRA QUEIJO BENDITO KG ",
+      "numero_vendas": 31,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 23.782000000000004,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7327,
+      "nome": "F. PROPRIA SEQUILHOS KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 103,
+      "nome": "F.PROPRIA BOLO FUBA C/ ERVA DOCE KG",
+      "numero_vendas": 2,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 0.734,
+      "ultima_venda": "2025-12-30"
+    },
+    {
+      "codigo": 3669,
+      "nome": "F.PROPRIA BOLO RECHEADO LEITE NINHO C/MORANGO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6818,
+      "nome": "F.PROPRIA CHIPS KG",
+      "numero_vendas": 25,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 19.767999999999997,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7333,
+      "nome": "F.PROPRIA ESFIRRA ABERTA UN",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6915,
+      "nome": "F.PROPRIA ESFIRRA BRCOLIS QJO E BACON KG ",
+      "numero_vendas": 38,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 17.807,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 508,
+      "nome": "F.PROPRIA FORROZINHO GOTAS CHOCOLATE KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 104255,
+      "nome": "F.PROPRIA LANCHE PEITO PERU C/MUSSARELA KG",
+      "numero_vendas": 36,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 24.494,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 104256,
+      "nome": "F.PROPRIA LANCHE PRESUNTO E QUEIJO KG",
+      "numero_vendas": 19,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 11.171999999999999,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 104254,
+      "nome": "F.PROPRIA LANCHE SALAME COM QUEIJO PRATO KG",
+      "numero_vendas": 8,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 4.27,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 1589,
+      "nome": "F.PROPRIA LUA DE MEL DOCE LEITE POLVILHADA COM NINHO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 759,
+      "nome": "F.PROPRIA PAO  DE CALABREZA KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 515,
+      "nome": "F.PROPRIA PAO BISNAGUINHA  FP KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 544,
+      "nome": "F.PROPRIA PAO CASEIRINHO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 1663,
+      "nome": "F.PROPRIA PAO DE MILHO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 523,
+      "nome": "F.PROPRIA PAO HAMBURGUER KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 2079,
+      "nome": "F.PROPRIA ROCAMBOLE DOCE LEITE KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 2072,
+      "nome": "F.PROPRIA ROCAMBOLE GOIABADA KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 2923,
+      "nome": "F.PROPRIA ROCAMBOLE LEITE NINHO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 643,
+      "nome": "F.PROPRIA ROSCA CASEIRA COCO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6231,
+      "nome": "F.PROPRIA ROSCA CASEIRA NINHO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 235,
+      "nome": "F.PROPRIA ROSCA CREME C/ GOIABADA",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 164,
+      "nome": "F.PROPRIA ROSCA RECHEADA COCO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6228,
+      "nome": "F.PROPRIA ROSQUINHA COCO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 511,
+      "nome": "F.PROPRIA ROSQUINHA DE LEITE NINHO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7195,
+      "nome": "F.PROPRIA SALGADO DE  CALABRESA ASSADO KG",
+      "numero_vendas": 14,
+      "primeira_venda": "2026-01-07",
+      "quantidade_total": 8.8,
+      "ultima_venda": "2026-01-20"
+    },
+    {
+      "codigo": 4052,
+      "nome": "F.PROPRIA SONHO CREME  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 93445,
+      "nome": "F.PROPRIA TORTA DE FRANGO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7395,
+      "nome": "FORROZINHO COCADA BENDITO KG ",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 1.274,
+      "ultima_venda": "2026-01-07"
+    },
+    {
+      "codigo": 101883,
+      "nome": "FP BROA DE FUBA KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7398,
+      "nome": "GELATINA COLORIDA BENDITO KG",
+      "numero_vendas": 48,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 37.719,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7411,
+      "nome": "HOT DOG BENDITO KG ",
+      "numero_vendas": 10,
+      "primeira_venda": "2026-01-02",
+      "quantidade_total": 13.437,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 7399,
+      "nome": "HOT DOG COM MOSTARDA BENDITO KG",
+      "numero_vendas": 9,
+      "primeira_venda": "2026-01-02",
+      "quantidade_total": 11.19,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 7421,
+      "nome": "LANCHE PATE FRANGO RICOTA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7433,
+      "nome": "LUA DE MEL DOCE C/NINHO BENDITO  KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-14",
+      "quantidade_total": 1.916,
+      "ultima_venda": "2026-01-16"
+    },
+    {
+      "codigo": 7434,
+      "nome": "LUA DE MEL DOCE LEITE C/NINHO BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7435,
+      "nome": "LUA DE MEL LEITE CONDENSADO BENDITO KG",
+      "numero_vendas": 33,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 11.592,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 7436,
+      "nome": "MANJAR BENDITO KG",
+      "numero_vendas": 29,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 26.974,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 7437,
+      "nome": "MARIA MOLE BENDITO KG",
+      "numero_vendas": 19,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 5.576,
+      "ultima_venda": "2026-01-19"
+    },
+    {
+      "codigo": 7455,
+      "nome": "MINI PUDIM BENDITO 100G",
+      "numero_vendas": 49,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 205,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 102365,
+      "nome": "PADARIA TABUA DE FRIOS  KG",
+      "numero_vendas": 3,
+      "primeira_venda": "2026-01-10",
+      "quantidade_total": 0.812,
+      "ultima_venda": "2026-01-15"
+    },
+    {
+      "codigo": 6944,
+      "nome": "PANETTONE FRUTA BENDITO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7473,
+      "nome": "PAO  DE CALABREZA BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 2.246,
+      "ultima_venda": "2026-01-17"
+    },
+    {
+      "codigo": 7096,
+      "nome": "PAO ABOBORA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7190,
+      "nome": "PAO AZEITONA BENDITO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6948,
+      "nome": "PAO BATATA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7306,
+      "nome": "PAO BATATA DOCE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6949,
+      "nome": "PAO BISNAGUINHA BENDITO  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6950,
+      "nome": "PAO BRIOCHE BENDITO  KG",
+      "numero_vendas": 19,
+      "primeira_venda": "2026-01-05",
+      "quantidade_total": 10.178,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 6954,
+      "nome": "PAO BRIOCHE CALABRESA BENDITO KG",
+      "numero_vendas": 2,
+      "primeira_venda": "2026-01-05",
+      "quantidade_total": 0.684,
+      "ultima_venda": "2026-01-05"
+    },
+    {
+      "codigo": 5580,
+      "nome": "PAO CASEIRAO 250 GR ",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7569,
+      "nome": "PAO CASEIRAO BENDITO 250GR ",
+      "numero_vendas": 55,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 458,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 6951,
+      "nome": "PAO CASEIRINHO BENDITO  KG",
+      "numero_vendas": 54,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 57.312,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7309,
+      "nome": "PAO CENOURINHA BENDITO KG",
+      "numero_vendas": 25,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 9.058,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 6955,
+      "nome": "PAO DE FRIOS BENDITO KG ",
+      "numero_vendas": 24,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 13.389999999999999,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 6956,
+      "nome": "PAO DE LEITE BENDITO KG",
+      "numero_vendas": 21,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 11.194,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7308,
+      "nome": "PAO DE LEMON PAPPER BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6957,
+      "nome": "PAO DE MILHO BENDITO KG",
+      "numero_vendas": 4,
+      "primeira_venda": "2026-01-15",
+      "quantidade_total": 1.504,
+      "ultima_venda": "2026-01-16"
+    },
+    {
+      "codigo": 6963,
+      "nome": "PAO DONUTS CHOCOLATE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6964,
+      "nome": "PAO DONUTS DOCE DE LEITE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6965,
+      "nome": "PAO FOFINHO BENDITO KG",
+      "numero_vendas": 55,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 104.05,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 95804,
+      "nome": "PAO GRATINADO KG",
+      "numero_vendas": 56,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 53.892999999999994,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 6966,
+      "nome": "PAO HAMBURGUER BENDITO KG",
+      "numero_vendas": 48,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 91.628,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 626,
+      "nome": "PAO HOT DOG  KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6975,
+      "nome": "PAO HOT DOG BENDITO  KG",
+      "numero_vendas": 39,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 32.572,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7030,
+      "nome": "PAO HOT DOG BENDITO  KG",
+      "numero_vendas": 24,
+      "primeira_venda": "2026-01-02",
+      "quantidade_total": 19.998,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 7032,
+      "nome": "PAO MANDIOQUINHA BENDITO KG",
+      "numero_vendas": 30,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 14.77,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 3605,
+      "nome": "PAO MANDIOQUINHA KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 913,
+      "nome": "PAO MINI BAGUETE KG",
+      "numero_vendas": 26,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 12.193999999999999,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7574,
+      "nome": "PATE DE AZEITONA PRETA BENDITO KG ",
+      "numero_vendas": 9,
+      "primeira_venda": "2026-01-08",
+      "quantidade_total": 2.068,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 7575,
+      "nome": "PATE DE AZEITONA VERDE BENDITO KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 1.27,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7474,
+      "nome": "PAVE CHOCOLATE BENDITO KG",
+      "numero_vendas": 9,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 9.938,
+      "ultima_venda": "2026-01-08"
+    },
+    {
+      "codigo": 7475,
+      "nome": "PAVE DE PESSEGO BENDITO KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 4.398,
+      "ultima_venda": "2026-01-08"
+    },
+    {
+      "codigo": 7480,
+      "nome": "PUDIM DE LEITE CONDENSADO BENDITO 400GR",
+      "numero_vendas": 18,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 35,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7478,
+      "nome": "PUDIM DE LEITE CONDENSADO BENDITO KG",
+      "numero_vendas": 20,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 49.876000000000005,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7479,
+      "nome": "PUDIM DE PADARIA BENDITO KG",
+      "numero_vendas": 31,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 8.862,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7481,
+      "nome": "PUDIM LEITE COND.TRIANGULO BENDITO KG",
+      "numero_vendas": 27,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 11.636,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7549,
+      "nome": "QUEIJADINHA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7482,
+      "nome": "QUICHE 4 QUEIJO BENDITO 400GR",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-09",
+      "quantidade_total": 8,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 7488,
+      "nome": "QUICHE FRANGO C/REQUEIJAO BENDITO 400GR",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-09",
+      "quantidade_total": 10,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 7930,
+      "nome": "REF COPA LOMBO ACEBOLADA BENDITO",
+      "numero_vendas": 3,
+      "primeira_venda": "2026-01-14",
+      "quantidade_total": 22,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7625,
+      "nome": "REFEICAO CARNE PANELA BENDITO UN",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-07",
+      "quantidade_total": 78,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 7660,
+      "nome": "REFEICAO FEIJOADA BENDITO UN",
+      "numero_vendas": 8,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 101,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7673,
+      "nome": "REFEICAO FILE FRANGO PARMEGIANA BENDITO UN",
+      "numero_vendas": 14,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 239,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 9362,
+      "nome": "REFEICAO ISCA DE  FRANGO A ACEBOLADA BENDITO UN",
+      "numero_vendas": 8,
+      "primeira_venda": "2026-01-02",
+      "quantidade_total": 98,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8966,
+      "nome": "REFEICAO ISCA DE  FRANGO A MILANESA BENDITO",
+      "numero_vendas": 11,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 143,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 7768,
+      "nome": "REFEICAO LAGARTO M.MADEIRA + BATATA ASSADA BENDITO",
+      "numero_vendas": 9,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 90,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 7796,
+      "nome": "REFEICAO MEDALHAO FRANGO BENDITO UN",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-07",
+      "quantidade_total": 75,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 7874,
+      "nome": "REFEICAO STROGONOFF CARNE BENDITO UN",
+      "numero_vendas": 10,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 117,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 7875,
+      "nome": "REFEICAO STROGONOFF FRANGO BENDITO UN",
+      "numero_vendas": 7,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 71,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7877,
+      "nome": "REFEICAO TIRINHA CARNE CHINESA BENDITO UN",
+      "numero_vendas": 9,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 126,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7492,
+      "nome": "ROCAMBOLE BRIGADEIRO BENDITO KG",
+      "numero_vendas": 24,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 9.026,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7494,
+      "nome": "ROCAMBOLE GOIABADA BENDITO KG",
+      "numero_vendas": 18,
+      "primeira_venda": "2026-01-07",
+      "quantidade_total": 7.04,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7495,
+      "nome": "ROCAMBOLE LEITE NINHO BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7496,
+      "nome": "ROCAMBOLE PRESTIGIO BENDITO KG",
+      "numero_vendas": 23,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 8.822,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 6979,
+      "nome": "ROSCA C/ CREME E  FRUTAS BENDITO KG",
+      "numero_vendas": 2,
+      "primeira_venda": "2026-01-10",
+      "quantidade_total": 0.476,
+      "ultima_venda": "2026-01-13"
+    },
+    {
+      "codigo": 6982,
+      "nome": "ROSCA CASEIRA COCO BENDITO KG",
+      "numero_vendas": 43,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 39.814,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 6985,
+      "nome": "ROSCA CASEIRA NINHO BENDITO KG",
+      "numero_vendas": 17,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 5.466,
+      "ultima_venda": "2026-01-17"
+    },
+    {
+      "codigo": 6987,
+      "nome": "ROSCA CREME C/ GOIABADA BENDITO KG ",
+      "numero_vendas": 21,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 8.608,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 6990,
+      "nome": "ROSCA RECHEADA CHOCOLATE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 6993,
+      "nome": "ROSCA RECHEADA COCO BENDITO  KG",
+      "numero_vendas": 2,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 0.62,
+      "ultima_venda": "2026-01-06"
+    },
+    {
+      "codigo": 6994,
+      "nome": "ROSCA RECHEADA GOTAS CHOCOLATE BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 7003,
+      "nome": "ROSQUINHA COCO BENDITO  KG",
+      "numero_vendas": 35,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 7.926,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7004,
+      "nome": "ROSQUINHA DE LEITE NINHO BENDITO  KG",
+      "numero_vendas": 23,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 3.662,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 7555,
+      "nome": "ROSQUINHA SAMANTA BENDITO KG",
+      "numero_vendas": 30,
+      "primeira_venda": "2026-01-08",
+      "quantidade_total": 15.78,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8321,
+      "nome": "ROT.ESPAGUETE A BOLONHESA + POLPETONE RECHEADO BENDITO",
+      "numero_vendas": 14,
+      "primeira_venda": "2026-01-15",
+      "quantidade_total": 54,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8945,
+      "nome": "ROT.ISCA DE FRANGO A MILANESA BENDITO KG",
+      "numero_vendas": 11,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 7.344,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8479,
+      "nome": "ROTISSERIA  MACARRAO PRIMAVERA BENDITO KG",
+      "numero_vendas": 9,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 14.161999999999999,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 8023,
+      "nome": "ROTISSERIA ARROZ A GREGA BENDITO KG",
+      "numero_vendas": 12,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 42.474000000000004,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8028,
+      "nome": "ROTISSERIA ARROZ BRANCO BENDITO KG",
+      "numero_vendas": 54,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 75.4,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8037,
+      "nome": "ROTISSERIA ARROZ CARRETEIRO BENDITO KG",
+      "numero_vendas": 9,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 29.716,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8048,
+      "nome": "ROTISSERIA ARROZ TEMPERADO BENDITO KG",
+      "numero_vendas": 20,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 36.236,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 8080,
+      "nome": "ROTISSERIA BANANA BENDITO KG",
+      "numero_vendas": 17,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 10.19,
+      "ultima_venda": "2026-01-20"
+    },
+    {
+      "codigo": 8093,
+      "nome": "ROTISSERIA BATATA  DOCE ASSADA BENDITO KG",
+      "numero_vendas": 4,
+      "primeira_venda": "2026-01-08",
+      "quantidade_total": 4.332,
+      "ultima_venda": "2026-01-20"
+    },
+    {
+      "codigo": 8089,
+      "nome": "ROTISSERIA BATATA ASSADA BENDITO KG",
+      "numero_vendas": 35,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 27.984,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8153,
+      "nome": "ROTISSERIA BERINJELA PIZZAOLA BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 9.456,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8166,
+      "nome": "ROTISSERIA BOLINHO DE ARROZ BENDITO KG",
+      "numero_vendas": 11,
+      "primeira_venda": "2026-01-09",
+      "quantidade_total": 12.716,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 8172,
+      "nome": "ROTISSERIA CABOTIA REFOGADA BENDITO KG",
+      "numero_vendas": 15,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 13.408,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 8176,
+      "nome": "ROTISSERIA CALDO DE MANDIOCA BENDITO KG",
+      "numero_vendas": 4,
+      "primeira_venda": "2026-01-20",
+      "quantidade_total": 5.874,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 8201,
+      "nome": "ROTISSERIA CANELONE FRANGO COM REQUEIJAO BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 3.428,
+      "ultima_venda": "2026-01-15"
+    },
+    {
+      "codigo": 8204,
+      "nome": "ROTISSERIA CANELONE PRE/QUEIJO E M.BRANCO BENDITO KG",
+      "numero_vendas": 21,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 16.451999999999998,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8221,
+      "nome": "ROTISSERIA CAPONATA BERINJELA BENDITO KG",
+      "numero_vendas": 44,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 33.933,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8239,
+      "nome": "ROTISSERIA COPA LOMBO A MILANESA BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 8237,
+      "nome": "ROTISSERIA COPA LOMBO ACEBOLADO BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 2.33,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 8274,
+      "nome": "ROTISSERIA COSTELINHA PORCO MOLHO BARBECUE BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 12.484,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8281,
+      "nome": "ROTISSERIA COUVE REFOGADA BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-10",
+      "quantidade_total": 2.152,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8519,
+      "nome": "ROTISSERIA COXINHA BUFALO WINGS KG",
+      "numero_vendas": 3,
+      "primeira_venda": "2026-01-17",
+      "quantidade_total": 4.106,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 8292,
+      "nome": "ROTISSERIA CREME DE MILHO BENDITO KG",
+      "numero_vendas": 14,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 6.944,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 93964,
+      "nome": "ROTISSERIA CUPIM ASSADO MOLHO ALHO  KG",
+      "numero_vendas": 10,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 14.09,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8298,
+      "nome": "ROTISSERIA DOBRADINHA BENDITO KG",
+      "numero_vendas": 11,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 21.52,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8307,
+      "nome": "ROTISSERIA ESCONDIDINHO DE CARNE SECA BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 18.532,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8309,
+      "nome": "ROTISSERIA ESCONDIDINHO DE PERNIL BENDITO  KG",
+      "numero_vendas": 1,
+      "primeira_venda": "2026-01-18",
+      "quantidade_total": 0.61,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 8308,
+      "nome": "ROTISSERIA ESCONDIDINHO FRANGO C/REQ.MANDIO.BENDITO KG",
+      "numero_vendas": 2,
+      "primeira_venda": "2026-01-14",
+      "quantidade_total": 1.182,
+      "ultima_venda": "2026-01-15"
+    },
+    {
+      "codigo": 8323,
+      "nome": "ROTISSERIA FAROFA BENDITO KG",
+      "numero_vendas": 56,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 79.15199999999999,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8328,
+      "nome": "ROTISSERIA FEIJAO BENDITO KG",
+      "numero_vendas": 40,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 36.822,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8336,
+      "nome": "ROTISSERIA FEIJOADA BENDITO KG",
+      "numero_vendas": 18,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 43.488,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8345,
+      "nome": "ROTISSERIA FILE FRANGO GRELHADO BENDITO KG",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 8349,
+      "nome": "ROTISSERIA FILE FRANGO PARMEGIANA BENDITO KG",
+      "numero_vendas": 32,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 50.636,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8361,
+      "nome": "ROTISSERIA FILE SOBRECOXA ASSADA BENDITO KG",
+      "numero_vendas": 37,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 53.268,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 9474,
+      "nome": "ROTISSERIA FILE TILAPIA GRELHADA COM LEGUMES BENDITO KG",
+      "numero_vendas": 3,
+      "primeira_venda": "2026-01-16",
+      "quantidade_total": 2.884,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 8381,
+      "nome": "ROTISSERIA FRANGO XADREZ BENDITO KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-16",
+      "quantidade_total": 3.264,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 8386,
+      "nome": "ROTISSERIA GELEIA DE PIMENTA BENDITO KG ",
+      "numero_vendas": 11,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 2.9170000000000003,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8385,
+      "nome": "ROTISSERIA GELEIA DE PIMENTA C/ABACAXI BENDITO KG",
+      "numero_vendas": 22,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 12.914,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 9124,
+      "nome": "ROTISSERIA HOT HOLL BENDITO UN",
+      "numero_vendas": 45,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 278.084,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8390,
+      "nome": "ROTISSERIA ISCA DE FRANGO ACEBOLADA BENDITO KG",
+      "numero_vendas": 10,
+      "primeira_venda": "2026-01-02",
+      "quantidade_total": 5.862,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 8391,
+      "nome": "ROTISSERIA JILO FRITO BENDITO KG",
+      "numero_vendas": 11,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 3.434,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8393,
+      "nome": "ROTISSERIA JOELHO PORCO ASSADO BENDITO KG",
+      "numero_vendas": 8,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 30.814,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8396,
+      "nome": "ROTISSERIA LAGARTO AO MOLHO MADEIRA BENDITO KG",
+      "numero_vendas": 14,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 18.1,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8400,
+      "nome": "ROTISSERIA LASANHA A BOLONHESA BENDITO  KG",
+      "numero_vendas": 22,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 74.05000000000001,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8401,
+      "nome": "ROTISSERIA LASANHA A BOLONHESA MASSA FRESCA BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 12.472,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 8403,
+      "nome": "ROTISSERIA LEGUMES BENDITO KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-19",
+      "quantidade_total": 1.302,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8409,
+      "nome": "ROTISSERIA LINGUICA ASSADA BENDITO KG",
+      "numero_vendas": 18,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 8.344,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 8416,
+      "nome": "ROTISSERIA LINGUICA RECHEADA ASSADA BENDITO KG",
+      "numero_vendas": 15,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 5.764,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 8424,
+      "nome": "ROTISSERIA LINGUICINHA FINININHA BENDITO KG",
+      "numero_vendas": 20,
+      "primeira_venda": "2026-01-05",
+      "quantidade_total": 7.778,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8439,
+      "nome": "ROTISSERIA MACARRAO AO MOLHO BRANCO BENDITO KG",
+      "numero_vendas": 7,
+      "primeira_venda": "2026-01-04",
+      "quantidade_total": 34.204,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 93626,
+      "nome": "ROTISSERIA MACARRAO C/BROCOLIS E BACON KG",
+      "numero_vendas": 21,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 35.716,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8442,
+      "nome": "ROTISSERIA MACARRAO C/CALABRESA MOLHO ROSE BENDITO KG",
+      "numero_vendas": 26,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 57.274,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8326,
+      "nome": "ROTISSERIA MACARRAO C/CHEDDAR E BACON",
+      "numero_vendas": 0,
+      "primeira_venda": null,
+      "quantidade_total": 0,
+      "ultima_venda": null
+    },
+    {
+      "codigo": 8459,
+      "nome": "ROTISSERIA MACARRAO ESPECIAL BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2026-01-05",
+      "quantidade_total": 14.548,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8480,
+      "nome": "ROTISSERIA MACARRONADA A BOLONHESA BENDITO KG",
+      "numero_vendas": 50,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 181.153,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8483,
+      "nome": "ROTISSERIA MAIONESE BENDITO KG",
+      "numero_vendas": 12,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 62.156,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 6857,
+      "nome": "ROTISSERIA MAIONESE DE LEGUMES COM FRANGO",
+      "numero_vendas": 4,
+      "primeira_venda": "2026-01-18",
+      "quantidade_total": 13.814,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8482,
+      "nome": "ROTISSERIA MAIONESE DE LEGUMES COM FRANGO BENDITO KG",
+      "numero_vendas": 16,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 81.086,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8484,
+      "nome": "ROTISSERIA MAMINHA ASSADA BENDITO KG",
+      "numero_vendas": 12,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 36.129999999999995,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8491,
+      "nome": "ROTISSERIA MEDALHAO FRANGO BENDITO KG",
+      "numero_vendas": 15,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 13.148,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8497,
+      "nome": "ROTISSERIA MIX LEGUMES ASSADO BENDITO KG",
+      "numero_vendas": 31,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 28.186,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8498,
+      "nome": "ROTISSERIA MOLHO PIMENTA ARTESANAL BENDITO KG",
+      "numero_vendas": 14,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 5.032,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 6960,
+      "nome": "ROTISSERIA NHOQUE AO MOLHO SUGO BENDITO  KG",
+      "numero_vendas": 15,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 20.012,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 8502,
+      "nome": "ROTISSERIA NHOQUE DE BATATA C/ CARNE BENDITO KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-21",
+      "quantidade_total": 5.26,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8529,
+      "nome": "ROTISSERIA PANQUECA DE CARNE AO POMODORO BENDITO KG",
+      "numero_vendas": 16,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 13.719999999999999,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8532,
+      "nome": "ROTISSERIA PANQUECA DE FRANGO BENDITO KG",
+      "numero_vendas": 12,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 10.064,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8541,
+      "nome": "ROTISSERIA PANQUECA FRANGO C REQUEIJAO BENDITO KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-15",
+      "quantidade_total": 3.938,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8544,
+      "nome": "ROTISSERIA PANQUECA PRESUNTO E MUSSARELA BENDITO KG",
+      "numero_vendas": 10,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 7.292,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8545,
+      "nome": "ROTISSERIA PANQUECA S/MOLHO CARNE BENDITO KG",
+      "numero_vendas": 3,
+      "primeira_venda": "2026-01-13",
+      "quantidade_total": 1.31,
+      "ultima_venda": "2026-01-15"
+    },
+    {
+      "codigo": 8551,
+      "nome": "ROTISSERIA PATE ALHO BENDITO KG",
+      "numero_vendas": 27,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 12.392,
+      "ultima_venda": "2026-01-21"
+    },
+    {
+      "codigo": 6835,
+      "nome": "ROTISSERIA PATE GORGONZOLA KG",
+      "numero_vendas": 6,
+      "primeira_venda": "2026-01-08",
+      "quantidade_total": 1.352,
+      "ultima_venda": "2026-01-17"
+    },
+    {
+      "codigo": 8563,
+      "nome": "ROTISSERIA PERNIL ACEBOLADO BENDITO  KG",
+      "numero_vendas": 7,
+      "primeira_venda": "2026-01-12",
+      "quantidade_total": 3.498,
+      "ultima_venda": "2026-01-20"
+    },
+    {
+      "codigo": 8571,
+      "nome": "ROTISSERIA POLENTA AO MOLHO CARNE MOIDA BENDITO KG",
+      "numero_vendas": 4,
+      "primeira_venda": "2026-01-19",
+      "quantidade_total": 9.29,
+      "ultima_venda": "2026-01-20"
+    },
+    {
+      "codigo": 8598,
+      "nome": "ROTISSERIA PURE DE BATATA BENDITO KG",
+      "numero_vendas": 16,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 11.112,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 8633,
+      "nome": "ROTISSERIA REPOLHO REFOGADO BENDITO KG",
+      "numero_vendas": 10,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 7.6899999999999995,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8671,
+      "nome": "ROTISSERIA SALADA BATATONESE BENDITO KG",
+      "numero_vendas": 17,
+      "primeira_venda": "2026-01-14",
+      "quantidade_total": 17.26,
+      "ultima_venda": "2026-01-26"
+    },
+    {
+      "codigo": 8963,
+      "nome": "ROTISSERIA SALADA CEASER C/FRANGO BENDITO",
+      "numero_vendas": 41,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 188.886,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8690,
+      "nome": "ROTISSERIA SALADA DE BATATA CURTINHA BENDITO KG",
+      "numero_vendas": 33,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 62.99,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8695,
+      "nome": "ROTISSERIA SALADA DE BETERRABA BENDITO KG",
+      "numero_vendas": 36,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 28.866,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8702,
+      "nome": "ROTISSERIA SALADA DE BROCOLIS C/COUVE FLOR BENDITO KG",
+      "numero_vendas": 16,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 7.56,
+      "ultima_venda": "2026-01-20"
+    },
+    {
+      "codigo": 9391,
+      "nome": "ROTISSERIA SALADA FRESH HONEY PERU BENDITO",
+      "numero_vendas": 15,
+      "primeira_venda": "2026-01-10",
+      "quantidade_total": 29,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8789,
+      "nome": "ROTISSERIA SALADA SUNOMONO BENDITOKG",
+      "numero_vendas": 15,
+      "primeira_venda": "2026-01-05",
+      "quantidade_total": 8.614,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8834,
+      "nome": "ROTISSERIA STROGONOFF DE CARNE BENDITO KG",
+      "numero_vendas": 13,
+      "primeira_venda": "2026-01-02",
+      "quantidade_total": 10.87,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8837,
+      "nome": "ROTISSERIA STROGONOFF DE FRANGO BENDITO KG",
+      "numero_vendas": 18,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 12.722000000000001,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 9123,
+      "nome": "ROTISSERIA SUSHI KANI C/CREAM CHEESE BENDITO UN",
+      "numero_vendas": 25,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 90,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8839,
+      "nome": "ROTISSERIA TABULE BENDITO KG",
+      "numero_vendas": 26,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 18.084,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8847,
+      "nome": "ROTISSERIA TIRINHA DE CARNE BENDITO KG",
+      "numero_vendas": 17,
+      "primeira_venda": "2025-12-30",
+      "quantidade_total": 13.600000000000001,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 8862,
+      "nome": "ROTISSERIA TOMATE CONFIT BENDITO KG ",
+      "numero_vendas": 4,
+      "primeira_venda": "2026-01-16",
+      "quantidade_total": 0.964,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8523,
+      "nome": "ROTISSERIA TULIPA BUFALO WINGS KG",
+      "numero_vendas": 14,
+      "primeira_venda": "2026-01-03",
+      "quantidade_total": 38.826,
+      "ultima_venda": "2026-01-25"
+    },
+    {
+      "codigo": 8874,
+      "nome": "ROTISSERIA TUTU DE FEIJAO BENDITO KG",
+      "numero_vendas": 9,
+      "primeira_venda": "2026-01-16",
+      "quantidade_total": 5.358,
+      "ultima_venda": "2026-01-23"
+    },
+    {
+      "codigo": 8900,
+      "nome": "ROTISSERIA YAKISSOBA BENDITO KG",
+      "numero_vendas": 3,
+      "primeira_venda": "2026-01-17",
+      "quantidade_total": 6.192,
+      "ultima_venda": "2026-01-18"
+    },
+    {
+      "codigo": 7499,
+      "nome": "SONHO CREME BENDITO KG",
+      "numero_vendas": 49,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 62.652,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7500,
+      "nome": "SONHO DOCE LEITE BENDITO KG ",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 3.086,
+      "ultima_venda": "2026-01-10"
+    },
+    {
+      "codigo": 7065,
+      "nome": "SUI PROD.BANHA KG",
+      "numero_vendas": 25,
+      "primeira_venda": "2025-12-31",
+      "quantidade_total": 56.907999999999994,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 7075,
+      "nome": "SUI PROD.TORRESMO FRITO KG",
+      "numero_vendas": 47,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 76.898,
+      "ultima_venda": "2026-01-27"
+    },
+    {
+      "codigo": 93533,
+      "nome": "TORRADA FABRICACAO PROPRIA KG",
+      "numero_vendas": 5,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 1.552,
+      "ultima_venda": "2026-01-22"
+    },
+    {
+      "codigo": 7503,
+      "nome": "TORTA DE FRANGO BENDITO KG",
+      "numero_vendas": 31,
+      "primeira_venda": "2025-12-29",
+      "quantidade_total": 25.738,
+      "ultima_venda": "2026-01-24"
+    },
+    {
+      "codigo": 7504,
+      "nome": "TORTA DE FRIOS BENDITO KG",
+      "numero_vendas": 17,
+      "primeira_venda": "2026-01-06",
+      "quantidade_total": 8.066,
+      "ultima_venda": "2026-01-22"
+    }
+  ],
+  "status": "ok",
+  "tabelas_consultadas": [
+    "venda122025",
+    "venda012026"
+  ]
+}

@@ -3,19 +3,19 @@ import React, { useState, useEffect } from "react";
 import { User } from "@/app/api/entities";
 import { MenuConfig as MenuConfigEntity } from "@/app/api/entities";
 import { Button } from "@/components/ui/button";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { 
-  Tabs, 
-  TabsList, 
-  TabsTrigger, 
-  TabsContent 
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent
 } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -23,9 +23,9 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 // Card components removed to reduce card bloat
 import { Badge } from "@/components/ui/badge";
-import { 
-  Settings, 
-  Paintbrush, 
+import {
+  Settings,
+  Paintbrush,
   Layout,
   Check,
   Grid,
@@ -36,8 +36,20 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { GripVertical, Power } from "lucide-react";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable
+} from "@hello-pangea/dnd";
+import {
+  GripVertical,
+  Power,
+  Plus,
+  Trash2,
+  Pencil,
+  X,
+  FolderPlus
+} from "lucide-react";
 
 // Componente ColorPalette para seleção de cores
 const ColorPalette = ({ onSelect }) => {
@@ -69,15 +81,18 @@ export default function MenuConfig({ categories, onConfigChange }) {
   const [activeTab, setActiveTab] = useState("layout");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Estados para configurações
   const [expandedCategories, setExpandedCategories] = useState([]);
   const [categoryColors, setCategoryColors] = useState({});
   const [fixedDropdowns, setFixedDropdowns] = useState({});
   const [availableDays, setAvailableDays] = useState([1, 2, 3, 4, 5]); // Segunda a sexta por padrão
   const [configId, setConfigId] = useState(null);
-  
-  // Adicionar estado para ordem das categorias
+
+  // Adicionar estado para grupos de categorias (Abas)
+  const [categoryGroups, setCategoryGroups] = useState([]);
+
+  // Adicionar estado para ordem das categorias (Legacy/Backup)
   const [categoryOrder, setCategoryOrder] = useState([]);
 
   // Adicionar estado para categorias ativas/inativas
@@ -89,7 +104,7 @@ export default function MenuConfig({ categories, onConfigChange }) {
       loadConfig();
     }
   }, [categories]); // Dependência nas categorias
-  
+
   // Carregar ordem das categorias
   useEffect(() => {
     if (Array.isArray(categories)) {
@@ -102,7 +117,7 @@ export default function MenuConfig({ categories, onConfigChange }) {
         // Por padrão, todas as categorias são ativas
         initialActiveState[category.id] = true;
       });
-      
+
       setActiveCategories(initialActiveState);
     }
   }, [categories]);
@@ -111,16 +126,16 @@ export default function MenuConfig({ categories, onConfigChange }) {
   const loadConfig = async () => {
     try {
       setLoading(true);
-      
+
       // Use mock user ID for development without authentication
       const mockUserId = 'mock-user-id';
-      
+
       // Filtrar para pegar apenas a configuração padrão do usuário
-      const configs = await MenuConfigEntity.filter({ 
+      const configs = await MenuConfigEntity.filter({
         user_id: mockUserId,
         is_default: true
       });
-      
+
       if (configs && configs.length > 0) {
         const config = configs[0];// Configurar estados com valores carregados
         setExpandedCategories(config.expanded_categories || []);
@@ -128,7 +143,7 @@ export default function MenuConfig({ categories, onConfigChange }) {
         setFixedDropdowns(config.fixed_dropdowns || {});
         setAvailableDays(config.available_days || [1, 2, 3, 4, 5]);
         setCategoryOrder(config.category_order || []);
-        
+
         // Inicializar o estado de categorias ativas
         // Se não houver configuração, assume todas ativas
         if (config.active_categories) {
@@ -141,6 +156,27 @@ export default function MenuConfig({ categories, onConfigChange }) {
           });
           setActiveCategories(initialActiveState);
         }
+
+        // Inicializar grupos de categorias
+        if (config.category_groups && config.category_groups.length > 0) {
+          setCategoryGroups(config.category_groups);
+        } else {
+          // Migração/Inicialização: Criar grupos padrão se não existirem
+          // Tenta distribuir as categorias baseadas no histórico ou coloca todas no primeiro grupo
+          const defaultGroups = [
+            {
+              id: 'almoco',
+              name: 'Almoço',
+              items: config.category_order || categories.map(c => c.id) // Fallback para todas as categorias
+            },
+            {
+              id: 'mono_porcoes',
+              name: 'Mono Porções',
+              items: []
+            }
+          ];
+          setCategoryGroups(defaultGroups);
+        }
       } else {
         // Se não tiver configuração, inicializa padrões
         const initialActiveState = {};
@@ -149,7 +185,8 @@ export default function MenuConfig({ categories, onConfigChange }) {
         });
         setActiveCategories(initialActiveState);
       }
-    } catch (error) {setError("Não foi possível carregar as configurações do cardápio.");
+    } catch (error) {
+      setError("Não foi possível carregar as configurações do cardápio.");
     } finally {
       setLoading(false);
     }
@@ -160,7 +197,7 @@ export default function MenuConfig({ categories, onConfigChange }) {
     try {
       // Use mock user ID for development without authentication
       const mockUserId = 'mock-user-id';
-      
+
       const defaultConfig = {
         user_id: mockUserId,
         expanded_categories: [],
@@ -174,9 +211,9 @@ export default function MenuConfig({ categories, onConfigChange }) {
           return obj;
         }, {})
       };
-      
+
       // Lógica de criação de configuração removida
-      
+
       // Atualizar estado local
       setConfigId(newConfig.id);
       setExpandedCategories([]);
@@ -188,7 +225,7 @@ export default function MenuConfig({ categories, onConfigChange }) {
         obj[category.id] = true; // Todas as categorias ativas por padrão
         return obj;
       }, {}));
-      
+
       // Notificar componente pai
       if (typeof onConfigChange === 'function') {
         onConfigChange({
@@ -202,19 +239,117 @@ export default function MenuConfig({ categories, onConfigChange }) {
             return obj;
           }, {})
         });
-      }} catch (error) {setError("Não foi possível criar a configuração padrão.");
+      }
+    } catch (error) {
+      setError("Não foi possível criar a configuração padrão.");
     }
   };
 
-    // Função para lidar com drag and drop
+  // Função para lidar com drag and drop (Grupos e Categorias)
   const handleDragEnd = (result) => {
-    if (!result.destination) return;
+    const { source, destination, type } = result;
 
-    const items = Array.from(categoryOrder);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    if (!destination) return;
 
-    setCategoryOrder(items);
+    // Se estiver reordenando GRUPOS
+    if (type === "group") {
+      const newGroups = Array.from(categoryGroups);
+      const [removed] = newGroups.splice(source.index, 1);
+      newGroups.splice(destination.index, 0, removed);
+      setCategoryGroups(newGroups);
+      return;
+    }
+
+    // Se estiver reordenando CATEGORIAS (dentro de grupos ou entre grupos)
+    // Descobrir grupo de origem e destino
+    const sourceGroupIndex = categoryGroups.findIndex(g => g.id === source.droppableId);
+    const destGroupIndex = categoryGroups.findIndex(g => g.id === destination.droppableId);
+
+    if (sourceGroupIndex === -1 || destGroupIndex === -1) return;
+
+    const newGroups = [...categoryGroups];
+    const sourceGroup = { ...newGroups[sourceGroupIndex] };
+    const destGroup = { ...newGroups[destGroupIndex] };
+
+    // Se for no mesmo grupo
+    if (sourceGroupIndex === destGroupIndex) {
+      const newItems = Array.from(sourceGroup.items);
+      const [removed] = newItems.splice(source.index, 1);
+      newItems.splice(destination.index, 0, removed);
+
+      sourceGroup.items = newItems;
+      newGroups[sourceGroupIndex] = sourceGroup;
+    } else {
+      // Movendo entre grupos
+      const sourceItems = Array.from(sourceGroup.items);
+      const destItems = Array.from(destGroup.items);
+
+      const [removed] = sourceItems.splice(source.index, 1);
+      destItems.splice(destination.index, 0, removed);
+
+      sourceGroup.items = sourceItems;
+      destGroup.items = destItems;
+
+      newGroups[sourceGroupIndex] = sourceGroup;
+      newGroups[destGroupIndex] = destGroup;
+    }
+
+    setCategoryGroups(newGroups);
+  };
+
+  // Funções para gerenciar grupos
+  const addGroup = () => {
+    const newGroup = {
+      id: `group_${Date.now()}`,
+      name: "Nova Aba",
+      items: []
+    };
+    setCategoryGroups([...categoryGroups, newGroup]);
+  };
+
+  const removeGroup = (groupId) => {
+    setCategoryGroups(prev => {
+      const groupToRemove = prev.find(g => g.id === groupId);
+      if (!groupToRemove) return prev;
+
+      // Se tiver itens, mover para o primeiro grupo disponível ou warning?
+      // Por simplicidade, vamos mover para o primeiro grupo (geralmente Almoco)
+      // ou apenas não remover se tiver itens? 
+      // User experience: Melhor alertar se tiver itens, mas aqui vamos fazer um merge simples.
+
+      const remainingGroups = prev.filter(g => g.id !== groupId);
+      if (remainingGroups.length > 0 && groupToRemove.items.length > 0) {
+        // Move orphaned items to the first group
+        const targetGroup = { ...remainingGroups[0] };
+        targetGroup.items = [...targetGroup.items, ...groupToRemove.items];
+        remainingGroups[0] = targetGroup;
+      }
+
+      return remainingGroups;
+    });
+  };
+
+  const updateGroupName = (groupId, newName) => {
+    setCategoryGroups(prev => prev.map(g =>
+      g.id === groupId ? { ...g, name: newName } : g
+    ));
+  };
+
+  // Estado temporário para edição de nome
+  const [editingGroupId, setEditingGroupId] = useState(null);
+  const [editingName, setEditingName] = useState("");
+
+  const startEditing = (group) => {
+    setEditingGroupId(group.id);
+    setEditingName(group.name);
+  };
+
+  const saveGroupName = () => {
+    if (editingGroupId && editingName.trim()) {
+      updateGroupName(editingGroupId, editingName);
+      setEditingGroupId(null);
+      setEditingName("");
+    }
   };
 
   // Função para salvar configurações
@@ -222,10 +357,10 @@ export default function MenuConfig({ categories, onConfigChange }) {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Use mock user ID for development without authentication
       const mockUserId = 'mock-user-id';
-      
+
       // Montar dados para salvar
       const configData = {
         user_id: mockUserId,
@@ -234,22 +369,23 @@ export default function MenuConfig({ categories, onConfigChange }) {
         fixed_dropdowns: fixedDropdowns || {},
         available_days: Array.isArray(availableDays) ? availableDays : [1, 2, 3, 4, 5],
         category_order: categoryOrder || [],
+        category_groups: categoryGroups || [], // Novo campo
         active_categories: activeCategories || {},
         is_default: true
       };// Debug log
-      
+
       // Verificar se já existe uma configuração padrão
-      const configs = await MenuConfigEntity.filter({ 
+      const configs = await MenuConfigEntity.filter({
         user_id: user.id,
         is_default: true
       });
-      
+
       // Lógica de salvamento de configuração removida
-      
+
       toast({
         description: "Configurações salvas com sucesso",
       });
-      
+
       // Notificar componente pai sobre mudanças
       if (typeof onConfigChange === 'function') {
         onConfigChange({
@@ -258,23 +394,25 @@ export default function MenuConfig({ categories, onConfigChange }) {
           fixedDropdowns: fixedDropdowns,
           availableDays: availableDays,
           category_order: categoryOrder,
+          categoryGroups: categoryGroups, // Novo campo
           activeCategories: activeCategories
         });
       }
-      
+
       setOpen(false); // Fechar o modal
-    } catch (error) {setError("Não foi possível salvar as configurações.");
+    } catch (error) {
+      setError("Não foi possível salvar as configurações.");
     } finally {
       setLoading(false);
     }
   };
-  
+
   // Função para alternar categoria ativa/inativa
   const toggleCategoryActive = (categoryId) => {
     setActiveCategories(prev => {
       const newState = { ...prev };
       // Garantir que o valor seja explicitamente um booleano
-      newState[categoryId] = !Boolean(prev[categoryId]);return newState;
+      newState[categoryId] = !Boolean(prev[categoryId]); return newState;
     });
   };
 
@@ -375,65 +513,165 @@ export default function MenuConfig({ categories, onConfigChange }) {
                 <div className="space-y-4">
                   {/* Ordem das Categorias */}
                   <div className="space-y-4">
-                    <h3 className="text-sm font-medium flex items-center gap-2">
-                      <GripVertical className="h-4 w-4" />
-                      Ordem das Categorias
-                    </h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium flex items-center gap-2">
+                        <GripVertical className="h-4 w-4" />
+                        Organização das Abas
+                      </h3>
+                      <Button onClick={addGroup} size="sm" variant="outline" className="h-8 gap-1">
+                        <Plus className="h-3 w-3" /> Nova Aba
+                      </Button>
+                    </div>
+
                     <p className="text-sm text-gray-500">
-                      Arraste para reordenar as categorias no cardápio:
+                      Crie abas e arraste categorias para organizá-las. As abas aparecerão no topo do cardápio.
                     </p>
 
                     <DragDropContext onDragEnd={handleDragEnd}>
-                      <Droppable droppableId="categories">
+                      <Droppable droppableId="all-groups" type="group">
                         {(provided) => (
                           <div
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className="space-y-2 max-h-[400px] overflow-y-auto pr-2"
+                            className="space-y-4 max-h-[500px] overflow-y-auto pr-2"
                           >
-                            {categoryOrder.map((categoryId, index) => {
-                              const category = categories.find(c => c.id === categoryId);
-                              if (!category) return null;
-                              
-                              return (
-                                <Draggable 
-                                  key={category.id} 
-                                  draggableId={category.id} 
-                                  index={index}
-                                >
-                                  {(provided) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      className="flex items-center gap-2 p-2 bg-white border rounded shadow-sm"
-                                    >
-                                      <div 
-                                        {...provided.dragHandleProps}
-                                        className="cursor-grab hover:text-blue-600"
-                                      >
-                                        <GripVertical className="h-4 w-4" />
+                            {categoryGroups.map((group, groupIndex) => (
+                              <Draggable key={group.id} draggableId={group.id} index={groupIndex}>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    className="border rounded-lg bg-gray-50/50 p-3 space-y-3"
+                                  >
+                                    {/* Group Header */}
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2 flex-1">
+                                        <div {...provided.dragHandleProps} className="cursor-grab hover:text-blue-600 p-1">
+                                          <GripVertical className="h-4 w-4 text-gray-400" />
+                                        </div>
+
+                                        {editingGroupId === group.id ? (
+                                          <div className="flex items-center gap-2 flex-1 max-w-[200px]">
+                                            <Input
+                                              value={editingName}
+                                              onChange={(e) => setEditingName(e.target.value)}
+                                              className="h-8 text-sm"
+                                              autoFocus
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter') saveGroupName();
+                                                if (e.key === 'Escape') setEditingGroupId(null);
+                                              }}
+                                            />
+                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={saveGroupName}>
+                                              <Check className="h-3 w-3 text-green-600" />
+                                            </Button>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center gap-2 group/title">
+                                            <span className="font-semibold text-sm">{group.name}</span>
+                                            <Button
+                                              size="icon"
+                                              variant="ghost"
+                                              className="h-6 w-6 opacity-0 group-hover/title:opacity-100 transition-opacity"
+                                              onClick={() => startEditing(group)}
+                                            >
+                                              <Pencil className="h-3 w-3 text-gray-500" />
+                                            </Button>
+                                          </div>
+                                        )}
                                       </div>
+
                                       <div className="flex items-center gap-2">
-                                        <div 
-                                          className="w-3 h-3 rounded-full"
-                                          style={{ 
-                                            backgroundColor: categoryColors[category.id] || category.color || '#808080' 
-                                          }}
-                                        />
-                                        <span>{category.name}</span>
+                                        <Badge variant="secondary" className="text-xs">
+                                          {group.items.length} cat.
+                                        </Badge>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50"
+                                          onClick={() => removeGroup(group.id)}
+                                          disabled={categoryGroups.length <= 1} // Prevent deleting last group
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </Button>
                                       </div>
                                     </div>
-                                  )}
-                                </Draggable>
-                              );
-                            })}
+
+                                    {/* Categories List */}
+                                    <Droppable droppableId={group.id} type="category">
+                                      {(provided, snapshot) => (
+                                        <div
+                                          ref={provided.innerRef}
+                                          {...provided.droppableProps}
+                                          className={`space-y-2 min-h-[50px] p-2 rounded-md transition-colors ${snapshot.isDraggingOver ? 'bg-blue-100/50' : 'bg-white border'
+                                            }`}
+                                        >
+                                          {group.items.length === 0 && (
+                                            <div className="text-xs text-center text-gray-400 py-4 border-2 border-dashed rounded">
+                                              Arraste categorias aqui
+                                            </div>
+                                          )}
+
+                                          {group.items.map((categoryId, index) => {
+                                            const category = categories.find(c => c.id === categoryId);
+                                            // Handle case where category might have been deleted but still in config
+                                            if (!category) return null;
+
+                                            // Determine styles dynamically
+                                            const catColor = categoryColors[category.id] || category.color || '#808080';
+                                            const isActive = activeCategories[category.id];
+
+                                            return (
+                                              <Draggable
+                                                key={category.id}
+                                                draggableId={category.id}
+                                                index={index}
+                                              >
+                                                {(provided, snapshot) => (
+                                                  <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    className={`flex items-center gap-2 p-2 rounded border text-sm transition-shadow ${snapshot.isDragging ? 'shadow-lg ring-2 ring-blue-400 bg-white z-50' : 'bg-white hover:border-blue-300'
+                                                      } ${!isActive ? 'opacity-60 saturate-0' : ''}`}
+                                                  >
+                                                    <div
+                                                      {...provided.dragHandleProps}
+                                                      className="cursor-grab hover:text-blue-600 text-gray-400"
+                                                    >
+                                                      <GripVertical className="h-4 w-4" />
+                                                    </div>
+
+                                                    <div
+                                                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                                      style={{ backgroundColor: catColor }}
+                                                    />
+
+                                                    <span className="truncate flex-1 font-medium">{category.name}</span>
+
+                                                    {/* Status indicator */}
+                                                    {!isActive && (
+                                                      <Badge variant="outline" className="text-[10px] h-5 px-1">Inativa</Badge>
+                                                    )}
+                                                  </div>
+                                                )}
+                                              </Draggable>
+                                            );
+                                          })}
+                                          {provided.placeholder}
+                                        </div>
+                                      )}
+                                    </Droppable>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
                             {provided.placeholder}
                           </div>
                         )}
                       </Droppable>
                     </DragDropContext>
                   </div>
-                  
+
                   {/* Ativar/Desativar Categorias - NOVA SEÇÃO */}
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium flex items-center gap-2">
@@ -443,21 +681,20 @@ export default function MenuConfig({ categories, onConfigChange }) {
                     <p className="text-sm text-gray-500">
                       Defina quais categorias estarão visíveis no cardápio:
                     </p>
-                    
+
                     <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
                       {categories.map(category => (
-                        <div 
-                          key={category.id} 
-                          className={`flex items-center justify-between p-2 border rounded ${
-                            activeCategories[category.id] ? 'bg-white' : 'bg-gray-50'
-                          }`}
+                        <div
+                          key={category.id}
+                          className={`flex items-center justify-between p-2 border rounded ${activeCategories[category.id] ? 'bg-white' : 'bg-gray-50'
+                            }`}
                         >
                           <div className="flex items-center gap-2">
-                            <div 
+                            <div
                               className="w-3 h-3 rounded-full opacity-75"
-                              style={{ 
+                              style={{
                                 backgroundColor: categoryColors[category.id] || category.color || '#808080',
-                                opacity: activeCategories[category.id] ? 1 : 0.5 
+                                opacity: activeCategories[category.id] ? 1 : 0.5
                               }}
                             />
                             <span className={activeCategories[category.id] ? '' : 'text-gray-400'}>
@@ -473,7 +710,7 @@ export default function MenuConfig({ categories, onConfigChange }) {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Coluna 2: Categorias Expandidas e Dropdowns Fixos */}
                 <div className="space-y-6">
                   <div className="space-y-2">
@@ -548,24 +785,24 @@ export default function MenuConfig({ categories, onConfigChange }) {
                   {categories.map(category => {
                     // Usar cor personalizada ou cor padrão da categoria
                     const categoryColor = categoryColors[category.id] || category.color || "#808080";
-                    
+
                     return (
                       <div key={category.id} className="p-3 bg-white border rounded shadow-sm">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-4 h-4 rounded-full" 
-                                style={{ backgroundColor: categoryColor }}
-                              ></div>
-                              <span className="font-medium">{category.name}</span>
-                            </div>
-                            <Badge variant="outline" style={{ borderColor: categoryColor, color: categoryColor }}>
-                              {categoryColor}
-                            </Badge>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: categoryColor }}
+                            ></div>
+                            <span className="font-medium">{category.name}</span>
                           </div>
-                          <div className="mt-1">
-                            <ColorPalette onSelect={(color) => updateCategoryColor(category.id, color)} />
-                          </div>
+                          <Badge variant="outline" style={{ borderColor: categoryColor, color: categoryColor }}>
+                            {categoryColor}
+                          </Badge>
+                        </div>
+                        <div className="mt-1">
+                          <ColorPalette onSelect={(color) => updateCategoryColor(category.id, color)} />
+                        </div>
                       </div>
                     );
                   })}
@@ -596,11 +833,10 @@ export default function MenuConfig({ categories, onConfigChange }) {
                     <button
                       key={day}
                       type="button"
-                      className={`p-3 rounded border flex flex-col items-center justify-center transition-colors ${
-                        availableDays.includes(day)
+                      className={`p-3 rounded border flex flex-col items-center justify-center transition-colors ${availableDays.includes(day)
                           ? "bg-blue-50 border-blue-200 text-blue-700"
                           : "bg-gray-50 border-gray-200 text-gray-400"
-                      }`}
+                        }`}
                       onClick={() => toggleDay(day)}
                       disabled={availableDays.length === 1 && availableDays.includes(day)}
                     >

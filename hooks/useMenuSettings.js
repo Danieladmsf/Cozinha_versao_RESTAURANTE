@@ -22,6 +22,7 @@ export const useMenuSettings = () => {
   const [fixedDropdowns, setFixedDropdowns] = useState({});
   const [availableDays, setAvailableDays] = useState([1, 2, 3, 4, 5]);
   const [categoryOrder, setCategoryOrder] = useState([]);
+  const [categoryGroups, setCategoryGroups] = useState([]); // New state for menu tabs
   const [clientCategorySettings, setClientCategorySettings] = useState({});
 
   // Carregar dados iniciais
@@ -73,6 +74,28 @@ export const useMenuSettings = () => {
         setAvailableDays(config.available_days || [1, 2, 3, 4, 5]);
         setSelectedMainCategories(config.selected_main_categories || []);
         setClientCategorySettings(config.client_category_settings || {});
+
+        // Load category groups
+        // IMPORTANTE: Só aplicar padrão se a propriedade NÃO estiver definida (undefined)
+        // Se estiver definida como [], respeitamos (usuário deletou tudo)
+        if (config.category_groups !== undefined) {
+          setCategoryGroups(config.category_groups);
+        } else {
+          // Initialize default groups if none exist in DB (migration only)
+          const defaultGroups = [
+            {
+              id: 'almoco',
+              name: 'Almoço',
+              items: config.category_order || []
+            },
+            {
+              id: 'mono_porcoes',
+              name: 'Mono Porções',
+              items: []
+            }
+          ];
+          setCategoryGroups(defaultGroups);
+        }
 
         const rootCategories = categoryTreeData.filter(cat => cat.level === 1);
         const categoriesToUse = rootCategories.length > 0 ? rootCategories : categoryTreeData;
@@ -151,6 +174,7 @@ export const useMenuSettings = () => {
         fixed_dropdowns: fixedDropdowns || {},
         available_days: availableDays || [1, 2, 3, 4, 5],
         category_order: categoryOrder || [],
+        category_groups: categoryGroups || [], // Include categoryGroups in save
         active_categories: activeCategories || {},
         selected_main_categories: selectedMainCategories || [],
         client_category_settings: clientCategorySettings || {},
@@ -171,7 +195,9 @@ export const useMenuSettings = () => {
         category_colors: configData.category_colors,
         fixed_dropdowns: configData.fixed_dropdowns,
         available_days: configData.available_days,
+        available_days: configData.available_days,
         category_order: configData.category_order,
+        category_groups: configData.category_groups,
         active_categories: configData.active_categories,
         selected_main_categories: configData.selected_main_categories
       };
@@ -188,29 +214,27 @@ export const useMenuSettings = () => {
 
   // Funções utilitárias
   const getFilteredCategories = () => {
-    console.log('useMenuSettings: getFilteredCategories - selectedMainCategories:', selectedMainCategories);
-
-    // Filtrar primeiro por nível 1 (categorias raiz)
-    let result = categoryTree.filter(cat => cat.level === 1);
-
+    // Se nada selecionado, retorna vazio
     if (selectedMainCategories.length === 0) {
-      console.log('useMenuSettings: getFilteredCategories - returning all level 1 categories:', result);
-      return result;
+      return [];
     }
 
-    const filteredCategories = result.filter(subCategory => {
-      const mainCategory = categories.find(cat =>
-        cat.value === subCategory.type
-      );
+    const result = [];
 
-      if (mainCategory) {
-        return selectedMainCategories.includes(mainCategory.value);
-      }
-
-      return false;
+    // Para cada tipo de categoria selecionado (ex: 'receitas_-_base')
+    selectedMainCategories.forEach(mainCatValue => {
+      // Retorna APENAS as raízes (L1) desse tipo
+      // Essas são as que vão virar ABAS (ex: Almoço, Confeitária)
+      const categoriesOfType = categoryTree.filter(cat => cat.type === mainCatValue);
+      const rootCategories = categoriesOfType.filter(cat => cat.level === 1);
+      result.push(...rootCategories);
     });
-    console.log('useMenuSettings: getFilteredCategories - returning filtered categories:', filteredCategories);
-    return filteredCategories;
+
+    // Remove duplicates
+    const uniqueResult = Array.from(new Set(result.map(c => c.id)))
+      .map(id => result.find(c => c.id === id));
+
+    return uniqueResult;
   };
 
   const toggleCategoryActive = (categoryId) => {
@@ -274,7 +298,9 @@ export const useMenuSettings = () => {
     categoryColors,
     fixedDropdowns,
     availableDays,
+    availableDays,
     categoryOrder,
+    categoryGroups,
     clientCategorySettings,
 
     // Setters
@@ -285,6 +311,7 @@ export const useMenuSettings = () => {
     setFixedDropdowns,
     setAvailableDays,
     setCategoryOrder,
+    setCategoryGroups,
     setClientCategorySettings,
 
     // Funções

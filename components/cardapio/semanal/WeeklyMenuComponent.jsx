@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Loader2, Utensils, Package } from 'lucide-react';
 import WeekNavigator from '@/components/shared/WeekNavigator';
 import MenuNotes from '@/components/shared/MenuNotes';
 import MenuNoteDialog from '@/components/shared/MenuNoteDialog';
@@ -30,6 +31,9 @@ export default function WeeklyMenuComponent() {
   const locationSelection = useLocationSelection(getAllClientIds());
   const menuOperations = useWeeklyMenuOperations();
   const menuHelpers = useMenuHelpers();
+
+  // Estado para controlar tab de tipo de refeição (Almoço / Mono Porções)
+  const [mealType, setMealType] = useState('almoco');
 
   const {
     categories,
@@ -73,6 +77,18 @@ export default function WeeklyMenuComponent() {
     }
   }, [menuConfig?.available_days, menuInterface.currentDayIndex]);
 
+  // Inicializar mealType com o primeiro grupo quando category_groups carrega
+  useEffect(() => {
+    if (menuConfig?.category_groups?.length > 0) {
+      const firstGroupId = menuConfig.category_groups[0].id;
+      // Só muda se o mealType atual não existe nos groups
+      const currentGroupExists = menuConfig.category_groups.some(g => g.id === mealType);
+      if (!currentGroupExists) {
+        setMealType(firstGroupId);
+      }
+    }
+  }, [menuConfig?.category_groups]);
+
   // Estado para controlar se já aplicamos as configurações iniciais
   const [hasAppliedInitialConfig, setHasAppliedInitialConfig] = React.useState(false);
 
@@ -99,7 +115,7 @@ export default function WeeklyMenuComponent() {
   const getCategoryColor = (categoryId) => menuHelpers.getCategoryColor(categoryId, categories, menuConfig);
   const getAvailableDays = () => menuConfig?.available_days || [1, 2, 3, 4, 5];
 
-  // Operações de menu
+  // Operações de menu - agora com suporte a mealType
   const handleMenuItemChange = async (dayIndex, categoryId, itemIndex, newItem) => {
     try {
       let currentMenu = weeklyMenu;
@@ -108,7 +124,7 @@ export default function WeeklyMenuComponent() {
         setWeeklyMenu(currentMenu);
       }
 
-      const updatedMenu = await menuOperations.updateMenuItem(currentMenu, dayIndex, categoryId, itemIndex, newItem);
+      const updatedMenu = await menuOperations.updateMenuItem(currentMenu, mealType, dayIndex, categoryId, itemIndex, newItem);
       setWeeklyMenu(updatedMenu);
     } catch (error) {
     }
@@ -123,7 +139,7 @@ export default function WeeklyMenuComponent() {
   const addMenuItem = async (dayIndex, categoryId) => {
     try {
       const createMenuFn = () => menuOperations.createWeeklyMenu(menuInterface.currentDate);
-      const updatedMenu = await menuOperations.addMenuItem(weeklyMenu, dayIndex, categoryId, createMenuFn, getActiveLocationIds);
+      const updatedMenu = await menuOperations.addMenuItem(weeklyMenu, mealType, dayIndex, categoryId, createMenuFn, getActiveLocationIds);
       if (updatedMenu) {
         setWeeklyMenu(updatedMenu);
       }
@@ -133,7 +149,7 @@ export default function WeeklyMenuComponent() {
 
   const removeMenuItem = async (dayIndex, categoryId, itemIndex) => {
     try {
-      const updatedMenu = await menuOperations.removeMenuItem(weeklyMenu, dayIndex, categoryId, itemIndex);
+      const updatedMenu = await menuOperations.removeMenuItem(weeklyMenu, mealType, dayIndex, categoryId, itemIndex);
       if (updatedMenu) {
         setWeeklyMenu(updatedMenu);
       }
@@ -202,6 +218,40 @@ export default function WeeklyMenuComponent() {
               availableDays={getAvailableDays()}
               onDayChange={menuInterface.setCurrentDayIndex}
             />
+
+            {/* Tabs Dinâmicas baseadas em Grupos */}
+            <div className="flex justify-center mt-4">
+              <Tabs value={mealType} onValueChange={setMealType} className="w-full max-w-3xl">
+                <TabsList className="flex w-full flex-wrap h-auto p-1 bg-gray-100/80">
+                  {menuConfig?.category_groups?.length > 0 ? (
+                    menuConfig.category_groups.map(group => (
+                      <TabsTrigger
+                        key={group.id}
+                        value={group.id}
+                        className="flex items-center gap-2 flex-1 min-w-[120px]"
+                      >
+                        {group.id === 'almoco' ? <Utensils className="h-4 w-4" /> :
+                          group.id === 'mono_porcoes' ? <Package className="h-4 w-4" /> :
+                            <div className="w-2 h-2 rounded-full bg-blue-400" />}
+                        {group.name}
+                      </TabsTrigger>
+                    ))
+                  ) : (
+                    <>
+                      {/* Fallback Legacy Tabs */}
+                      <TabsTrigger value="almoco" className="flex items-center gap-2 flex-1">
+                        <Utensils className="h-4 w-4" />
+                        Almoço
+                      </TabsTrigger>
+                      <TabsTrigger value="mono_porcoes" className="flex items-center gap-2 flex-1">
+                        <Package className="h-4 w-4" />
+                        Mono Porções
+                      </TabsTrigger>
+                    </>
+                  )}
+                </TabsList>
+              </Tabs>
+            </div>
           </div>
         </div>
 
@@ -210,57 +260,87 @@ export default function WeeklyMenuComponent() {
           <div className="flex-1 space-y-4">
             {/* Cards de Categorias */}
             <div className="space-y-4">
-              {getActiveCategories().map(category => {
-                if (!category) return null;
+              {(() => {
+                // Determine which categories to show based on selected tab (mealType)
+                let categoriesToShow = [];
 
-                const categoryItems = weeklyMenu?.menu_data[menuInterface.currentDayIndex]?.[category.id] || [];
-                const fixedDropdowns = menuConfig?.fixed_dropdowns?.[category.id] || 0;
-                const items = menuHelpers.ensureMinimumItems(categoryItems, fixedDropdowns);
-                const categoryColor = getCategoryColor(category.id);
+                if (menuConfig?.category_groups?.length > 0) {
+                  const currentGroup = menuConfig.category_groups.find(g => g.id === mealType);
+                  if (currentGroup) {
+                    // Filter categories that belong to this group AND are active
+                    categoriesToShow = currentGroup.items
+                      .map(id => categories.find(c => c.id === id))
+                      .filter(Boolean)
+                      .filter(cat => {
+                        // Check if active (default to true if not specified)
+                        return menuConfig.active_categories?.[cat.id] !== false;
+                      });
+                  }
+                } else {
+                  // Legacy behavior: show all active categories
+                  categoriesToShow = getActiveCategories();
+                }
 
-                console.log(`🍽️ [WeeklyMenuComponent] Categoria ${category.name} (${category.id}) - Dia ${menuInterface.currentDayIndex}:`, {
-                  categoryItems: categoryItems.length,
-                  fixedDropdowns,
-                  itemsAposEnsureMinimum: items.length,
-                  categoryItems,
-                  items
+                if (categoriesToShow.length === 0) {
+                  return (
+                    <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
+                      <p className="text-gray-500">Nenhuma categoria configurada para esta aba.</p>
+                      <p className="text-sm text-gray-400 mt-1">Vá em Configurações para adicionar categorias.</p>
+                    </div>
+                  );
+                }
+
+                return categoriesToShow.map(category => {
+                  if (!category) return null;
+
+                  // Acessar dados usando a estrutura: menu_data[mealType][dayIndex][categoryId]
+                  const mealTypeData = weeklyMenu?.menu_data?.[mealType] || weeklyMenu?.menu_data;
+                  const categoryItems = mealTypeData?.[menuInterface.currentDayIndex]?.[category.id] || [];
+                  const fixedDropdowns = menuConfig?.fixed_dropdowns?.[category.id] || 0;
+                  const items = menuHelpers.ensureMinimumItems(categoryItems, fixedDropdowns);
+                  const categoryColor = getCategoryColor(category.id);
+
+                  console.log(`🍽️ [WeeklyMenuComponent] Categoria ${category.name} - Tab ${mealType} - Dia ${menuInterface.currentDayIndex}:`, {
+                    categoryItems: categoryItems.length,
+                    items: items.length
+                  });
+
+                  return (
+                    <CategoryMenuCard
+                      key={category.id}
+                      category={category}
+                      items={items}
+                      categoryColor={categoryColor}
+                      isLocationVisible={menuInterface.isLocationVisible(category.id)}
+                      onToggleLocationVisibility={() => toggleLocationVisibility(category.id)}
+                      onMenuItemChange={handleMenuItemChange}
+                      onAddMenuItem={() => addMenuItem(menuInterface.currentDayIndex, category.id)}
+                      onRemoveMenuItem={(itemIndex) => removeMenuItem(menuInterface.currentDayIndex, category.id, itemIndex)}
+                      recipes={recipes}
+                      categories={categories}
+                      menuHelpers={menuHelpers}
+                      menuInterface={menuInterface}
+                      noteActions={noteActions}
+                      currentDayIndex={menuInterface.currentDayIndex}
+                      renderLocationCheckboxes={(itemIndex, item) => (
+                        <div className="mt-2 p-2 bg-white rounded border border-gray-200">
+                          <LocationCheckboxGroup
+                            locations={locations}
+                            item={item}
+                            recipes={recipes}
+                            locationSelection={locationSelection}
+                            onLocationChange={(locationId, checked) =>
+                              handleLocationChange(menuInterface.currentDayIndex, category.id, itemIndex, locationId, checked)
+                            }
+                            categoryId={category.id}
+                            itemIndex={itemIndex}
+                          />
+                        </div>
+                      )}
+                    />
+                  );
                 });
-
-                return (
-                  <CategoryMenuCard
-                    key={category.id}
-                    category={category}
-                    items={items}
-                    categoryColor={categoryColor}
-                    isLocationVisible={menuInterface.isLocationVisible(category.id)}
-                    onToggleLocationVisibility={() => toggleLocationVisibility(category.id)}
-                    onMenuItemChange={handleMenuItemChange}
-                    onAddMenuItem={() => addMenuItem(menuInterface.currentDayIndex, category.id)}
-                    onRemoveMenuItem={(itemIndex) => removeMenuItem(menuInterface.currentDayIndex, category.id, itemIndex)}
-                    recipes={recipes}
-                    categories={categories}
-                    menuHelpers={menuHelpers}
-                    menuInterface={menuInterface}
-                    noteActions={noteActions}
-                    currentDayIndex={menuInterface.currentDayIndex}
-                    renderLocationCheckboxes={(itemIndex, item) => (
-                      <div className="mt-2 p-2 bg-white rounded border border-gray-200">
-                        <LocationCheckboxGroup
-                          locations={locations}
-                          item={item}
-                          recipes={recipes}
-                          locationSelection={locationSelection}
-                          onLocationChange={(locationId, checked) =>
-                            handleLocationChange(menuInterface.currentDayIndex, category.id, itemIndex, locationId, checked)
-                          }
-                          categoryId={category.id}
-                          itemIndex={itemIndex}
-                        />
-                      </div>
-                    )}
-                  />
-                );
-              })}
+              })()}
             </div>
           </div>
 

@@ -214,20 +214,18 @@ export default function CategoryMenuCard({
           })}
         </div>
 
-        {items.length < 10 && (
-          <div className="mt-3 pt-2 border-t border-gray-200">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full border-dashed border-gray-300 hover:border-gray-400 h-9 rounded-lg text-sm"
-              style={buttonStyle}
-              onClick={onAddMenuItem}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Adicionar item
-            </Button>
-          </div>
-        )}
+        <div className="mt-3 pt-2 border-t border-gray-200">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full border-dashed border-gray-300 hover:border-gray-400 h-9 rounded-lg text-sm"
+            style={buttonStyle}
+            onClick={onAddMenuItem}
+          >
+            <Plus className="h-3 w-3 mr-1" />
+            Adicionar item
+          </Button>
+        </div>
       </div>
     </div>
   );
