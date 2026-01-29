@@ -1708,9 +1708,9 @@ export default function RecipeTechnical() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="dados-tecnicos">Dados Técnicos</TabsTrigger>
+            <TabsTrigger value="book">Receituário</TabsTrigger>
             <TabsTrigger value="pre-preparo">Pré-Preparo</TabsTrigger>
             <TabsTrigger value="ficha-tecnica">Ficha Técnica</TabsTrigger>
-            <TabsTrigger value="book">Receituário</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados-tecnicos">

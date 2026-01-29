@@ -8,9 +8,7 @@ export async function POST(request) {
 
   console.log("Upload request initiated. Token present:", !!process.env.BLOB_READ_WRITE_TOKEN);
 
-  // Le o corpo como Blob/Buffer
-  // Note: Em App Router Route Handlers, request.body é um ReadableStream ou podemos usar formData()
-
+  // Le o corpo como FormData
   const formData = await request.formData();
   const file = formData.get('file');
 
@@ -18,9 +16,19 @@ export async function POST(request) {
     return NextResponse.json({ error: 'No files received.' }, { status: 400 });
   }
 
-  const blob = await put(filename, file, {
-    access: 'public',
-  });
+  try {
+    const blob = await put(filename, file, {
+      access: 'public',
+    });
 
-  return NextResponse.json(blob);
+    console.log("✅ Upload bem-sucedido:", blob.url);
+    return NextResponse.json(blob);
+  } catch (error) {
+    console.error("❌ Erro detalhado no Upload Vercel Blob:", error);
+    console.error("Stack:", error.stack);
+    return NextResponse.json(
+      { error: error.message, details: error.toString() },
+      { status: 500 }
+    );
+  }
 }

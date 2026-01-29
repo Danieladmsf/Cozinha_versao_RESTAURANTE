@@ -118,22 +118,6 @@ export default function RecipeMetricsDashboard({ metricsData, className, costFie
       listUnitColor: 'text-green-400'
     },
     {
-      label: weightFieldName || 'Peso da Cuba',
-      value: formatDisplayValue(metrics.cuba_weight, 'weight'),
-      unit: 'kg',
-      gradient: 'from-purple-50 to-purple-100',
-      borderColor: 'border-purple-200',
-      textColor: 'text-purple-600',
-      unitColor: 'text-purple-400',
-      tooltip: 'Peso final da receita/porção pronta. É o peso que vai para venda ou consumo.',
-      listBgHover: 'hover:bg-pink-50 bg-pink-50/10', // Mantendo cores originais aproximadas ou ajustando se necessário? O original não tinha roxo na lista, vamos ver
-      // Original tinha peso da cuba? No código inline removido não tinha peso da cuba explicitamente na lista, mas tinha custo da cuba. Vamos manter para consistência.
-      listBgHover: 'hover:bg-purple-50 bg-purple-50/10',
-      listTextLabel: 'text-purple-600 font-medium',
-      listTextValue: 'text-purple-700 font-bold',
-      listUnitColor: 'text-purple-400'
-    },
-    {
       label: costFieldName || 'Custo CMV',
       value: formatDisplayValue(metrics.cuba_cost, 'currency'),
       unit: 'R$',

@@ -26,12 +26,27 @@ import {
     Trash2,
     Image as ImageIcon,
     ImageOff,
-    Youtube
+    Youtube,
+    Wrench,
+    Info,
+    ExternalLink
 } from 'lucide-react';
+import Link from 'next/link';
 import { useRecipeStore } from '@/hooks/ficha-tecnica/useRecipeStore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore'; // Adicionado
+import { storage, db } from '@/lib/firebase'; // Adicionado db
 import { cn } from "@/lib/utils";
+
+// Paleta de cores para seleção múltipla
+const HIGHLIGHT_PALETTE = [
+    { name: 'blue', bg: 'bg-blue-50', border: 'border-blue-300', text: 'text-blue-700', icon: 'text-blue-500', indicator: 'bg-blue-400', ring: 'ring-blue-200' },
+    { name: 'green', bg: 'bg-emerald-50', border: 'border-emerald-300', text: 'text-emerald-700', icon: 'text-emerald-500', indicator: 'bg-emerald-500', ring: 'ring-emerald-200' },
+    { name: 'purple', bg: 'bg-purple-50', border: 'border-purple-300', text: 'text-purple-700', icon: 'text-purple-500', indicator: 'bg-purple-500', ring: 'ring-purple-200' },
+    { name: 'orange', bg: 'bg-orange-50', border: 'border-orange-300', text: 'text-orange-700', icon: 'text-orange-500', indicator: 'bg-orange-500', ring: 'ring-orange-200' },
+    { name: 'rose', bg: 'bg-rose-50', border: 'border-rose-300', text: 'text-rose-700', icon: 'text-rose-500', indicator: 'bg-rose-500', ring: 'ring-rose-200' },
+    { name: 'cyan', bg: 'bg-cyan-50', border: 'border-cyan-300', text: 'text-cyan-700', icon: 'text-cyan-500', indicator: 'bg-cyan-500', ring: 'ring-cyan-200' },
+];
 
 export default function RecipeBook({ recipeData: initialData }) {
     // Conecta ao Store para obter dados reativos
@@ -60,6 +75,28 @@ export default function RecipeBook({ recipeData: initialData }) {
     const [stepUploadingIndex, setStepUploadingIndex] = useState(null); // Armazena o índice da etapa que está fazendo upload
     const [collapsedPhotos, setCollapsedPhotos] = useState({}); // Controla visibilidade das fotos por etapa { [idx]: true/false }
     const fileInputRef = useRef(null);
+
+    // Estados para Ferramentas
+    const [isToolModalOpen, setIsToolModalOpen] = useState(false);
+    const [availableTools, setAvailableTools] = useState([]);
+    const [toolSearchTerm, setToolSearchTerm] = useState('');
+    const [activeToolStep, setActiveToolStep] = useState(null); // { prepIndex, lineIndex }
+    const [loadingTools, setLoadingTools] = useState(false);
+    const [highlightedTools, setHighlightedTools] = useState([]); // Array de IDs selecionados
+
+    // Helper para obter cor da ferramenta baseada na ordem de seleção
+    const getToolColor = (toolId) => {
+        const index = highlightedTools.indexOf(toolId);
+        if (index === -1) return null;
+        return HIGHLIGHT_PALETTE[index % HIGHLIGHT_PALETTE.length];
+    };
+
+    const toggleToolHighlight = (toolId) => {
+        setHighlightedTools(prev => {
+            if (prev.includes(toolId)) return prev.filter(id => id !== toolId);
+            return [...prev, toolId];
+        });
+    };
 
     // Estados locais para edição dos campos de qualidade (sincronizados com recipeData via store ao salvar)
     const [localData, setLocalData] = useState({
@@ -233,7 +270,100 @@ export default function RecipeBook({ recipeData: initialData }) {
         newPhotos.splice(photoIndex, 1);
 
         actions.updatePreparation(prepIndex, 'photos', newPhotos);
+        actions.updatePreparation(prepIndex, 'photos', newPhotos);
     };
+
+    // === LÓGICA DE FERRAMENTAS ===
+
+    // Carregar ferramentas
+    const loadTools = async () => {
+        if (availableTools.length > 0) return; // Já carregou
+        setLoadingTools(true);
+        try {
+            const querySnapshot = await getDocs(collection(db, 'ferramentas'));
+            const list = [];
+            querySnapshot.forEach((doc) => {
+                list.push({ id: doc.id, ...doc.data() });
+            });
+            setAvailableTools(list);
+        } catch (error) {
+            console.error("Erro ao carregar ferramentas:", error);
+        } finally {
+            setLoadingTools(false);
+        }
+    };
+
+    const openToolModal = (prepIndex, lineIndex) => {
+        setActiveToolStep({ prepIndex, lineIndex });
+        setToolSearchTerm('');
+        setIsToolModalOpen(true);
+        loadTools();
+    };
+
+    const handleSelectTool = (tool) => {
+        if (!activeToolStep) return;
+        const { prepIndex, lineIndex } = activeToolStep;
+
+        const currentPrep = recipeData.preparations[prepIndex];
+        const currentTools = { ...(currentPrep.tools || {}) };
+
+        // Inicializa array para a linha se não existir
+        if (!currentTools[lineIndex]) currentTools[lineIndex] = [];
+
+        // Evita duplicatas na mesma linha
+        if (currentTools[lineIndex].some(t => t.id === tool.id)) {
+            alert("Ferramenta já adicionada nesta etapa.");
+            return;
+        }
+
+        // Adiciona ferramenta simplificada
+        currentTools[lineIndex].push({
+            id: tool.id,
+            nome: tool.nome,
+            imageUrl: tool.imageUrl,
+            codigo: tool.codigo
+        });
+
+        // Atualiza store/estado
+        actions.updatePreparation(prepIndex, 'tools', currentTools);
+
+        // Auto-save
+        const updatedPreparations = [...recipeData.preparations];
+        updatedPreparations[prepIndex] = {
+            ...updatedPreparations[prepIndex],
+            tools: currentTools
+        };
+        saveRecipeToFirestore(recipeData, updatedPreparations);
+    };
+
+    const removeTool = (prepIndex, lineIndex, toolIndex) => {
+        const currentPrep = recipeData.preparations[prepIndex];
+        const currentTools = { ...(currentPrep.tools || {}) };
+
+        if (currentTools[lineIndex]) {
+            currentTools[lineIndex].splice(toolIndex, 1);
+            if (currentTools[lineIndex].length === 0) delete currentTools[lineIndex];
+
+            actions.updatePreparation(prepIndex, 'tools', currentTools);
+
+            // Auto-save
+            const updatedPreparations = [...recipeData.preparations];
+            updatedPreparations[prepIndex] = {
+                ...updatedPreparations[prepIndex],
+                tools: currentTools
+            };
+            saveRecipeToFirestore(recipeData, updatedPreparations);
+        }
+    };
+
+    const filteredTools = toolSearchTerm.trim().length === 0
+        ? []
+        : availableTools.filter(t =>
+            t.nome?.toLowerCase().includes(toolSearchTerm.toLowerCase()) ||
+            t.codigo?.toLowerCase().includes(toolSearchTerm.toLowerCase())
+        );
+
+    // =============================
 
     const handleSave = async () => {
         // Salva os campos de texto no store
@@ -299,6 +429,24 @@ export default function RecipeBook({ recipeData: initialData }) {
     };
 
     const ingredients = getAllIngredients();
+
+    // Coleta todas as ferramentas únicas da receita
+    const getAllTools = () => {
+        const toolsMap = new Map();
+        recipeData.preparations?.forEach(prep => {
+            if (prep.tools) {
+                Object.values(prep.tools).forEach(lineTools => {
+                    lineTools.forEach(tool => {
+                        if (!toolsMap.has(tool.id)) {
+                            toolsMap.set(tool.id, tool);
+                        }
+                    });
+                });
+            }
+        });
+        return Array.from(toolsMap.values());
+    };
+    const allTools = getAllTools();
 
     return (
         <div className="max-w-5xl mx-auto bg-white min-h-screen pb-12 print:p-0 print:max-w-none shadow-lg rounded-xl my-4">
@@ -378,6 +526,61 @@ export default function RecipeBook({ recipeData: initialData }) {
                             ))}
                             {ingredients.length === 0 && (
                                 <li className="text-gray-400 italic text-center py-4">Nenhum ingrediente cadastrado</li>
+                            )}
+                        </ul>
+                    </div>
+
+                    {/* LISTA DE FERRAMENTAS UTILIZADAS (NOVO CARD) */}
+                    <div className="bg-blue-50/50 rounded-xl p-6 border border-blue-100 print:bg-transparent print:border-none print:p-0">
+                        <h3 className="text-xs uppercase tracking-wider text-blue-600 font-bold mb-4 flex items-center gap-2 border-b pb-2 border-blue-200">
+                            <Wrench className="w-4 h-4" />
+                            Ferramentas Necessárias
+                        </h3>
+
+                        <ul className="space-y-2 text-sm">
+                            {allTools.map((tool, idx) => {
+                                const color = getToolColor(tool.id);
+                                const isHighlighted = !!color;
+
+                                return (
+                                    <li
+                                        key={idx}
+                                        onClick={() => toggleToolHighlight(tool.id)}
+                                        className={`flex justify-between items-center pb-2 border-b border-dashed last:border-0 rounded-lg transition-all px-3 py-2 cursor-pointer select-none group 
+                                        ${isHighlighted
+                                                ? `${color.bg} ${color.border} border shadow-sm transform scale-[1.02]`
+                                                : 'border-blue-100 hover:bg-gray-50 border-transparent'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-8 h-8 rounded bg-white border flex items-center justify-center overflow-hidden flex-shrink-0 transition-all ${isHighlighted ? color.border : 'border-gray-200 group-hover:border-orange-200'}`}>
+                                                {tool.imageUrl ? (
+                                                    <img src={tool.imageUrl} alt={tool.nome} className="w-full h-full object-contain" />
+                                                ) : (
+                                                    <Wrench className={`w-4 h-4 ${isHighlighted ? color.icon : 'text-gray-300'}`} />
+                                                )}
+                                            </div>
+                                            <span className={`transition-colors font-medium ${isHighlighted ? color.text : 'text-gray-600'}`}>{tool.nome}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {isHighlighted && (
+                                                <div className={`w-2 h-2 rounded-full ${color.indicator} animate-in zoom-in`} />
+                                            )}
+                                            <Link
+                                                href={`/ferramentas?id=${tool.id}`}
+                                                target="_blank"
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors opacity-60 hover:opacity-100"
+                                                title="Ver cadastro completo"
+                                            >
+                                                <Info className="w-4 h-4" />
+                                            </Link>
+                                        </div>
+                                    </li>
+                                )
+                            })}
+                            {allTools.length === 0 && (
+                                <li className="text-gray-400 italic text-center py-4">Nenhuma ferramenta vinculada</li>
                             )}
                         </ul>
                     </div>
@@ -559,8 +762,30 @@ export default function RecipeBook({ recipeData: initialData }) {
                                                     const currentPhoto = prep.photos?.[lineIdx];
                                                     const isPhotosHidden = collapsedPhotos[idx];
 
+                                                    // Verifica highlight múltiplo
+                                                    const matchingTools = (prep.tools?.[lineIdx] || []).filter(t => highlightedTools.includes(t.id));
+                                                    const hasMatch = matchingTools.length > 0;
+
+                                                    // Estilo base
+                                                    let containerClasses = "group/line py-1 transition-all duration-300 rounded relative overflow-hidden";
+                                                    if (hasMatch) {
+                                                        const firstColor = getToolColor(matchingTools[0].id);
+                                                        containerClasses += ` shadow-sm pl-4 pr-2 -mx-2 my-1 ${matchingTools.length === 1 ? firstColor.bg + ' ' + firstColor.ring + ' ring-1' : 'bg-gray-50 ring-1 ring-gray-200'}`;
+                                                    } else {
+                                                        containerClasses += " hover:bg-gray-50/50 px-2 -mx-2";
+                                                    }
+
                                                     return (
-                                                        <div key={lineIdx} className="group/line py-0.5">
+                                                        <div key={lineIdx} className={containerClasses}>
+                                                            {/* Barra lateral colorida para highlights */}
+                                                            {hasMatch && (
+                                                                <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col">
+                                                                    {matchingTools.map(t => {
+                                                                        const color = getToolColor(t.id);
+                                                                        return <div key={t.id} className={`flex-1 w-full ${color.indicator}`} title={t.nome} />;
+                                                                    })}
+                                                                </div>
+                                                            )}
                                                             <div className="flex items-start gap-2">
                                                                 {/* Botão de Upload Discreto - Lado Esquerdo (Ao lado do número) */}
                                                                 {!isPhotosHidden && (
@@ -588,6 +813,27 @@ export default function RecipeBook({ recipeData: initialData }) {
                                                                                 </label>
                                                                             </>
                                                                         )}
+
+                                                                        {/* Botão de Ferramenta */}
+                                                                        {/* Botão de Ferramenta com Tooltip Customizado */}
+                                                                        <button
+                                                                            onClick={() => openToolModal(idx, lineIdx)}
+                                                                            className={`relative group/btn flex items-center justify-center w-5 h-5 rounded-full cursor-pointer transition-colors ml-1 ${prep.tools?.[lineIdx]?.length > 0 ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50'}`}
+                                                                        >
+                                                                            <Wrench className="w-3 h-3" />
+
+                                                                            {/* Tooltip flutuante lista as ferramentas */}
+                                                                            {prep.tools?.[lineIdx]?.length > 0 && (
+                                                                                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-[200px] bg-gray-900 text-white text-xs rounded p-2 opacity-0 group-hover/btn:opacity-100 pointer-events-none transition-opacity z-20 shadow-xl">
+                                                                                    <div className="font-bold mb-1 border-b border-gray-700 pb-1">Ferramentas:</div>
+                                                                                    <ul className="list-disc pl-3 space-y-0.5 text-[10px]">
+                                                                                        {prep.tools[lineIdx].map(t => <li key={t.id}>{t.nome}</li>)}
+                                                                                    </ul>
+                                                                                    {/* Seta do tooltip */}
+                                                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                                                                </div>
+                                                                            )}
+                                                                        </button>
                                                                     </div>
                                                                 )}
 
@@ -616,6 +862,8 @@ export default function RecipeBook({ recipeData: initialData }) {
                                                                     </div>
                                                                 </div>
                                                             )}
+
+
                                                         </div>
                                                     );
                                                 });
@@ -663,6 +911,174 @@ export default function RecipeBook({ recipeData: initialData }) {
 
                 </div>
             </div>
+            {/* MODAL DE SELEÇÃO DE FERRAMENTAS */}
+            {isToolModalOpen && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 print:hidden">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[600px] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+
+                        {/* HEADER */}
+                        <div className="px-6 py-4 border-b flex justify-between items-center bg-white shrink-0">
+                            <h3 className="font-bold text-xl flex items-center gap-2 text-gray-800">
+                                <Wrench className="w-5 h-5 text-orange-500" />
+                                Selecionar Ferramentas
+                            </h3>
+                            <button onClick={() => setIsToolModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors bg-gray-100 hover:bg-gray-200 rounded-full p-2">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* CORPO SPLIT */}
+                        <div className="flex-1 flex overflow-hidden">
+
+                            {/* COLUNA ESQUERDA: BUSCA */}
+                            <div className="flex-1 flex flex-col border-r border-gray-200 bg-white">
+                                <div className="p-4 border-b">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar ferramenta por nome ou código..."
+                                            value={toolSearchTerm}
+                                            onChange={(e) => setToolSearchTerm(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all shadow-sm"
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto p-4 bg-gray-50/30">
+                                    {loadingTools ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                            <Loader2 className="w-10 h-10 animate-spin mb-3 text-orange-400" />
+                                            <span className="text-sm font-medium">Carregando ferramentas...</span>
+                                        </div>
+                                    ) : filteredTools.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-400 p-8 text-center">
+                                            {toolSearchTerm.trim().length === 0 ? (
+                                                <>
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <Search className="w-8 h-8 text-gray-300" />
+                                                    </div>
+                                                    <p className="text-gray-500 font-medium">Digite para buscar ferramentas</p>
+                                                    <p className="text-xs text-gray-400 mt-1">Busque pelo nome ou código (ex: Faca, FER001)</p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Wrench className="w-12 h-12 mb-3 opacity-20" />
+                                                    <p className="text-sm font-medium">Nenhuma ferramenta encontrada.</p>
+                                                </>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 gap-2">
+                                            {filteredTools.map(tool => {
+                                                // Verifica se já está selecionado
+                                                const isSelected = activeToolStep &&
+                                                    recipeData.preparations[activeToolStep.prepIndex]?.tools?.[activeToolStep.lineIndex]?.some(t => t.id === tool.id);
+
+                                                return (
+                                                    <button
+                                                        key={tool.id}
+                                                        onClick={() => !isSelected && handleSelectTool(tool)}
+                                                        disabled={isSelected}
+                                                        className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm transition-all text-left group relative overflow-hidden ${isSelected ? 'bg-blue-50 border-blue-200 opacity-60 cursor-default' : 'bg-white border-gray-100 hover:border-orange-200 hover:shadow-md cursor-pointer'}`}
+                                                    >
+                                                        <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
+                                                            {tool.imageUrl ? (
+                                                                <img src={tool.imageUrl} alt={tool.nome} className="w-full h-full object-contain" />
+                                                            ) : (
+                                                                <Wrench className="w-6 h-6 text-gray-300" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0 pr-8">
+                                                            <div className={`font-semibold text-sm truncate ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>{tool.nome}</div>
+                                                            <div className="text-xs text-gray-500 font-mono mt-0.5">{tool.codigo}</div>
+                                                        </div>
+
+                                                        {isSelected ? (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 flex items-center gap-1 bg-blue-100 px-2 py-1 rounded text-xs font-bold">
+                                                                <CheckCircle2 className="w-3 h-3" />
+                                                                OK
+                                                            </div>
+                                                        ) : (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm border border-orange-100">
+                                                                Adicionar
+                                                            </div>
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="p-3 bg-gray-50 border-t text-xs text-center text-gray-400 shrink-0">
+                                    {filteredTools.length > 0 ? `Encontradas ${filteredTools.length} ferramentas` : 'Lista de ferramentas'}
+                                </div>
+                            </div>
+
+                            {/* COLUNA DIREITA: SELECIONADOS */}
+                            <div className="w-[320px] bg-gray-50 flex flex-col border-l border-gray-200 shadow-inner">
+                                <div className="p-4 border-b bg-gray-100/50 flex justify-between items-center">
+                                    <h4 className="font-bold text-gray-700 text-sm uppercase tracking-wide">Selecionados</h4>
+                                    <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                        {activeToolStep && (recipeData.preparations[activeToolStep.prepIndex]?.tools?.[activeToolStep.lineIndex]?.length || 0)}
+                                    </span>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto p-4 content-start">
+                                    {(!activeToolStep || !recipeData.preparations[activeToolStep.prepIndex]?.tools?.[activeToolStep.lineIndex] ||
+                                        recipeData.preparations[activeToolStep.prepIndex].tools[activeToolStep.lineIndex].length === 0) ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-center p-4 opacity-50">
+                                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4 text-gray-400">
+                                                <Utensils className="w-8 h-8" />
+                                            </div>
+                                            <p className="text-gray-600 text-sm font-medium">Nenhuma ferramenta<br />selecionada</p>
+                                            <p className="text-xs text-gray-400 mt-2">Selecione itens na lista ao lado para vincular a esta etapa.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {recipeData.preparations[activeToolStep.prepIndex].tools[activeToolStep.lineIndex].map((tool, tIdx) => (
+                                                <div key={`${tool.id}-${tIdx}`} className="bg-white border border-gray-200 rounded-xl p-2 flex items-center gap-3 shadow-sm group hover:border-red-200 transition-colors">
+                                                    <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                        {tool.imageUrl ? (
+                                                            <img src={tool.imageUrl} alt={tool.nome} className="w-full h-full object-contain" />
+                                                        ) : (
+                                                            <Wrench className="w-4 h-4 text-gray-400" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-sm font-medium text-gray-800 truncate">{tool.nome}</div>
+                                                        <div className="text-[10px] text-gray-400 font-mono">{tool.codigo}</div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeTool(activeToolStep.prepIndex, activeToolStep.lineIndex, tIdx)}
+                                                        className="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                        title="Remover"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* FOOTER */}
+                        <div className="p-4 bg-white border-t flex justify-end gap-3 shrink-0">
+                            <Button
+                                onClick={() => setIsToolModalOpen(false)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white min-w-[120px]"
+                            >
+                                Concluir
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
+

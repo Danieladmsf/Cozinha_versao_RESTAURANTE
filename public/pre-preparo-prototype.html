@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pré-Preparo - Protótipo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-blue: #3b82f6;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --accent-green-light: #ecfdf5;
+            --accent-orange: #f97316;
+            --accent-orange-light: #fff7ed;
+            --accent-purple: #8b5cf6;
+            --accent-purple-light: #f5f3ff;
+            --accent-pink: #ec4899;
+            --accent-pink-light: #fdf2f8;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .page-title .icon {
+            width: 32px;
+            height: 32px;
+            color: var(--accent-orange);
+        }
+
+        /* Recipe Info Card */
+        .recipe-info-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .recipe-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .meta-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .meta-badge .icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab.active {
+            background: var(--bg-secondary);
+            color: var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-card-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-card-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sidebar-card-header .icon {
+            width: 18px;
+            height: 18px;
+            color: var(--accent-blue);
+        }
+
+        /* Ingredients List */
+        .ingredient-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ingredient-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 16px;
+            border-bottom: 1px dashed var(--border-color);
+            transition: background 0.2s;
+            gap: 8px;
+        }
+
+        .ingredient-item:last-child {
+            border-bottom: none;
+        }
+
+        .ingredient-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .ingredient-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .ingredient-item .name {
+            font-size: 14px;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .ingredient-item .amount {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .ingredient-item .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .ingredient-item .checkbox.checked {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .ingredient-item .checkbox .icon {
+            width: 14px;
+            height: 14px;
+            color: white;
+            display: none;
+        }
+
+        .ingredient-item .checkbox.checked .icon {
+            display: block;
+        }
+
+        .ingredient-item.checked .name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Prep Date Row */
+        .prep-date-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .prep-days-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .prep-type-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .prep-start-date {
+            margin-left: auto;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .prep-start-date.d0 {
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+        }
+
+        .prep-start-date.d1 {
+            background: var(--accent-orange-light);
+            color: var(--accent-orange);
+        }
+
+        .prep-start-date.d2 {
+            background: var(--accent-pink-light);
+            color: var(--accent-pink);
+        }
+
+        .prep-start-date.d3 {
+            background: var(--accent-purple-light);
+            color: var(--accent-purple);
+        }
+
+        /* Production Date Picker */
+        .production-date-card {
+            background: linear-gradient(135deg, var(--accent-blue-light) 0%, #ffffff 100%);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .production-date-card .icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-blue);
+        }
+
+        .production-date-card label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .production-date-card input {
+            padding: 8px 12px;
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            background: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Step Card */
+        .step-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--accent-blue-light) 0%, #ffffff 100%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-badge {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .step-action-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .step-action-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-blue);
+        }
+
+        .step-action-btn .icon {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* Step Content */
+        .step-content {
+            padding: 20px;
+        }
+
+        .instruction-list {
+            list-style: none;
+            counter-reset: instruction;
+        }
+
+        .instruction-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .instruction-item:last-child {
+            border-bottom: none;
+        }
+
+        .instruction-number {
+            counter-increment: instruction;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .instruction-number::before {
+            content: counter(instruction);
+        }
+
+        .instruction-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .instruction-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .instruction-checkbox:hover {
+            border-color: var(--accent-green);
+        }
+
+        .instruction-checkbox.checked {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .instruction-checkbox .icon {
+            width: 16px;
+            height: 16px;
+            color: white;
+            display: none;
+        }
+
+        .instruction-checkbox.checked .icon {
+            display: block;
+        }
+
+        .instruction-item.completed .instruction-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Timer Widget */
+        .timer-widget {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: var(--accent-orange-light);
+            border-radius: 8px;
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .timer-widget .icon {
+            width: 20px;
+            height: 20px;
+            color: var(--accent-orange);
+        }
+
+        .timer-text {
+            font-size: 13px;
+            color: var(--accent-orange);
+            font-weight: 500;
+        }
+
+        .timer-btn {
+            margin-left: auto;
+            padding: 6px 12px;
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .timer-btn:hover {
+            background: #ea580c;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: var(--accent-purple-light);
+            border-radius: 8px;
+            margin-top: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .tip-box .icon {
+            width: 20px;
+            height: 20px;
+            color: var(--accent-purple);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .tip-text {
+            font-size: 13px;
+            color: var(--accent-purple);
+            line-height: 1.5;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .progress-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), #34d399);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-percent {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-green);
+            min-width: 45px;
+            text-align: right;
+        }
+
+        /* Photo Upload Zone */
+        .photo-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+
+        .photo-zone:hover {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue-light);
+        }
+
+        .photo-zone .icon {
+            width: 32px;
+            height: 32px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .photo-zone-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Complete Button */
+        .complete-step-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-green), #34d399);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .complete-step-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .complete-step-btn .icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+
+            .tabs-container {
+                overflow-x: auto;
+            }
+
+            .tab {
+                white-space: nowrap;
+                padding: 10px 16px;
+            }
+
+            .recipe-info-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <i data-lucide="chef-hat" class="icon"></i>
+                <h1>Pré-Preparo</h1>
+            </div>
+        </div>
+
+        <!-- Recipe Info -->
+        <div class="recipe-info-card">
+            <div>
+                <div class="recipe-name">Arroz Branco</div>
+                <div class="recipe-meta">
+                    <span class="meta-badge">
+                        <i data-lucide="clock" class="icon"></i>
+                        40 min
+                    </span>
+                    <span class="meta-badge">
+                        <i data-lucide="scale" class="icon"></i>
+                        350g
+                    </span>
+                    <span class="meta-badge">
+                        <i data-lucide="tag" class="icon"></i>
+                        Guarnições
+                    </span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <button class="tab">Dados Técnicos</button>
+            <button class="tab">Receituário</button>
+            <button class="tab active">Pré-Preparo</button>
+            <button class="tab">Ficha Técnica</button>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container">
+            <span class="progress-label">Progresso do Preparo</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+            </div>
+            <span class="progress-percent" id="progressPercent">25%</span>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar - Ingredients -->
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <i data-lucide="shopping-basket" class="icon"></i>
+                        <h3>Lista de Ingredientes</h3>
+                    </div>
+                    <ul class="ingredient-list" id="ingredientList">
+                        <!-- Ingredients will be rendered by JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- Timer Card -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <i data-lucide="timer" class="icon"></i>
+                        <h3>Temporizadores</h3>
+                    </div>
+                    <div style="padding: 16px;">
+                        <div class="timer-widget">
+                            <i data-lucide="clock" class="icon"></i>
+                            <span class="timer-text">Cozinhar: 15-18 min</span>
+                            <button class="timer-btn" onclick="startTimer(18)">Iniciar</button>
+                        </div>
+                        <div class="timer-widget"
+                            style="margin-top: 8px; background: var(--accent-purple-light); border-color: rgba(139, 92, 246, 0.2);">
+                            <i data-lucide="clock" class="icon" style="color: var(--accent-purple)"></i>
+                            <span class="timer-text" style="color: var(--accent-purple);">Descansar: 5 min</span>
+                            <button class="timer-btn" style="background: var(--accent-purple);"
+                                onclick="startTimer(5)">Iniciar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content - Steps -->
+            <div class="main-content">
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">
+                            <span class="step-badge">1</span>
+                            <div>
+                                <div class="step-title">Preparo Inicial</div>
+                                <div class="step-subtitle">Limpeza e corte dos ingredientes</div>
+                            </div>
+                        </div>
+                        <div class="step-actions">
+                            <button class="step-action-btn" title="Ver vídeo">
+                                <i data-lucide="play-circle" class="icon"></i>
+                            </button>
+                            <button class="step-action-btn" title="Adicionar foto">
+                                <i data-lucide="camera" class="icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <ol class="instruction-list">
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Lavar o arroz em água corrente até a água sair clara
+                                    (opcional, remove excesso de amido).</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Descascar e picar a cebola em cubos pequenos.</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Descascar e picar o alho finamente.</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="tip-box">
+                            <i data-lucide="lightbulb" class="icon"></i>
+                            <p class="tip-text"><strong>Dica:</strong> Deixe todos os ingredientes preparados antes de
+                                começar a cozinhar (mise en place). Isso facilita o processo e evita erros.</p>
+                        </div>
+
+                        <button class="complete-step-btn" onclick="completeStep(1)">
+                            <i data-lucide="check-circle" class="icon"></i>
+                            Concluir Etapa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">
+                            <span class="step-badge" style="background: var(--accent-orange);">2</span>
+                            <div>
+                                <div class="step-title">Refogado</div>
+                                <div class="step-subtitle">Preparar a base aromática</div>
+                            </div>
+                        </div>
+                        <div class="step-actions">
+                            <button class="step-action-btn" title="Ver vídeo">
+                                <i data-lucide="play-circle" class="icon"></i>
+                            </button>
+                            <button class="step-action-btn" title="Adicionar foto">
+                                <i data-lucide="camera" class="icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <ol class="instruction-list">
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Aquecer o óleo em panela grossa.</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Refogar cebola até dourar levemente (~2 min).</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Adicionar alho e refogar por mais 30 segundos (não deixar
+                                    queimar).</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="timer-widget">
+                            <i data-lucide="clock" class="icon"></i>
+                            <span class="timer-text">Tempo de refogado: ~2 min</span>
+                            <button class="timer-btn" onclick="startTimer(2)">Iniciar Timer</button>
+                        </div>
+
+                        <button class="complete-step-btn" onclick="completeStep(2)">
+                            <i data-lucide="check-circle" class="icon"></i>
+                            Concluir Etapa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">
+                            <span class="step-badge" style="background: var(--accent-green);">3</span>
+                            <div>
+                                <div class="step-title">Cocção</div>
+                                <div class="step-subtitle">Cozinhar o arroz</div>
+                            </div>
+                        </div>
+                        <div class="step-actions">
+                            <button class="step-action-btn" title="Ver vídeo">
+                                <i data-lucide="play-circle" class="icon"></i>
+                            </button>
+                            <button class="step-action-btn" title="Adicionar foto">
+                                <i data-lucide="camera" class="icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <ol class="instruction-list">
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Adicionar o arroz e mexer bem, tostando levemente (~1 min).
+                                </p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Adicionar a água FERVENTE e o sal.</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Tampar e cozinhar em fogo BAIXO por 15-18 minutos.</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="timer-widget">
+                            <i data-lucide="clock" class="icon"></i>
+                            <span class="timer-text">Tempo de cocção: 15-18 min</span>
+                            <button class="timer-btn" onclick="startTimer(18)">Iniciar Timer</button>
+                        </div>
+
+                        <button class="complete-step-btn" onclick="completeStep(3)">
+                            <i data-lucide="check-circle" class="icon"></i>
+                            Concluir Etapa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">
+                            <span class="step-badge" style="background: var(--accent-purple);">4</span>
+                            <div>
+                                <div class="step-title">Finalização</div>
+                                <div class="step-subtitle">Descanso e apresentação</div>
+                            </div>
+                        </div>
+                        <div class="step-actions">
+                            <button class="step-action-btn" title="Ver vídeo">
+                                <i data-lucide="play-circle" class="icon"></i>
+                            </button>
+                            <button class="step-action-btn" title="Adicionar foto">
+                                <i data-lucide="camera" class="icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <ol class="instruction-list">
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Desligar o fogo e deixar descansar tampado por 5 minutos.
+                                </p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                            <li class="instruction-item">
+                                <div class="instruction-number"></div>
+                                <p class="instruction-text">Soltar com garfo antes de servir.</p>
+                                <div class="instruction-checkbox" onclick="toggleInstruction(this)">
+                                    <i data-lucide="check" class="icon"></i>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="photo-zone">
+                            <i data-lucide="camera" class="icon"></i>
+                            <p class="photo-zone-text">Clique para adicionar foto do resultado</p>
+                        </div>
+
+                        <button class="complete-step-btn" onclick="completeStep(4)"
+                            style="background: linear-gradient(135deg, var(--accent-purple), #a78bfa);">
+                            <i data-lucide="check-circle" class="icon"></i>
+                            Finalizar Preparo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ingredient data with prep configuration
+        const ingredients = [
+            { id: 1, name: 'Arroz Branco Tipo 1', amount: '72g', prepDays: 0, prepType: 'none' },
+            { id: 2, name: 'Água Filtrada', amount: '143ml', prepDays: 0, prepType: 'none' },
+            { id: 3, name: 'Óleo de Soja', amount: '2ml', prepDays: 0, prepType: 'none' },
+            { id: 4, name: 'Cebola Branca', amount: '5g', prepDays: 1, prepType: 'picar' },
+            { id: 5, name: 'Alho Fresco', amount: '1g', prepDays: 1, prepType: 'picar' },
+            { id: 6, name: 'Sal Refinado', amount: '1g', prepDays: 0, prepType: 'none' }
+        ];
+
+        // Prep type options
+        const prepTypes = [
+            { value: 'none', label: 'Sem pré-preparo' },
+            { value: 'picar', label: 'Picar' },
+            { value: 'descascar', label: 'Descascar' },
+            { value: 'descongelar', label: 'Descongelar' },
+            { value: 'dessalgar', label: 'Dessalgar' },
+            { value: 'hidratar', label: 'Hidratar' },
+            { value: 'marinar', label: 'Marinar' },
+            { value: 'limpar', label: 'Limpar' }
+        ];
+
+
+        // Render ingredients list
+        function renderIngredients() {
+            const list = document.getElementById('ingredientList');
+
+            list.innerHTML = ingredients.map(ing => {
+                // Only show prep config row if ingredient needs prep
+                const showPrepRow = ing.prepType !== 'none' || ing.prepDays > 0;
+                const prepDaysLabel = ing.prepDays === 0 ? 'No dia' : `D-${ing.prepDays}`;
+                const prepDaysClass = `d${Math.min(ing.prepDays, 3)}`;
+
+                return `
+                    <li class="ingredient-item" data-id="${ing.id}">
+                        <div class="ingredient-row">
+                            <div class="checkbox" onclick="toggleIngredient(this)">
+                                <i data-lucide="check" class="icon"></i>
+                            </div>
+                            <span class="name">${ing.name}</span>
+                            <span class="amount">${ing.amount}</span>
+                        </div>
+                        <div class="prep-date-row">
+                            <select class="prep-days-select" onchange="updatePrepDays(${ing.id}, this.value)">
+                                <option value="0" ${ing.prepDays === 0 ? 'selected' : ''}>No dia (D-0)</option>
+                                <option value="1" ${ing.prepDays === 1 ? 'selected' : ''}>1 dia antes (D-1)</option>
+                                <option value="2" ${ing.prepDays === 2 ? 'selected' : ''}>2 dias antes (D-2)</option>
+                                <option value="3" ${ing.prepDays === 3 ? 'selected' : ''}>3 dias antes (D-3)</option>
+                            </select>
+                            <select class="prep-type-select" onchange="updatePrepType(${ing.id}, this.value)">
+                                ${prepTypes.map(t => `<option value="${t.value}" ${ing.prepType === t.value ? 'selected' : ''}>${t.label}</option>`).join('')}
+                            </select>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            // Re-initialize Lucide icons for dynamically added content
+            lucide.createIcons();
+        }
+
+        // Update prep days for ingredient
+        function updatePrepDays(id, days) {
+            const ing = ingredients.find(i => i.id === id);
+            if (ing) {
+                ing.prepDays = parseInt(days);
+                renderIngredients();
+            }
+        }
+
+        // Update prep type for ingredient
+        function updatePrepType(id, type) {
+            const ing = ingredients.find(i => i.id === id);
+            if (ing) {
+                ing.prepType = type;
+                // Auto-set prep days if not set
+                if (type !== 'none' && ing.prepDays === 0) {
+                    if (type === 'dessalgar') ing.prepDays = 2;
+                    else if (type === 'descongelar' || type === 'hidratar' || type === 'marinar') ing.prepDays = 1;
+                    else ing.prepDays = 1;
+                }
+                if (type === 'none') ing.prepDays = 0;
+                renderIngredients();
+            }
+        }
+
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Toggle ingredient checkbox
+        function toggleIngredient(checkbox) {
+            checkbox.classList.toggle('checked');
+            checkbox.closest('.ingredient-item').classList.toggle('checked');
+            updateProgress();
+        }
+
+        // Toggle instruction checkbox
+        function toggleInstruction(checkbox) {
+            checkbox.classList.toggle('checked');
+            checkbox.closest('.instruction-item').classList.toggle('completed');
+            updateProgress();
+        }
+
+        // Complete entire step
+        function completeStep(stepNumber) {
+            const stepCard = document.querySelectorAll('.step-card')[stepNumber - 1];
+            const checkboxes = stepCard.querySelectorAll('.instruction-checkbox');
+
+            checkboxes.forEach(cb => {
+                cb.classList.add('checked');
+                cb.closest('.instruction-item').classList.add('completed');
+            });
+
+            stepCard.style.opacity = '0.7';
+            stepCard.querySelector('.step-header').style.background = 'linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%)';
+
+            updateProgress();
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const totalItems = document.querySelectorAll('.instruction-checkbox').length +
+                document.querySelectorAll('.ingredient-item .checkbox').length;
+            const completedItems = document.querySelectorAll('.instruction-checkbox.checked').length +
+                document.querySelectorAll('.ingredient-item .checkbox.checked').length;
+
+            const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+        }
+
+        // Start timer
+        function startTimer(minutes) {
+            const endTime = Date.now() + (minutes * 60 * 1000);
+
+            // Create modal for timer
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 40px;
+                border-radius: 16px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                text-align: center;
+                z-index: 1000;
+            `;
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            `;
+
+            modal.innerHTML = `
+                <div style="font-size: 14px; color: #64748b; margin-bottom: 8px;">Temporizador</div>
+                <div id="timerDisplay" style="font-size: 48px; font-weight: 700; color: #f97316;">${minutes}:00</div>
+                <button onclick="this.parentElement.remove(); document.querySelector('[style*=\\'z-index: 999\\']').remove();" style="
+                    margin-top: 24px;
+                    padding: 12px 32px;
+                    background: #f97316;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                ">Cancelar</button>
+            `;
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(modal);
+
+            const display = modal.querySelector('#timerDisplay');
+
+            const interval = setInterval(() => {
+                const remaining = endTime - Date.now();
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    display.textContent = '00:00';
+                    display.style.color = '#10b981';
+
+                    // Play sound or vibrate
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate([200, 100, 200, 100, 200]);
+                    }
+
+                    alert('⏰ Tempo finalizado!');
+                    modal.remove();
+                    overlay.remove();
+                    return;
+                }
+
+                const min = Math.floor(remaining / 60000);
+                const sec = Math.floor((remaining % 60000) / 1000);
+                display.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Initialize
+        renderIngredients();
+        updateProgress();
+    </script>
+</body>
+
+</html>

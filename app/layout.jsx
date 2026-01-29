@@ -19,7 +19,8 @@ import {
   Clipboard,
   Settings,
   ClipboardList,
-  DollarSign
+  DollarSign,
+  Wrench
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SidebarNav from "@/components/shared/navigation";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }) {
     { name: "Quadro de Equipe", href: "/quadro-de-equipe", icon: Users },
     { name: "Receitas", href: "/receitas", icon: ChefHat },
     { name: "Ficha Técnica", href: "/ficha-tecnica", icon: Clipboard },
+    { name: "Ferramentas", href: "/ferramentas", icon: Wrench },
     { name: "Análise de Receitas", href: "/analise-de-receitas", icon: TrendingUp },
     { name: "Ordem de Produção", href: "/cardapio", icon: Utensils },
     { name: "Programação", href: "/programacao", icon: ClipboardList },
