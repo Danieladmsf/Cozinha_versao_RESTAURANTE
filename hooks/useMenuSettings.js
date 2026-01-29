@@ -76,25 +76,13 @@ export const useMenuSettings = () => {
         setClientCategorySettings(config.client_category_settings || {});
 
         // Load category groups
-        // IMPORTANTE: Só aplicar padrão se a propriedade NÃO estiver definida (undefined)
-        // Se estiver definida como [], respeitamos (usuário deletou tudo)
+        // IMPORTANTE: Se não existir no banco, inicializa como array vazio (sistema dinâmico)
+        // O usuário deve configurar as abas manualmente via página de configurações
         if (config.category_groups !== undefined) {
           setCategoryGroups(config.category_groups);
         } else {
-          // Initialize default groups if none exist in DB (migration only)
-          const defaultGroups = [
-            {
-              id: 'almoco',
-              name: 'Almoço',
-              items: config.category_order || []
-            },
-            {
-              id: 'mono_porcoes',
-              name: 'Mono Porções',
-              items: []
-            }
-          ];
-          setCategoryGroups(defaultGroups);
+          // Sistema dinâmico: começa vazio, usuário configura as abas
+          setCategoryGroups([]);
         }
 
         const rootCategories = categoryTreeData.filter(cat => cat.level === 1);

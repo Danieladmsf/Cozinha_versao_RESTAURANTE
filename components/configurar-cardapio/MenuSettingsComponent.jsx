@@ -16,7 +16,13 @@ import {
   Loader2,
   AlertCircle,
   ArrowLeft,
-  Save
+  Save,
+  LayoutGrid,
+  Layers,
+  Users,
+  Palette,
+  Calendar,
+  CheckCircle2
 } from "lucide-react";
 
 import { useMenuSettings } from '@/hooks/useMenuSettings';
@@ -46,7 +52,7 @@ export default function MenuSettingsComponent() {
     fixedDropdowns,
     availableDays,
     categoryOrder,
-    categoryGroups, // Novo
+    categoryGroups,
     clientCategorySettings,
 
     // Setters
@@ -57,7 +63,7 @@ export default function MenuSettingsComponent() {
     setFixedDropdowns,
     setAvailableDays,
     setCategoryOrder,
-    setCategoryGroups, // Novo
+    setCategoryGroups,
     setClientCategorySettings,
 
     // Funções
@@ -91,44 +97,60 @@ export default function MenuSettingsComponent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 mx-auto animate-spin text-blue-600 mb-4" />
-          <p className="text-gray-600">Carregando configurações...</p>
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-slate-200 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <p className="text-slate-600 mt-4 font-medium">Carregando configurações...</p>
         </div>
       </div>
     );
   }
 
+  // Tab configuration with icons
+  const tabConfig = [
+    { value: "categories", label: "Categorias", icon: LayoutGrid },
+    { value: "layout", label: "Layout", icon: Layers },
+    { value: "clients", label: "Clientes", icon: Users },
+    { value: "colors", label: "Cores", icon: Palette },
+    { value: "days", label: "Dias da Semana", icon: Calendar },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Header Premium */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push('/cardapio')}
+                className="text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar ao Cardápio
               </Button>
+              <div className="h-8 w-px bg-slate-700" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Settings className="h-6 w-6" />
+                <h1 className="text-2xl font-bold flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/20 rounded-lg">
+                    <Settings className="h-6 w-6 text-emerald-400" />
+                  </div>
                   Configurações do Cardápio
                 </h1>
-                <p className="text-gray-600">
-                  Configure as categorias visíveis, cores, número de dropdowns fixos e dias disponíveis
+                <p className="text-slate-400 mt-1">
+                  Configure categorias, layout, cores e dias disponíveis
                 </p>
               </div>
             </div>
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-200 px-6"
             >
               {saving ? (
                 <>
@@ -147,78 +169,92 @@ export default function MenuSettingsComponent() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {error && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert variant="destructive" className="mb-6 border-red-200 bg-red-50">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 mb-8">
-            <TabsTrigger value="categories">Categorias</TabsTrigger>
-            <TabsTrigger value="layout">Layout</TabsTrigger>
-            <TabsTrigger value="clients">Clientes</TabsTrigger>
-            <TabsTrigger value="colors">Cores</TabsTrigger>
-            <TabsTrigger value="days">Dias da Semana</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          {/* Enhanced Tabs */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2">
+            <TabsList className="grid grid-cols-5 gap-2 bg-transparent">
+              {tabConfig.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="flex items-center gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:bg-slate-100 transition-all duration-200"
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="font-medium">{tab.label}</span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+          </div>
 
-          <TabsContent value="categories" className="space-y-8">
-            <Categorias
-              categories={categories}
-              categoryTree={categoryTree}
-              selectedMainCategories={selectedMainCategories}
-              setSelectedMainCategories={setSelectedMainCategories}
-            />
-          </TabsContent>
+          {/* Tab Contents */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <TabsContent value="categories" className="space-y-8 mt-0">
+              <Categorias
+                categories={categories}
+                categoryTree={categoryTree}
+                selectedMainCategories={selectedMainCategories}
+                setSelectedMainCategories={setSelectedMainCategories}
+              />
+            </TabsContent>
 
-          <TabsContent value="layout" className="space-y-8">
-            <Layout
-              categories={categories}
-              categoryTree={categoryTree}
-              selectedMainCategories={selectedMainCategories}
-              activeCategories={activeCategories}
-              expandedCategories={expandedCategories}
-              categoryColors={categoryColors}
-              fixedDropdowns={fixedDropdowns}
-              categoryOrder={categoryOrder}
-              categoryGroups={categoryGroups} // Novo
-              getFilteredCategories={getFilteredCategories}
-              toggleCategoryActive={toggleCategoryActive}
-              toggleExpandedCategory={toggleExpandedCategory}
-              updateFixedDropdowns={updateFixedDropdowns}
-              setCategoryOrder={setCategoryOrder}
-              setCategoryGroups={setCategoryGroups} // Novo
-            />
-          </TabsContent>
+            <TabsContent value="layout" className="space-y-8 mt-0">
+              <Layout
+                categories={categories}
+                categoryTree={categoryTree}
+                selectedMainCategories={selectedMainCategories}
+                activeCategories={activeCategories}
+                expandedCategories={expandedCategories}
+                categoryColors={categoryColors}
+                fixedDropdowns={fixedDropdowns}
+                categoryOrder={categoryOrder}
+                categoryGroups={categoryGroups}
+                getFilteredCategories={getFilteredCategories}
+                toggleCategoryActive={toggleCategoryActive}
+                toggleExpandedCategory={toggleExpandedCategory}
+                updateFixedDropdowns={updateFixedDropdowns}
+                setCategoryOrder={setCategoryOrder}
+                setCategoryGroups={setCategoryGroups}
+              />
+            </TabsContent>
 
-          <TabsContent value="clients" className="space-y-8">
-            <Clientes
-              categories={categories}
-              customers={customers}
-              clientCategorySettings={clientCategorySettings}
-              setClientCategorySettings={setClientCategorySettings}
-              categoryColors={categoryColors}
-              fixedDropdowns={fixedDropdowns}
-              getFilteredCategories={getFilteredCategories}
-            />
-          </TabsContent>
+            <TabsContent value="clients" className="space-y-8 mt-0">
+              <Clientes
+                categories={categories}
+                customers={customers}
+                clientCategorySettings={clientCategorySettings}
+                setClientCategorySettings={setClientCategorySettings}
+                categoryColors={categoryColors}
+                fixedDropdowns={fixedDropdowns}
+                getFilteredCategories={getFilteredCategories}
+              />
+            </TabsContent>
 
-          <TabsContent value="colors" className="space-y-6">
-            <Cores
-              categoryColors={categoryColors}
-              updateCategoryColor={updateCategoryColor}
-              getFilteredCategories={getFilteredCategories}
-            />
-          </TabsContent>
+            <TabsContent value="colors" className="space-y-6 mt-0">
+              <Cores
+                categoryColors={categoryColors}
+                updateCategoryColor={updateCategoryColor}
+                getFilteredCategories={getFilteredCategories}
+              />
+            </TabsContent>
 
-          <TabsContent value="days" className="space-y-6">
-            <DiasDaSemana
-              availableDays={availableDays}
-              toggleDay={toggleDay}
-            />
-          </TabsContent>
+            <TabsContent value="days" className="space-y-6 mt-0">
+              <DiasDaSemana
+                availableDays={availableDays}
+                toggleDay={toggleDay}
+              />
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>

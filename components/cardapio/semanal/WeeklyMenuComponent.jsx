@@ -230,24 +230,14 @@ export default function WeeklyMenuComponent() {
                         value={group.id}
                         className="flex items-center gap-2 flex-1 min-w-[120px]"
                       >
-                        {group.id === 'almoco' ? <Utensils className="h-4 w-4" /> :
-                          group.id === 'mono_porcoes' ? <Package className="h-4 w-4" /> :
-                            <div className="w-2 h-2 rounded-full bg-blue-400" />}
+                        <div className="w-2 h-2 rounded-full bg-blue-400" />
                         {group.name}
                       </TabsTrigger>
                     ))
                   ) : (
-                    <>
-                      {/* Fallback Legacy Tabs */}
-                      <TabsTrigger value="almoco" className="flex items-center gap-2 flex-1">
-                        <Utensils className="h-4 w-4" />
-                        Almoço
-                      </TabsTrigger>
-                      <TabsTrigger value="mono_porcoes" className="flex items-center gap-2 flex-1">
-                        <Package className="h-4 w-4" />
-                        Mono Porções
-                      </TabsTrigger>
-                    </>
+                    <div className="w-full py-2 text-center text-gray-500 text-sm">
+                      Nenhuma aba configurada. Vá em Configurações → Layout para criar abas.
+                    </div>
                   )}
                 </TabsList>
               </Tabs>

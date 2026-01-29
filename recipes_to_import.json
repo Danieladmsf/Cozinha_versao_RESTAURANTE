@@ -1,0 +1,560 @@
+[
+  {
+    "code": "7768",
+    "name": "REFEICAO LAGARTO M.MADEIRA + BATATA ASSADA BENDITO",
+    "full_name_original": "007768 - REFEICAO LAGARTO M.MADEIRA + BATATA ASSADA BENDITO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8966",
+    "name": "REFEICAO ISCA DE FRANGO A MILANESA",
+    "full_name_original": "08966 - REFEICAO ISCA DE FRANGO A MILANESA",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8480",
+    "name": "ROTISSERIA MACARRONADA A BOLONHESA BENDITO KG",
+    "full_name_original": "008480 - ROTISSERIA MACARRONADA A BOLONHESA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "93626",
+    "name": "ROTISSERIA MACARRAO C/BROCOLIS E BACON KG",
+    "full_name_original": "093626 - ROTISSERIA MACARRAO C/BROCOLIS E BACON KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8028",
+    "name": "ROTISSERIA ARROZ BRANCO BENDITO KG",
+    "full_name_original": "008028 - ROTISSERIA ARROZ BRANCO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8328",
+    "name": "ROTISSERIA FEIJAO BENDITO KG",
+    "full_name_original": "008328 - ROTISSERIA FEIJAO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8089",
+    "name": "ROTISSERIA BATATA ASSADA BENDITO KG",
+    "full_name_original": "008089 - ROTISSERIA BATATA ASSADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8598",
+    "name": "ROTISSERIA PURE DE BATATA BENDITO KG",
+    "full_name_original": "008598 - ROTISSERIA PURE DE BATATA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8403",
+    "name": "ROTISSERIA LEGUMES BENDITO KG",
+    "full_name_original": "008403 - ROTISSERIA LEGUMES BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8409",
+    "name": "ROTISSERIA LINGUICA ASSADA BENDITO KG",
+    "full_name_original": "008409 - ROTISSERIA LINGUICA ASSADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8945",
+    "name": "ROT.ISCA DE FRANGO A MILANESA BENDITO KG",
+    "full_name_original": "008945 - ROT.ISCA DE FRANGO A MILANESA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8396",
+    "name": "ROTISSERIA LAGARTO AO MOLHO MADEIRA BENDITO KG",
+    "full_name_original": "008396 - ROTISSERIA LAGARTO AO MOLHO MADEIRA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8221",
+    "name": "ROTISSERIA CAPONATA BERINJELA BENDITO KG",
+    "full_name_original": "008221 - ROTISSERIA CAPONATA BERINJELA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8789",
+    "name": "ROTISSERIA SALADA SUNOMONO BENDITOKG",
+    "full_name_original": "008789 - ROTISSERIA SALADA SUNOMONO BENDITOKG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8963",
+    "name": "ROTISSERIA SALADA CEASER C/FRANGO BENDITO",
+    "full_name_original": "008963 - ROTISSERIA SALADA CEASER C/FRANGO BENDITO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8962",
+    "name": "ROTISSERIA SALADA MIX DE FOLHA E LEGUMES C/PROTEINAS BENDITO",
+    "full_name_original": "008962 - ROTISSERIA SALADA MIX DE FOLHA E LEGUMES C/PROTEINAS BENDITO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9124",
+    "name": "ROTISSERIA HOT HOLL BENDITO UN",
+    "full_name_original": "009124 - ROTISSERIA HOT HOLL BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9119",
+    "name": "ROTISSERIA CALIFORNIA BENDITO UN",
+    "full_name_original": "009119 - ROTISSERIA CALIFORNIA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9129",
+    "name": "ROTISSERIA SALADA POKE DE SHIMEJI BENDITO UN",
+    "full_name_original": "009129 - ROTISSERIA SALADA POKE DE SHIMEJI BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8307",
+    "name": "ROTISSERIA ESCONDIDINHO DE CARNE SECA BENDITO KG",
+    "full_name_original": "008307 - ROTISSERIA ESCONDIDINHO DE CARNE SECA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8316",
+    "name": "ROTISSERIA ESCONDIDINHO FRANGO BENDITO KG",
+    "full_name_original": "008316 - ROTISSERIA ESCONDIDINHO FRANGO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8333",
+    "name": "ROTISSERIA BATATA/RECHEADA  BROCOLIS E BACON",
+    "full_name_original": "008333 - ROTISSERIA BATATA/RECHEADA  BROCOLIS E BACON",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8332",
+    "name": "ROTISSERIA BATATA/RECHEADA  FRANGO C/ REQUEIJAO",
+    "full_name_original": "008332 - ROTISSERIA BATATA/RECHEADA  FRANGO C/ REQUEIJAO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8386",
+    "name": "ROTISSERIA GELEIA DE PIMENTA BENDITO KG",
+    "full_name_original": "008386 - ROTISSERIA GELEIA DE PIMENTA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8551",
+    "name": "ROTISSERIA PATE ALHO BENDITO KG",
+    "full_name_original": "008551 - ROTISSERIA PATE ALHO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8498",
+    "name": "ROTISSERIA MOLHO PIMENTA ARTESANAL BENDITO KG",
+    "full_name_original": "008498 - ROTISSERIA MOLHO PIMENTA ARTESANAL BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7875",
+    "name": "REFEICAO STROGONOFF FRANGO BENDITO UN",
+    "full_name_original": "007875 - REFEICAO STROGONOFF FRANGO BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7877",
+    "name": "REFEICAO TIRINHA CARNE CHINESA BENDITO UN",
+    "full_name_original": "007877 - REFEICAO TIRINHA CARNE CHINESA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8442",
+    "name": "ROTISSERIA MACARRAO C/CALABRESA MOLHO ROSE BENDITO KG",
+    "full_name_original": "008442 - ROTISSERIA MACARRAO C/CALABRESA MOLHO ROSE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8080",
+    "name": "ROTISSERIA BANANA BENDITO KG",
+    "full_name_original": "008080 - ROTISSERIA BANANA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8491",
+    "name": "ROTISSERIA MEDALHAO FRANGO BENDITO KG",
+    "full_name_original": "008491 - ROTISSERIA MEDALHAO FRANGO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8602",
+    "name": "ROTISSERIA QUIBE ASSADO BENDITO KG",
+    "full_name_original": "008602 - ROTISSERIA QUIBE ASSADO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8231",
+    "name": "ROTISSERIA CHARUTO BENDITO KG",
+    "full_name_original": "008231 - ROTISSERIA CHARUTO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8837",
+    "name": "ROTISSERIA STROGONOFF DE FRANGO BENDITO KG",
+    "full_name_original": "008837 - ROTISSERIA STROGONOFF DE FRANGO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8695",
+    "name": "ROTISSERIA SALADA DE BETERRABA BENDITO KG",
+    "full_name_original": "008695 - ROTISSERIA SALADA DE BETERRABA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8713",
+    "name": "ROTISSERIA SALADA DE GRAO DE BICO BENDITO KG",
+    "full_name_original": "008713 - ROTISSERIA SALADA DE GRAO DE BICO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9123",
+    "name": "ROTISSERIA SUSHI KANI C/CREAM CHEESE BENDITO UN",
+    "full_name_original": "009123 - ROTISSERIA SUSHI KANI C/CREAM CHEESE BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9289",
+    "name": "ROTISSERIA TEMAKI HOT SALMAO GRELAHADO",
+    "full_name_original": "009289 - ROTISSERIA TEMAKI HOT SALMAO GRELAHADO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "6878",
+    "name": "ROT REFRIGERADO PANQUECA FRANGO C/CATUPIRY KG",
+    "full_name_original": "006878 - ROT REFRIGERADO PANQUECA FRANGO C/CATUPIRY KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "6879",
+    "name": "ROT REFRIGERADO PANQUECA DE CARNE AO POMODORO",
+    "full_name_original": "006879 - ROT REFRIGERADO PANQUECA DE CARNE AO POMODORO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "2771",
+    "name": "ROT REFRIGERADO PANQUECA PRESUNTO MUSSARELA KG",
+    "full_name_original": "002771 - ROT REFRIGERADO PANQUECA PRESUNTO MUSSARELA KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9067",
+    "name": "ROTISSERIA PANQUECA MASSA ESPINAFRE C/PALMITO BENDITO KG",
+    "full_name_original": "009067 - ROTISSERIA PANQUECA MASSA ESPINAFRE C/PALMITO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9075",
+    "name": "ROTISSERIA PANQUECA MASSA ESPINAFRE FRAN.CREAM.BENDITO KG",
+    "full_name_original": "009075 - ROTISSERIA PANQUECA MASSA ESPINAFRE FRAN.CREAM.BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7673",
+    "name": "REFEICAO FILE FRANGO PARMEGIANA BENDITO UN",
+    "full_name_original": "007673 - REFEICAO FILE FRANGO PARMEGIANA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8948",
+    "name": "REF COPA LOMBO SUINA MILANESA BENDITO",
+    "full_name_original": "008948 - REF COPA LOMBO SUINA MILANESA BENDITO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8321",
+    "name": "ROT.ESPAGUETE A BOLONHESA + POLPETONE RECHEADO BENDITO",
+    "full_name_original": "008321 - ROT.ESPAGUETE A BOLONHESA + POLPETONE RECHEADO BENDITO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8292",
+    "name": "ROTISSERIA CREME DE MILHO BENDITO KG",
+    "full_name_original": "008292 - ROTISSERIA CREME DE MILHO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8391",
+    "name": "ROTISSERIA JILO FRITO BENDITO KG",
+    "full_name_original": "008391 - ROTISSERIA JILO FRITO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8153",
+    "name": "ROTISSERIA BERINJELA PIZZAOLA BENDITO KG",
+    "full_name_original": "008153 - ROTISSERIA BERINJELA PIZZAOLA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8349",
+    "name": "ROTISSERIA FILE FRANGO PARMEGIANA BENDITO KG",
+    "full_name_original": "008349 - ROTISSERIA FILE FRANGO PARMEGIANA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8158",
+    "name": "ROTISSERIA BIFE A ROLE BENDITO KG",
+    "full_name_original": "008158 - ROTISSERIA BIFE A ROLE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8284",
+    "name": "ROTISSERIA COXA SOBRECOXA ASSADA BENDITO KG",
+    "full_name_original": "008284 - ROTISSERIA COXA SOBRECOXA ASSADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8690",
+    "name": "ROTISSERIA SALADA DE BATATA CURTINHA BENDITO KG",
+    "full_name_original": "008690 - ROTISSERIA SALADA DE BATATA CURTINHA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8687",
+    "name": "ROTISSERIA SALADA CENOURA C/VAGEM BENDITO KG",
+    "full_name_original": "008687 - ROTISSERIA SALADA CENOURA C/VAGEM BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8400",
+    "name": "ROTISSERIA LASANHA A BOLONHESA BENDITO  KG",
+    "full_name_original": "008400 - ROTISSERIA LASANHA A BOLONHESA BENDITO  KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "6960",
+    "name": "ROTISSERIA NHOQUE AO MOLHO SUGO KG",
+    "full_name_original": "006960 - ROTISSERIA NHOQUE AO MOLHO SUGO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7575",
+    "name": "PATE DE AZEITONA VERDE BENDITO KG",
+    "full_name_original": "007575 - PATE DE AZEITONA VERDE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7576",
+    "name": "PATE DE GORGONZOLA BENDITO KG",
+    "full_name_original": "007576 - PATE DE GORGONZOLA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8079",
+    "name": "PATE DE NOZES BENDITO KG",
+    "full_name_original": "008079 - PATE DE NOZES BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7574",
+    "name": "PATE DE AZEITONA PRETA BENDITO KG",
+    "full_name_original": "007574 - PATE DE AZEITONA PRETA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7625",
+    "name": "REFEICAO CARNE PANELA BENDITO UN",
+    "full_name_original": "007625 - REFEICAO CARNE PANELA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8323",
+    "name": "ROTISSERIA FAROFA BENDITO KG",
+    "full_name_original": "008323 - ROTISSERIA FAROFA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8804",
+    "name": "ROTISSERIA SOBRECOXA RECHEADA BENDITO KG",
+    "full_name_original": "008804 - ROTISSERIA SOBRECOXA RECHEADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8006",
+    "name": "ROTISSERIA ALMONDEGAS AO MOLHO BENDITO KG",
+    "full_name_original": "008006 - ROTISSERIA ALMONDEGAS AO MOLHO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8519",
+    "name": "ROTISSERIA COXINHA BUFALO WINGS KG",
+    "full_name_original": "008519 - ROTISSERIA COXINHA BUFALO WINGS KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8671",
+    "name": "ROTISSERIA SALADA BATATONESE BENDITO KG",
+    "full_name_original": "008671 - ROTISSERIA SALADA BATATONESE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8839",
+    "name": "ROTISSERIA TABULE BENDITO KG",
+    "full_name_original": "008839 - ROTISSERIA TABULE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8571",
+    "name": "ROTISSERIA POLENTA AO MOLHO CARNE MOIDA BENDITO KG",
+    "full_name_original": "008571 - ROTISSERIA POLENTA AO MOLHO CARNE MOIDA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7570",
+    "name": "MOLHO PESTO BENDITO KG",
+    "full_name_original": "007570 - MOLHO PESTO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "9362",
+    "name": "REFEICAO ISCA DE FRANGO A ACEBOLADA BENDITO UN",
+    "full_name_original": "009362 - REFEICAO ISCA DE FRANGO A ACEBOLADA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7874",
+    "name": "REFEICAO STROGONOFF CARNE BENDITO UN",
+    "full_name_original": "007874 - REFEICAO STROGONOFF CARNE BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8279",
+    "name": "ROTISSERIA COUVE FLOR EMPANADA BENDITO KG",
+    "full_name_original": "008279 - ROTISSERIA COUVE FLOR EMPANADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8381",
+    "name": "ROTISSERIA FRANGO XADREZ BENDITO KG",
+    "full_name_original": "008381 - ROTISSERIA FRANGO XADREZ BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8834",
+    "name": "ROTISSERIA STROGONOFF DE CARNE BENDITO KG",
+    "full_name_original": "008834 - ROTISSERIA STROGONOFF DE CARNE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8663",
+    "name": "ROTISSERIA RONDELE FRANGO REQUEIJAO BENDITO KG",
+    "full_name_original": "008663 - ROTISSERIA RONDELE FRANGO REQUEIJAO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7660",
+    "name": "REFEICAO FEIJOADA BENDITO UN",
+    "full_name_original": "007660 - REFEICAO FEIJOADA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8900",
+    "name": "ROTISSERIA YAKISSOBA BENDITO KG",
+    "full_name_original": "008900 - ROTISSERIA YAKISSOBA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8336",
+    "name": "ROTISSERIA FEIJOADA BENDITO KG",
+    "full_name_original": "008336 - ROTISSERIA FEIJOADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8361",
+    "name": "ROTISSERIA FILE SOBRECOXA ASSADA BENDITO KG",
+    "full_name_original": "008361 - ROTISSERIA FILE SOBRECOXA ASSADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8298",
+    "name": "ROTISSERIA DOBRADINHA BENDITO KG",
+    "full_name_original": "008298 - ROTISSERIA DOBRADINHA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "2893",
+    "name": "ASS.FRANGO METADE BENDITO UNIDADE",
+    "full_name_original": "002893 - ASS.FRANGO METADE BENDITO UNIDADE",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8484",
+    "name": "ROTISSERIA MAMINHA ASSADA BENDITO KG",
+    "full_name_original": "008484 - ROTISSERIA MAMINHA ASSADA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8523",
+    "name": "ROTISSERIA TULIPA BUFALO WINGS KG",
+    "full_name_original": "008523 - ROTISSERIA TULIPA BUFALO WINGS KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8037",
+    "name": "ROTISSERIA ARROZ CARRETEIRO BENDITO KG",
+    "full_name_original": "008037 - ROTISSERIA ARROZ CARRETEIRO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8023",
+    "name": "ROTISSERIA ARROZ A GREGA BENDITO KG",
+    "full_name_original": "008023 - ROTISSERIA ARROZ A GREGA BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "6857",
+    "name": "ROTISSERIA MAIONESE DE LEGUMES COM FRANGO",
+    "full_name_original": "006857 - ROTISSERIA MAIONESE DE LEGUMES COM FRANGO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8482",
+    "name": "ROTISSERIA MAIONESE DE LEGUMES COM FRANGO BENDITO KG",
+    "full_name_original": "008482 - ROTISSERIA MAIONESE DE LEGUMES COM FRANGO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "6873",
+    "name": "ROT REFRIGERADO FAROFA KG",
+    "full_name_original": "006873 - ROT REFRIGERADO FAROFA KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "93583",
+    "name": "ASS.FRANGO BENDITO INTEIRO",
+    "full_name_original": "093583 - ASS.FRANGO BENDITO INTEIRO",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "93964",
+    "name": "ROTISSERIA CUPIM ASSADO MOLHO ALHO  KG",
+    "full_name_original": "093964 - ROTISSERIA CUPIM ASSADO MOLHO ALHO  KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8274",
+    "name": "ROTISSERIA COSTELINHA PORCO MOLHO BARBECUE BENDITO KG",
+    "full_name_original": "008274 - ROTISSERIA COSTELINHA PORCO MOLHO BARBECUE BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "8393",
+    "name": "ROTISSERIA JOELHO PORCO ASSADO BENDITO KG",
+    "full_name_original": "008393 - ROTISSERIA JOELHO PORCO ASSADO BENDITO KG",
+    "category": "Produtos > marmitas 3 DV"
+  },
+  {
+    "code": "7652",
+    "name": "REFEICAO COXA SOBRECOXA ASSADA BENDITO UN",
+    "full_name_original": "007652 - REFEICAO COXA SOBRECOXA ASSADA BENDITO UN",
+    "category": "Produtos > marmitas 3 DV"
+  }
+]

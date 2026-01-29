@@ -41,18 +41,11 @@ const IngredientTable = ({
             onUpdatePreparation(prepIndex, 'sub_components', components);
           }}
           preparationsData={rest.preparations}
-          assemblyConfig={prep.assembly_config || {}}
-          onAssemblyConfigChange={(field, value) => {
-            const newConfig = { ...prep.assembly_config, [field]: value };
-            onUpdatePreparation(prepIndex, 'assembly_config', newConfig);
-          }}
-          totalYieldWeight={prep.total_yield_weight_prep || 0}
           onRemoveSubComponent={(index) => {
             const newSubComponents = [...prep.sub_components];
             newSubComponents.splice(index, 1);
             onUpdatePreparation(prepIndex, 'sub_components', newSubComponents);
           }}
-          showAssemblyConfig={!isProduct}
           showComponentsTable={true}
           onAddComponent={() => onOpenAddAssemblyItemModal(prepIndex)}
           addComponentLabel={isAssemblyOnly ? 'Adicionar Preparo/Receita' : 'Adicionar Produto'}

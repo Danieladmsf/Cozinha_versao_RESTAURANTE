@@ -261,6 +261,22 @@ export default function RecipeBasicInfoForm() {
               </p>
             )}
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="video_url" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500"></span>
+              Link do YouTube
+            </Label>
+            <Input
+              id="video_url"
+              name="video_url"
+              value={recipe.video_url || ''}
+              onChange={handleInputChange}
+              placeholder="https://youtube.com/watch?v=..."
+              disabled={isLoading}
+              className="w-full focus:ring-red-500 focus:border-red-500"
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

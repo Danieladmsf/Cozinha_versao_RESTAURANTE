@@ -4,21 +4,14 @@ import { formatCapitalize } from '@/lib/textUtils';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Layers, Trash2, Plus } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { formatWeight, formatCurrency, parseNumericValue } from "@/lib/formatUtils";
 
 const AssemblySubComponents = ({
   subComponents = [],
   onUpdateSubComponents,
   preparationsData = [],
-  assemblyConfig = {},
-  onAssemblyConfigChange,
-  totalYieldWeight = 0,
   onRemoveSubComponent,
-  showAssemblyConfig = false,
   showComponentsTable = true,
   onAddComponent,
   addComponentLabel = 'Adicionar Preparo/Receita',
@@ -27,24 +20,25 @@ const AssemblySubComponents = ({
 }) => {
 
   // Calculate total assembly weight from sub-components
-  // For Products: exclude packaging steps from weight sum (they contribute units, not kg)
+  // Exclude packaging steps from weight sum (they contribute units/cost, not kg)
   const calculateTotalWeight = useCallback((components) => {
     if (!components || components.length === 0) return 0;
 
     return components.reduce((total, sc) => {
       // Check if this component's source preparation is a packaging step
-      if (isProduct) {
-        const sourcePrep = preparationsData.find(p => p.id === sc.source_id);
-        const isPackaging = sourcePrep?.processes?.includes('packaging');
-        if (isPackaging) {
-          return total; // Don't add weight for packaging
-        }
+      // SEMPRE excluir embalagem do peso, independentemente de ser receita ou produto
+      const sourcePrep = preparationsData.find(p => p.id === sc.source_id);
+      const isPackaging = sourcePrep?.processes?.includes('packaging') ||
+        sc.isPackaging === true;
+
+      if (isPackaging) {
+        return total; // Don't add weight for packaging
       }
 
       const weight = parseNumericValue(sc.assembly_weight_kg) || 0;
       return total + weight;
     }, 0);
-  }, [isProduct, preparationsData]);
+  }, [preparationsData]);
 
   // Handle weight change for individual sub-components
   const handleWeightChange = useCallback((subComponentId, newWeight) => {
@@ -239,99 +233,6 @@ const AssemblySubComponents = ({
             </tfoot>
           </table>
 
-          {/* Configuração e Totais Unificados */}
-          {showAssemblyConfig && (
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 border-t rounded-b-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <Layers className="h-4 w-4 text-indigo-600" />
-                <h6 className="font-semibold text-indigo-800 text-sm">Configuração do Porcionamento</h6>
-              </div>
-
-              <div className="bg-white/60 rounded-md p-3 border border-indigo-100">
-                <div className="grid grid-cols-4 gap-x-6 gap-y-2 items-center">
-                  {/* Row de Labels */}
-                  <Label className="text-xs font-medium text-indigo-700">Tipo</Label>
-                  <Label className="text-xs font-medium text-indigo-700">Qtd. Unid.</Label>
-                  <Label className="text-xs font-medium text-indigo-700">Peso Total (kg)</Label>
-                  <Label className="text-xs font-medium text-green-800">Custo Total</Label>
-
-                  {/* Row de Inputs e Valores */}
-                  <div className="w-full">
-                    <Select
-                      value={assemblyConfig.container_type || 'cuba'}
-                      onValueChange={(value) => onAssemblyConfigChange('container_type', value)}
-                    >
-                      <SelectTrigger className="h-9 text-sm w-full">
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cuba">Cuba</SelectItem>
-                        <SelectItem value="cuba-p">Cuba P</SelectItem>
-                        <SelectItem value="cuba-g">Cuba G</SelectItem>
-                        <SelectItem value="descartavel">Descartável</SelectItem>
-                        <SelectItem value="Porção">Porção</SelectItem>
-                        <SelectItem value="Unid.">Unidade</SelectItem>
-                        <SelectItem value="kg">Kg</SelectItem>
-                        <SelectItem value="outros">Outros</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="w-full">
-                    <Input
-                      type="text"
-                      value={assemblyConfig.units_quantity || ''}
-                      onChange={(e) => onAssemblyConfigChange('units_quantity', e.target.value)}
-                      placeholder="1"
-                      className="h-9 text-sm text-center w-full"
-                    />
-                  </div>
-
-                  <div className="h-9 relative w-full">
-                    <Input
-                      type="text"
-                      // Display: SEMPRE mostra a soma real dos componentes.
-                      // O uso da key força o re-render visual quando a soma muda (escala aplicada).
-                      key={`total-${totalAssemblyWeight}-${assemblyConfig.units_quantity}`}
-                      defaultValue={String((totalAssemblyWeight * (parseNumericValue(assemblyConfig.units_quantity) || 1)).toFixed(3)).replace('.', ',')}
-                      onBlur={(e) => {
-                        const newTotalWeight = parseNumericValue(e.target.value);
-                        // Compara com o peso atual REAL (soma dos componentes)
-                        const currentTotalWeight = totalAssemblyWeight * (parseNumericValue(assemblyConfig.units_quantity) || 1);
-
-                        // Registra o valor no config apenas para log, mas a lógica de escala manda
-                        onAssemblyConfigChange('total_weight', String(newTotalWeight).replace('.', ','));
-
-                        // Se houver mudança significativa e valores válidos
-                        if (newTotalWeight > 0 && currentTotalWeight > 0 && Math.abs(newTotalWeight - currentTotalWeight) > 0.001) {
-                          const scaleFactor = newTotalWeight / currentTotalWeight;
-
-                          const updatedComponents = subComponents.map(sc => {
-                            const currentWeight = parseNumericValue(sc.assembly_weight_kg);
-                            const newWeight = currentWeight * scaleFactor;
-
-                            return {
-                              ...sc,
-                              assembly_weight_kg: String(newWeight.toFixed(3)).replace('.', ',')
-                            };
-                          });
-
-                          onUpdateSubComponents(updatedComponents);
-                        }
-                      }}
-                      className="h-9 text-sm text-center font-bold text-indigo-800 bg-indigo-100/70 border-indigo-200 w-full"
-                    />
-                  </div>
-
-                  <div className="h-9 px-2 flex items-center justify-center bg-green-100/70 rounded-md w-full">
-                    <span className="text-sm font-bold text-green-900">
-                      {formatCurrency(totalCost * (parseNumericValue(assemblyConfig.units_quantity) || 1))}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </>

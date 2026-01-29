@@ -161,21 +161,8 @@ export default function MenuConfig({ categories, onConfigChange }) {
         if (config.category_groups && config.category_groups.length > 0) {
           setCategoryGroups(config.category_groups);
         } else {
-          // Migração/Inicialização: Criar grupos padrão se não existirem
-          // Tenta distribuir as categorias baseadas no histórico ou coloca todas no primeiro grupo
-          const defaultGroups = [
-            {
-              id: 'almoco',
-              name: 'Almoço',
-              items: config.category_order || categories.map(c => c.id) // Fallback para todas as categorias
-            },
-            {
-              id: 'mono_porcoes',
-              name: 'Mono Porções',
-              items: []
-            }
-          ];
-          setCategoryGroups(defaultGroups);
+          // Sistema dinâmico: começa vazio, usuário configura as abas
+          setCategoryGroups([]);
         }
       } else {
         // Se não tiver configuração, inicializa padrões
@@ -834,8 +821,8 @@ export default function MenuConfig({ categories, onConfigChange }) {
                       key={day}
                       type="button"
                       className={`p-3 rounded border flex flex-col items-center justify-center transition-colors ${availableDays.includes(day)
-                          ? "bg-blue-50 border-blue-200 text-blue-700"
-                          : "bg-gray-50 border-gray-200 text-gray-400"
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
+                        : "bg-gray-50 border-gray-200 text-gray-400"
                         }`}
                       onClick={() => toggleDay(day)}
                       disabled={availableDays.length === 1 && availableDays.includes(day)}

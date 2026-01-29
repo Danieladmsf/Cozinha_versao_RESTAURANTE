@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Grid, GripVertical, Plus, Trash2, Pencil, Check, FolderPlus } from "lucide-react";
+import { Grid, GripVertical, Plus, Trash2, Pencil, Check, FolderPlus, Loader2, LayoutGrid } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const LayoutTab = ({
@@ -26,6 +26,29 @@ const LayoutTab = ({
 }) => {
   const [editingGroupId, setEditingGroupId] = React.useState(null);
   const [editingName, setEditingName] = React.useState("");
+
+  // Fix for SSR/hydration issues with DragDropContext
+  const [isMounted, setIsMounted] = React.useState(false);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Auto-save categoryGroups to localStorage when they change
+  React.useEffect(() => {
+    if (categoryGroups && categoryGroups.length >= 0) {
+      try {
+        const cachedConfig = localStorage.getItem('menuConfig');
+        if (cachedConfig) {
+          const config = JSON.parse(cachedConfig);
+          config.category_groups = categoryGroups;
+          localStorage.setItem('menuConfig', JSON.stringify(config));
+          console.log('✅ [LayoutTab] categoryGroups salvo no localStorage:', categoryGroups.length, 'grupos');
+        }
+      } catch (e) {
+        console.error('❌ [LayoutTab] Erro ao salvar categoryGroups no localStorage:', e);
+      }
+    }
+  }, [categoryGroups]);
 
   const allFilteredCategories = getFilteredCategories();
 
@@ -148,7 +171,11 @@ const LayoutTab = ({
   };
 
   const removeGroup = (groupId) => {
+    console.log('🗑️ [LayoutTab] Removendo grupo:', groupId);
+    const removedGroup = categoryGroups.find(g => g.id === groupId);
+    console.log('🗑️ [LayoutTab] Grupo removido:', removedGroup?.name);
     const newGroups = categoryGroups.filter(g => g.id !== groupId);
+    console.log('🗑️ [LayoutTab] Grupos restantes:', newGroups.length);
     setCategoryGroups(newGroups);
   };
 
@@ -168,6 +195,19 @@ const LayoutTab = ({
     }
   };
 
+  // Show loading while component is mounting (fixes SSR issues with DragDropContext)
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-slate-200 rounded-full"></div>
+          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+        </div>
+        <span className="ml-3 text-slate-600 font-medium">Carregando...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -177,13 +217,15 @@ const LayoutTab = ({
 
           {/* Esquerda: Abas Existentes (Tabs) */}
           <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GripVertical className="h-5 w-5" />
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-100">
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <div className="p-1.5 bg-slate-900 rounded-lg">
+                    <GripVertical className="h-4 w-4 text-white" />
+                  </div>
                   Abas Configuradas
                 </CardTitle>
-                <p className="text-sm text-gray-500 font-normal">
+                <p className="text-sm text-slate-500 font-normal mt-1">
                   Arraste categorias da lista ao lado para a área pontilhada abaixo para criar novas abas.
                 </p>
               </CardHeader>
@@ -196,9 +238,9 @@ const LayoutTab = ({
                       {categoryGroups && categoryGroups.map((group, groupIndex) => (
                         <Draggable key={group.id} draggableId={group.id} index={groupIndex}>
                           {(provided) => (
-                            <div {...provided.innerRef} {...provided.draggableProps} className="border rounded-lg bg-white shadow-sm p-0 overflow-hidden">
+                            <div {...provided.innerRef} {...provided.draggableProps} className="border border-slate-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-200 p-0 overflow-hidden">
                               {/* Group Header */}
-                              <div className="flex items-center justify-between p-3 bg-gray-50 border-b">
+                              <div className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100">
                                 <div className="flex items-center gap-2 flex-1">
                                   <div {...provided.dragHandleProps}>
                                     <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
@@ -246,11 +288,15 @@ const LayoutTab = ({
                                       </p>
                                     )}
                                     <div className="space-y-1">
-                                      {group.items.map((itemId, index) => {
-                                        const cat = categories.find(c => c.id === itemId) || categoryTree.find(c => c.id === itemId);
-                                        if (!cat) return null;
-                                        return (
-                                          <Draggable key={itemId} draggableId={itemId} index={index}>
+                                      {/* Filtrar items válidos primeiro para evitar problemas de índice */}
+                                      {group.items
+                                        .map(itemId => ({
+                                          itemId,
+                                          cat: categories.find(c => c.id === itemId) || categoryTree.find(c => c.id === itemId)
+                                        }))
+                                        .filter(item => item.cat)
+                                        .map((item, index) => (
+                                          <Draggable key={item.itemId} draggableId={item.itemId} index={index}>
                                             {(provided) => (
                                               <div
                                                 ref={provided.innerRef}
@@ -259,12 +305,12 @@ const LayoutTab = ({
                                                 className="flex items-center gap-2 p-2 bg-white border rounded text-sm group"
                                               >
                                                 <Grid className="h-3 w-3 text-gray-300" />
-                                                <span>{cat.name}</span>
+                                                <span>{item.cat.name}</span>
                                               </div>
                                             )}
                                           </Draggable>
-                                        );
-                                      })}
+                                        ))
+                                      }
                                       {provided.placeholder}
                                     </div>
                                   </div>
@@ -286,16 +332,18 @@ const LayoutTab = ({
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className={`
-                                    border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center gap-2 transition-colors
-                                    ${snapshot.isDraggingOver ? 'border-primary bg-primary/5' : 'border-gray-300 bg-gray-50/50'}
-                                `}
+                        border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center gap-2 transition-all duration-200
+                        ${snapshot.isDraggingOver
+                          ? 'border-emerald-400 bg-emerald-50 scale-[1.02]'
+                          : 'border-slate-300 bg-slate-50/50 hover:border-slate-400'}
+                      `}
                     >
-                      <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-                        <FolderPlus className="h-6 w-6 text-blue-600" />
+                      <div className={`h-14 w-14 rounded-full flex items-center justify-center mb-2 transition-colors duration-200 ${snapshot.isDraggingOver ? 'bg-emerald-100' : 'bg-slate-100'}`}>
+                        <FolderPlus className={`h-7 w-7 transition-colors duration-200 ${snapshot.isDraggingOver ? 'text-emerald-600' : 'text-slate-500'}`} />
                       </div>
-                      <h3 className="font-medium text-gray-900">Arraste uma Categoria aqui</h3>
-                      <p className="text-sm text-gray-500 max-w-xs">
-                        Para criar uma nova aba (ex: "Confeitária"). Os itens da categoria serão adicionados automaticamente.
+                      <h3 className="font-semibold text-slate-800">Arraste uma Categoria aqui</h3>
+                      <p className="text-sm text-slate-500 max-w-xs">
+                        Para criar uma nova aba (ex: "Confeitaria"). Os itens da categoria serão adicionados automaticamente.
                       </p>
                       {provided.placeholder}
                     </div>
@@ -307,11 +355,16 @@ const LayoutTab = ({
 
           {/* Direita: Categorias Disponíveis */}
           <div className="space-y-4">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-base">Categorias Disponíveis</CardTitle>
+            <Card className="h-full border-slate-200 shadow-sm">
+              <CardHeader className="bg-gradient-to-r from-emerald-50 to-white border-b border-slate-100">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-800">
+                  <div className="p-1.5 bg-emerald-500 rounded-lg">
+                    <LayoutGrid className="h-4 w-4 text-white" />
+                  </div>
+                  Categorias Disponíveis
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4">
                 <Droppable droppableId="source-categories" type="category" isDropDisabled={true}>
                   {(provided) => (
                     <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2 max-h-[600px] overflow-y-auto pr-2">

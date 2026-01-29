@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Item VR Soft</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f0f2f5;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #1a73e8;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>🥥 Busca de Item VR Soft</h1>
+        <p>Este utilitário conecta na sua API local (<code>http://localhost:8000</code>) para encontrar o item.</p>
+
+        <div style="margin-bottom: 15px; padding: 10px; background: #e8f0fe; border-radius: 4px;">
+            <strong>Passo 1:</strong> Certifique-se que a API está rodando no terminal:<br>
+            <code>python api_vrsoft.py</code>
+        </div>
+
+        <button id="btnSearch" onclick="buscarItem()">🔍 Buscar Item 1855 / Água de Coco</button>
+        <div id="status" class="status">Aguardando comando...</div>
+    </div>
+
+    <div class="card" id="resultCard" style="display:none;">
+        <h2>Resultados</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        const AUTH = btoa('admin:VrSoft@2026');
+        const HEADERS = {
+            'Authorization': `Basic ${AUTH}`,
+            'Content-Type': 'application/json'
+        };
+
+        async function buscarItem() {
+            const btn = document.getElementById('btnSearch');
+            const status = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const resultCard = document.getElementById('resultCard');
+
+            btn.disabled = true;
+            status.textContent = "⏳ Conectando na API local...";
+            resultCard.style.display = 'block';
+            resultsDiv.innerHTML = ''; // Limpar anterior
+
+            try {
+                // 1. Testar Health
+                try {
+                    await fetch(`${API_URL}/health`, { headers: HEADERS });
+                } catch (e) {
+                    throw new Error("Não foi possível conectar em http://localhost:8000. A API está rodando?");
+                }
+
+                status.textContent = "✅ API Conectada! Buscando tabelas...";
+
+                // 2. Tentar descobrir tabelas
+                const tablesRes = await fetch(`${API_URL}/database/tables`, { headers: HEADERS });
+                const tables = await tablesRes.json();
+
+                const tableGuesses = ['produto', 'produtos', 'tb_produto', 'cadastro_produto', 'itens', 'item'];
+                let targetTable = null;
+
+                // Tentar encontrar tabela
+                for (let t of tables) {
+                    if (tableGuesses.includes(t.toLowerCase())) {
+                        targetTable = t;
+                        break;
+                    }
+                }
+
+                if (!targetTable) {
+                    // Tentar por substring
+                    targetTable = tables.find(t => t.toLowerCase().includes('prod'));
+                }
+
+                if (!targetTable) {
+                    logResult("⚠️ Nenhuma tabela óbvia de produtos encontrada. Tentando 'produtos' padrão...", 'orange');
+                    targetTable = 'produtos';
+                } else {
+                    logResult(`file_folder Tabela provável encontrada: <strong>${targetTable}</strong>`, 'blue');
+                }
+
+                // 3. Executar Queries de Busca
+                status.textContent = `🔎 Buscando item 1855 na tabela '${targetTable}'...`;
+
+                const queries = [
+                    `SELECT * FROM ${targetTable} WHERE codigo = 1855`,
+                    `SELECT * FROM ${targetTable} WHERE id = 1855`,
+                    `SELECT * FROM ${targetTable} WHERE descricao ILIKE '%AGUA COCO%' LIMIT 5`,
+                    `SELECT * FROM ${targetTable} WHERE nome ILIKE '%AGUA COCO%' LIMIT 5`
+                ];
+
+                let foundAny = false;
+
+                for (let q of queries) {
+                    logResult(`Executando: <code>${q}</code>`, 'black');
+
+                    try {
+                        const res = await fetch(`${API_URL}/query/execute`, {
+                            method: 'POST',
+                            headers: HEADERS,
+                            body: JSON.stringify({ query: q })
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (Array.isArray(data) && data.length > 0) {
+                                foundAny = true;
+                                logResult(`🎉 <strong>ENCONTRADO ${data.length} REGISTRO(S)!</strong>`, 'green');
+
+                                // Mostrar dados bonitinhos
+                                const pre = document.createElement('pre');
+                                pre.textContent = JSON.stringify(data, null, 2);
+                                resultsDiv.appendChild(pre);
+                            } else {
+                                logResult("Item não encontrado com esta query.", 'gray');
+                            }
+                        } else {
+                            const err = await res.json();
+                            logResult(`Erro na query: ${err.detail || 'Desconhecido'}`, 'red');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                if (foundAny) {
+                    status.textContent = "✅ Busca finalizada com sucesso!";
+                    status.className = "status success";
+                } else {
+                    status.textContent = "❌ Item não encontrado nas tentativas automáticas.";
+                    status.className = "status error";
+                }
+
+            } catch (error) {
+                status.textContent = `❌ Erro fatal: ${error.message}`;
+                status.className = "status error";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function logResult(msg, color) {
+            const div = document.createElement('div');
+            div.style.color = color || 'black';
+            div.style.marginBottom = '5px';
+            div.style.borderBottom = '1px solid #eee';
+            div.style.paddingBottom = '5px';
+            div.innerHTML = msg;
+            document.getElementById('results').appendChild(div);
+        }
+    </script>
+</body>
+
+</html>

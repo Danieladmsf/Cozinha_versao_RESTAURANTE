@@ -37,8 +37,15 @@ import {
   X,
   StickyNote,
   ChevronsUpDown,
-  Package2
+  Package2,
+  HelpCircle
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Command,
   CommandEmpty,
@@ -98,6 +105,8 @@ import RecipeCollectDialog from "./RecipeCollectDialog";
 import RecipeSimplePrintDialog from "./RecipeSimplePrintDialog";
 import DraggablePreparationList from "./DraggablePreparationList";
 import { IngredientSelectorContent } from "./IngredientSelectorContent";
+import RecipeMetricsDashboard from "./RecipeMetricsDashboard";
+import RecipeBook from "./RecipeBook";
 export default function RecipeTechnical() {
   const { toast } = useToast();
 
@@ -1697,10 +1706,11 @@ export default function RecipeTechnical() {
 
         {/* Sistema de Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="dados-tecnicos">Dados Técnicos</TabsTrigger>
             <TabsTrigger value="pre-preparo">Pré-Preparo</TabsTrigger>
             <TabsTrigger value="ficha-tecnica">Ficha Técnica</TabsTrigger>
+            <TabsTrigger value="book">Receituário</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados-tecnicos">
@@ -1944,60 +1954,39 @@ export default function RecipeTechnical() {
                       </Popover>
                     </div>
                   </div>
+
+                  <div className="mt-4">
+                    <Label htmlFor="video_url" className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1">
+                      <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                      Link do YouTube
+                    </Label>
+                    <Input
+                      id="video_url"
+                      name="video_url"
+                      value={recipeData.video_url || ''}
+                      onChange={handleRecipeInputChange}
+                      placeholder="https://youtube.com/watch?v=..."
+                      className="w-full focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
               {/* COLUNA 2: Informações de Custo e Peso (COMPACTA) */}
-              <Card className="bg-white backdrop-blur-sm bg-opacity-90 border border-gray-100 h-full flex flex-col overflow-hidden">
+              <Card className="bg-white backdrop-blur-sm bg-opacity-90 border border-gray-100 h-full flex flex-col">
                 <CardHeader className="py-4 px-6 border-b bg-gray-50/50">
                   <CardTitle className="text-lg font-medium text-gray-700">
                     Métricas
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-0 overflow-y-auto flex-1">
-                  <div className="divide-y divide-gray-100">
-                    {/* PESOS */}
-                    <div className="flex justify-between items-center p-4 hover:bg-gray-50">
-                      <span className="text-sm text-gray-500">Peso Bruto</span>
-                      <span className="font-semibold text-gray-700 flex items-center">
-                        <span className="text-xs text-gray-400 mr-1">kg</span>
-                        {formatDisplayValue(recipeData.total_weight, 'weight')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 hover:bg-blue-50 bg-blue-50/10">
-                      <span className="text-sm text-blue-600 font-medium">Peso Líquido</span>
-                      <span className="font-bold text-blue-700 flex items-center">
-                        <span className="text-xs text-blue-400 mr-1">kg</span>
-                        {formatDisplayValue(recipeData.yield_weight, 'weight')}
-                      </span>
-                    </div>
-
-                    {/* CUSTOS */}
-                    <div className="flex justify-between items-center p-4 hover:bg-gray-50 border-t-2 border-dashed border-gray-200">
-                      <span className="text-sm text-gray-500">Custo/Kg (Bruto)</span>
-                      <span className="font-semibold text-gray-700 flex items-center">
-                        <span className="text-xs text-gray-400 mr-1">R$</span>
-                        {formatDisplayValue(recipeData.cost_per_kg_raw, 'currency')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 hover:bg-green-50 bg-green-50/10">
-                      <span className="text-sm text-green-600 font-medium">Custo/Kg (Liq)</span>
-                      <span className="font-bold text-green-700 flex items-center">
-                        <span className="text-xs text-green-400 mr-1">R$</span>
-                        {formatDisplayValue(recipeData.cost_per_kg_yield, 'currency')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 hover:bg-pink-50 bg-pink-50/10">
-                      <span className="text-sm text-pink-600 font-medium">{recipeData.cost_field_name || 'Custo final'}</span>
-                      <span className="font-bold text-pink-700 flex items-center">
-                        <span className="text-xs text-pink-400 mr-1">R$</span>
-                        {formatDisplayValue(
-                          calculateCubaCost(recipeData.cuba_weight, recipeData.cost_per_kg_yield),
-                          'currency'
-                        )}
-                      </span>
-                    </div>
-                  </div>
+                <CardContent className="p-0 flex-1 bg-gray-50/10">
+                  <RecipeMetricsDashboard
+                    metricsData={recipeData}
+                    variant="list"
+                    className="grid-cols-1 gap-0"
+                    weightFieldName={recipeData.weight_field_name}
+                    costFieldName={recipeData.cost_field_name}
+                  />
                 </CardContent>
               </Card>
 
@@ -2142,6 +2131,10 @@ export default function RecipeTechnical() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="book" className="min-h-[600px] bg-white">
+            <RecipeBook recipeData={{ ...recipeData, preparations: preparationsData }} />
           </TabsContent>
         </Tabs>
 

@@ -1,0 +1,186 @@
+[
+  {
+    "code": "688",
+    "name": "688 - SALADA DE FRUTAS MIX KG",
+    "original_name": "000688 - SALADA DE FRUTAS MIX KG",
+    "clean_name": "SALADA DE FRUTAS MIX KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6968",
+    "name": "6968 - SALADA MIX DE LEGUMES E FOLHAS GD UND",
+    "original_name": "006968 - SALADA MIX DE LEGUMES E FOLHAS GD UND",
+    "clean_name": "SALADA MIX DE LEGUMES E FOLHAS GD UND",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7305",
+    "name": "7305 - SALADA RUCULA COM MANGA GD UN",
+    "original_name": "007305 - SALADA RUCULA COM MANGA GD UN",
+    "clean_name": "SALADA RUCULA COM MANGA GD UN",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6826",
+    "name": "6826 - SALADA PRIMAVERA GRANDE UND",
+    "original_name": "006826 - SALADA PRIMAVERA GRANDE UND",
+    "clean_name": "SALADA PRIMAVERA GRANDE UND",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9017",
+    "name": "9017 - SALADA MIX PALMITO GRANDE UND",
+    "original_name": "009017 - SALADA MIX PALMITO GRANDE UND",
+    "clean_name": "SALADA MIX PALMITO GRANDE UND",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "690",
+    "name": "690 - CHEIRO VERDE PICADO KG",
+    "original_name": "690 - CHEIRO VERDE PICADO KG",
+    "clean_name": "CHEIRO VERDE PICADO KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "987",
+    "name": "987 - ALHO PORO PICADO KG",
+    "original_name": "000987 - ALHO PORO PICADO KG",
+    "clean_name": "ALHO PORO PICADO KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "102481",
+    "name": "102481 - ALFACE AMERICANA 200G",
+    "original_name": "102481 - ALFACE AMERICANA 200G",
+    "clean_name": "ALFACE AMERICANA 200G",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6528",
+    "name": "6528 - SALADA TROPICAL KG - REP.ROX.CEN.ACEL.BETER",
+    "original_name": "006528 - SALADA TROPICAL KG - REP.ROX.CEN.ACEL.BETER",
+    "clean_name": "SALADA TROPICAL KG - REP.ROX.CEN.ACEL.BETER",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9404",
+    "name": "9404 - MIX DE FOLHAS ALF/AMERICANA/RUCULA/TOMATE CEREJA",
+    "original_name": "009404 - MIX DE FOLHAS ALF/AMERICANA/RUCULA/TOMATE CEREJA",
+    "clean_name": "MIX DE FOLHAS ALF/AMERICANA/RUCULA/TOMATE CEREJA",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9413",
+    "name": "9413 - RUCULA HIGIENIZADA 200G",
+    "original_name": "009413 - RUCULA HIGIENIZADA 200G",
+    "clean_name": "RUCULA HIGIENIZADA 200G",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9395",
+    "name": "9395 - MIX DE FOLHAS ALF/CRESPA/ROXA CENORURA RALADA 200G",
+    "original_name": "009395 - MIX DE FOLHAS ALF/CRESPA/ROXA CENORURA RALADA 200G",
+    "clean_name": "MIX DE FOLHAS ALF/CRESPA/ROXA CENORURA RALADA 200G",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "94333",
+    "name": "94333 - CABOTIA DESCASCADA PICADA KG",
+    "original_name": "094333 - CABOTIA DESCASCADA PICADA KG",
+    "clean_name": "CABOTIA DESCASCADA PICADA KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9390",
+    "name": "9390 - CABOTIA DESCASCADA FATIA KG",
+    "original_name": "009390 - CABOTIA DESCASCADA FATIA KG",
+    "clean_name": "CABOTIA DESCASCADA FATIA KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "286",
+    "name": "286 - KIT SOPA KG",
+    "original_name": "000286 - KIT SOPA KG",
+    "clean_name": "KIT SOPA KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "44",
+    "name": "44 - ALHO DESCASCADO KG",
+    "original_name": "000044 - ALHO DESCASCADO KG",
+    "clean_name": "ALHO DESCASCADO KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "345",
+    "name": "345 - CENOURA RALADA KG",
+    "original_name": "000345 - CENOURA RALADA KG",
+    "clean_name": "CENOURA RALADA KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "781",
+    "name": "781 - CENOURA C/ VAGEM PICADO KG",
+    "original_name": "000781 - CENOURA C/ VAGEM PICADO KG",
+    "clean_name": "CENOURA C/ VAGEM PICADO KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6997",
+    "name": "6997 - BATATA PIRULITO PRE COZIDA 1 KG",
+    "original_name": "006997 - BATATA PIRULITO PRE COZIDA 1 KG",
+    "clean_name": "BATATA PIRULITO PRE COZIDA 1 KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9394",
+    "name": "9394 - KIT PARA CARNE DE PANELA BENDITO KG",
+    "original_name": "009394 - KIT PARA CARNE DE PANELA BENDITO KG",
+    "clean_name": "KIT PARA CARNE DE PANELA BENDITO KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "5604",
+    "name": "5604 - KIT MAIONESE KG",
+    "original_name": "005604 - KIT MAIONESE KG",
+    "clean_name": "KIT MAIONESE KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9152",
+    "name": "9152 - KIT YAKISSOBA KG",
+    "original_name": "009152 - KIT YAKISSOBA KG",
+    "clean_name": "KIT YAKISSOBA KG",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "9151",
+    "name": "9151 - KIT VINAGRETE NO POTE",
+    "original_name": "009151 - KIT VINAGRETE NO POTE",
+    "clean_name": "KIT VINAGRETE NO POTE",
+    "category": "PROCESSADOS",
+    "type": "receitas_-_base"
+  }
+]

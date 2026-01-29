@@ -23,6 +23,18 @@ const nextConfig = {
       fullUrl: false,
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+      }
+    ],
+  },
   // Configurar redirecionamentos para evitar 404s de arquivos VSDA
   async redirects() {
     return [

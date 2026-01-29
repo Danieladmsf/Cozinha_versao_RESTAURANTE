@@ -4,20 +4,23 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   const { searchParams } = new URL(request.url);
-  const filename = searchParams.get('filename');
+  const filename = searchParams.get('filename') || 'image.jpg';
 
-  if (!filename) {
-    return NextResponse.json({ message: 'Missing filename' }, { status: 400 });
+  console.log("Upload request initiated. Token present:", !!process.env.BLOB_READ_WRITE_TOKEN);
+
+  // Le o corpo como Blob/Buffer
+  // Note: Em App Router Route Handlers, request.body é um ReadableStream ou podemos usar formData()
+
+  const formData = await request.formData();
+  const file = formData.get('file');
+
+  if (!file) {
+    return NextResponse.json({ error: 'No files received.' }, { status: 400 });
   }
 
-  try {
-    const blob = await put(filename, request.body, {
-      access: 'public',
-    });
+  const blob = await put(filename, file, {
+    access: 'public',
+  });
 
-    return NextResponse.json(blob);
-  } catch (error) {
-    console.error("Erro detalhado no upload para o Vercel Blob:", error);
-    return NextResponse.json({ message: 'Error uploading file', error: error.message }, { status: 500 });
-  }
+  return NextResponse.json(blob);
 }

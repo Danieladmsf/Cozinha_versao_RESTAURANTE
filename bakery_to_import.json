@@ -1,0 +1,842 @@
+[
+  {
+    "code": "7499",
+    "name": "7499 - PAO DE LARANJINHA BENDITO KG",
+    "original_name": "006880 - PAO DE LARANJINHA BENDITO KG",
+    "clean_name": "PAO DE LARANJINHA BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6956",
+    "name": "6956 - PAO DE LEITE BENDITO KG",
+    "original_name": "006956 - PAO DE LEITE BENDITO KG",
+    "clean_name": "PAO DE LEITE BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6965",
+    "name": "6965 - PAO FOFINHO BENDITO KG",
+    "original_name": "006965 - PAO FOFINHO BENDITO KG",
+    "clean_name": "PAO FOFINHO BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6974",
+    "name": "6974 - PAO HAMBURGUER MINI BENDITO  KG",
+    "original_name": "006974 - PAO HAMBURGUER MINI BENDITO  KG",
+    "clean_name": "PAO HAMBURGUER MINI BENDITO  KG",
+    "category": "SANDUICHES E LANCHES",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6966",
+    "name": "6966 - PAO HAMBURGUER BENDITO KG",
+    "original_name": "006966 - PAO HAMBURGUER BENDITO KG",
+    "clean_name": "PAO HAMBURGUER BENDITO KG",
+    "category": "SANDUICHES E LANCHES",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7569",
+    "name": "7569 - PAO CASEIRAO BENDITO 250GR",
+    "original_name": "007569 - PAO CASEIRAO BENDITO 250GR",
+    "clean_name": "PAO CASEIRAO BENDITO 250GR",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7030",
+    "name": "7030 - PAO HOT DOG BENDITO  KG",
+    "original_name": "007030 - PAO HOT DOG BENDITO  KG",
+    "clean_name": "PAO HOT DOG BENDITO  KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6951",
+    "name": "6951 - PAO CASEIRINHO BENDITO  KG",
+    "original_name": "006951 - PAO CASEIRINHO BENDITO  KG",
+    "clean_name": "PAO CASEIRINHO BENDITO  KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6950",
+    "name": "6950 - PAO BRIOCHE BENDITO  KG",
+    "original_name": "006950 - PAO BRIOCHE BENDITO  KG",
+    "clean_name": "PAO BRIOCHE BENDITO  KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7496",
+    "name": "7496 - ROCAMBOLE PRESTIGIO BENDITO KG",
+    "original_name": "007496 - ROCAMBOLE PRESTIGIO BENDITO KG",
+    "clean_name": "ROCAMBOLE PRESTIGIO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7492",
+    "name": "7492 - ROCAMBOLE BRIGADEIRO BENDITO KG",
+    "original_name": "007492 - ROCAMBOLE BRIGADEIRO BENDITO KG",
+    "clean_name": "ROCAMBOLE BRIGADEIRO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "8932",
+    "name": "8932 - BOLO CHOCOLATE C/CORBETURA BENDITO KG",
+    "original_name": "008932 - BOLO CHOCOLATE C/CORBETURA BENDITO KG",
+    "clean_name": "BOLO CHOCOLATE C/CORBETURA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7071",
+    "name": "7071 - BOLO CHOCOLATE S/ COBERT BENDITO KG",
+    "original_name": "007071 - BOLO CHOCOLATE S/ COBERT BENDITO KG",
+    "clean_name": "BOLO CHOCOLATE S/ COBERT BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6856",
+    "name": "6856 - BOLO COCO BENDITO KG",
+    "original_name": "006856 - BOLO COCO BENDITO KG",
+    "clean_name": "BOLO COCO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7068",
+    "name": "7068 - BOLO CENOURA COBERTURA CHOCOLATE BENDITO KG",
+    "original_name": "007068 - BOLO CENOURA COBERTURA CHOCOLATE BENDITO KG",
+    "clean_name": "BOLO CENOURA COBERTURA CHOCOLATE BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7132",
+    "name": "7132 - F.PROPRIA BOLO LARANJA BEDNITO KG",
+    "original_name": "007132 - F.PROPRIA BOLO LARANJA BEDNITO KG",
+    "clean_name": "F.PROPRIA BOLO LARANJA BEDNITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7209",
+    "name": "7209 - BOLO POTE BENDITO KG",
+    "original_name": "007209 - BOLO POTE BENDITO KG",
+    "clean_name": "BOLO POTE BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "358590",
+    "name": "358590 - CUPCAKE UND BENDITO 70GR",
+    "original_name": "035859 - CUPCAKE UND BENDITO 70GR",
+    "clean_name": "CUPCAKE UND BENDITO 70GR",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7200",
+    "name": "7200 - BOLO PISCINA CENOURA BENDITO KG",
+    "original_name": "007200 - BOLO PISCINA CENOURA BENDITO KG",
+    "clean_name": "BOLO PISCINA CENOURA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7202",
+    "name": "7202 - BOLO PISCINA CHOCOLATE BENDITOKG",
+    "original_name": "007202 - BOLO PISCINA CHOCOLATE BENDITOKG",
+    "clean_name": "BOLO PISCINA CHOCOLATE BENDITOKG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7102",
+    "name": "7102 - BOLO DE CHURROS CHOCOLATE BENDITO KG",
+    "original_name": "007102 - BOLO DE CHURROS CHOCOLATE BENDITO KG",
+    "clean_name": "BOLO DE CHURROS CHOCOLATE BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7108",
+    "name": "7108 - BOLO DE CHURROS BENDITO KG",
+    "original_name": "007108 - BOLO DE CHURROS BENDITO KG",
+    "clean_name": "BOLO DE CHURROS BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7198",
+    "name": "7198 - BOLO PACOCA BENDITO  KG",
+    "original_name": "007198 - BOLO PACOCA BENDITO  KG",
+    "clean_name": "BOLO PACOCA BENDITO  KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "8108",
+    "name": "8108 - BOLO FUBA C/ ERVA DOCE BENDITO KG",
+    "original_name": "008108 - BOLO FUBA C/ ERVA DOCE BENDITO KG",
+    "clean_name": "BOLO FUBA C/ ERVA DOCE BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7041",
+    "name": "7041 - BOLO BANANA BENDITO KG",
+    "original_name": "007041 - BOLO BANANA BENDITO KG",
+    "clean_name": "BOLO BANANA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7567",
+    "name": "7567 - BOLO MACA BENDITO KG",
+    "original_name": "007567 - BOLO MACA BENDITO KG",
+    "clean_name": "BOLO MACA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7530",
+    "name": "7530 - DOGUINHO BENDITO KG",
+    "original_name": "007530 - DOGUINHO BENDITO KG",
+    "clean_name": "DOGUINHO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7195",
+    "name": "7195 - F.PROPRIA SALGADO DE  CALABRESA ASSADO KG",
+    "original_name": "007195 - F.PROPRIA SALGADO DE  CALABRESA ASSADO KG",
+    "clean_name": "F.PROPRIA SALGADO DE  CALABRESA ASSADO KG",
+    "category": "SALGADOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6880",
+    "name": "6880 - PAO DE LARANJINHA BENDITO KG",
+    "original_name": "006880 - PAO DE LARANJINHA BENDITO KG",
+    "clean_name": "PAO DE LARANJINHA BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7308",
+    "name": "7308 - PAO DE LEMON PAPPER BENDITO KG",
+    "original_name": "007308 - PAO DE LEMON PAPPER BENDITO KG",
+    "clean_name": "PAO DE LEMON PAPPER BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7188",
+    "name": "7188 - PAO MADRE BENDITO KG",
+    "original_name": "007188 - PAO MADRE BENDITO KG",
+    "clean_name": "PAO MADRE BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7190",
+    "name": "7190 - PAO AZEITONA BENDITO  KG",
+    "original_name": "007190 - PAO AZEITONA BENDITO  KG",
+    "clean_name": "PAO AZEITONA BENDITO  KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7096",
+    "name": "7096 - PAO ABOBORA BENDITO KG",
+    "original_name": "007096 - PAO ABOBORA BENDITO KG",
+    "clean_name": "PAO ABOBORA BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7309",
+    "name": "7309 - PAO CENOURINHA BENDITO KG",
+    "original_name": "007309 - PAO CENOURINHA BENDITO KG",
+    "clean_name": "PAO CENOURINHA BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7296",
+    "name": "7296 - BOLO SALGADO DE FRANGO BENDITO KG",
+    "original_name": "007296 - BOLO SALGADO DE FRANGO BENDITO KG",
+    "clean_name": "BOLO SALGADO DE FRANGO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7503",
+    "name": "7503 - TORTA DE FRANGO BENDITO KG",
+    "original_name": "007503 - TORTA DE FRANGO BENDITO KG",
+    "clean_name": "TORTA DE FRANGO BENDITO KG",
+    "category": "TORTAS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7504",
+    "name": "7504 - TORTA DE FRIOS BENDITO KG",
+    "original_name": "007504 - TORTA DE FRIOS BENDITO KG",
+    "clean_name": "TORTA DE FRIOS BENDITO KG",
+    "category": "TORTAS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7480",
+    "name": "7480 - PUDIM DE LEITE CONDENSADO BENDITO 400GR",
+    "original_name": "007480 - PUDIM DE LEITE CONDENSADO BENDITO 400GR",
+    "clean_name": "PUDIM DE LEITE CONDENSADO BENDITO 400GR",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7478",
+    "name": "7478 - PUDIM DE LEITE CONDENSADO BENDITO KG",
+    "original_name": "007478 - PUDIM DE LEITE CONDENSADO BENDITO KG",
+    "clean_name": "PUDIM DE LEITE CONDENSADO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7455",
+    "name": "7455 - MINI PUDIM BENDITO 100G",
+    "original_name": "007455 - MINI PUDIM BENDITO 100G",
+    "clean_name": "MINI PUDIM BENDITO 100G",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7436",
+    "name": "7436 - MANJAR BENDITO KG",
+    "original_name": "007436 - MANJAR BENDITO KG",
+    "clean_name": "MANJAR BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7302",
+    "name": "7302 - BRIGADEIRAO BENDITO KG",
+    "original_name": "007302 - BRIGADEIRAO BENDITO KG",
+    "clean_name": "BRIGADEIRAO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6976",
+    "name": "6976 - PAO TORRESMO BENDITO  KG",
+    "original_name": "006976 - PAO TORRESMO BENDITO  KG",
+    "clean_name": "PAO TORRESMO BENDITO  KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7437",
+    "name": "7437 - MARIA MOLE BENDITO KG",
+    "original_name": "007437 - MARIA MOLE BENDITO KG",
+    "clean_name": "MARIA MOLE BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7473",
+    "name": "7473 - PAO  DE CALABREZA BENDITO KG",
+    "original_name": "007473 - PAO  DE CALABREZA BENDITO KG",
+    "clean_name": "PAO  DE CALABREZA BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6955",
+    "name": "6955 - PAO DE FRIOS BENDITO KG",
+    "original_name": "006955 - PAO DE FRIOS BENDITO KG",
+    "clean_name": "PAO DE FRIOS BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7123",
+    "name": "7123 - BOLO GELADO ABACAXI BENDITO  KG",
+    "original_name": "007123 - BOLO GELADO ABACAXI BENDITO  KG",
+    "clean_name": "BOLO GELADO ABACAXI BENDITO  KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7479",
+    "name": "7479 - PUDIM DE PADARIA BENDITO KG",
+    "original_name": "007479 - PUDIM DE PADARIA BENDITO KG",
+    "clean_name": "PUDIM DE PADARIA BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7398",
+    "name": "7398 - GELATINA COLORIDA BENDITO KG",
+    "original_name": "007398 - GELATINA COLORIDA BENDITO KG",
+    "clean_name": "GELATINA COLORIDA BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7529",
+    "name": "7529 - COOKIES CHOCOLATE BENDITO KG",
+    "original_name": "007529 - COOKIES CHOCOLATE BENDITO KG",
+    "clean_name": "COOKIES CHOCOLATE BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7327",
+    "name": "7327 - F. PROPRIA SEQUILHOS KG",
+    "original_name": "007327 - F. PROPRIA SEQUILHOS KG",
+    "clean_name": "F. PROPRIA SEQUILHOS KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7522",
+    "name": "7522 - BOLO POTE LEITE NINHO SONHO VAL.BENDITO 250GR",
+    "original_name": "007522 - BOLO POTE LEITE NINHO SONHO VAL.BENDITO 250GR",
+    "clean_name": "BOLO POTE LEITE NINHO SONHO VAL.BENDITO 250GR",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7213",
+    "name": "7213 - BOLO RECH.BRIGADEIRO C/LEITE NINHO BENDITO KG",
+    "original_name": "007213 - BOLO RECH.BRIGADEIRO C/LEITE NINHO BENDITO KG",
+    "clean_name": "BOLO RECH.BRIGADEIRO C/LEITE NINHO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7210",
+    "name": "7210 - BOLO RECHEADO BEIJINHO C/ACABAXI BENDITO KG",
+    "original_name": "007210 - BOLO RECHEADO BEIJINHO C/ACABAXI BENDITO KG",
+    "clean_name": "BOLO RECHEADO BEIJINHO C/ACABAXI BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7241",
+    "name": "7241 - BOLO RECHEADO BRIGADEIRO BENDITO  KG",
+    "original_name": "007241 - BOLO RECHEADO BRIGADEIRO BENDITO  KG",
+    "clean_name": "BOLO RECHEADO BRIGADEIRO BENDITO  KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7232",
+    "name": "7232 - BOLO RECHEADO BRIGADEIRO C/ SONHO VALSA BENDITO KG",
+    "original_name": "007232 - BOLO RECHEADO BRIGADEIRO C/ SONHO VALSA BENDITO KG",
+    "clean_name": "BOLO RECHEADO BRIGADEIRO C/ SONHO VALSA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7242",
+    "name": "7242 - BOLO RECHEADO BRIGADEIRO/PRESTIGIO BENDITO KG",
+    "original_name": "007242 - BOLO RECHEADO BRIGADEIRO/PRESTIGIO BENDITO KG",
+    "clean_name": "BOLO RECHEADO BRIGADEIRO/PRESTIGIO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7245",
+    "name": "7245 - BOLO RECHEADO DOCE LEITE C/AMEIXA BENDITO KG",
+    "original_name": "007245 - BOLO RECHEADO DOCE LEITE C/AMEIXA BENDITO KG",
+    "clean_name": "BOLO RECHEADO DOCE LEITE C/AMEIXA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7254",
+    "name": "7254 - BOLO RECHEADO LEITE NINHO ABACAXI BENDITO  KG",
+    "original_name": "007254 - BOLO RECHEADO LEITE NINHO ABACAXI BENDITO  KG",
+    "clean_name": "BOLO RECHEADO LEITE NINHO ABACAXI BENDITO  KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7257",
+    "name": "7257 - BOLO RECHEADO  LEITE NINHO C/CEREJA BENDITO KG",
+    "original_name": "007257 - BOLO RECHEADO  LEITE NINHO C/CEREJA BENDITO KG",
+    "clean_name": "BOLO RECHEADO  LEITE NINHO C/CEREJA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7260",
+    "name": "7260 - BOLO RECHEADO LEITE NINHO C/MORANGO BENDITO KG",
+    "original_name": "007260 - BOLO RECHEADO LEITE NINHO C/MORANGO BENDITO KG",
+    "clean_name": "BOLO RECHEADO LEITE NINHO C/MORANGO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7315",
+    "name": "7315 - ESFIRRA CALABRESA BENDITO KG",
+    "original_name": "007315 - ESFIRRA CALABRESA BENDITO KG",
+    "clean_name": "ESFIRRA CALABRESA BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7355",
+    "name": "7355 - ESFIRRA CARNE BENDITO KG",
+    "original_name": "007355 - ESFIRRA CARNE BENDITO KG",
+    "clean_name": "ESFIRRA CARNE BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7348",
+    "name": "7348 - ESFIRRA CARNE, BROCOLIS E QUEIJO BENDITO KG",
+    "original_name": "007348 - ESFIRRA CARNE, BROCOLIS E QUEIJO BENDITO KG",
+    "clean_name": "ESFIRRA CARNE, BROCOLIS E QUEIJO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7381",
+    "name": "7381 - ESFIRRA FRANGO BENDITO KG",
+    "original_name": "007381 - ESFIRRA FRANGO BENDITO KG",
+    "clean_name": "ESFIRRA FRANGO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7386",
+    "name": "7386 - ESFIRRA QUEIJO BENDITO KG",
+    "original_name": "007386 - ESFIRRA QUEIJO BENDITO KG",
+    "clean_name": "ESFIRRA QUEIJO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6915",
+    "name": "6915 - F.PROPRIA ESFIRRA BRCOLIS QJO E BACON KG",
+    "original_name": "006915 - F.PROPRIA ESFIRRA BRCOLIS QJO E BACON KG",
+    "clean_name": "F.PROPRIA ESFIRRA BRCOLIS QJO E BACON KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7306",
+    "name": "7306 - PAO BATATA DOCE BENDITO KG",
+    "original_name": "007306 - PAO BATATA DOCE BENDITO KG",
+    "clean_name": "PAO BATATA DOCE BENDITO KG",
+    "category": "DOCES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7141",
+    "name": "7141 - BOLO LIMAO C COBERTURA BENDITO KG",
+    "original_name": "007141 - BOLO LIMAO C COBERTURA BENDITO KG",
+    "clean_name": "BOLO LIMAO C COBERTURA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7120",
+    "name": "7120 - BOLO FUBA C/MILHO BENDITO KG",
+    "original_name": "007120 - BOLO FUBA C/MILHO BENDITO KG",
+    "clean_name": "BOLO FUBA C/MILHO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7113",
+    "name": "7113 - BOLO FORMIGUEIRO BENDITO KG",
+    "original_name": "007113 - BOLO FORMIGUEIRO BENDITO KG",
+    "clean_name": "BOLO FORMIGUEIRO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6987",
+    "name": "6987 - ROSCA CREME C/ GOIABADA BENDITO KG",
+    "original_name": "006987 - ROSCA CREME C/ GOIABADA BENDITO KG",
+    "clean_name": "ROSCA CREME C/ GOIABADA BENDITO KG",
+    "category": "ROSCAS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6982",
+    "name": "6982 - ROSCA CASEIRA COCO BENDITO KG",
+    "original_name": "006982 - ROSCA CASEIRA COCO BENDITO KG",
+    "clean_name": "ROSCA CASEIRA COCO BENDITO KG",
+    "category": "ROSCAS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7003",
+    "name": "7003 - ROSQUINHA COCO BENDITO  KG",
+    "original_name": "007003 - ROSQUINHA COCO BENDITO  KG",
+    "clean_name": "ROSQUINHA COCO BENDITO  KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6996",
+    "name": "6996 - ROSQUINHA BRIOCHE LEITE NINHO BENDITO KG",
+    "original_name": "006996 - ROSQUINHA BRIOCHE LEITE NINHO BENDITO KG",
+    "clean_name": "ROSQUINHA BRIOCHE LEITE NINHO BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6985",
+    "name": "6985 - ROSCA CASEIRA NINHO BENDITO KG",
+    "original_name": "006985 - ROSCA CASEIRA NINHO BENDITO KG",
+    "clean_name": "ROSCA CASEIRA NINHO BENDITO KG",
+    "category": "ROSCAS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7004",
+    "name": "7004 - ROSQUINHA DE LEITE NINHO BENDITO  KG",
+    "original_name": "007004 - ROSQUINHA DE LEITE NINHO BENDITO  KG",
+    "clean_name": "ROSQUINHA DE LEITE NINHO BENDITO  KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7427",
+    "name": "7427 - LUA DE MEL CHOCOLATE BENDITO KG",
+    "original_name": "007427 - LUA DE MEL CHOCOLATE BENDITO KG",
+    "clean_name": "LUA DE MEL CHOCOLATE BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7433",
+    "name": "7433 - LUA DE MEL DOCE C/NINHO BENDITO  KG",
+    "original_name": "007433 - LUA DE MEL DOCE C/NINHO BENDITO  KG",
+    "clean_name": "LUA DE MEL DOCE C/NINHO BENDITO  KG",
+    "category": "DOCES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7434",
+    "name": "7434 - LUA DE MEL DOCE LEITE C/NINHO BENDITO KG",
+    "original_name": "007434 - LUA DE MEL DOCE LEITE C/NINHO BENDITO KG",
+    "clean_name": "LUA DE MEL DOCE LEITE C/NINHO BENDITO KG",
+    "category": "DOCES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7435",
+    "name": "7435 - LUA DE MEL LEITE CONDENSADO BENDITO KG",
+    "original_name": "007435 - LUA DE MEL LEITE CONDENSADO BENDITO KG",
+    "clean_name": "LUA DE MEL LEITE CONDENSADO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7493",
+    "name": "7493 - ROCAMBOLE DOCE LEITE BENDITO KG",
+    "original_name": "007493 - ROCAMBOLE DOCE LEITE BENDITO KG",
+    "clean_name": "ROCAMBOLE DOCE LEITE BENDITO KG",
+    "category": "DOCES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7495",
+    "name": "7495 - ROCAMBOLE LEITE NINHO BENDITO KG",
+    "original_name": "007495 - ROCAMBOLE LEITE NINHO BENDITO KG",
+    "clean_name": "ROCAMBOLE LEITE NINHO BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7031",
+    "name": "7031 - PAO ITALIANO BENDITO KG",
+    "original_name": "007031 - PAO ITALIANO BENDITO KG",
+    "clean_name": "PAO ITALIANO BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6957",
+    "name": "6957 - PAO DE MILHO BENDITO KG",
+    "original_name": "006957 - PAO DE MILHO BENDITO KG",
+    "clean_name": "PAO DE MILHO BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7121",
+    "name": "7121 - BOLO FUBA  BENDITO KG",
+    "original_name": "007121 - BOLO FUBA  BENDITO KG",
+    "clean_name": "BOLO FUBA  BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7197",
+    "name": "7197 - BOLO NOZES BENDITO KG",
+    "original_name": "007197 - BOLO NOZES BENDITO KG",
+    "clean_name": "BOLO NOZES BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7032",
+    "name": "7032 - PAO MANDIOQUINHA BENDITO KG",
+    "original_name": "007032 - PAO MANDIOQUINHA BENDITO KG",
+    "clean_name": "PAO MANDIOQUINHA BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6818",
+    "name": "6818 - F.PROPRIA CHIPS KG",
+    "original_name": "006818 - F.PROPRIA CHIPS KG",
+    "clean_name": "F.PROPRIA CHIPS KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7142",
+    "name": "7142 - BOLO MESCLADO C/COBERTURA BENDITO KG",
+    "original_name": "007142 - BOLO MESCLADO C/COBERTURA BENDITO KG",
+    "clean_name": "BOLO MESCLADO C/COBERTURA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7143",
+    "name": "7143 - BOLO MESCLADO SIMPLES BENDITO KG",
+    "original_name": "007143 - BOLO MESCLADO SIMPLES BENDITO KG",
+    "clean_name": "BOLO MESCLADO SIMPLES BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7487",
+    "name": "7487 - QUICHE FRANGO C/PALMITO BENDITO 400 G",
+    "original_name": "007487 - QUICHE FRANGO C/PALMITO BENDITO 400 G",
+    "clean_name": "QUICHE FRANGO C/PALMITO BENDITO 400 G",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7490",
+    "name": "7490 - QUICHE PRESUNTO E MUSSARELA BENDITO 400GR",
+    "original_name": "007490 - QUICHE PRESUNTO E MUSSARELA BENDITO 400GR",
+    "clean_name": "QUICHE PRESUNTO E MUSSARELA BENDITO 400GR",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7482",
+    "name": "7482 - QUICHE 4 QUEIJO BENDITO 400GR",
+    "original_name": "007482 - QUICHE 4 QUEIJO BENDITO 400GR",
+    "clean_name": "QUICHE 4 QUEIJO BENDITO 400GR",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7411",
+    "name": "7411 - HOT DOG BENDITO KG",
+    "original_name": "007411 - HOT DOG BENDITO KG",
+    "clean_name": "HOT DOG BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7399",
+    "name": "7399 - HOT DOG COM MOSTARDA BENDITO KG",
+    "original_name": "007399 - HOT DOG COM MOSTARDA BENDITO KG",
+    "clean_name": "HOT DOG COM MOSTARDA BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7119",
+    "name": "7119 - BOLO FUBA C/ GOIABADA BENDITO KG",
+    "original_name": "007119 - BOLO FUBA C/ GOIABADA BENDITO KG",
+    "clean_name": "BOLO FUBA C/ GOIABADA BENDITO KG",
+    "category": "BOLOS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7494",
+    "name": "7494 - ROCAMBOLE GOIABADA BENDITO KG",
+    "original_name": "007494 - ROCAMBOLE GOIABADA BENDITO KG",
+    "clean_name": "ROCAMBOLE GOIABADA BENDITO KG",
+    "category": "PRODUCAO PADARIA",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "7561",
+    "name": "7561 - PAO AUSTRALIANO BENDITO KG",
+    "original_name": "007561 - PAO AUSTRALIANO BENDITO KG",
+    "clean_name": "PAO AUSTRALIANO BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6590",
+    "name": "6590 - BROA DE  ERVA DOCE KG",
+    "original_name": "006590 - BROA DE  ERVA DOCE KG",
+    "clean_name": "BROA DE  ERVA DOCE KG",
+    "category": "DOCES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6643",
+    "name": "6643 - BROA DE FUBA C/GOTAS DE CHOCOLATE KG",
+    "original_name": "006643 - BROA DE FUBA C/GOTAS DE CHOCOLATE KG",
+    "clean_name": "BROA DE FUBA C/GOTAS DE CHOCOLATE KG",
+    "category": "BROAS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6591",
+    "name": "6591 - BROA TRADICIONAL KG",
+    "original_name": "006591 - BROA TRADICIONAL KG",
+    "clean_name": "BROA TRADICIONAL KG",
+    "category": "BROAS PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6980",
+    "name": "6980 - ROSCA C/ CREME BENDITO KG",
+    "original_name": "006980 - ROSCA C/ CREME BENDITO KG",
+    "clean_name": "ROSCA C/ CREME BENDITO KG",
+    "category": "ROSCAS",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6963",
+    "name": "6963 - PAO DONUTS CHOCOLATE BENDITO KG",
+    "original_name": "006963 - PAO DONUTS CHOCOLATE BENDITO KG",
+    "clean_name": "PAO DONUTS CHOCOLATE BENDITO KG",
+    "category": "PAES PRODUCAO",
+    "type": "receitas_-_base"
+  },
+  {
+    "code": "6964",
+    "name": "6964 - PAO DONUTS DOCE DE LEITE BENDITO KG",
+    "original_name": "006964 - PAO DONUTS DOCE DE LEITE BENDITO KG",
+    "clean_name": "PAO DONUTS DOCE DE LEITE BENDITO KG",
+    "category": "DOCES PRODUCAO",
+    "type": "receitas_-_base"
+  }
+]

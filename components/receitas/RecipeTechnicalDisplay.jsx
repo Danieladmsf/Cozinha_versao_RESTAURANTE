@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
-  AlertCircle, 
-  AlertTriangle, 
-  Info, 
-  Printer, 
-  ChevronDown, 
-  ChevronUp, 
-  Calculator 
+import {
+  AlertCircle,
+  AlertTriangle,
+  Info,
+  Printer,
+  ChevronDown,
+  ChevronUp,
+  Calculator
 } from "lucide-react";
 import RecipeTechnicalPrintDialog from "./RecipeTechnicalPrintDialog";
 import { RecipeValidator } from "@/components/utils/recipeValidator";
@@ -34,7 +34,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
     try {
       // Primeiro calcular métricas precisas (considerando todos os ingredientes)
       const preciseMetrics = RecipeCalculator.calculatePreciseMetrics(recipe, preparations);
-      
+
       // Criar objeto com valores corrigidos
       const metricsFixedRecipe = {
         ...recipe,
@@ -45,10 +45,10 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
         cost_per_kg_yield: preciseMetrics.costPerKgYield,
         cuba_cost: preciseMetrics.cubaCost
       };
-      
+
       // Identificar problemas
       const issues = [];
-      
+
       // Verificar se o peso bruto inclui todos os ingredientes
       if (Math.abs(metricsFixedRecipe.total_weight - recipe.total_weight) > 0.1) {
         issues.push({
@@ -57,7 +57,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
           fix: `Corrigido para ${formatWeight(metricsFixedRecipe.total_weight)}`
         });
       }
-      
+
       // Verificar se o rendimento é realista
       if (metricsFixedRecipe.yield_weight > metricsFixedRecipe.total_weight) {
         issues.push({
@@ -66,7 +66,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
           fix: `Verifique se há erros nos pesos de processo`
         });
       }
-      
+
       // Verificar custo por kg bruto
       if (Math.abs(metricsFixedRecipe.cost_per_kg_raw - recipe.cost_per_kg_raw) / recipe.cost_per_kg_raw > 0.05) {
         issues.push({
@@ -75,7 +75,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
           fix: `Corrigido para ${formatCurrency(metricsFixedRecipe.cost_per_kg_raw)}`
         });
       }
-      
+
       // Verificar custo por kg rendimento
       if (Math.abs(metricsFixedRecipe.cost_per_kg_yield - recipe.cost_per_kg_yield) / recipe.cost_per_kg_yield > 0.05) {
         issues.push({
@@ -84,7 +84,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
           fix: `Ajustado para ${formatCurrency(metricsFixedRecipe.cost_per_kg_yield)}`
         });
       }
-      
+
       // Verificar detalhes dos ingredientes para possíveis problemas
       preciseMetrics.ingredientDetails.forEach(ing => {
         // Verificar ingredientes sem peso
@@ -95,39 +95,40 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
             suggestion: 'Defina um peso para este ingrediente'
           });
         }
-        
+
         // Verificar rendimentos anormalmente altos
         if (ing.initialWeight > 0 && ing.yieldRate > 105) {
           issues.push({
-            type: 'warning', 
+            type: 'warning',
             message: `Ingrediente "${ing.name}" tem rendimento maior que 100%: ${ing.yieldRate.toFixed(1)}%`,
             suggestion: 'Verifique se os pesos de processo estão corretos'
           });
         }
       });
-      
+
       // Após cálculos precisos, validar outros aspectos
       // Depois validar outros aspectos
-      const { recipe: validatedRecipe, preparations: validatedPreparations, issues: validationIssues } = 
+      const { recipe: validatedRecipe, preparations: validatedPreparations, issues: validationIssues } =
         RecipeValidator.validateAndCorrect(metricsFixedRecipe, preparations);
-      
+
       // Combinar todos os problemas
       const allIssues = [...issues, ...validationIssues];
-      
-      setValidatedData({ 
-        recipe: metricsFixedRecipe, 
+
+      setValidatedData({
+        recipe: metricsFixedRecipe,
         preparations,
         issues: allIssues,
         originalRecipe: { ...recipe },
         originalPreparations: [...preparations]
       });
-      
+
       setRecalculationResult({
         recipe: metricsFixedRecipe,
         metrics: preciseMetrics
       });
-      
-    } catch (error) {setValidatedData({
+
+    } catch (error) {
+      setValidatedData({
         recipe: { ...recipe },
         preparations: [...preparations],
         issues: [{
@@ -141,9 +142,9 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
   };
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('pt-BR', { 
-      style: 'currency', 
-      currency: 'BRL' 
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
     }).format(value);
   };
 
@@ -179,17 +180,17 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
   // Função para detectar diferenças significativas
   const isDifferent = (original, validated, field) => {
     if (!original || !validated) return false;
-    
+
     if (field === 'total_weight' || field === 'yield_weight') {
       const diff = Math.abs((original[field] - validated[field]) / original[field]);
       return diff > 0.05; // 5% de diferença é significativo
     }
-    
+
     if (field === 'cost_per_kg_raw' || field === 'cost_per_kg_yield') {
       const diff = Math.abs((original[field] - validated[field]) / original[field]);
       return diff > 0.1; // 10% de diferença é significativo
     }
-    
+
     return false;
   };
 
@@ -202,10 +203,10 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
   const warningIssues = getWarningIssues();
 
   // Determinar se há diferenças significativas
-  const hasDifferences = isDifferent(originalRecipe, validatedRecipe, 'total_weight') || 
-                         isDifferent(originalRecipe, validatedRecipe, 'yield_weight') ||
-                         isDifferent(originalRecipe, validatedRecipe, 'cost_per_kg_raw') ||
-                         isDifferent(originalRecipe, validatedRecipe, 'cost_per_kg_yield');
+  const hasDifferences = isDifferent(originalRecipe, validatedRecipe, 'total_weight') ||
+    isDifferent(originalRecipe, validatedRecipe, 'yield_weight') ||
+    isDifferent(originalRecipe, validatedRecipe, 'cost_per_kg_raw') ||
+    isDifferent(originalRecipe, validatedRecipe, 'cost_per_kg_yield');
 
   return (
     <div className="space-y-6">
@@ -225,7 +226,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
                 <Calculator className="h-3 w-3" />
                 Recalcular
               </Button>
-              
+
               {hasDifferences && (
                 <Button
                   variant="outline"
@@ -310,9 +311,9 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           <AlertTitle className="flex items-center justify-between">
             <span>Avisos sobre os dados da receita</span>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="text-amber-700 hover:text-amber-900"
               onClick={() => setShowWarnings(!showWarnings)}
             >
@@ -337,18 +338,18 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
           <div className="flex justify-between items-center">
             <CardTitle>Informações de Custo e Peso</CardTitle>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="flex items-center gap-2"
                 onClick={handleRecalculate}
               >
                 <Calculator className="h-4 w-4" />
                 Recalcular
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="flex items-center gap-2"
                 onClick={handlePrint}
               >
@@ -373,9 +374,9 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
               <h3 className="text-sm font-medium text-blue-700">Peso Total (Rendimento)</h3>
               <p className="text-lg font-bold">{formatWeight(validatedRecipe.yield_weight)}</p>
               {validatedRecipe.yield_weight > 0 && validatedRecipe.total_weight > 0 && (
-                <Badge 
-                  className={validatedRecipe.yield_weight <= validatedRecipe.total_weight * 1.05 
-                    ? "bg-green-100 text-green-800" 
+                <Badge
+                  className={validatedRecipe.yield_weight <= validatedRecipe.total_weight * 1.05
+                    ? "bg-green-100 text-green-800"
                     : "bg-amber-100 text-amber-800"}
                 >
                   {Math.round((validatedRecipe.yield_weight / validatedRecipe.total_weight) * 100)}% do peso bruto
@@ -416,7 +417,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
             </div>
             {validatedRecipe.cuba_weight > 0 && (
               <div className="p-4 bg-purple-50 rounded-lg">
-                <h3 className="text-sm font-medium text-purple-700">Custo da Cuba</h3>
+                <h3 className="text-sm font-medium text-purple-700">Custo CMV</h3>
                 <p className="text-lg font-bold">
                   {formatCurrency(validatedRecipe.cuba_weight * validatedRecipe.cost_per_kg_yield)}
                 </p>
@@ -426,7 +427,7 @@ export default function RecipeTechnicalDisplay({ recipe, preparations = [] }) {
               </div>
             )}
           </div>
-          
+
           {/* Resumo dos valores corrigidos */}
           {recalculationResult && hasDifferences && (
             <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-md">

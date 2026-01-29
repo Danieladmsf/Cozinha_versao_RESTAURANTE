@@ -86,7 +86,7 @@ export function useRecipeStore(selector) {
         cubaCost: `R$ ${metrics.cuba_cost?.toFixed(2) || '0.00'}`,
       };
     }, [state.metrics]),
-    
+
     // Nova função para buscar preço atual de ingrediente
     getIngredientCurrentPrice: useCallback((ingredientId) => {
       return useRecipeZustandStore.getState().getIngredientCurrentPrice(ingredientId);
@@ -98,5 +98,28 @@ export function useRecipeStore(selector) {
     actions,
     computed,
     ...getters,
+  };
+}
+
+/**
+ * Hook utilitário para acessar apenas as métricas
+ */
+export function useRecipeMetrics() {
+  const metrics = useRecipeZustandStore((state) => state.metrics);
+
+  const formatted = {
+    totalWeight: `${metrics?.total_weight?.toFixed(3) || '0.000'} kg`,
+    yieldWeight: `${metrics?.yield_weight?.toFixed(3) || '0.000'} kg`,
+    totalCost: `R$ ${metrics?.total_cost?.toFixed(2) || '0.00'}`,
+    costPerKgRaw: `R$ ${metrics?.cost_per_kg_raw?.toFixed(2) || '0.00'}`,
+    costPerKgYield: `R$ ${metrics?.cost_per_kg_yield?.toFixed(2) || '0.00'}`,
+    yieldPercentage: `${metrics?.yield_percentage?.toFixed(1) || '0.0'}%`,
+    cubaWeight: `${metrics?.cuba_weight?.toFixed(3) || '0.000'} kg`,
+    cubaCost: `R$ ${metrics?.cuba_cost?.toFixed(2) || '0.00'}`,
+  };
+
+  return {
+    raw: metrics || {},
+    formatted
   };
 }
