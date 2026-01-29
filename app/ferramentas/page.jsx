@@ -1,5 +1,5 @@
-import FerramentasComponent from '@/components/ferramentas/FerramentasComponent';
+import POPsComponent from '@/components/ferramentas/POPsComponent';
 
 export default function FerramentasPage() {
-    return <FerramentasComponent />;
+    return <POPsComponent />;
 }
