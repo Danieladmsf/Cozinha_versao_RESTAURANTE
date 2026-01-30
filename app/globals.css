@@ -291,7 +291,7 @@
 @media print {
   @page {
     margin: 1cm;
-    size: landscape;
+    /* size: landscape; -- Removed to allow components to define paper size (e.g. A4 Portrait for POP) */
   }
 
   /* Hide navigation, sidebar, header */
@@ -320,14 +320,19 @@
   html,
   main,
   #root,
-  .main-app-container {
+  .main-app-container,
+  .flex,
+  .flex-col,
+  .overflow-hidden,
+  .overflow-y-auto {
     background-color: white !important;
     width: 100% !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: visible !important;
-    position: static !important;
+    position: relative !important;
+    /* Changed from static to relative to keep stacking context if needed */
     display: block !important;
   }
 

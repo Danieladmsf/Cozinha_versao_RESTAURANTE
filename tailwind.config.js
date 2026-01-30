@@ -5,6 +5,12 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  // Safelist ensures these classes are always generated, even when used dynamically
+  safelist: [
+    'text-red-600',
+    'text-blue-600',
+    'font-bold',
+  ],
   theme: {
     extend: {
       screens: {
