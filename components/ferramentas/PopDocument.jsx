@@ -5,38 +5,38 @@ import parse from 'html-react-parser';
 
 const styles = StyleSheet.create({
     page: {
-        paddingTop: 100,
-        paddingBottom: 80,
-        paddingHorizontal: 40,
-        fontSize: 10,
+        paddingTop: 70,
+        paddingBottom: 60,
+        paddingHorizontal: 30,
+        fontSize: 8,
         fontFamily: 'Helvetica',
-        lineHeight: 1.4,
+        lineHeight: 1.3,
     },
     header: {
         position: 'absolute',
-        top: 20,
-        left: 40,
-        right: 40,
-        height: 60,
-        borderBottomWidth: 2,
+        top: 15,
+        left: 30,
+        right: 30,
+        height: 45,
+        borderBottomWidth: 1,
         borderBottomColor: '#1f2937',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingBottom: 8,
+        paddingBottom: 4,
     },
     footer: {
         position: 'absolute',
-        bottom: 20,
-        left: 40,
-        right: 40,
-        height: 50,
+        bottom: 15,
+        left: 30,
+        right: 30,
+        height: 40,
         borderTopWidth: 1,
         borderTopColor: '#d1d5db',
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        paddingTop: 8,
+        paddingTop: 4,
     },
     logoContainer: {
         width: 40,
@@ -88,40 +88,37 @@ const styles = StyleSheet.create({
     },
     // Content
     mainTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontFamily: 'Helvetica-Bold',
         textTransform: 'uppercase',
         color: '#111827',
-        marginBottom: 4,
+        marginBottom: 8,
     },
     description: {
-        fontSize: 10,
+        fontSize: 9,
         color: '#4b5563',
-        marginBottom: 15,
-        paddingLeft: 8,
-        borderLeftWidth: 2,
-        borderLeftColor: '#e5e7eb',
+        marginBottom: 12,
     },
     section: {
-        marginBottom: 10,
-        padding: 8,
+        marginBottom: 6,
+        padding: 5,
         borderWidth: 1,
         borderColor: '#e5e7eb',
-        borderRadius: 4,
+        borderRadius: 3,
     },
     sectionTitle: {
-        fontSize: 8,
+        fontSize: 7,
         textTransform: 'uppercase',
         fontFamily: 'Helvetica-Bold',
         color: '#374151',
         borderBottomWidth: 1,
         borderBottomColor: '#f3f4f6',
-        paddingBottom: 3,
-        marginBottom: 5,
+        paddingBottom: 2,
+        marginBottom: 3,
     },
     p: {
-        marginBottom: 4,
-        fontSize: 9,
+        marginBottom: 2,
+        fontSize: 7,
         color: '#374151',
     },
     strong: {
@@ -150,24 +147,25 @@ const styles = StyleSheet.create({
         backgroundColor: '#fef2f2',
         borderColor: '#fecaca',
         borderWidth: 1,
-        borderRadius: 4,
-        padding: 8,
+        borderRadius: 3,
+        padding: 5,
+        marginBottom: 6,
     },
     warningTitle: {
         color: '#b91c1c',
-        fontSize: 8,
+        fontSize: 7,
         fontFamily: 'Helvetica-Bold',
-        marginBottom: 3,
+        marginBottom: 2,
         textTransform: 'uppercase',
     },
     stepsTitle: {
-        fontSize: 11,
+        fontSize: 9,
         fontFamily: 'Helvetica-Bold',
         textTransform: 'uppercase',
-        marginBottom: 10,
+        marginBottom: 6,
         borderBottomWidth: 1,
         borderBottomColor: '#111827',
-        paddingBottom: 4,
+        paddingBottom: 3,
     },
     stepContainer: {
         marginBottom: 8,
@@ -194,17 +192,17 @@ const styles = StyleSheet.create({
         objectFit: 'contain',
     },
     mainImageContainer: {
-        height: 150,
+        height: 100,
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 15,
+        marginBottom: 8,
         borderWidth: 1,
         borderColor: '#e5e7eb',
-        borderRadius: 4,
+        borderRadius: 3,
     },
     mainImage: {
-        maxHeight: 140,
+        maxHeight: 95,
         objectFit: 'contain',
     },
     signatureCol: {
@@ -232,6 +230,10 @@ const domNodeToPdf = (children) => {
             return child.data;
         }
         if (child.type === 'tag') {
+            // Ignorar tags de strikethrough - retorna apenas o conteúdo interno
+            if (['s', 'del', 'strike'].includes(child.name)) {
+                return domNodeToPdf(child.children);
+            }
             let s = {};
             if (['strong', 'b'].includes(child.name)) s = styles.strong;
             if (['em', 'i'].includes(child.name)) s = styles.em;
@@ -299,42 +301,45 @@ export default function PopDocument({ data }) {
 
                 {/* TITLE */}
                 <Text style={styles.mainTitle}>{data.nome || 'Nova Ferramenta'}</Text>
-                {data.descricao && <Text style={styles.description}>{data.descricao}</Text>}
+                {data.descricao && <Text style={styles.description}>{data.descricao.replace(/<[^>]*>/g, '')}</Text>}
 
-                {/* MAIN IMAGE */}
-                {data.imageUrl && (
-                    <View style={styles.mainImageContainer}>
-                        <Image src={data.imageUrl} style={styles.mainImage} />
+                {/* IMAGEM À ESQUERDA + DADOS TÉCNICOS À DIREITA */}
+                <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                    {/* Imagem à esquerda */}
+                    <View style={{ width: '35%', marginRight: 10 }}>
+                        {data.imageUrl && (
+                            <View style={styles.mainImageContainer}>
+                                <Image src={data.imageUrl} style={styles.mainImage} />
+                            </View>
+                        )}
                     </View>
-                )}
-
-                {/* TWO COLUMNS */}
-                <View style={styles.row}>
-                    <View style={styles.col}>
-                        <View style={styles.section} wrap={false}>
+                    {/* Dados Técnicos à direita */}
+                    <View style={{ flex: 1 }}>
+                        <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Dados Técnicos</Text>
                             <HtmlText html={data.especificacoes} />
-                        </View>
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionTitle}>Manutenção</Text>
-                            <HtmlText html={data.manutencao} />
-                        </View>
-                    </View>
-                    <View style={styles.colGap} />
-                    <View style={styles.col}>
-                        <View style={styles.section} wrap={false}>
-                            <Text style={styles.sectionTitle}>EPIs Necessários</Text>
-                            <HtmlText html={data.materiais} />
-                        </View>
-                        <View style={styles.warningBox} wrap={false}>
-                            <Text style={styles.warningTitle}>Precauções de Segurança</Text>
-                            <HtmlText html={data.precaucoes} />
                         </View>
                     </View>
                 </View>
 
+                {/* DEMAIS CARDS EM LISTA VERTICAL */}
+                <View style={{ marginBottom: 10 }}>
+                    <View style={styles.section} wrap={false}>
+                        <Text style={styles.sectionTitle}>EPIs Necessários</Text>
+                        <HtmlText html={data.materiais} />
+                    </View>
+                    <View style={styles.section} wrap={false}>
+                        <Text style={styles.sectionTitle}>Manutenção</Text>
+                        <HtmlText html={data.manutencao} />
+                    </View>
+                    <View style={styles.warningBox} wrap={false}>
+                        <Text style={styles.warningTitle}>Precauções de Segurança</Text>
+                        <HtmlText html={data.precaucoes} />
+                    </View>
+                </View>
+
                 {/* STEPS - Starts on new page */}
-                {/* Fixed sub-header for procedure pages (appears below main header on page 2+) */}
+                {/* Fixed sub-header for procedure pages (appears below main header on page 3+) */}
                 <Text
                     style={{
                         position: 'absolute',
@@ -344,8 +349,6 @@ export default function PopDocument({ data }) {
                         fontSize: 11,
                         fontFamily: 'Helvetica-Bold',
                         textTransform: 'uppercase',
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#111827',
                         paddingBottom: 4,
                     }}
                     fixed

@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "predev": "taskkill /F /IM node.exe 2>nul || exit 0",
+    "predev": "npx kill-port 3000 2>nul || exit 0",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

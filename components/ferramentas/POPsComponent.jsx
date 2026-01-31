@@ -92,7 +92,7 @@ export default function POPsComponent() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50 to-gray-100 p-4 md:p-6">
+        <div className="min-h-screen bg-gray-100 p-4 md:p-6">
             <div className="max-w-[1400px] mx-auto">
 
                 {/* HEADER */}
@@ -122,8 +122,8 @@ export default function POPsComponent() {
                                 <button
                                     onClick={() => setActiveTab(categoria.id)}
                                     className={`flex items-center gap-2 px-5 py-3 font-medium rounded-lg transition-all shadow-sm ${isActive
-                                            ? 'text-white shadow-md transform scale-[1.02]'
-                                            : 'bg-white hover:bg-gray-50 border border-gray-200 text-gray-600'
+                                        ? 'text-white shadow-md transform scale-[1.02]'
+                                        : 'bg-white hover:bg-gray-50 border border-gray-200 text-gray-600'
                                         }`}
                                     style={isActive ? { backgroundColor: categoria.corPrimaria } : { color: categoria.corPrimaria }}
                                 >
