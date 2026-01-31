@@ -49,7 +49,7 @@ export const useWeeklyMenuOperations = () => {
     }
   }, []);
 
-  const updateMenuItem = useCallback(async (weeklyMenu, mealType = 'almoco', dayIndex, categoryId, itemIndex, newItem) => {
+  const updateMenuItem = useCallback(async (weeklyMenu, mealType, dayIndex, categoryId, itemIndex, newItem) => {
     try {
 
       const updatedMenu = { ...weeklyMenu };
@@ -80,7 +80,7 @@ export const useWeeklyMenuOperations = () => {
     }
   }, [toast]);
 
-  const addMenuItem = useCallback(async (weeklyMenu, mealType = 'almoco', dayIndex, categoryId, createWeeklyMenuFn, getActiveLocationIds = null) => {
+  const addMenuItem = useCallback(async (weeklyMenu, mealType, dayIndex, categoryId, createWeeklyMenuFn, getActiveLocationIds = null) => {
     try {
 
       let currentMenu = weeklyMenu;
@@ -119,7 +119,7 @@ export const useWeeklyMenuOperations = () => {
     }
   }, []);
 
-  const removeMenuItem = useCallback(async (weeklyMenu, mealType = 'almoco', dayIndex, categoryId, itemIndex) => {
+  const removeMenuItem = useCallback(async (weeklyMenu, mealType, dayIndex, categoryId, itemIndex) => {
     try {
       if (!weeklyMenu) return null;
 

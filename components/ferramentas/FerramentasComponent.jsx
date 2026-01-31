@@ -35,7 +35,8 @@ import {
     FilePlus,
     Upload,
     Info,
-    ShieldCheck, // Ícone para EPIs
+    ShieldCheck,
+    X,
 
 } from 'lucide-react';
 import {
@@ -99,20 +100,18 @@ export default function FerramentasComponent({ categoria }) {
         codigo: '',
         nome: '',
         descricao: '',
-        nome: '',
-        descricao: '',
         imageUrl: '',
         logoUrl: '', // URL do Logo
         materiais: '',
         especificacoes: '',
-        manutencao: '',
-        precaucoes: '',
+        usabilidade: '', // Campo para Usabilidade
         manutencao: '',
         precaucoes: '',
         passos: [{ description: '', imageUrl: '' }],
         // Títulos personalizados (opcionais check overrides)
         titulos: {
             dados: '',
+            usabilidade: '',
             epis: '',
             manutencao: '',
             precaucoes: ''
@@ -141,11 +140,11 @@ export default function FerramentasComponent({ categoria }) {
             logoUrl: '',
             materiais: '',
             especificacoes: '',
+            usabilidade: '',
             manutencao: '',
             precaucoes: '',
-            precaucoes: '',
             passos: [{ description: '' }],
-            titulos: { dados: '', epis: '', manutencao: '', precaucoes: '' }
+            titulos: { dados: '', usabilidade: '', epis: '', manutencao: '', precaucoes: '' }
         });
     }, [colecaoNome]);
 
@@ -203,16 +202,15 @@ export default function FerramentasComponent({ categoria }) {
             codigo: generateCode(),
             nome: '',
             descricao: '',
-            nome: '',
-            descricao: '',
             imageUrl: '',
             logoUrl: '',
             materiais: '',
-            especificacoes: '', // Resetar especificacoes
+            especificacoes: '',
+            usabilidade: '',
             manutencao: '',
             precaucoes: '',
             passos: [{ description: '', imageUrl: '' }],
-            titulos: { dados: '', epis: '', manutencao: '', precaucoes: '' }
+            titulos: { dados: '', usabilidade: '', epis: '', manutencao: '', precaucoes: '' }
         });
         setCurrentFerramentaId(null);
         setIsEditing(true);
@@ -231,13 +229,14 @@ export default function FerramentasComponent({ categoria }) {
             imageUrl: ferramenta.imageUrl || '',
             logoUrl: ferramenta.logoUrl || '',
             materiais: ferramenta.materiais || '',
-            especificacoes: ferramenta.especificacoes || '', // Carregar especificacoes
+            especificacoes: ferramenta.especificacoes || '',
+            usabilidade: ferramenta.usabilidade || '',
             manutencao: ferramenta.manutencao || '',
             precaucoes: ferramenta.precaucoes || '',
             passos: ferramenta.passos?.length > 0
                 ? ferramenta.passos
                 : [{ description: '', imageUrl: '' }],
-            titulos: ferramenta.titulos || { dados: '', epis: '', manutencao: '', precaucoes: '' }
+            titulos: ferramenta.titulos || { dados: '', usabilidade: '', epis: '', manutencao: '', precaucoes: '' }
         });
         setCurrentFerramentaId(ferramenta.id);
         setCurrentFerramentaId(ferramenta.id);
@@ -378,12 +377,11 @@ export default function FerramentasComponent({ categoria }) {
                 codigo: localData.codigo.trim().toUpperCase(),
                 nome: localData.nome.trim(),
                 descricao: localData.descricao?.trim() || '',
-                nome: localData.nome.trim(),
-                descricao: localData.descricao?.trim() || '',
                 imageUrl: localData.imageUrl?.trim() || '',
                 logoUrl: localData.logoUrl?.trim() || '',
                 materiais: localData.materiais?.trim() || '',
-                especificacoes: localData.especificacoes?.trim() || '', // Salvar especificacoes
+                especificacoes: localData.especificacoes?.trim() || '',
+                usabilidade: localData.usabilidade?.trim() || '',
                 manutencao: localData.manutencao?.trim() || '',
                 precaucoes: localData.precaucoes?.trim() || '',
                 passos: passosValidos,
@@ -445,7 +443,7 @@ export default function FerramentasComponent({ categoria }) {
             const { pdf } = await import('@react-pdf/renderer');
             const { default: PopDocument } = await import('./PopDocument');
 
-            const blob = await pdf(<PopDocument data={localData} />).toBlob();
+            const blob = await pdf(<PopDocument data={localData} cards={categoria?.cards} />).toBlob();
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -535,7 +533,39 @@ export default function FerramentasComponent({ categoria }) {
         return { ...cardConfig, titulo: effectiveTitle, originalTitle: cardConfig.titulo };
     };
 
+    // Verifica se um card está configurado na categoria
+    const hasCard = (cardId) => {
+        if (!categoria?.cards || categoria.cards.length === 0) {
+            // Cards padrão (ferramentas legacy)
+            return ['dados', 'epis', 'manutencao', 'precaucoes'].includes(cardId);
+        }
+        // Mapeamento de IDs legados e títulos conhecidos
+        const idMap = {
+            'especificacoes': 'dados',
+            'materiais': 'epis',
+        };
+        const titleMap = {
+            'dados': ['dados técnicos', 'dados'],
+            'usabilidade': ['usabilidade'],
+            'epis': ['epis necessários', 'epis', 'epi\'s'],
+            'manutencao': ['manutenção', 'manutencao'],
+            'precaucoes': ['precauções de segurança', 'precaucoes', 'precauções'],
+        };
+
+        const mapId = idMap[cardId] || cardId;
+        const possibleTitles = titleMap[cardId] || [cardId];
+
+        return categoria.cards.some(c => {
+            // Buscar por ID
+            if (c.id === mapId || c.id === cardId) return true;
+            // Buscar por título (case-insensitive)
+            const cardTitulo = (c.titulo || '').toLowerCase().trim();
+            return possibleTitles.some(t => cardTitulo.includes(t.toLowerCase()));
+        });
+    };
+
     const configDados = getSectionConfig('dados', 'Dados Técnicos');
+    const configUsabilidade = getSectionConfig('usabilidade', 'Usabilidade');
     const configEpis = getSectionConfig('epis', 'EPIs Necessários');
     const configManutencao = getSectionConfig('manutencao', 'Manutenção');
     const configPrecaucoes = getSectionConfig('precaucoes', 'Precauções de Segurança', 'text-red-700');
@@ -905,53 +935,77 @@ export default function FerramentasComponent({ categoria }) {
                                 </div>
                             </div>
 
-                            {/* DADOS TÉCNICOS - Dynamic */}
-                            <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
-                                {renderSectionHeader('dados', configDados)}
+                            {/* DADOS TÉCNICOS - Condicional */}
+                            {hasCard('dados') && (
+                                <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
+                                    {renderSectionHeader('dados', configDados)}
 
-                                {isEditing ? (
-                                    <RichTextEditor
-                                        value={localData.especificacoes}
-                                        onChange={(html) => { setLocalData(prev => ({ ...prev, especificacoes: html })); setIsDirty(true); }}
-                                        placeholder={`${configDados.titulo}...`}
-                                    />
-                                ) : (
-                                    <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.especificacoes || "---" }} />
+                                    {isEditing ? (
+                                        <RichTextEditor
+                                            value={localData.especificacoes}
+                                            onChange={(html) => { setLocalData(prev => ({ ...prev, especificacoes: html })); setIsDirty(true); }}
+                                            placeholder={`${configDados.titulo}...`}
+                                        />
+                                    ) : (
+                                        <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.especificacoes || "---" }} />
 
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
 
-                            {/* EPIs NECESSÁRIOS - Dynamic */}
-                            <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
-                                {renderSectionHeader('epis', configEpis)}
+                            {/* USABILIDADE - Condicional */}
+                            {hasCard('usabilidade') && (
+                                <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
+                                    {renderSectionHeader('usabilidade', configUsabilidade)}
 
-                                {isEditing ? (
-                                    <RichTextEditor
-                                        value={localData.materiais}
-                                        onChange={(html) => { setLocalData(prev => ({ ...prev, materiais: html })); setIsDirty(true); }}
-                                        placeholder={`${configEpis.titulo}...`}
-                                    />
-                                ) : (
-                                    <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.materiais || "---" }} />
+                                    {isEditing ? (
+                                        <RichTextEditor
+                                            value={localData.usabilidade}
+                                            onChange={(html) => { setLocalData(prev => ({ ...prev, usabilidade: html })); setIsDirty(true); }}
+                                            placeholder={`${configUsabilidade.titulo}...`}
+                                        />
+                                    ) : (
+                                        <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.usabilidade || "---" }} />
 
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
 
-                            {/* MANUTENÇÃO / FERRAMENTAS - Dynamic */}
-                            <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
-                                {renderSectionHeader('manutencao', configManutencao)}
+                            {/* EPIs NECESSÁRIOS - Condicional */}
+                            {hasCard('epis') && (
+                                <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
+                                    {renderSectionHeader('epis', configEpis)}
 
-                                {isEditing ? (
-                                    <RichTextEditor
-                                        value={localData.manutencao}
-                                        onChange={(html) => { setLocalData(prev => ({ ...prev, manutencao: html })); setIsDirty(true); }}
-                                        placeholder={`${configManutencao.titulo}...`}
-                                    />
-                                ) : (
-                                    <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.manutencao || "---" }} />
+                                    {isEditing ? (
+                                        <RichTextEditor
+                                            value={localData.materiais}
+                                            onChange={(html) => { setLocalData(prev => ({ ...prev, materiais: html })); setIsDirty(true); }}
+                                            placeholder={`${configEpis.titulo}...`}
+                                        />
+                                    ) : (
+                                        <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.materiais || "---" }} />
 
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* MANUTENÇÃO / FERRAMENTAS - Condicional */}
+                            {hasCard('manutencao') && (
+                                <div className="bg-white rounded border border-gray-300 p-4 print:border-gray-800 break-inside-avoid">
+                                    {renderSectionHeader('manutencao', configManutencao)}
+
+                                    {isEditing ? (
+                                        <RichTextEditor
+                                            value={localData.manutencao}
+                                            onChange={(html) => { setLocalData(prev => ({ ...prev, manutencao: html })); setIsDirty(true); }}
+                                            placeholder={`${configManutencao.titulo}...`}
+                                        />
+                                    ) : (
+                                        <div className="text-sm text-gray-800 leading-snug" dangerouslySetInnerHTML={{ __html: localData.manutencao || "---" }} />
+
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* === COLUNA DIREITA === */}
@@ -1083,11 +1137,26 @@ export default function FerramentasComponent({ categoria }) {
                                                                     {passo.imageUrl ? 'Alterar Imagem' : 'Adicionar Imagem'}
                                                                 </Button>
                                                                 {passo.imageUrl && (
-                                                                    <img
-                                                                        src={passo.imageUrl}
-                                                                        alt={`Passo ${idx + 1}`}
-                                                                        className="h-32 w-auto object-contain rounded border bg-gray-50"
-                                                                    />
+                                                                    <div className="relative inline-block">
+                                                                        <img
+                                                                            src={passo.imageUrl}
+                                                                            alt={`Passo ${idx + 1}`}
+                                                                            className="h-32 w-auto object-contain rounded border bg-gray-50"
+                                                                        />
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                const newPassos = [...localData.passos];
+                                                                                newPassos[idx] = { ...newPassos[idx], imageUrl: '' };
+                                                                                setLocalData(prev => ({ ...prev, passos: newPassos }));
+                                                                                setIsDirty(true);
+                                                                            }}
+                                                                            className="absolute -top-2 -right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md transition-colors"
+                                                                            title="Remover imagem"
+                                                                        >
+                                                                            <X className="w-4 h-4" />
+                                                                        </button>
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -1121,21 +1190,23 @@ export default function FerramentasComponent({ categoria }) {
                                 </div>
                             </div>
 
-                            {/* PRECAUÇÕES DE SEGURANÇA - Dynamic */}
-                            <div className="bg-red-50 border border-red-200 p-4 rounded print:border-red-900 mt-6 break-inside-avoid">
-                                {renderSectionHeader('precaucoes', configPrecaucoes)}
+                            {/* PRECAUÇÕES DE SEGURANÇA - Condicional */}
+                            {hasCard('precaucoes') && (
+                                <div className="bg-red-50 border border-red-200 p-4 rounded print:border-red-900 mt-6 break-inside-avoid">
+                                    {renderSectionHeader('precaucoes', configPrecaucoes)}
 
-                                {isEditing ? (
-                                    <RichTextEditor
-                                        value={localData.precaucoes}
-                                        onChange={(html) => { setLocalData(prev => ({ ...prev, precaucoes: html })); setIsDirty(true); }}
-                                        placeholder={`${configPrecaucoes.titulo}...`}
-                                    />
-                                ) : (
-                                    <div className="text-sm text-red-900 leading-snug" dangerouslySetInnerHTML={{ __html: localData.precaucoes || "---" }} />
+                                    {isEditing ? (
+                                        <RichTextEditor
+                                            value={localData.precaucoes}
+                                            onChange={(html) => { setLocalData(prev => ({ ...prev, precaucoes: html })); setIsDirty(true); }}
+                                            placeholder={`${configPrecaucoes.titulo}...`}
+                                        />
+                                    ) : (
+                                        <div className="text-sm text-red-900 leading-snug" dangerouslySetInnerHTML={{ __html: localData.precaucoes || "---" }} />
 
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -18,11 +18,39 @@ Cada POP deve conter os seguintes campos:
 
 ### 2. Dados Técnicos (especificacoes)
 Especificações técnicas do item/procedimento:
+
+**Para Equipamentos/Ferramentas:**
+```html
+<p><strong>Material:</strong> Aço inoxidável AISI 304</p>
+<p><strong>Dimensões:</strong> 35cm × 20cm</p>
+<p><strong>Peso:</strong> 180g</p>
+```
+
+**Para Alimentos/Cortes (INCLUI OBRIGATORIAMENTE):**
 ```html
 <p><strong>Tipo de Corte:</strong> Tiras longitudinais, perpendiculares às fibras</p>
-<p><strong>Dimensões Padrão:</strong> 5-7 cm (comprimento) × 1-1,5 cm (largura)</p>
-<p><strong>Material:</strong> Aço inoxidável AISI 304</p>
+<p><strong>Dimensões Padrão:</strong> 5-6 cm (comprimento) × 1,5 cm (largura) × 1,5-2 cm (espessura)</p>
+<p><strong>Peso por Porção:</strong> ~14g (7 iscas = 100g)</p>
+<p><strong>Matéria-Prima:</strong> Peito de frango sem osso e sem pele</p>
+<p><strong>Temperatura Ideal:</strong> 0°C a 4°C</p>
+<p><strong>Rendimento:</strong> Aprox. 95% do peso bruto</p>
+<p><strong>Validade após preparo:</strong></p>
+<p>• Refrigerado (0-4°C): XX a XX horas</p>
+<p>• Congelado (-18°C): até X meses</p>
+<p>• Descongelado: usar em até 24 horas (não recongelar)</p>
 ```
+
+**Tabela de Validades de Referência:**
+
+| Alimento | Refrigerado (0-4°C) | Congelado (-18°C) |
+|----------|---------------------|-------------------|
+| Frango cru | 24-48 horas | até 3 meses |
+| Carne bovina crua | 48-72 horas | até 4 meses |
+| Carne suína crua | 48 horas | até 3 meses |
+| Peixe cru | 24 horas | até 2 meses |
+| Vegetais cortados | 3-5 dias | até 6 meses |
+| Molhos prontos | 5-7 dias | até 3 meses |
+| Preparações cozidas | 3-5 dias | até 3 meses |
 
 ### 3. EPIs Necessários (materiais)
 Use códigos de referência para rastreabilidade:

@@ -37,11 +37,11 @@ const LayoutTab = ({
   React.useEffect(() => {
     if (categoryGroups && categoryGroups.length >= 0) {
       try {
-        const cachedConfig = localStorage.getItem('menuConfig');
+        const cachedConfig = localStorage.getItem('menuConfig_v2');
         if (cachedConfig) {
           const config = JSON.parse(cachedConfig);
           config.category_groups = categoryGroups;
-          localStorage.setItem('menuConfig', JSON.stringify(config));
+          localStorage.setItem('menuConfig_v2', JSON.stringify(config));
           console.log('✅ [LayoutTab] categoryGroups salvo no localStorage:', categoryGroups.length, 'grupos');
         }
       } catch (e) {

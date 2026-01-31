@@ -1,14 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Recipe, Ingredient, Category, CategoryTree, CategoryType } from "@/app/api/entities";
+import { Recipe, Ingredient, Category, CategoryTree, CategoryType, MenuConfig } from "@/app/api/entities";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +17,7 @@ import {
   EyeOff,
   Pencil,
   Printer,
+  Settings
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,13 +31,13 @@ import {
 import { toast } from "@/components/ui/use-toast"
 import RecipeSimplePrintDialog from "@/components/receitas/RecipeSimplePrintDialog";
 import BulkRecipeCreator from "@/components/receitas/BulkRecipeCreator";
+import RecipeSettingsDialog from "@/components/receitas/RecipeSettingsDialog";
+import { APP_CONSTANTS } from "@/lib/constants";
 
 export default function Recipes() {
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
   const [recipes, setRecipes] = useState([]);
   const [ingredients, setIngredients] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
@@ -49,21 +47,23 @@ export default function Recipes() {
   const [viewMode, setViewMode] = useState("grid");
   const [recipeCategories, setRecipeCategories] = useState([]);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
-  const [isSimplePrintDialogOpen, setIsSimplePrintDialogOpen] = useState(false);
   const [recipeToPrint, setRecipeToPrint] = useState(null);
 
   const [isPrintRecipeDialogOpen, setIsPrintRecipeDialogOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // State for config
+  const [visibleTypes, setVisibleTypes] = useState({});
 
   // State for subcategory logic
   const [fullCategoryTree, setFullCategoryTree] = useState([]);
-  const [activeSubCategory, setActiveSubCategory] = useState(null); // stores the full category object
+  const [activeSubCategory, setActiveSubCategory] = useState(null);
 
   useEffect(() => {
     loadRecipes();
-    loadCategories();
     loadIngredients();
     loadCategoryTypes();
-    // loadRecipeCategories will be called after categoryTypes are loaded or independently
+    loadVisibilitySettings();
   }, []);
 
   // Reload categories when activeType changes
@@ -72,25 +72,50 @@ export default function Recipes() {
     // Reset active category when type switches
     setActiveCategory("all");
     setActiveSubCategory(null);
-  }, [activeType, fullCategoryTree]); // Re-run when type changes or tree loads
+  }, [activeType, fullCategoryTree]);
 
   const loadCategoryTypes = async () => {
     try {
       const types = await CategoryType.list();
-      // Filter only relevant types if needed, or stick to 'receitas' and 'receitas_-_base'
-      // We accept 'receitas' and 'receitas_-_base' (mapped to Products)
-      const allowedTypes = ['receitas', 'receitas_-_base'];
-      const filteredTypes = types.filter(t => allowedTypes.includes(t.value));
-      setCategoryTypes(filteredTypes.sort((a, b) => (a.order || 0) - (b.order || 0)));
+      setCategoryTypes(types.sort((a, b) => (a.order || 0) - (b.order || 0)));
     } catch (error) {
-      console.error("Error loading category types", error);
+      console.error("Error loading category types:", error);
     }
   };
 
+  const loadVisibilitySettings = async () => {
+    try {
+      const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
+      const configs = await MenuConfig.query([
+        { field: 'user_id', operator: '==', value: mockUserId },
+        { field: 'is_default', operator: '==', value: true }
+      ]);
+
+      if (configs && configs.length > 0 && configs[0].recipe_visible_types) {
+        setVisibleTypes(configs[0].recipe_visible_types);
+      } else {
+        // Default: Show only 'receitas' and 'receitas_-_base' if no config
+        setVisibleTypes({
+          'receitas': true,
+          'receitas_-_base': true
+        });
+      }
+    } catch (e) {
+      console.error("Failed to load visibility settings", e);
+    }
+  };
+
+  // Filter types based on configuration
+  const visibleCategoryTypes = categoryTypes.filter(type => {
+    if (Object.keys(visibleTypes).length > 0) {
+      return visibleTypes[type.value] === true;
+    }
+    // Fallback if config loading or empty:
+    return ['receitas', 'receitas_-_base'].includes(type.value);
+  });
+
   const loadRecipeCategories = async () => {
     try {
-      // If fullCategoryTree is empty, we might need to fetch it first. 
-      // But usually it is fetched once. Let's make sure we have it.
       let allCategories = fullCategoryTree;
       if (allCategories.length === 0) {
         allCategories = await CategoryTree.list();
@@ -98,7 +123,7 @@ export default function Recipes() {
       }
 
       const recipeCategories = allCategories
-        .filter(cat => cat.type === activeType && cat.active !== false && cat.level === 1) // Filter by activeType
+        .filter(cat => cat.type === activeType && cat.active !== false && cat.level === 1)
         .sort((a, b) => (a.order || 0) - (b.order || 0));
 
       if (recipeCategories.length > 0) {
@@ -109,14 +134,10 @@ export default function Recipes() {
         return;
       }
 
-      // Fallback only if type is 'receitas' and no tree data
-      if (activeType === 'receitas' && recipeCategories.length === 0) {
-        const categoryList = await Category.list();
-        // ... fallback logic if needed, but assuming CategoryTree is the source of truth now
-      }
+      // Fallback logic could go here if needed
       setRecipeCategories([]);
     } catch (error) {
-      // Error logic
+      console.error("Error loading recipe categories", error);
     }
   };
 
@@ -137,30 +158,6 @@ export default function Recipes() {
     try {
       const ingredientsData = await Ingredient.list();
       setIngredients(ingredientsData);
-    } catch (error) {
-      // Silent error
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const categoriesData = await Category.list();
-      const recipeCategories = categoriesData
-        .filter(cat => cat.type === "recipe" && cat.active !== false)
-        .map(cat => ({
-          value: cat.name,
-          label: cat.name,
-          id: cat.id
-        }));
-
-      if (!recipeCategories.find(cat =>
-        cat.value.toLowerCase() === "outro" ||
-        cat.value.toLowerCase() === "outros"
-      )) {
-        recipeCategories.push({ value: "outro", label: "Outro" });
-      }
-
-      setCategories(recipeCategories);
     } catch (error) {
       // Silent error
     }
@@ -193,7 +190,7 @@ export default function Recipes() {
       });
       loadRecipes();
     } catch (error) {
-      // Error
+      console.error("Error toggling active status", error);
     }
   };
 
@@ -211,12 +208,11 @@ export default function Recipes() {
           return;
         }
 
+        // Fallback to Category legacy
         const allCategories = await Category.list();
         const categoryToDelete = allCategories.find(cat => cat.name.toLowerCase() === categoryName.toLowerCase());
         if (categoryToDelete) {
           await Category.delete(categoryToDelete.id);
-          loadCategories();
-          // reload tabs
           loadRecipeCategories();
           toast({ title: "Categoria excluída" });
         }
@@ -228,11 +224,12 @@ export default function Recipes() {
 
   // Helper to find root category type
   const getRootCategoryType = (categoryName) => {
-    if (!categoryName) return 'receitas'; // Default or unclassified
+    if (!categoryName) return 'receitas'; // Default
+
     // Find node
     let node = fullCategoryTree.find(c => c.name === categoryName);
     if (!node) {
-      // Fallback: check legacy categories or assume 'receitas'
+      // Fallback: assume 'receitas' if not found in tree
       return 'receitas';
     }
 
@@ -263,20 +260,28 @@ export default function Recipes() {
   const getFilteredRecipes = () => {
     let filtered = recipes;
 
-    // Filter by Active Type FIRST
-    filtered = filtered.filter(recipe => {
-      const type = getRootCategoryType(recipe.category);
-      return type === activeType;
-    });
+    // IMPORTANT: If searching, we search across ALL types and categories.
+    // If NOT searching, we filter by activeType.
+    if (!searchTerm) {
+      filtered = filtered.filter(recipe => {
+        const type = getRootCategoryType(recipe.category);
+        return type === activeType;
+      });
+    }
 
     if (searchTerm) {
       filtered = filtered.filter(recipe =>
         (recipe.name && recipe.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (recipe.code && recipe.code.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (recipe.category && recipe.category.toLowerCase().includes(searchTerm.toLowerCase()))
       );
+      // When searching, we skip category filtering to show all matches
+      filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+      return filtered;
     }
 
     if (activeCategory !== "all") {
+      //...
       let targetNames = [activeCategory];
       let targetCategoryIds = [];
 
@@ -304,11 +309,8 @@ export default function Recipes() {
   };
 
   const filteredRecipes = getFilteredRecipes();
-  const uniqueCategories = [...new Set(recipes.map(recipe => recipe.category))];
 
   // Logic to determine badges to show
-  // We want to show the subcategories (Level 2) of the currently selected Tab (Level 1).
-  // Even if a subcategory is selected, we keep showing its siblings so the user can switch.
   let visibleBadgesParentId = null;
   const rootCatForBadges = fullCategoryTree.find(c => c.name === activeCategory && c.level === 1);
   if (rootCatForBadges) {
@@ -320,7 +322,6 @@ export default function Recipes() {
     : [];
 
   const handleSubCategoryClick = (cat) => {
-    // Allow deselecting by clicking the same badge again
     if (activeSubCategory?.id === cat.id) {
       setActiveSubCategory(null);
     } else {
@@ -328,18 +329,14 @@ export default function Recipes() {
     }
   };
 
-  const handleResetSubCategory = () => {
-    setActiveSubCategory(null);
-  }
-
-  const handleEdit = useCallback((recipeData) => {
-    router.push(`/ficha-tecnica?id=${recipeData.id}`);
-  }, [router]);
-
   const handlePrintSimpleRecipe = (recipe) => {
     setRecipeToPrint(recipe);
     setIsPrintRecipeDialogOpen(true);
   };
+
+  const handleEdit = useCallback((recipeData) => {
+    router.push(`/ficha-tecnica?id=${recipeData.id}`);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
@@ -375,54 +372,67 @@ export default function Recipes() {
 
           <div className="mb-6 space-y-4">
 
-            {/* Type Selector */}
-            {categoryTypes.length > 0 && (
-              <Tabs value={activeType} onValueChange={setActiveType} className="w-full mb-4">
-                <TabsList className="bg-gray-100 p-1">
-                  {categoryTypes.map(type => (
-                    <TabsTrigger
-                      key={type.id}
-                      value={type.value}
-                      className="min-w-[120px]"
-                    >
-                      {type.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            )}
+            {/* Header com Configuração */}
+            <div className="flex justify-between items-center mb-2">
+              {visibleCategoryTypes.length > 0 && (
+                <Tabs value={activeType} onValueChange={setActiveType} className="w-full max-w-3xl">
+                  <TabsList className="bg-gray-100 p-1 flex-wrap h-auto">
+                    {visibleCategoryTypes.map(type => (
+                      <TabsTrigger
+                        key={type.id}
+                        value={type.value}
+                        className="min-w-[100px]"
+                      >
+                        {type.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              )}
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsSettingsOpen(true)}
+                title="Configurar Abas"
+                className="ml-2"
+              >
+                <Settings className="h-4 w-4 text-gray-600" />
+              </Button>
+            </div>
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
-                <TabsList className="w-full justify-start border-b border-orange-200 bg-transparent p-0 h-auto space-x-1">
+                <TabsList className="w-full justify-start border-b border-orange-200 bg-transparent p-0 h-auto space-x-1 flex-wrap">
                   <TabsTrigger
                     value="all"
                     className="rounded-t-lg border-t border-x border-b-0 border-transparent px-4 py-2 data-[state=active]:bg-orange-50 data-[state=active]:border-orange-200 data-[state=active]:text-orange-700 data-[state=active]:shadow-none relative -mb-[1px]"
                   >
                     Todas
                   </TabsTrigger>
-                  {recipeCategories.map(category => (
-                    <TabsTrigger
-                      key={category.id}
-                      value={category.name}
-                      className="rounded-t-lg border-t border-x border-b-0 border-transparent px-4 py-2 relative group data-[state=active]:bg-orange-50 data-[state=active]:border-orange-200 data-[state=active]:text-orange-700 data-[state=active]:shadow-none -mb-[1px]"
-                    >
-                      {category.name === "prato_principal" ? "Prato Principal" :
-                        category.name === "entrada" ? "Entrada" :
-                          category.name === "sobremesa" ? "Sobremesa" : category.name}
-
-                      <span
-                        className="ml-2 p-0.5 rounded-full hover:bg-red-100 text-gray-300 hover:text-red-600 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteCategory(category.name);
-                        }}
-                        title="Excluir categoria"
+                  {recipeCategories
+                    .map(category => (
+                      <TabsTrigger
+                        key={category.id}
+                        value={category.name}
+                        className="rounded-t-lg border-t border-x border-b-0 border-transparent px-4 py-2 relative group data-[state=active]:bg-orange-50 data-[state=active]:border-orange-200 data-[state=active]:text-orange-700 data-[state=active]:shadow-none -mb-[1px]"
                       >
-                        <Trash className="h-3 w-3" />
-                      </span>
-                    </TabsTrigger>
-                  ))}
+                        {category.name === "prato_principal" ? "Prato Principal" :
+                          category.name === "entrada" ? "Entrada" :
+                            category.name === "sobremesa" ? "Sobremesa" : category.name}
+
+                        <span
+                          className="ml-2 p-0.5 rounded-full hover:bg-red-100 text-gray-300 hover:text-red-600 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteCategory(category.name);
+                          }}
+                          title="Excluir categoria"
+                        >
+                          <Trash className="h-3 w-3" />
+                        </span>
+                      </TabsTrigger>
+                    ))}
                 </TabsList>
               </Tabs>
 
@@ -500,7 +510,10 @@ export default function Recipes() {
                       <div className="flex justify-between items-start">
                         <div className="flex flex-col flex-1 mr-2">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-medium text-base">{recipe.name}</h3>
+                            <h3 className="font-medium text-base">
+                              {recipe.code && <span className="text-gray-500 text-sm font-mono mr-2">#{recipe.code}</span>}
+                              {recipe.name}
+                            </h3>
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge variant={recipe.active ? "secondary" : "secondary"} className={cn("text-[10px] px-1.5 py-0", recipe.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500")}>
@@ -576,6 +589,12 @@ export default function Recipes() {
         onClose={() => setIsPrintRecipeDialogOpen(false)}
         recipe={recipeToPrint}
         preparations={recipeToPrint?.preparations || []}
+      />
+
+      <RecipeSettingsDialog
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSave={(newSettings) => setVisibleTypes(newSettings)}
       />
     </div>
   );

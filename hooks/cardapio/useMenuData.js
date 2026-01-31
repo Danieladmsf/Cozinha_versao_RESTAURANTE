@@ -141,14 +141,42 @@ export const useMenuData = (currentDate) => {
     }
   }, []);
 
-
+  // FUNÇÃO DE EMERGÊNCIA: Limpar Cache Persistente do Firestore
+  const nukeFirestoreCache = async () => {
+    try {
+      const { clearIndexedDbPersistence, terminate } = require('firebase/firestore');
+      const { db } = require('@/lib/firebase');
+      console.log('☢️ [NUCLEAR] Terminando conexão Firestore...');
+      await terminate(db);
+      console.log('☢️ [NUCLEAR] Limpando persistência IndexedDB...');
+      await clearIndexedDbPersistence(db);
+      console.log('✅ [NUCLEAR] Cache do Firestore LIMPO! Recarregando página...');
+      window.location.reload();
+    } catch (e) {
+      console.error('❌ [NUCLEAR] Falha ao limpar Firestore:', e);
+    }
+  };
 
   const loadMenuConfig = async () => {
     try {
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
 
+      // ...rest of function
+
+      // Adicionar log se encontrar config "fantasma"
+      if (configs && configs.length > 0) {
+        const config = configs[0];
+        // SE encontrar abas proibidas vindo do banco (ou cache do banco), avisar e sugerir limpeza
+        if (config.category_groups && config.category_groups.some(g => g.name === 'Menu diário' || g.name === 'Almoço')) {
+          console.error('🚨 [useMenuData] DETECTADO DADO FANTASMA (Firestore Persistence)!');
+          console.error('🚨 [useMenuData] Execute nukeFirestoreCache() no console ou limpe os dados do site.');
+          // Opcional: Auto-nuke? Talvez perigoso de fazer loop. Melhor expor a função.
+        }
+        // ...
+      }
+
       // Primeiro tenta carregar do cache local se existir e for recente
-      const cachedConfig = localStorage.getItem('menuConfig');
+      const cachedConfig = localStorage.getItem('menuConfig_v2');
       if (cachedConfig) {
         try {
           const parsedConfig = JSON.parse(cachedConfig);
@@ -176,7 +204,7 @@ export const useMenuData = (currentDate) => {
             delete migratedConfig.categoryOrder;
             delete migratedConfig.selectedMainCategories;
 
-            localStorage.setItem('menuConfig', JSON.stringify(migratedConfig));
+            localStorage.setItem('menuConfig_v2', JSON.stringify(migratedConfig));
             return migratedConfig;
           }
 
@@ -198,7 +226,7 @@ export const useMenuData = (currentDate) => {
         const config = configs[0];
 
         // Atualizar cache com dados do banco
-        localStorage.setItem('menuConfig', JSON.stringify(config));
+        localStorage.setItem('menuConfig_v2', JSON.stringify(config));
 
         return config;
       }
@@ -292,7 +320,7 @@ export const useMenuData = (currentDate) => {
   const forceReloadFromDatabase = useCallback(async () => {
     try {
       // Limpar todos os caches
-      localStorage.removeItem('menuConfig');
+      localStorage.removeItem('menuConfig_v2');
       globalCache = {
         categories: null,
         recipes: null,
@@ -312,7 +340,7 @@ export const useMenuData = (currentDate) => {
         const config = configs[0];
 
         // Atualizar cache e estado
-        localStorage.setItem('menuConfig', JSON.stringify(config));
+        localStorage.setItem('menuConfig_v2', JSON.stringify(config));
         setMenuConfig(config);
 
         // Notificar outras instâncias
@@ -353,7 +381,7 @@ export const useMenuData = (currentDate) => {
   // Detectar mudanças no localStorage e recarregar config
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'menuConfig') {
+      if (e.key === 'menuConfig_v2') {
         refreshMenuConfig();
       }
     };
@@ -375,6 +403,7 @@ export const useMenuData = (currentDate) => {
     refreshMenuConfig,
     forceReloadFromDatabase,
     invalidateWeeklyMenuCache,
-    isCacheValid: isCacheValid()
+    isCacheValid: isCacheValid(),
+    nukeFirestoreCache
   };
 };

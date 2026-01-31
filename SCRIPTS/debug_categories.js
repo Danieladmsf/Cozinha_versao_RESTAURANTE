@@ -1,43 +1,64 @@
-// Debug script to check category tree structure
-import { db } from '../lib/firebase.js';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const serviceAccount = require('../cozinha-afeto-2026-firebase-adminsdk-fbsvc-41985dc804.json');
 
-async function debug() {
-    console.log("=== Checking Category Tree ===\n");
+initializeApp({
+    credential: cert(serviceAccount)
+});
 
-    // Get all categories
-    const catSnap = await getDocs(collection(db, 'CategoryTree'));
-    const categories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+const db = getFirestore();
 
-    console.log(`Total categories in CategoryTree: ${categories.length}\n`);
 
-    // Find PROCESSADOS FLV
-    const processadosFLV = categories.find(c => c.name === 'PROCESSADOS FLV');
-    console.log("PROCESSADOS FLV:", processadosFLV ? { id: processadosFLV.id, level: processadosFLV.level } : "NOT FOUND");
 
-    // Find PROCESSADOS (child of FLV)
-    const processados = categories.find(c => c.name === 'PROCESSADOS');
-    console.log("PROCESSADOS:", processados ? { id: processados.id, parent_id: processados.parent_id, level: processados.level } : "NOT FOUND");
 
-    // Find 3rd level categories
-    const frutas = categories.find(c => c.name === 'FRUTAS PROCESSADAS');
-    const legumes = categories.find(c => c.name === 'LEGUMES PROCESSADAS');
-    const bebidas = categories.find(c => c.name === 'BEBIDAS PROCESSADAS');
 
-    console.log("\n=== 3rd Level Categories ===");
-    console.log("FRUTAS PROCESSADAS:", frutas ? { id: frutas.id, parent_id: frutas.parent_id, level: frutas.level } : "NOT FOUND");
-    console.log("LEGUMES PROCESSADAS:", legumes ? { id: legumes.id, parent_id: legumes.parent_id, level: legumes.level } : "NOT FOUND");
-    console.log("BEBIDAS PROCESSADAS:", bebidas ? { id: bebidas.id, parent_id: bebidas.parent_id, level: bebidas.level } : "NOT FOUND");
+async function checkCategories() {
+    console.log('--- Analyze CategoryTree for Rotisseria ---');
+    const treeSnapshot = await db.collection('CategoryTree').get();
+    const allDocs = [];
+    treeSnapshot.forEach(doc => allDocs.push({ id: doc.id, ...doc.data() }));
 
-    // Check if parent_id of 3rd level matches PROCESSADOS id
-    if (processados && frutas) {
-        console.log("\n=== Parent-Child Relationship Check ===");
-        console.log(`PROCESSADOS id: ${processados.id}`);
-        console.log(`FRUTAS parent_id: ${frutas.parent_id}`);
-        console.log(`Match: ${processados.id === frutas.parent_id}`);
-    }
+    const relevantNames = [
+        "MARMITA 3 DIVISÓRIAS", "MACARRÃO", "MASSAS", "MONO ARROZ",
+        "MONO FEIJÃO", "MONO GUARNIÇÃO", "MONO PROTEÍNAS", "SALADAS PROTEICAS",
+        "SALADAS COZIDAS", "SUSHI", "POKE", "TEMAKI", "MOLHOS", "PATÊS", "GELEIAS"
+    ];
 
-    process.exit(0);
+    const matches = allDocs.filter(d => {
+        const name = d.name.toUpperCase();
+        return relevantNames.some(r => name.includes(r.toUpperCase()));
+    });
+
+    matches.forEach(m => console.log(`Matched: ${m.name} (ID: ${m.id}, Level: ${m.level}, Parent: ${m.parent_id})`));
 }
 
-debug().catch(e => { console.error(e); process.exit(1); });
+
+async function checkRotisseria() {
+    console.log('--- Checking ROTISSERIA Category ---');
+    const snapshot = await db.collection('CategoryTree').where('name', '==', 'ROTISSERIA').get();
+    snapshot.forEach(doc => {
+        console.log(`[ROTISSERIA] ID: ${doc.id}, Type: ${doc.data().type}, Level: ${doc.data().level}`);
+    });
+}
+
+async function checkRecipes() {
+    console.log('--- Checking Recent Recipes ---');
+    const snapshot = await db.collection('Recipe')
+        .orderBy('createdAt', 'desc')
+        .limit(10)
+        .get();
+
+    if (snapshot.empty) {
+        console.log('No recipes found.');
+    } else {
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            console.log(`[Recipe] Code: ${d.code} | Name: ${d.name} | Category: ${d.category} | Active: ${d.active}`);
+        });
+    }
+}
+
+checkCategories();
+checkRecipes();

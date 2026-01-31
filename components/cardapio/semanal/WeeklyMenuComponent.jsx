@@ -32,8 +32,8 @@ export default function WeeklyMenuComponent() {
   const menuOperations = useWeeklyMenuOperations();
   const menuHelpers = useMenuHelpers();
 
-  // Estado para controlar tab de tipo de refeição (Almoço / Mono Porções)
-  const [mealType, setMealType] = useState('almoco');
+  // Estado para controlar tab de tipo de refeição (Dynamic Tabs)
+  const [mealType, setMealType] = useState(null);
 
   const {
     categories,
@@ -43,8 +43,17 @@ export default function WeeklyMenuComponent() {
     menuConfig,
     loading,
     setWeeklyMenu,
-    loadWeeklyMenu
+    loadWeeklyMenu,
+    forceReloadFromDatabase
   } = useMenuData(menuInterface.currentDate);
+
+  // Auto-recovery: Se menuConfig estiver nulo após carregar, forçar busca no banco
+  useEffect(() => {
+    if (!loading && !menuConfig) {
+      console.log('🔄 [WeeklyMenuComponent] Configuração não encontrada. Tentando forçar recarregamento...');
+      forceReloadFromDatabase();
+    }
+  }, [loading, menuConfig, forceReloadFromDatabase]);
 
   // Log para debug
   console.log('📋 [WeeklyMenuComponent] Dados recebidos:', {
@@ -52,17 +61,15 @@ export default function WeeklyMenuComponent() {
     currentDayIndex: menuInterface.currentDayIndex,
     categories: categories?.length || 0,
     recipes: recipes?.length || 0,
-    weeklyMenu: weeklyMenu ? {
-      id: weeklyMenu.id,
-      weekKey: weeklyMenu.week_key,
-      temMenuData: !!weeklyMenu.menu_data,
-      diasComDados: weeklyMenu.menu_data ? Object.keys(weeklyMenu.menu_data).length : 0,
-      diasDisponiveis: weeklyMenu.menu_data ? Object.keys(weeklyMenu.menu_data) : [],
-      menuData: weeklyMenu.menu_data
-    } : 'null',
+    weeklyMenu: weeklyMenu ? 'presente' : 'null',
     menuConfig: menuConfig ? 'presente' : 'null',
+    categoryGroups: menuConfig?.category_groups || 'undefined',
     loading
   });
+
+  if (menuConfig?.category_groups?.length > 0) {
+    console.log('🔍 [WeeklyMenuComponent] Abas detectadas:', menuConfig.category_groups.map(g => ({ id: g.id, name: g.name })));
+  }
 
   const menuNotes = useMenuNotes(menuInterface.currentDate);
   const noteActions = useMenuNoteActions(menuNotes, categories, recipes);
@@ -80,14 +87,21 @@ export default function WeeklyMenuComponent() {
   // Inicializar mealType com o primeiro grupo quando category_groups carrega
   useEffect(() => {
     if (menuConfig?.category_groups?.length > 0) {
-      const firstGroupId = menuConfig.category_groups[0].id;
-      // Só muda se o mealType atual não existe nos groups
-      const currentGroupExists = menuConfig.category_groups.some(g => g.id === mealType);
-      if (!currentGroupExists) {
+      // Se não tiver mealType selecionado, ou se o selecionado não existir mais nos grupos
+      const currentGroupExists = mealType && menuConfig.category_groups.some(g => g.id === mealType);
+
+      if (!mealType || !currentGroupExists) {
+        const firstGroupId = menuConfig.category_groups[0].id;
+        console.log('🔄 [WeeklyMenuComponent] Definindo aba inicial:', firstGroupId);
         setMealType(firstGroupId);
       }
+    } else {
+      // Se não houver grupos, resetar mealType
+      if (mealType) {
+        setMealType(null);
+      }
     }
-  }, [menuConfig?.category_groups]);
+  }, [menuConfig?.category_groups, mealType]);
 
   // Estado para controlar se já aplicamos as configurações iniciais
   const [hasAppliedInitialConfig, setHasAppliedInitialConfig] = React.useState(false);
@@ -220,7 +234,18 @@ export default function WeeklyMenuComponent() {
             />
 
             {/* Tabs Dinâmicas baseadas em Grupos */}
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4 flex-col items-center gap-2">
+              {menuConfig?.category_groups?.some(g => g.name === 'Menu diário' || g.name === 'Almoço') && (
+                <button
+                  onClick={() => {
+                    const { nukeFirestoreCache } = require('@/hooks/cardapio/useMenuData').useMenuData(menuInterface.currentDate);
+                    nukeFirestoreCache();
+                  }}
+                  className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 font-bold animate-pulse"
+                >
+                  ☢️ DADOS ANTIGOS DETECTADOS! CLIQUE AQUI PARA LIMPAR
+                </button>
+              )}
               <Tabs value={mealType} onValueChange={setMealType} className="w-full max-w-3xl">
                 <TabsList className="flex w-full flex-wrap h-auto p-1 bg-gray-100/80">
                   {menuConfig?.category_groups?.length > 0 ? (

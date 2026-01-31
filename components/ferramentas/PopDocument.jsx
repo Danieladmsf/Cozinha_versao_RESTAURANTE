@@ -277,7 +277,54 @@ const HtmlText = ({ html }) => {
     return <View>{reactElements}</View>;
 };
 
-export default function PopDocument({ data }) {
+export default function PopDocument({ data, cards }) {
+    // Mapeamento de IDs legados e títulos conhecidos
+    const idMap = {
+        'especificacoes': 'dados',
+        'materiais': 'epis',
+    };
+    const titleMap = {
+        'dados': ['dados técnicos', 'dados'],
+        'usabilidade': ['usabilidade'],
+        'epis': ['epis necessários', 'epis', 'epi\'s'],
+        'manutencao': ['manutenção', 'manutencao'],
+        'precaucoes': ['precauções de segurança', 'precaucoes', 'precauções'],
+    };
+
+    // Verifica se um card está configurado
+    const hasCard = (cardId) => {
+        if (!cards || cards.length === 0) {
+            // Cards padrão (ferramentas legacy)
+            return ['dados', 'epis', 'manutencao', 'precaucoes'].includes(cardId);
+        }
+
+        const mapId = idMap[cardId] || cardId;
+        const possibleTitles = titleMap[cardId] || [cardId];
+
+        return cards.some(c => {
+            // Buscar por ID
+            if (c.id === mapId || c.id === cardId) return true;
+            // Buscar por título (case-insensitive)
+            const cardTitulo = (c.titulo || '').toLowerCase().trim();
+            return possibleTitles.some(t => cardTitulo.includes(t.toLowerCase()));
+        });
+    };
+
+    // Obtém título do card
+    const getCardTitle = (cardId, defaultTitle) => {
+        if (!cards) return defaultTitle;
+
+        const mapId = idMap[cardId] || cardId;
+        const possibleTitles = titleMap[cardId] || [cardId];
+
+        const card = cards.find(c => {
+            if (c.id === mapId || c.id === cardId) return true;
+            const cardTitulo = (c.titulo || '').toLowerCase().trim();
+            return possibleTitles.some(t => cardTitulo.includes(t.toLowerCase()));
+        });
+        return card?.titulo || defaultTitle;
+    };
+
     return (
         <Document>
             <Page size="A4" style={styles.page} wrap>
@@ -313,29 +360,50 @@ export default function PopDocument({ data }) {
                             </View>
                         )}
                     </View>
-                    {/* Dados Técnicos à direita */}
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Dados Técnicos</Text>
-                            <HtmlText html={data.especificacoes} />
+                    {/* Dados Técnicos à direita - Condicional */}
+                    {hasCard('dados') && (
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>{getCardTitle('dados', 'Dados Técnicos')}</Text>
+                                <HtmlText html={data.especificacoes} />
+                            </View>
                         </View>
-                    </View>
+                    )}
                 </View>
 
-                {/* DEMAIS CARDS EM LISTA VERTICAL */}
+                {/* DEMAIS CARDS EM LISTA VERTICAL - Condicionais */}
                 <View style={{ marginBottom: 10 }}>
-                    <View style={styles.section} wrap={false}>
-                        <Text style={styles.sectionTitle}>EPIs Necessários</Text>
-                        <HtmlText html={data.materiais} />
-                    </View>
-                    <View style={styles.section} wrap={false}>
-                        <Text style={styles.sectionTitle}>Manutenção</Text>
-                        <HtmlText html={data.manutencao} />
-                    </View>
-                    <View style={styles.warningBox} wrap={false}>
-                        <Text style={styles.warningTitle}>Precauções de Segurança</Text>
-                        <HtmlText html={data.precaucoes} />
-                    </View>
+                    {/* Usabilidade - Condicional */}
+                    {hasCard('usabilidade') && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionTitle}>{getCardTitle('usabilidade', 'Usabilidade')}</Text>
+                            <HtmlText html={data.usabilidade} />
+                        </View>
+                    )}
+
+                    {/* EPIs Necessários - Condicional */}
+                    {hasCard('epis') && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionTitle}>{getCardTitle('epis', 'EPIs Necessários')}</Text>
+                            <HtmlText html={data.materiais} />
+                        </View>
+                    )}
+
+                    {/* Manutenção - Condicional */}
+                    {hasCard('manutencao') && (
+                        <View style={styles.section} wrap={false}>
+                            <Text style={styles.sectionTitle}>{getCardTitle('manutencao', 'Manutenção')}</Text>
+                            <HtmlText html={data.manutencao} />
+                        </View>
+                    )}
+
+                    {/* Precauções de Segurança - Condicional */}
+                    {hasCard('precaucoes') && (
+                        <View style={styles.warningBox} wrap={false}>
+                            <Text style={styles.warningTitle}>{getCardTitle('precaucoes', 'Precauções de Segurança')}</Text>
+                            <HtmlText html={data.precaucoes} />
+                        </View>
+                    )}
                 </View>
 
                 {/* STEPS - Starts on new page */}

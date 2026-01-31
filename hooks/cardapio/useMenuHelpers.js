@@ -6,10 +6,16 @@ export const useMenuHelpers = () => {
 
     // Primeiro filtro: categorias principais selecionadas
     let filteredCategories = categories;
-    if (menuConfig.selected_main_categories && menuConfig.selected_main_categories.length > 0) {
-      filteredCategories = categories.filter(category => {
-        return menuConfig.selected_main_categories.includes(category.type);
-      });
+    // Se a configuração de tipos principais estiver definida (array), respeitar estritamente
+    if (menuConfig.selected_main_categories && Array.isArray(menuConfig.selected_main_categories)) {
+      if (menuConfig.selected_main_categories.length > 0) {
+        filteredCategories = categories.filter(category => {
+          return menuConfig.selected_main_categories.includes(category.type);
+        });
+      } else {
+        // Array vazio: Usuário desmarcou tudo explicitamente -> Nenhuma categoria
+        filteredCategories = [];
+      }
     }
 
     // Filtrar apenas categorias de nível 1 (raiz)
