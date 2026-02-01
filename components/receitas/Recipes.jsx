@@ -223,13 +223,30 @@ export default function Recipes() {
   };
 
   // Helper to find root category type
-  const getRootCategoryType = (categoryName) => {
-    if (!categoryName) return 'receitas'; // Default
+  // Agora usa category_id da receita (se disponível) para busca direta
+  const getRootCategoryType = (categoryName, categoryId = null) => {
+    // Busca por ID primeiro (mais confiável)
+    if (categoryId) {
+      const catById = fullCategoryTree.find(c => c.id === categoryId);
+      if (catById) {
+        // Traverse up to find root type
+        let node = catById;
+        const visited = new Set();
+        while (node && node.parent_id && !visited.has(node.id)) {
+          visited.add(node.id);
+          const parent = fullCategoryTree.find(c => c.id === node.parent_id);
+          if (parent) node = parent;
+          else break;
+        }
+        return node?.type || 'receitas';
+      }
+    }
 
-    // Find node
+    // Fallback: busca por nome
+    if (!categoryName) return 'receitas';
+
     let node = fullCategoryTree.find(c => c.name === categoryName);
     if (!node) {
-      // Fallback: assume 'receitas' if not found in tree
       return 'receitas';
     }
 
@@ -264,7 +281,7 @@ export default function Recipes() {
     // If NOT searching, we filter by activeType.
     if (!searchTerm) {
       filtered = filtered.filter(recipe => {
-        const type = getRootCategoryType(recipe.category);
+        const type = getRootCategoryType(recipe.category, recipe.category_id);
         return type === activeType;
       });
     }

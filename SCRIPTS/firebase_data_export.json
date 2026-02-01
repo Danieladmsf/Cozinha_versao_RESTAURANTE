@@ -1,0 +1,164 @@
+{
+  "extractedAt": "2026-02-01T02:10:13.498Z",
+  "categoryTree": [
+    {
+      "id": "SIORdjOwkHLULdvCsLTy",
+      "name": "PRODUTOS",
+      "type": "produtos",
+      "level": 1,
+      "parent_id": null,
+      "active": true
+    },
+    {
+      "id": "8jYAjAWUAQLxCkzt6Uwc",
+      "name": "MONO FEIJÃO",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "AzVubRMm4npc76NKYqEN",
+      "name": "POKE / TEMAKI",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "BDr87ZW1TkVXHsmwGJYq",
+      "name": "MACARRÃO / MASSAS",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "H4W6Bjn6MxR0sq8h8E2A",
+      "name": "MONO PROTEÍNAS",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "JZO5MgdX6z3gIlI4RMAx",
+      "name": "SUSHI",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "PqW22UcLCzGp7x8dOZRy",
+      "name": "SALADAS PROTEICAS",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "WeJNVeKgraRqYvZc6oQ1",
+      "name": "MONO GUARNIÇÃO",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "d2kV4CBmeAkAWWrAZiT2",
+      "name": "MONO ARROZ",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "r9LXUo1IKzXOrZUaUaoN",
+      "name": "MARMITA 3 DIVISÓRIAS",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "vxmEQgiGflQv06AZrRRC",
+      "name": "MOLHOS / PATÊS / GELEIAS",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    },
+    {
+      "id": "yWPzCXqc4QeHFfhxwf3X",
+      "name": "SALADAS COZIDAS",
+      "type": "produtos",
+      "level": 2,
+      "parent_id": "SIORdjOwkHLULdvCsLTy",
+      "active": true
+    }
+  ],
+  "categoryTypes": [
+    {
+      "id": "FKvcKAgYrTT3EWRnr9Jn",
+      "value": "contas",
+      "label": "Contas",
+      "order": 3,
+      "is_system": true,
+      "createdAt": {
+        "_seconds": 1769860017,
+        "_nanoseconds": 445000000
+      },
+      "updatedAt": {
+        "_seconds": 1769860017,
+        "_nanoseconds": 445000000
+      }
+    },
+    {
+      "id": "MvLH6vE7FzRVnxWJwFkV",
+      "value": "produtos",
+      "is_system": false,
+      "order": 4,
+      "createdAt": {
+        "_seconds": 1769860084,
+        "_nanoseconds": 749000000
+      },
+      "label": "Produtos",
+      "updatedAt": {
+        "_seconds": 1769860095,
+        "_nanoseconds": 406000000
+      }
+    },
+    {
+      "id": "NcS3kazt3EP9G5VkBb2D",
+      "value": "ingredientes",
+      "label": "Ingredientes",
+      "order": 1,
+      "is_system": true,
+      "createdAt": {
+        "_seconds": 1769860017,
+        "_nanoseconds": 112000000
+      },
+      "updatedAt": {
+        "_seconds": 1769860017,
+        "_nanoseconds": 112000000
+      }
+    },
+    {
+      "id": "lLW8wDhyoRivWXEa94bl",
+      "value": "receitas",
+      "label": "Receitas",
+      "order": 2,
+      "is_system": true,
+      "createdAt": {
+        "_seconds": 1769860017,
+        "_nanoseconds": 377000000
+      },
+      "updatedAt": {
+        "_seconds": 1769860017,
+        "_nanoseconds": 377000000
+      }
+    }
+  ],
+  "recipes": []
+}

@@ -59,8 +59,10 @@ export default function BulkRecipeCreator({ onSuccess }) {
     try {
       const data = await CategoryTree.list();
 
-      // Filtrar apenas categorias de receitas
-      const recipeCats = data.filter(cat => cat.type === "receitas" && cat.active !== false);
+      // Filtrar categorias de receitas E produtos (ambos são válidos para receitas)
+      const recipeCats = data.filter(cat =>
+        (cat.type === "receitas" || cat.type === "produtos") && cat.active !== false
+      );
 
       const roots = recipeCats
         .filter(c => c.level === 1)
@@ -139,22 +141,34 @@ export default function BulkRecipeCreator({ onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.category) {
+    // Parser avançado: suporta dois formatos
+    // Formato 1 (com categoria): CATEGORIA / SUBCATEGORIA CÓDIGO – NOME, ...
+    // Formato 2 (simples): CÓDIGO – NOME; CÓDIGO – NOME; ...
+
+    const rawInput = formData.recipeNames.trim();
+
+    if (!rawInput) {
       toast({
-        title: "Categoria obrigatória",
-        description: "Por favor, selecione uma categoria.",
+        title: "Nenhum dado",
+        description: "Insira pelo menos uma receita",
         variant: "destructive"
       });
       return;
     }
 
-    // Separar os nomes por ponto e vírgula e remover espaços extras
-    const names = formData.recipeNames
-      .split(";")
-      .map(name => name.trim())
-      .filter(name => name.length > 0);
+    // Detecta o formato baseado na presença de vírgulas vs ponto e vírgula
+    const hasCommas = rawInput.includes(',');
 
-    if (names.length === 0) {
+    // Se tem vírgulas, assume formato avançado (com categoria)
+    // Se tem ponto e vírgula ou nenhum, assume formato simples
+    const separator = hasCommas ? ',' : ';';
+
+    const entries = rawInput
+      .split(separator)
+      .map(entry => entry.trim())
+      .filter(entry => entry.length > 0);
+
+    if (entries.length === 0) {
       toast({
         title: "Nenhum nome válido",
         description: "Insira pelo menos um nome de receita",
@@ -167,11 +181,100 @@ export default function BulkRecipeCreator({ onSuccess }) {
       setIsProcessing(true);
       const processingResults = [];
 
-      for (const name of names) {
+      for (const rawEntry of entries) {
         try {
+          let code = null;
+          let recipeName = rawEntry;
+          let category = formData.category; // Usa categoria selecionada como padrão
+          let categoryId = selectedCategoryId; // Usa ID selecionado como padrão
+
+          // Regex para extrair: [CATEGORIA / SUBCATEGORIA] [CÓDIGO] – [NOME]
+          // Exemplo: "PRODUTOS / MARMITA 3 DIVISÓRIAS 007768 – REFEIÇÃO LAGARTO"
+
+          // Primeiro, tenta encontrar o padrão com código numérico seguido de travessão/hífen
+          const codeNameMatch = rawEntry.match(/(\d{4,})\s*[–\-]\s*(.+)$/);
+
+          if (codeNameMatch) {
+            code = codeNameMatch[1];
+            recipeName = codeNameMatch[2].trim();
+
+            // Extrai a categoria (tudo antes do código)
+            const beforeCode = rawEntry.substring(0, rawEntry.indexOf(code)).trim();
+
+            if (beforeCode) {
+              // Pega a categoria extraída
+              let extractedCat = beforeCode.replace(/\s*\/\s*$/, '').trim();
+
+              // Se a categoria tem " / ", pega apenas a última parte como categoria
+              if (extractedCat.includes(' / ')) {
+                const catParts = extractedCat.split(' / ');
+                category = catParts[catParts.length - 1].trim();
+              } else if (extractedCat) {
+                category = extractedCat;
+              }
+
+              // Buscar o ID da categoria extraída no groupedCategories
+              const allItems = groupedCategories.flatMap(g => g.items);
+              const foundCat = allItems.find(c =>
+                c.originalName === category ||
+                c.originalName?.includes(category) ||
+                category?.includes(c.originalName)
+              );
+              if (foundCat) {
+                categoryId = foundCat.id;
+                category = foundCat.originalName; // Usar nome exato
+              }
+            }
+          } else {
+            // Fallback: tenta separar por travessão/hífen sem código
+            const separators = [' – ', ' - ', '–', '-'];
+            for (const sep of separators) {
+              if (rawEntry.includes(sep)) {
+                const parts = rawEntry.split(sep);
+                const potentialCode = parts[0].trim();
+
+                // Verifica se termina com código numérico
+                const codeAtEnd = potentialCode.match(/(\d{4,})$/);
+                if (codeAtEnd) {
+                  code = codeAtEnd[1];
+                  const beforeCode = potentialCode.substring(0, potentialCode.lastIndexOf(code)).trim();
+                  if (beforeCode) {
+                    let extractedCat = beforeCode.replace(/\s*\/\s*$/, '').trim();
+                    if (extractedCat.includes(' / ')) {
+                      const catParts = extractedCat.split(' / ');
+                      category = catParts[catParts.length - 1].trim();
+                    } else if (extractedCat) {
+                      category = extractedCat;
+                    }
+
+                    // Buscar o ID da categoria extraída
+                    const allItems = groupedCategories.flatMap(g => g.items);
+                    const foundCat = allItems.find(c =>
+                      c.originalName === category ||
+                      c.originalName?.includes(category) ||
+                      category?.includes(c.originalName)
+                    );
+                    if (foundCat) {
+                      categoryId = foundCat.id;
+                      category = foundCat.originalName;
+                    }
+                  }
+                  recipeName = parts.slice(1).join(sep).trim();
+                  break;
+                } else if (/^\d{4,}$/.test(potentialCode) || /^[A-Z0-9]{3,10}$/i.test(potentialCode)) {
+                  code = potentialCode;
+                  recipeName = parts.slice(1).join(sep).trim();
+                  break;
+                }
+              }
+            }
+          }
+
           const recipeData = {
-            name,
-            category: formData.category, // Salva o nome da categoria apenas (padrão atual do sistema)
+            name: recipeName,
+            code: code,
+            category: category || formData.category,
+            category_id: categoryId || selectedCategoryId || null,
             prep_time: parseInt(formData.prepTime, 10) || 0,
             yield_weight: parseInt(formData.yieldWeight, 10) || 0,
             total_weight: 0,
@@ -181,13 +284,15 @@ export default function BulkRecipeCreator({ onSuccess }) {
 
           const result = await Recipe.create(recipeData);
           processingResults.push({
-            name,
+            name: rawEntry,
+            code: code,
+            category: category,
             success: true,
             id: result.id
           });
         } catch (err) {
           processingResults.push({
-            name,
+            name: rawEntry,
             success: false,
             error: err.message
           });
@@ -200,7 +305,7 @@ export default function BulkRecipeCreator({ onSuccess }) {
 
       toast({
         title: "Processamento concluído",
-        description: `${successCount} de ${names.length} receitas criadas.`
+        description: `${successCount} de ${entries.length} receitas criadas.`
       });
 
       if (successCount > 0 && typeof onSuccess === 'function') {
@@ -305,19 +410,20 @@ export default function BulkRecipeCreator({ onSuccess }) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="recipeNames">Nomes das Receitas (separados por ;)</Label>
+                <Label htmlFor="recipeNames">Receitas</Label>
                 <Textarea
                   id="recipeNames"
                   name="recipeNames"
                   value={formData.recipeNames}
                   onChange={handleChange}
-                  placeholder="Arroz branco; Feijão carioca; Alface americana"
+                  placeholder="PRODUTOS / MARMITA 007768 – REFEIÇÃO LAGARTO, PRODUTOS / MARMITA 008966 – REFEIÇÃO ISCA"
                   required
                   rows={5}
                 />
-                <p className="text-sm text-gray-500">
-                  Digite cada nome de receita separado por ponto e vírgula (;)
-                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p><strong>Formato avançado (,):</strong> CATEGORIA / SUBCATEGORIA CÓDIGO – NOME, ...</p>
+                  <p><strong>Formato simples (;):</strong> CÓDIGO – NOME; CÓDIGO – NOME; ...</p>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
