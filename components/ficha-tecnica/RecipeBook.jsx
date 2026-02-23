@@ -35,9 +35,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRecipeStore } from '@/hooks/ficha-tecnica/useRecipeStore';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, getDocs } from 'firebase/firestore'; // Adicionado
-import { storage, db } from '@/lib/firebase'; // Adicionado db
+import { useRecipeBookStorage } from '@/hooks/ficha-tecnica/useRecipeBookStorage';
+import { useRecipeImageUpload } from '@/hooks/ficha-tecnica/useRecipeImageUpload';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { cn } from "@/lib/utils";
 
 // Paleta de cores para seleção múltipla
@@ -90,6 +91,10 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
     const [highlightedTools, setHighlightedTools] = useState([]); // Array de IDs selecionados
     const [showPortioningSummary, setShowPortioningSummary] = useState(false); // Toggle: false = lista ingredientes, true = resumo porcionamento
 
+    // Custom Hooks de Infraestrutura extraídos do componente
+    const { saveRecipeToFirestore } = useRecipeBookStorage();
+    const { uploadToVercelBlob, isUploading: vBlobUploading } = useRecipeImageUpload();
+
     // Helper para obter cor da ferramenta baseada na ordem de seleção
     const getToolColor = (toolId) => {
         const index = highlightedTools.indexOf(toolId);
@@ -140,34 +145,6 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
     const yieldData = handleCreateYield();
 
-    // Função auxiliar para salvar receita diretamente via API
-    const saveRecipeToFirestore = async (updatedRecipe, updatedPreparations) => {
-        if (!updatedRecipe.id) {
-            console.warn("Receita sem ID, não é possível salvar.");
-            return false;
-        }
-        try {
-            const payload = {
-                ...updatedRecipe,
-                preparations: updatedPreparations
-            };
-            const response = await fetch(`/api/recipes?id=${updatedRecipe.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erro ao salvar');
-            }
-            console.log("✅ Receita salva no Firestore com sucesso!");
-            return true;
-        } catch (error) {
-            console.error("❌ Erro ao salvar no Firestore:", error);
-            return false;
-        }
-    };
-
     const handleImageUpload = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -179,7 +156,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
         setIsMainUploading(true);
         try {
-            console.log("Iniciando upload Vercel Blob da foto principal...");
+
             const pathPrefix = `recipes/${recipeData.id}/main_photo`;
             const downloadURL = await uploadToVercelBlob(file, pathPrefix);
 
@@ -192,7 +169,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
             }
 
             // AUTO-SAVE: Persiste a foto principal no banco de dados via API
-            console.log("Auto-salvando foto principal no Firestore...");
+
             const updatedRecipe = { ...recipeData, photo_url: downloadURL };
             await saveRecipeToFirestore(updatedRecipe, recipeData.preparations || []);
 
@@ -202,27 +179,6 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
         } finally {
             setIsMainUploading(false);
         }
-    };
-
-    // Função genérica de upload usando Vercel Blob via API Route
-    const uploadToVercelBlob = async (file, pathPrefix) => {
-        const filename = `${pathPrefix}_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // Chama nossa API Route
-        const response = await fetch(`/api/upload?filename=${filename}`, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error('Falha no upload para Vercel Blob');
-        }
-
-        const newBlob = await response.json();
-        return newBlob.url;
     };
 
     // Função para upload de foto de uma etapa específica E de uma linha específica
@@ -240,7 +196,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
         setStepUploadingIndex(uploadId);
 
         try {
-            console.log(`Iniciando upload Vercel Blob para etapa ${prepIndex}, linha ${lineIndex}`);
+
 
             // Prefixo único por linha
             const pathPrefix = `recipes/${recipeData.id}/steps/${prepIndex}_line_${lineIndex}`;
@@ -285,7 +241,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
             };
 
             // AUTO-SAVE: Persiste imediatamente no banco de dados via API
-            console.log("Auto-salvando foto da etapa no Firestore...");
+
             await saveRecipeToFirestore(recipeData, updatedPreparations);
 
         } catch (error) {
@@ -520,7 +476,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
 
     // Coleta todos os ingredientes de todas as preparações, agrupados por etapa
-    const getIngredientsByStage = () => {
+    const ingredientStages = React.useMemo(() => {
         if (!recipeData.preparations) return [];
 
         const stages = [];
@@ -556,12 +512,10 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
             }
         });
         return stages;
-    };
-
-    const ingredientStages = getIngredientsByStage();
+    }, [recipeData.preparations]);
 
     // Coleta dados de porcionamento (componentes da montagem) da etapa de Porcionamento
-    const getPortioningSummary = () => {
+    const portioningSummary = React.useMemo(() => {
         if (!recipeData.preparations) return [];
 
         // Encontra a etapa de porcionamento/assembly pelo processo
@@ -629,12 +583,10 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
             ...comp,
             percentage: !comp.isPackaging && totalWeight > 0 ? (comp.weight / totalWeight) * 100 : 0
         }));
-    };
-
-    const portioningSummary = getPortioningSummary();
+    }, [recipeData.preparations]);
 
     // Coleta todas as ferramentas únicas da receita
-    const getAllTools = () => {
+    const allTools = React.useMemo(() => {
         const toolsMap = new Map();
         recipeData.preparations?.forEach(prep => {
             if (prep.tools) {
@@ -648,8 +600,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
             }
         });
         return Array.from(toolsMap.values());
-    };
-    const allTools = getAllTools();
+    }, [recipeData.preparations]);
 
     return (
         <div className="max-w-6xl mx-auto bg-white min-h-screen pb-12 print:p-0 print:max-w-none shadow-lg rounded-xl my-4 recipe-book-print-container">

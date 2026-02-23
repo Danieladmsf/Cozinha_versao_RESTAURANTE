@@ -9,7 +9,7 @@ import IngredientRow from './optimized/IngredientRow';
 import RecipeRow from './optimized/RecipeRow';
 import { processTypes } from '@/lib/recipeConstants';
 import { parseNumericValue } from '@/lib/formatUtils';
-import RecipeCalculator from '@/lib/recipeCalculator';
+import { RecipeEngine as RecipeCalculator } from "@/lib/recipe-engine/RecipeEngine";
 
 const IngredientTable = ({
   prep,
@@ -75,83 +75,80 @@ const IngredientTable = ({
                 const newVal = parseNumericValue(e.target.value);
                 const originalVal = parseNumericValue(originalYieldRef.current);
 
-                console.log(`[SCALING CHECK] onBlur triggered. newVal: ${newVal}, originalVal: ${originalVal}`);
                 if (!newVal || newVal <= 0 || !originalVal || originalVal <= 0) {
-                  console.log(`[SCALING CHECK] Early Return - Invalid values.`);
                   return;
                 }
 
                 // Simple scaling factor based on what the user actually changed
                 const factor = newVal / originalVal;
-                console.log(`[SCALING CHECK] Calculated factor: ${factor}`);
                 if (Math.abs(factor - 1) < 0.001) {
-                  console.log(`[SCALING CHECK] Early Return - No significant change (Factor ~ 1).`);
                   return;
                 }
 
                 const unitLabel = prep.assembly_config?.unit_type === 'kg' ? 'kg' : 'unidades';
-                if (window.confirm(`Deseja redimensionar todos os ingredientes desta receita para render proporcionalmente exatamente ${newVal} ${unitLabel}?`)) {
+                // Removido o window.confirm para auto-scale transparente e fluido
 
-                  // 1. Scale sub_components for this assembly
-                  const newSubComponents = subComponents.map(sc => {
-                    const sourcePrep = rest.preparations?.find(p => p.id === sc.source_id);
+                // 1. Scale sub_components for this assembly
+                const newSubComponents = subComponents.map(sc => {
+                  const sourcePrep = rest.preparations?.find(p => p.id === sc.source_id);
+                  const isPackaging = sourcePrep?.processes?.includes('packaging') || sc.isPackaging === true;
+                  if (isPackaging) return sc;
+
+                  const currentWeight = parseNumericValue(sc.assembly_weight_kg) || 0;
+                  return {
+                    ...sc,
+                    assembly_weight_kg: (currentWeight * factor).toFixed(5).replace('.', ',')
+                  };
+                });
+
+                // Prepare to batch update both the assembly sub_components and its source ingredients
+                if (rest.preparations && rest.onBatchUpdatePreparations) {
+                  const clonedPreps = [...rest.preparations];
+
+                  // Update the assembly components list first
+                  clonedPreps[prepIndex] = {
+                    ...clonedPreps[prepIndex],
+                    sub_components: newSubComponents
+                  };
+
+                  // Then scale all affected source preparations
+                  subComponents.forEach(sc => {
+                    const sourcePrepIndex = clonedPreps.findIndex(p => p.id === sc.source_id);
+                    if (sourcePrepIndex === -1) return;
+
+                    const sourcePrep = clonedPreps[sourcePrepIndex];
                     const isPackaging = sourcePrep?.processes?.includes('packaging') || sc.isPackaging === true;
-                    if (isPackaging) return sc;
 
-                    const currentWeight = parseNumericValue(sc.assembly_weight_kg) || 0;
-                    return {
-                      ...sc,
-                      assembly_weight_kg: (currentWeight * factor).toFixed(5).replace('.', ',')
-                    };
+                    if (isPackaging) return;
+
+                    if (sourcePrep.ingredients && sourcePrep.ingredients.length > 0) {
+                      clonedPreps[sourcePrepIndex] = {
+                        ...clonedPreps[sourcePrepIndex],
+                        ingredients: RecipeCalculator.scaleIngredients(sourcePrep.ingredients, factor)
+                      };
+                    }
                   });
 
-                  // Prepare to batch update both the assembly sub_components and its source ingredients
-                  if (rest.preparations && rest.onBatchUpdatePreparations) {
-                    const clonedPreps = [...rest.preparations];
+                  rest.onBatchUpdatePreparations(clonedPreps);
+                } else {
+                  // Fallback sem onBatchUpdatePreparations
+                  onUpdatePreparation(prepIndex, 'sub_components', newSubComponents);
 
-                    // Update the assembly components list first
-                    clonedPreps[prepIndex] = {
-                      ...clonedPreps[prepIndex],
-                      sub_components: newSubComponents
-                    };
-
-                    // Then scale all affected source preparations
+                  if (rest.preparations) {
                     subComponents.forEach(sc => {
-                      const sourcePrepIndex = clonedPreps.findIndex(p => p.id === sc.source_id);
+                      const sourcePrepIndex = rest.preparations.findIndex(p => p.id === sc.source_id);
                       if (sourcePrepIndex === -1) return;
 
-                      const sourcePrep = clonedPreps[sourcePrepIndex];
+                      const sourcePrep = rest.preparations[sourcePrepIndex];
                       const isPackaging = sourcePrep?.processes?.includes('packaging') || sc.isPackaging === true;
+
                       if (isPackaging) return;
 
                       if (sourcePrep.ingredients && sourcePrep.ingredients.length > 0) {
-                        clonedPreps[sourcePrepIndex] = {
-                          ...clonedPreps[sourcePrepIndex],
-                          ingredients: RecipeCalculator.scaleIngredients(sourcePrep.ingredients, factor)
-                        };
+                        onUpdatePreparation(sourcePrepIndex, 'ingredients',
+                          RecipeCalculator.scaleIngredients(sourcePrep.ingredients, factor));
                       }
                     });
-
-                    rest.onBatchUpdatePreparations(clonedPreps);
-                  } else {
-                    // Fallback sem onBatchUpdatePreparations
-                    onUpdatePreparation(prepIndex, 'sub_components', newSubComponents);
-
-                    if (rest.preparations) {
-                      subComponents.forEach(sc => {
-                        const sourcePrepIndex = rest.preparations.findIndex(p => p.id === sc.source_id);
-                        if (sourcePrepIndex === -1) return;
-
-                        const sourcePrep = rest.preparations[sourcePrepIndex];
-                        const isPackaging = sourcePrep?.processes?.includes('packaging') || sc.isPackaging === true;
-                        if (isPackaging) return;
-
-                        if (sourcePrep.ingredients && sourcePrep.ingredients.length > 0) {
-                          onUpdatePreparation(sourcePrepIndex, 'ingredients',
-                            RecipeCalculator.scaleIngredients(sourcePrep.ingredients, factor));
-                        }
-                      });
-                    }
                   }
                 }
               }}

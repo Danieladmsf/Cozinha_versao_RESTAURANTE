@@ -1,0 +1,3 @@
+﻿- The AI assistant should always prioritize creating or modifying data in its native format rather than creating frontend workarounds.
+- No 'gambiarras' (workarounds/hacks) should be used to fix old problems; find the root cause and fix the data structure or the core logic.
+- Be completely transparent and honest with the user about what exactly was done, avoiding hiding technical debt.

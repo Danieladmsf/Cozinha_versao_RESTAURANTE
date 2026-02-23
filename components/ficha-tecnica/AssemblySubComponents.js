@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import RecipeCalculator from '@/lib/recipeCalculator';
+import { RecipeEngine as RecipeCalculator } from "@/lib/recipe-engine/RecipeEngine";
 import { formatCapitalize } from '@/lib/textUtils';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -78,10 +78,6 @@ const AssemblySubComponents = ({
 
     const factor = desiredWeight / currentYield;
     if (Math.abs(factor - 1) < 0.001) return;
-
-    if (!window.confirm(`Deseja redimensionar os ingredientes de "${sourcePrep.title}" para render ${desiredWeight} kg? (Fator: ${factor.toFixed(4)})`)) {
-      return;
-    }
 
     // Scale using centralized utility + batch update
     if (onBatchUpdatePreparations && preparationsData) {

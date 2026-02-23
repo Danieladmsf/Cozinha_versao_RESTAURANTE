@@ -371,8 +371,9 @@ const ProgramacaoCozinhaTabs = () => {
           let mainCategory = null;
           if (recipe.category_id && categoryMap[recipe.category_id]) {
             mainCategory = categoryMap[recipe.category_id];
-          } else if (recipe.category && categoryMap[recipe.category.toLowerCase()]) {
-            mainCategory = categoryMap[recipe.category.toLowerCase()];
+          } else if (recipe.category) {
+            const normalizedCat = recipe.category.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            mainCategory = categoryMap[normalizedCat];
           }
 
           return mainCategory && mainCategory.id === targetTab.id;

@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Printer } from "lucide-react";
-import { RecipeCalculator } from '@/components/utils/recipeCalculator';
+import { RecipeEngine as RecipeCalculator } from "@/lib/recipe-engine/RecipeEngine";
 
 // Constantes
 const DEFAULT_CUBA_WEIGHT = 3.5;

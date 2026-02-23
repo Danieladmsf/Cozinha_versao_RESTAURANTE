@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { RecipeCalculator, parseNumber } from '@/lib/recipeCalculator';
-
+import { RecipeEngine as RecipeCalculator } from '@/lib/recipe-engine/RecipeEngine';
+const parseNumber = RecipeCalculator.parseValue;
 /**
  * Hook para calcular a Lista de Produção da Cozinha
  * Cruza pedidos do dia × fichas técnicas para gerar quanto de cada ingrediente cru cozinhar
@@ -147,7 +147,7 @@ export function useProductionList(orders, recipes, selectedDay, categories = [],
                 // -----------------------------------------------
                 // Calcular o rendimento total da receita (yield weight)
                 // -----------------------------------------------
-                const metrics = RecipeCalculator.calculateRecipeMetrics(recipe.preparations, recipe);
+                const metrics = RecipeCalculator.calculateRecipeMetrics(recipe, recipe.preparations || []);
                 const recipeYieldWeight = metrics.yield_weight || 0;
 
                 if (recipeYieldWeight <= 0) return;

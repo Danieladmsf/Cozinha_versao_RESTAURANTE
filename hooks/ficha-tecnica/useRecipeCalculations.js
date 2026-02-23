@@ -9,8 +9,7 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import RecipeCalculator, { parseNumber, formatters } from '@/lib/recipeCalculator';
-import { updateRecipeMetrics } from '@/lib/recipeMetricsCalculator';
+import { RecipeEngine as RecipeCalculator, parseValue as parseNumber, formatters } from '@/lib/recipe-engine/RecipeEngine';
 
 /**
  * Hook principal para todos os cálculos relacionados à receita
@@ -43,11 +42,10 @@ export function useRecipeCalculations() {
    * Atualiza métricas quando dados mudam (versão otimizada)
    */
   const updateRecipeMetricsOptimized = useCallback((preparationsData, currentMetrics = {}, recipeData = {}, allRecipes = []) => {
-
     try {
-      return updateRecipeMetrics(preparationsData, currentMetrics, recipeData, allRecipes);
+      return RecipeCalculator.calculateRecipeMetrics(recipeData, preparationsData, allRecipes);
     } catch (error) {
-      return RecipeCalculator.getEmptyMetrics();
+      return RecipeCalculator.getEmptyRecipeMetrics();
     }
   }, []);
 
@@ -228,7 +226,7 @@ export function useRecipeCalculations() {
   const calculateTotalRecipeCost = useCallback((preparations) => {
     if (!preparations || preparations.length === 0) return 0;
 
-    const result = RecipeCalculator.calculateRecipeMetrics(preparations);
+    const result = RecipeCalculator.calculateRecipeMetrics({}, preparations);
     return result.total_cost;
   }, []);
 
@@ -238,7 +236,7 @@ export function useRecipeCalculations() {
   const calculateTotalRecipeWeight = useCallback((preparations, type = 'yield') => {
     if (!preparations || preparations.length === 0) return 0;
 
-    const result = RecipeCalculator.calculateRecipeMetrics(preparations);
+    const result = RecipeCalculator.calculateRecipeMetrics({}, preparations);
     return type === 'yield' ? result.yield_weight : result.total_weight;
   }, []);
 
@@ -280,13 +278,13 @@ export function useRecipeCalculations() {
    */
   const generateDebugReport = useCallback((preparations, recipeData = {}) => {
     try {
-      return RecipeCalculator.generateDebugReport(preparations, recipeData);
+      return RecipeCalculator.generateDebugReport(recipeData, preparations);
     } catch (error) {
       return {
         timestamp: new Date().toISOString(),
         error: error.message,
         validation: { isValid: false, errors: [error.message], warnings: [] },
-        metrics: RecipeCalculator.getEmptyMetrics()
+        metrics: RecipeCalculator.getEmptyRecipeMetrics()
       };
     }
   }, []);

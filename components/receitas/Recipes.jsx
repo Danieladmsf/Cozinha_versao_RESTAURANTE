@@ -53,8 +53,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { toast } from "@/components/ui/use-toast"
-import RecipeSimplePrintDialog from "@/components/receitas/RecipeSimplePrintDialog";
-import BulkRecipeCreator from "@/components/receitas/BulkRecipeCreator";
 import RecipeSettingsDialog from "@/components/receitas/RecipeSettingsDialog";
 import { APP_CONSTANTS } from "@/lib/constants";
 
@@ -613,11 +611,6 @@ export default function Recipes() {
                   className="pl-8"
                 />
               </div>
-              <div className="flex gap-2">
-                <BulkRecipeCreator
-                  onSuccess={loadRecipes}
-                />
-              </div>
             </div>
           </motion.div>
 
@@ -956,13 +949,6 @@ export default function Recipes() {
           </div>
         </div>
       </div>
-
-      <RecipeSimplePrintDialog
-        isOpen={isPrintRecipeDialogOpen}
-        onClose={() => setIsPrintRecipeDialogOpen(false)}
-        recipe={recipeToPrint}
-        preparations={recipeToPrint?.preparations || []}
-      />
 
       <RecipeSettingsDialog
         isOpen={isSettingsOpen}

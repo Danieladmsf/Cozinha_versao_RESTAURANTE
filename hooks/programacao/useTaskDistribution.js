@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, Timestamp } from 'firebase/firestore';
-import { RecipeCalculator, parseNumber } from '@/lib/recipeCalculator';
-
+import { RecipeEngine as RecipeCalculator } from '@/lib/recipe-engine/RecipeEngine';
+const parseNumber = RecipeCalculator.parseValue;
 /**
  * TASK TYPES:
  * - rendimento:     Cozinheira cozinha no dia (arroz, feijão, macarrão, proteínas)
@@ -93,7 +93,7 @@ export function getCanonicalIngredientName(name) {
  */
 function getRecipeYieldWeight(recipe) {
     if (!recipe) return 0;
-    const metrics = RecipeCalculator.calculateRecipeMetrics(recipe.preparations, recipe);
+    const metrics = RecipeCalculator.calculateRecipeMetrics(recipe, recipe.preparations || []);
     return metrics.yield_weight || 0;
 }
 

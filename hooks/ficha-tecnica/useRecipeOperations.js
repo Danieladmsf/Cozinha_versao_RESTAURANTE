@@ -43,14 +43,9 @@ export function useRecipeOperations() {
     setPreparationsData(prev => {
       let updatedPreparations = [...prev];
 
-      console.log('🔄 [AUTO-POPULATE] Nova etapa:', newPrep.title);
-      console.log('🔄 [AUTO-POPULATE] É montagem?', isAssembly);
-      console.log('🔄 [AUTO-POPULATE] Montagens existentes:', updatedPreparations.filter(p => p.processes?.includes('assembly')).map(p => p.title));
-
       if (isAssembly) {
-        // Se for montagem: adicionar todas as etapas anteriores (não-montagem) como sub_components
+        // Auto-popular montagem com todas as etapas anteriores
         const previousSteps = updatedPreparations.filter(p => !p.processes?.includes('assembly'));
-        console.log('🔄 [AUTO-POPULATE] Montagem criada - adicionando etapas anteriores:', previousSteps.map(p => p.title));
 
         newPrep.sub_components = previousSteps.map(step => ({
           id: String(Date.now() + Math.random()),
@@ -61,13 +56,9 @@ export function useRecipeOperations() {
           origin_id: step.id // Marca como item de matriz (bloqueado)
         }));
       } else {
-        // Se NÃO for montagem: adicionar esta etapa em todas as montagens existentes
-        const assemblies = updatedPreparations.filter(p => p.processes?.includes('assembly'));
-        console.log('🔄 [AUTO-POPULATE] Etapa normal - adicionando em montagens:', assemblies.map(p => p.title));
-
+        // Auto-vincular esta nova etapa nas montagens/porcionamentos existentes
         updatedPreparations = updatedPreparations.map(prep => {
           if (prep.processes?.includes('assembly')) {
-            // Adicionar a nova etapa como sub_component da montagem
             const newSubComponent = {
               id: String(Date.now() + Math.random()),
               name: newPrep.title,
@@ -76,8 +67,7 @@ export function useRecipeOperations() {
               assembly_weight_kg: 0,
               origin_id: newPrep.id // Marca como item de matriz (bloqueado)
             };
-
-            console.log('🔄 [AUTO-POPULATE] Adicionando sub_component em:', prep.title);
+            // Adicionar como sub-componente na montagem
 
             return {
               ...prep,
@@ -202,7 +192,6 @@ export function useRecipeOperations() {
           const newIngredients = [...newPrep.ingredients];
 
           if (newIngredients[ingredientIndex]) {
-            console.log('🔄 [updateIngredient] Updating field:', { prepIndex, ingredientIndex, field, value });
             // CORRIGIDO: Converter strings vazias para 0 em campos de peso
             const isWeightField = field.startsWith('weight_');
             const normalizedValue = isWeightField && value === '' ? 0 : value;
@@ -369,12 +358,6 @@ export function useRecipeOperations() {
         throw new Error('Receita não encontrada');
       }
 
-      console.log('🔵 [useRecipeOperations] Receita bruta do Firebase:', JSON.stringify(recipe.preparations?.map(p => ({
-        id: p.id,
-        title: p.title,
-        notes: p.notes
-      })), null, 2));
-
       // CORRIGIDO: Normalizar campos de peso vazios em ingredientes (Firestore omite strings vazias)
       const normalizedPreparations = (recipe.preparations || []).map(prep => ({
         ...prep,
@@ -391,12 +374,6 @@ export function useRecipeOperations() {
           weight_pre_cooking: ing.weight_pre_cooking || 0,
         }))
       }));
-
-      console.log('🟢 [useRecipeOperations] Preparações normalizadas:', JSON.stringify(normalizedPreparations.map(p => ({
-        id: p.id,
-        title: p.title,
-        notes: p.notes
-      })), null, 2));
 
       return {
         success: true,

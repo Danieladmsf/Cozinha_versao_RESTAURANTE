@@ -1,0 +1,302 @@
+﻿
+>                      "name":  "Rotisseria File Sobrecoxa Assada Bendito KG",
+                       "portion_cost":  19.590870488322718,
+                       "id":  "89zz5VBM4Gugi1narIdc",
+                       "code":  "008361",
+                       "has_ingredients":  true,
+                       "storage_temperature":  "",
+                       "updatedAt":  {
+                                         "type":  "firestore/timestamp/1.0",
+                                         "seconds":  1771815615,
+                                         "nanoseconds":  523000000
+                                     },
+                       "active":  true,
+                       "container_type":  "kg",
+                       "shelf_life":  "",
+                       "createdAt":  {
+                                         "nanoseconds":  702000000,
+                                         "seconds":  1769976395
+                                     },
+                       "type":  "receitas",
+                       "cuba_cost":  19.590870488322718,
+                       "cost_per_kg_raw":  8.688606403013182,
+                       "preparations":  [
+                                            {
+                                                "processes":  [
+                                                                  "seasoning",
+                                                                  "cooking"
+                                                              ],
+                                                "ingredients":  [
+                                                                    
+"@{weight_cooked=0.89171974522293; ingredient_id=pwE7oN3rfwvgmuaPIT9T; unit=kg; 
+weight_raw=; task_type=System.Object[]; name=FilÃ© de Sobrecoxa; 
+quantity=1.2738853503184713; technical_data=; weight_frozen=; locked=False; 
+current_price=18; weight_pre_cooking=1.1464968152866242; weight_thawed=; 
+weight_portioned=; weight_clean=}",
+                                                                    "@{locked=False; 
+weight_thawed=; weight_pre_cooking=0.01910828025477707; current_price=2.5; 
+weight_portioned=; weight_clean=; weight_raw=; unit=kg; 
+ingredient_id=bpBfEm9oUwz8t73sPIv2; weight_cooked=0.01910828025477707; 
+quantity=0.01910828025477707; name=Sal Refinado; weight_frozen=; technical_data=}",
+                                                                    
+"@{quantity=0.012738853503184712; name=Alho Fresco; weight_raw=; unit=kg; 
+weight_cooked=0.012738853503184712; ingredient_id=1BWqf9KBUdkhJydgq0Da; weight_frozen=; 
+technical_data=; weight_thawed=; current_price=35; 
+weight_pre_cooking=0.012738853503184712; locked=False; weight_clean=; weight_portioned=}",
+                                                                    "@{weight_frozen=; 
+technical_data=; weight_raw=; unit=kg; weight_cooked=0.025477707006369425; 
+ingredient_id=xlRpMydoeJ3AjOG9sIwc; quantity=0.025477707006369425; name=Pimenta do Reino; 
+weight_portioned=; weight_clean=; locked=False; weight_thawed=; current_price=85; 
+weight_pre_cooking=0.025477707006369425}",
+                                                                    "@{technical_data=; 
+weight_frozen=; quantity=0.025477707006369425; name=Ãleo de Soja; task_type=; 
+ingredient_id=T0vI5jbPMbHw3r4A9JSl; weight_cooked=0.025477707006369425; weight_raw=; 
+unit=L; weight_clean=; weight_portioned=; current_price=7.5; 
+weight_pre_cooking=0.025477707006369425; weight_thawed=; locked=False}",
+                                                                    "@{weight_frozen=; 
+technical_data=; quantity=0.025477707006369425; name=PÃ¡prica Doce; weight_raw=; unit=kg; 
+weight_cooked=0.025477707006369425; ingredient_id=dOUL2UWJizVdwWvoeWVB; weight_clean=; 
+weight_portioned=; weight_thawed=; weight_pre_cooking=0.025477707006369425; 
+current_price=65; locked=False}"
+                                                                ],
+                                                "total_raw_weight_prep":  
+0.20732599999999998,
+                                                "title":  "1Âª Etapa: FilÃ© Sobrecoxa 
+Assada",
+                                                "total_cost_prep":  4.115509,
+                                                "notes":  [
+  
+                                                          ],
+                                                "yield_percentage_prep":  
+72.35030821025823,
+                                                "average_yield_prep":  0,
+                                                "instructions":  "Importado de: FilÃ© 
+Sobrecoxa Assada.",
+                                                "id":  "gzexue4j0mlsgonum",
+                                                "total_yield_weight_prep":  
+0.15000099999999997,
+                                                "origin_id":  "9z8rzpHJJjCUQJubPUo2"
+                                            },
+                                            {
+                                                "average_yield_prep":  0,
+                                                "total_yield_weight_prep":  1,
+                                                "id":  "04f0qkp38mlsgonum",
+                                                "notes":  [
+  
+                                                          ],
+                                                "yield_percentage_prep":  100,
+                                                "total_raw_weight_prep":  1,
+                                                "title":  "2Âª Etapa: Embalagem",
+                                                "total_cost_prep":  1.95,
+                                                "assembly_config":  {
+                                                                        "total_weight":  
+"0",
+                                                                        "units_quantity": 
+ "1",
+                                                                        "container_type": 
+ "unidade"
+                                                                    },
+                                                "ingredients":  [
+                                                                    "@{weight_frozen=; 
+technical_data=; quantity=1; id=2sz4a6w8rmlsgonum; name=D76; weight_raw=0; unit=kg; 
+weight_cooked=; ingredient_id=H7tG7zLisi87NqrytfJh; weight_clean=; weight_portioned=; 
+weight_thawed=; current_price=1.95; weight_pre_cooking=; locked=True}"
+                                                                ],
+                                                "processes":  [
+                                                                  "packaging"
+                                                              ]
+                                            },
+                                            {
+                                                "average_yield_prep":  0,
+                                                "total_yield_weight_prep":  3,
+                                                "id":  "yvfivuhvrmlsgonum",
+                                                "notes":  [
+                                                              "@{title=InstruÃ§Ã£o; 
+content=Porcionar conforme peso padrÃ£o registrado.}"
+                                                          ],
+                                                "yield_percentage_prep":  100,
+                                                "assembly_config":  {
+                                                                        "units_quantity": 
+ "0",
+                                                                        "total_weight":  
+"0",
+                                                                        "unit_type":  
+"un",
+                                                                        "container_type": 
+ "kg",
+                                                                        "notes":  ""
+                                                                    },
+                                                "total_raw_weight_prep":  3,
+                                                "total_cost_prep":  0,
+                                                "title":  "3Âª Etapa: Porcionamento",
+                                                "sub_components":  [
+                                                                       
+"@{ingredients=System.Object[]; input_yield_weight=0; source_id=gzexue4j0mlsgonum; 
+assembly_weight_kg=1; input_total_cost=undefined; type=recipe; isPackaging=False; 
+id=nrzk60ltomlsgonum; name=FilÃ© Sobrecoxa Assada}",
+                                                                       
+"@{isPackaging=True; source_id=04f0qkp38mlsgonum; assembly_weight_kg=1; 
+id=9l8absyn2mlsgonum; name=Embalagem; type=recipe}"
+                                                                   ],
+                                                "processes":  [
+                                                                  "portioning"
+                                                              ],
+                                                "ingredients":  [
+  
+                                                                ]
+                                            }
+                                        ],
+                       "category_id":  "rk84ZnLG98NHUTtVFrsC",
+                       "yield_percentage":  88.70056497175142,
+                       "name_complement":  "",
+                       "operational_cost":  0,
+                       "last_calculated":  "2026-02-23T03:00:15.522Z",
+                       "portion_weight_calculated":  2,
+                       "preparation_metrics":  [
+                                                   {
+                                                       "preparationTitle":  "1Âª Etapa: 
+FilÃ© Sobrecoxa Assada",
+                                                       "averageYield":  95,
+                                                       "hasSubComponents":  false,
+                                                       "hasIngredients":  true,
+                                                       "isFinalizationOnly":  false,
+                                                       "hasSubRecipes":  false,
+                                                       "totalCost":  27.436305732484076,
+                                                       "totalPrepTime":  0,
+                                                       "preparationIndex":  0,
+                                                       "totalRawWeight":  
+1.3821656050955413,
+                                                       "yieldPercentage":  
+72.35023041474655,
+                                                       "includedInTotal":  true,
+                                                       "totalYieldWeight":  1
+                                                   },
+                                                   {
+                                                       "preparationIndex":  1,
+                                                       "totalRawWeight":  1,
+                                                       "yieldPercentage":  100,
+                                                       "totalYieldWeight":  1,
+                                                       "includedInTotal":  true,
+                                                       "hasSubComponents":  false,
+                                                       "preparationTitle":  "2Âª Etapa: 
+Embalagem",
+                                                       "averageYield":  100,
+                                                       "hasIngredients":  true,
+                                                       "isFinalizationOnly":  true,
+                                                       "hasSubRecipes":  false,
+                                                       "totalPrepTime":  0,
+                                                       "totalCost":  1.95
+                                                   },
+                                                   {
+                                                       "yieldPercentage":  100,
+                                                       "totalYieldWeight":  2,
+                                                       "includedInTotal":  true,
+                                                       "preparationIndex":  2,
+                                                       "totalRawWeight":  2,
+                                                       "isFinalizationOnly":  true,
+                                                       "hasSubRecipes":  false,
+                                                       "totalPrepTime":  0,
+                                                       "totalCost":  0,
+                                                       "hasSubComponents":  true,
+                                                       "averageYield":  0,
+                                                       "preparationTitle":  "3Âª Etapa: 
+Porcionamento",
+                                                       "hasIngredients":  false
+                                                   }
+                                               ]
+                   },
+                   {
+                       "createdAt":  {
+                                         "type":  "firestore/timestamp/1.0",
+                                         "seconds":  1771355125,
+                                         "nanoseconds":  990000000
+                                     },
+                       "category":  "Bovino",
+                       "type":  "receitas",
+                       "preparations":  [
+                                            {
+                                                "assembly_config":  {
+                                                                        "units_quantity": 
+ "1",
+                                                                        "total_weight":  
+"1.925",
+                                                                        "container_type": 
+ "cuba"
+                                                                    },
+                                                "title":  "1Âª Etapa: Massa de Carne e 
+Tempero",
+                                                "instructions":  "",
+                                                "ingredients":  [
+                                                                    "@{weight_frozen=; 
+quantity=1; name=AcÃ©m; id=iXiYeYP3rsyiu24pAckz; task_type=System.Object[]; 
+weight_cooked=; ingredient_id=iXiYeYP3rsyiu24pAckz; unit=kg; weight_raw=1; weight_clean=; 
+current_price=28; weight_pre_cooking=; weight_thawed=; locked=False}",
+                                                                    "@{weight_cooked=; 
+ingredient_id=bpBfEm9oUwz8t73sPIv2; unit=kg; weight_raw=0.015; locked=False; 
+quantity=0.0150; current_price=2; weight_pre_cooking=; name=Sal Refinado; weight_thawed=; 
+weight_clean=; weight_frozen=}",
+                                                                    "@{unit=kg; 
+weight_raw=0.01; locked=False; weight_cooked=; ingredient_id=1BWqf9KBUdkhJydgq0Da; 
+quantity=0.0100; weight_thawed=; weight_pre_cooking=; current_price=35; name=Alho Fresco; 
+weight_frozen=; weight_clean=}",
+                                                                    "@{quantity=0.0200; 
+name=Pimenta do Reino; weight_pre_cooking=; current_price=85; weight_thawed=; 
+ingredient_id=xlRpMydoeJ3AjOG9sIwc; weight_cooked=; locked=False; unit=kg; 
+weight_raw=0.02; weight_clean=; weight_frozen=}",
+                                                                    "@{weight_frozen=; 
+ingredient_id=T0vI5jbPMbHw3r4A9JSl; weight_cooked=; weight_raw=0.02; unit=L; task_type=; 
+name=Ãleo de Soja; quantity=0.0200; weight_clean=; locked=False; current_price=7.5; 
+weight_pre_cooking=; weight_thawed=}",
+                                                                    "@{quantity=0.0200; 
+name=PÃ¡prica Doce; current_price=65; weight_pre_cooking=; weight_thawed=; 
+ingredient_id=dOUL2UWJizVdwWvoeWVB; weight_cooked=; locked=False; weight_raw=0.02; 
+unit=kg; weight_clean=; weight_frozen=}",
+                                                                    "@{weight_clean=; 
+weight_frozen=; ingredient_id=xFkqVKNgWYfBxXmhC3hH; weight_cooked=; unit=kg; 
+weight_raw=0.05; locked=False; name=Cebola; current_price=4.5; weight_pre_cooking=; 
+weight_thawed=; quantity=0.0500}",
+                                                                    "@{weight_clean=; 
+weight_frozen=; unit=kg; locked=False; weight_raw=0.2; weight_cooked=; 
+ingredient_id=udu4K2vcjKv3PEwI1uJo; weight_thawed=; name=Farinha de Rosca; 
+current_price=8.9; weight_pre_cooking=; quantity=0.2000}",
+                                                                    "@{locked=False; 
+weight_thawed=; weight_pre_cooking=; current_price=12; weight_clean=; task_type=; 
+unit=kg; weight_raw=0.2; ingredient_id=5esyryEnrCaoM2xC3pcb; weight_cooked=; 
+quantity=0.2000; name=Ovos (unidade ~50g); weight_frozen=}",
+                                                                    "@{weight_cooked=; 
+ingredient_id=cohNJKrNuafLPpD9vZYk; weight_raw=0.01; unit=kg; task_type=System.Object[]; 
+name=Salsinha; quantity=0.0100; weight_frozen=; locked=False; current_price=12; 
+weight_pre_cooking=; weight_thawed=; weight_clean=}"
+                                                                ],
+                                                "processes":  [
+                                                                  "mixing",
+                                                                  "seasoning"
+                                                              ],
+                                                "notes":  [
+                                                              
+"@{updatedAt=2026-02-17T19:05:25.958Z; createdAt=2026-02-17T19:05:25.958Z; title=Modo de 
+Preparo; content=1. Misturar carne moÃda com cebola ralada, alho, sal, pimenta, 
+pÃ¡prica.\n2. Adicionar farinha de rosca, ovo e salsinha.\n3. Sovar atÃ© massa 
+homogÃªnea.}"
+                                                          ]
+                                            },
+                                            {
+                                                "ingredients":  [
+                                                                    "@{locked=False; 
+weight_thawed=; weight_pre_cooking=0.2; current_price=39.9; weight_clean=; unit=kg; 
+weight_raw=; ingredient_id=GqsD0So4ufWBpt9z5fPY; weight_cooked=0.2; 
+task_type=System.Object[]; name=Mussarela Fatiada; quantity=0.2000; weight_frozen=}",
+                                                                    "@{weight_cooked=0.2; 
+ingredient_id=udu4K2vcjKv3PEwI1uJo; unit=kg; locked=False; weight_raw=; 
+current_price=8.9; weight_pre_cooking=0.2; name=Farinha de Rosca; weight_thawed=; 
+quantity=0.2000; weight_frozen=; weight_clean=}",
+                                                                    "@{current_price=7.5; 
+weight_pre_cooking=0.02; weight_thawed=; locked=False; weight_clean=; name=Ãleo de Soja; 
+quantity=0.0200; ingredient_id=T0vI5jbPMbHw3r4A9JSl; weight_cooked=0.02; unit=L; 
+weight_raw=; task_type=; weight_frozen=}"
+                                                                ],
+                                                "processes":  [
+                                                                  "assembly",
+                                                                  "cooking"
+
+

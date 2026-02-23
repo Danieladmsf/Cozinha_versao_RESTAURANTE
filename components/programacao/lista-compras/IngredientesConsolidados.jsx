@@ -154,11 +154,11 @@ const IngredientesConsolidados = ({
         if (consolidated[key]) {
           consolidated[key].totalQuantity += ing.quantity;
           consolidated[key].totalWeight += ing.weight;
-          consolidated[key].usedInRecipes += 1;
 
           if (!consolidated[key].recipes.includes(ing.recipe)) {
             consolidated[key].recipes.push(ing.recipe);
           }
+          consolidated[key].usedInRecipes = consolidated[key].recipes.length;
           // Manter categorias de receita para referência
           if (ing.recipeCategory && !consolidated[key].recipeCategories?.includes(ing.recipeCategory)) {
             if (!consolidated[key].recipeCategories) consolidated[key].recipeCategories = [];

@@ -1,5 +1,5 @@
 import { Ingredient, Recipe } from '@/app/api/entities';
-import { RecipeCalculator } from '@/lib/recipeCalculator';
+import { RecipeEngine as RecipeCalculator } from '@/lib/recipe-engine/RecipeEngine';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { isValidId } from '@/lib/validators';
@@ -156,7 +156,7 @@ export async function PUT(request) {
           });
 
           if (needsUpdate) {
-            const updatedMetrics = RecipeCalculator.calculateRecipeMetrics(recipe.preparations, recipe);
+            const updatedMetrics = RecipeCalculator.calculateRecipeMetrics(recipe, recipe.preparations || []);
             const finalUpdatedRecipe = {
               ...recipe,
               ...updatedMetrics

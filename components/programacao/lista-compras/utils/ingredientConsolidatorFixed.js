@@ -8,9 +8,11 @@
  * 3. Uso correto da quantidade do ingrediente na receita
  */
 
+import { RecipeEngine } from '@/lib/recipe-engine/RecipeEngine';
+
 /**
  * Extrai o peso mais adequado de um ingrediente PARA LISTA DE COMPRAS
- * LÓGICA: Usa o PESO INICIAL do PRIMEIRO PROCESSO (o que você compra no mercado)
+ * Usa o método robusto getInitialWeight da nossa Single Source of Truth
  *
  * ⚠️ IMPORTANTE: Para lista de compras, precisamos do peso BRUTO (antes de qualquer processamento)!
  *
@@ -28,52 +30,13 @@
  *   - weight_pre_cooking: 2,194 kg
  *   - weight_cooked: 1,951 kg
  */
-const getIngredientWeight = (ingredient) => {
-  // Helper para converter valores vazios/inválidos e lidar com formato brasileiro (vírgula)
-  const parseWeight = (value) => {
-    if (value === null || value === undefined || value === '') return 0;
-
-    // Se for string, substituir vírgula por ponto (formato brasileiro → formato JS)
-    if (typeof value === 'string') {
-      value = value.replace(',', '.');
-    }
-
-    const parsed = parseFloat(value);
-    return isNaN(parsed) ? 0 : parsed;
-  };
-
-  // 1. PRIORIDADE: Peso INICIAL do primeiro processo (o que você compra)
-  // Ordem: Descongelamento > Limpeza > Cocção
-  let weight = parseWeight(ingredient.weight_frozen);   // Início de Descongelamento
-  if (!weight) weight = parseWeight(ingredient.weight_raw);      // Início de Limpeza
-  if (!weight) weight = parseWeight(ingredient.raw_weight);
-  if (!weight) weight = parseWeight(ingredient.weight);
-  if (!weight) weight = parseWeight(ingredient.weight_pre_cooking); // Início de Cocção
-
-  // 2. SEGUNDO RECURSO: Peso intermediário (após primeira etapa)
-  if (!weight) weight = parseWeight(ingredient.weight_thawed);  // Fim de Descongelamento
-  if (!weight) weight = parseWeight(ingredient.weight_clean);   // Fim de Limpeza
-
-  // 3. Tentar objetos aninhados (mesma ordem)
-  if (!weight && ingredient.weights) {
-    weight = parseWeight(ingredient.weights.frozen);
-    if (!weight) weight = parseWeight(ingredient.weights.raw);
-    if (!weight) weight = parseWeight(ingredient.weights.pre_cooking);
-    if (!weight) weight = parseWeight(ingredient.weights.thawed);
-    if (!weight) weight = parseWeight(ingredient.weights.clean);
-  }
-
-  // 4. ÚLTIMO RECURSO: Peso final/cozido (menor peso, maior perda)
-  if (!weight) weight = parseWeight(ingredient.weight_cooked);
-  if (!weight && ingredient.weights) {
-    weight = parseWeight(ingredient.weights.cooked);
-  }
-
-  return weight;
+const getIngredientWeight = (ingredient, preparationProcesses = []) => {
+  return RecipeEngine.getInitialWeight(ingredient, preparationProcesses);
 };
 
-const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [], depth = 0) => {
+const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [], depth = 0, topLevelRecipeName = null) => {
   const ingredients = [];
+  const currentTopLevelName = topLevelRecipeName || recipe.name;
 
   // Guard to prevent infinite recursion
   if (depth > 5) return [];
@@ -91,7 +54,7 @@ const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [],
 
         const unit = (ingredient.unit || '').toLowerCase().trim();
         const quantity = parseFloat(ingredient.quantity) || 0;
-        let weight = getIngredientWeight(ingredient);
+        let weight = getIngredientWeight(ingredient, preparation.processes || []);
 
         // Fallback: If no weight found but unit implies mass/volume, use quantity
         if ((!weight || weight === 0) && quantity > 0) {
@@ -123,7 +86,7 @@ const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [],
           unit: ingredient.unit || 'kg',
           quantity: totalWeight,
           weight: totalWeight,
-          recipe: recipe.name,
+          recipe: currentTopLevelName,
           recipeCategory: recipe.category || 'Outros',
           brand: ingredient.brand || '',
           notes: ingredient.notes || '',
@@ -138,6 +101,18 @@ const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [],
 
       items.forEach(sub => {
         if (sub.type === 'recipe' || sub.recipe_id) {
+          // Prevenção de Falsa Recursão: Evitar que SubComponentes de Etapas Internas ativem busca de Receita Externa
+          const sourceId = sub.source_id || sub.id;
+          let isInternalPrep = false;
+          if (sourceId && recipe && recipe.preparations) {
+            isInternalPrep = recipe.preparations.some(p => p.id === sourceId);
+          }
+
+          if (isInternalPrep) {
+            // Se for uma etapa interna, já processamos os ingredientes direto da fonte no loop principal.
+            return;
+          }
+
           let subRecipe = null;
           if (sub.recipe_id) subRecipe = allRecipes.find(r => r.id === sub.recipe_id);
           if (!subRecipe && sub.name) subRecipe = allRecipes.find(r => r.name === sub.name);
@@ -158,7 +133,7 @@ const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [],
 
             if (usedWeight > 0 && subYieldKg > 0) {
               const subMultiplier = (usedWeight / subYieldKg) * recipeMultiplier;
-              const subIngredients = extractIngredientsFromRecipe(subRecipe, subMultiplier, allRecipes, depth + 1);
+              const subIngredients = extractIngredientsFromRecipe(subRecipe, subMultiplier, allRecipes, depth + 1, currentTopLevelName);
               ingredients.push(...subIngredients);
             }
           }
@@ -248,12 +223,12 @@ const consolidateDuplicateIngredients = (allIngredients) => {
       // Somar quantidades e pesos
       consolidated[key].totalQuantity += ingredient.quantity;
       consolidated[key].totalWeight += ingredient.weight;
-      consolidated[key].usedInRecipes += 1;
 
       // Combinar receitas onde é usado
       if (!consolidated[key].recipes.includes(ingredient.recipe)) {
         consolidated[key].recipes.push(ingredient.recipe);
       }
+      consolidated[key].usedInRecipes = consolidated[key].recipes.length;
 
       // ✅ NOVO: Combinar categorias de receitas
       if (ingredient.recipeCategory && !consolidated[key].recipeCategories.includes(ingredient.recipeCategory)) {

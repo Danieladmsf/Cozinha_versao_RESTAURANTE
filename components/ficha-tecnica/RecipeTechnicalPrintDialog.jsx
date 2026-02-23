@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Printer } from "lucide-react";
-import { RecipeCalculator } from '@/components/utils/recipeCalculator';
+import { RecipeEngine as RecipeCalculator } from "@/lib/recipe-engine/RecipeEngine";
 
 export default function RecipeTechnicalPrintDialog({
   recipe,

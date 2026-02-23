@@ -52,6 +52,19 @@ const IngredientRow = ({
     return isNaN(parsed) ? 0 : parsed;
   };
 
+  const formatDisplayValue = (value) => {
+    if (!value && value !== 0) return '';
+    const num = parseNumericValue(value);
+    if (num === 0 && String(value).trim() === '') return '';
+
+    // Se o número tem mais de 3 casas decimais, trunca visualmente para 3 casas
+    const strVal = String(value).replace(',', '.');
+    if (strVal.includes('.') && strVal.split('.')[1].length > 3) {
+      return num.toFixed(3).replace('.', ',');
+    }
+    return String(value); // Mantém como o usuário digitou se for válido e curto
+  };
+
 
   const calculatedValues = useMemo(() => {
     const calculateLoss = (initial, final) => {
@@ -277,7 +290,7 @@ const IngredientRow = ({
           <TableCell className="px-4 py-2">
             <Input
               type="text"
-              value={ingredient.weight_frozen || ''}
+              value={formatDisplayValue(ingredient.weight_frozen)}
               onChange={(e) => updateIngredientField('weight_frozen', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -287,7 +300,7 @@ const IngredientRow = ({
           <TableCell className="px-4 py-2">
             <Input
               type="text"
-              value={ingredient.weight_thawed || ''}
+              value={formatDisplayValue(ingredient.weight_thawed)}
               onChange={(e) => updateIngredientField('weight_thawed', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -308,7 +321,7 @@ const IngredientRow = ({
             <TableCell className="px-4 py-2">
               <Input
                 type="text"
-                value={ingredient.weight_raw || ''}
+                value={formatDisplayValue(ingredient.weight_raw)}
                 onChange={(e) => updateIngredientField('weight_raw', e.target.value)}
                 disabled={readOnly || ingredient.locked}
                 className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -324,7 +337,7 @@ const IngredientRow = ({
             <TableCell className="px-4 py-2">
               <Input
                 type="text"
-                value={ingredient.weight_thawed || ''}
+                value={formatDisplayValue(ingredient.weight_thawed)}
                 readOnly
                 className="w-24 h-8 text-center text-xs bg-gray-50 cursor-not-allowed"
                 placeholder="0,000"
@@ -335,7 +348,7 @@ const IngredientRow = ({
           <TableCell className="px-4 py-2">
             <Input
               type="text"
-              value={ingredient.weight_clean || ''}
+              value={formatDisplayValue(ingredient.weight_clean)}
               onChange={(e) => updateIngredientField('weight_clean', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -355,7 +368,7 @@ const IngredientRow = ({
           <TableCell className="px-4 py-2">
             <Input
               type="text"
-              value={ingredient.weight_pre_cooking || ''}
+              value={formatDisplayValue(ingredient.weight_pre_cooking)}
               onChange={(e) => updateIngredientField('weight_pre_cooking', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -372,7 +385,7 @@ const IngredientRow = ({
           <TableCell className="px-4 py-2">
             <Input
               type="text"
-              value={ingredient.weight_cooked || ''}
+              value={formatDisplayValue(ingredient.weight_cooked)}
               onChange={(e) => updateIngredientField('weight_cooked', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -394,7 +407,7 @@ const IngredientRow = ({
             <TableCell className="px-4 py-2">
               <Input
                 type="text"
-                value={ingredient.weight_raw || ''}
+                value={formatDisplayValue(ingredient.weight_raw)}
                 onChange={(e) => updateIngredientField('weight_raw', e.target.value)}
                 disabled={readOnly || ingredient.locked}
                 className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -405,7 +418,7 @@ const IngredientRow = ({
           <TableCell className="px-4 py-2">
             <Input
               type="text"
-              value={ingredient.weight_portioned || ''}
+              value={formatDisplayValue(ingredient.weight_portioned)}
               onChange={(e) => updateIngredientField('weight_portioned', e.target.value)}
               disabled={readOnly || ingredient.locked}
               className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}

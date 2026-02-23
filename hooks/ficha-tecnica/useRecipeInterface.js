@@ -1,14 +1,12 @@
 import { useCallback, useEffect } from 'react';
-import { RecipeCalculator } from '@/lib/recipeCalculator';
-
 /**
  * Hook para gerenciar lógicas de interface da Ficha Técnica
  * Extraído automaticamente de RecipeTechnicall.jsx
  */
 export function useRecipeInterface({ recipeData, preparationsData, updateRecipeData }) {
-  
-  
-  
+
+
+
   // Handlers de navegação
   const handleTabChange = useCallback((setActiveTab, newTab) => {
     setActiveTab(newTab);
@@ -47,12 +45,12 @@ export function useRecipeInterface({ recipeData, preparationsData, updateRecipeD
   // Handlers de formulário
   const handleInputChange = useCallback((setRecipeData, e) => {
     const { name, value } = e.target;
-    
+
     // Ignorar mudanças no campo cuba_weight pois é calculado automaticamente
     if (name === 'cuba_weight') {
       return;
     }
-    
+
     setRecipeData(prev => ({
       ...prev,
       [name]: value
@@ -76,8 +74,8 @@ export function useRecipeInterface({ recipeData, preparationsData, updateRecipeD
 
   // Handlers de processo
   const handleProcessSelection = useCallback((setSelectedProcesses, processId, checked) => {
-    setSelectedProcesses(prev => 
-      checked 
+    setSelectedProcesses(prev =>
+      checked
         ? [...prev, processId]
         : prev.filter(p => p !== processId)
     );
@@ -85,13 +83,13 @@ export function useRecipeInterface({ recipeData, preparationsData, updateRecipeD
 
   // Handlers de ações
   const handleSave = useCallback(async (
-    setSaving, 
-    recipeData, 
-    preparationsData, 
+    setSaving,
+    recipeData,
+    preparationsData,
     saveRecipe
   ) => {
     setSaving(true);
-    
+
     try {
       const result = await saveRecipe(recipeData, preparationsData);
       return result;
@@ -115,17 +113,17 @@ export function useRecipeInterface({ recipeData, preparationsData, updateRecipeD
         currency: 'BRL'
       }).format(num);
     }
-    
+
     if (type === 'weight') {
       const num = parseFloat(value) || 0;
       return num.toFixed(3).replace('.', ',');
     }
-    
+
     if (type === 'percentage') {
       const num = parseFloat(value) || 0;
       return num.toFixed(2).replace('.', ',') + '%';
     }
-    
+
     return value;
   }, []);
 
