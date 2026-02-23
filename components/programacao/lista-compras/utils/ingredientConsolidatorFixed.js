@@ -100,6 +100,11 @@ const extractIngredientsFromRecipe = (recipe, recipeMultiplier, allRecipes = [],
       if (!items || !Array.isArray(items)) return;
 
       items.forEach(sub => {
+        // EVITAR CONTA DUPLA: Se o sub_component aponta para um preparation interno da mesma receita,
+        // ele JÁ FOI processado no loop principal de ingredients. Não devemos buscar como receita externa.
+        const isInternalPrep = recipe.preparations && recipe.preparations.some(p => p.id === sub.source_id || p.id === sub.recipe_id || p.id === sub.id);
+        if (isInternalPrep) return;
+
         if (sub.type === 'recipe' || sub.recipe_id) {
           // Prevenção de Falsa Recursão: Evitar que SubComponentes de Etapas Internas ativem busca de Receita Externa
           const sourceId = sub.source_id || sub.id;
@@ -169,26 +174,34 @@ const calculateRecipeQuantities = (orders, recipes) => {
 
           // CORREÇÃO: Calcular baseado no tipo de unidade
           let recipeMultiplier = 0;
-          const itemQuantity = parseFloat(item.quantity);
+          const itemQuantity = parseFloat(item.quantity) || 0;
           const unitType = (item.unit_type || '').toLowerCase();
 
           if (unitType === 'cuba' || unitType === 'cuba-g' || unitType === 'cuba-p') {
-            // Para cubas: a quantidade é o número de cubas
-            // Se pede 2 cubas, multiplica a receita por 2
             recipeMultiplier = itemQuantity;
-
           } else if (unitType === 'unid.' || unitType === 'porção') {
-            // Para unidades/porções: calcular quantas receitas são necessárias
-            const portionWeight = recipe.portion_weight_calculated || 0.06; // peso de 1 porção
-            const cubaWeight = recipe.cuba_weight || 1; // peso de 1 cuba
+            const portionWeight = parseFloat(recipe.portion_weight_calculated) || 0.06;
+            const cubaWeight = parseFloat(recipe.cuba_weight) || 1;
             const portionsPerCuba = cubaWeight / portionWeight;
             recipeMultiplier = itemQuantity / portionsPerCuba;
+          } else if (unitType === 'unidade' || unitType === 'un') {
+            // Se a receita tem portionWeight, a lógica é: ela produz X porções. 
+            // Tentar extrair units_quantity se existir
+            let units_qty = 1;
+            const prep = (recipe.preparations || []).find(p => p.assembly_config?.units_quantity);
+            if (prep && prep.assembly_config.units_quantity) {
+              units_qty = parseFloat(prep.assembly_config.units_quantity);
+            } else if (recipe.assemblies && recipe.assemblies.length > 0) {
+              const asm = recipe.assemblies[0];
+              if (asm.units_quantity) units_qty = parseFloat(asm.units_quantity);
+            }
+            // Se a receita gera units_qty unidades, e o usuário pediu itemQuantity unidades:
+            // Multiplicador da receita inteira = itemQuantity / units_qty
+            recipeMultiplier = itemQuantity / units_qty;
 
           } else if (unitType === 'kg') {
-            // Para kg: calcular baseado no rendimento da receita
-            const yieldWeight = recipe.yield_weight || recipe.cuba_weight || 1;
+            const yieldWeight = parseFloat(recipe.yield_weight) || parseFloat(recipe.cuba_weight) || 1;
             recipeMultiplier = itemQuantity / yieldWeight;
-
           } else {
             // Fallback: assumir que é cuba
             recipeMultiplier = itemQuantity;
