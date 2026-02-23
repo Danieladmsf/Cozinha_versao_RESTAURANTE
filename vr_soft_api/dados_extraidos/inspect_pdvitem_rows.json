@@ -1,0 +1,10 @@
+{
+  "columns": [
+    "id",
+    "id_listagemprodutopdv",
+    "id_produto",
+    "imagem",
+    "descricaovisualizacao"
+  ],
+  "rows": []
+}

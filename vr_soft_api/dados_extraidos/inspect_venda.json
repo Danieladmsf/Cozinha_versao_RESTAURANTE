@@ -1,0 +1,50 @@
+{
+  "columns": [
+    "id",
+    "id_loja",
+    "id_produto",
+    "data",
+    "precovenda",
+    "quantidade",
+    "id_comprador",
+    "custocomimposto",
+    "piscofins",
+    "operacional",
+    "icmscredito",
+    "icmsdebito",
+    "valortotal",
+    "custosemimposto",
+    "oferta",
+    "perda",
+    "customediosemimposto",
+    "customediocomimposto",
+    "piscofinscredito",
+    "cupomfiscal",
+    "id_tipooferta"
+  ],
+  "rows": [
+    {
+      "id": "8204761",
+      "id_loja": "1",
+      "id_produto": "3",
+      "data": "2026-02-01",
+      "precovenda": "49.90",
+      "quantidade": "3.489",
+      "id_comprador": "1",
+      "custocomimposto": "42.2000",
+      "piscofins": "0.00",
+      "operacional": "0.00",
+      "icmscredito": "12.00",
+      "icmsdebito": "18.00",
+      "valortotal": "174.10",
+      "custosemimposto": "37.1358",
+      "oferta": "f",
+      "perda": "0.00",
+      "customediosemimposto": "27.6078",
+      "customediocomimposto": "31.4222",
+      "piscofinscredito": "0.00",
+      "cupomfiscal": "t",
+      "id_tipooferta": null
+    }
+  ]
+}

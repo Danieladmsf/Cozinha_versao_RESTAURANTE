@@ -1,0 +1,10 @@
+{
+  "columns": [
+    "fonte",
+    "id_loja",
+    "datahoraemissao",
+    "id_produto",
+    "quantidade"
+  ],
+  "rows": []
+}

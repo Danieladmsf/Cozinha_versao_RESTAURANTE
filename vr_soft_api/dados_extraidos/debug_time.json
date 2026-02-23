@@ -1,0 +1,12 @@
+{
+  "columns": [
+    "db_time",
+    "db_tz"
+  ],
+  "rows": [
+    {
+      "db_time": "2026-02-22 11:57:08.04713",
+      "db_tz": "America/Sao_Paulo"
+    }
+  ]
+}

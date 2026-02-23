@@ -1,0 +1,26 @@
+{
+  "columns": [
+    "id",
+    "id_loja",
+    "id_produto",
+    "data",
+    "precovenda",
+    "quantidade",
+    "id_comprador",
+    "custocomimposto",
+    "piscofins",
+    "operacional",
+    "icmscredito",
+    "icmsdebito",
+    "valortotal",
+    "custosemimposto",
+    "oferta",
+    "perda",
+    "customediosemimposto",
+    "customediocomimposto",
+    "piscofinscredito",
+    "cupomfiscal",
+    "id_tipooferta"
+  ],
+  "rows": []
+}

@@ -1,0 +1,799 @@
+{
+  "columns": [
+    "table_name"
+  ],
+  "rows": [
+    {
+      "table_name": "baixabemitem"
+    },
+    {
+      "table_name": "vendaitem"
+    },
+    {
+      "table_name": "vendaitem"
+    },
+    {
+      "table_name": "produtobloqueioitem"
+    },
+    {
+      "table_name": "simulacaoofertaitem"
+    },
+    {
+      "table_name": "agendamentoitem"
+    },
+    {
+      "table_name": "cadastrolaluritem"
+    },
+    {
+      "table_name": "cadastrolacsitem"
+    },
+    {
+      "table_name": "fatocontabilitem"
+    },
+    {
+      "table_name": "dreitem"
+    },
+    {
+      "table_name": "dresaldoinicialitem"
+    },
+    {
+      "table_name": "planocontareferencialitem"
+    },
+    {
+      "table_name": "planocontasaldoinicialitem"
+    },
+    {
+      "table_name": "vendaitem"
+    },
+    {
+      "table_name": "decretocadastroitem"
+    },
+    {
+      "table_name": "vendaitem"
+    },
+    {
+      "table_name": "vendaitem"
+    },
+    {
+      "table_name": "estoqueitem"
+    },
+    {
+      "table_name": "devolucaocupomitem"
+    },
+    {
+      "table_name": "trocacupomitem"
+    },
+    {
+      "table_name": "vendaitem022023"
+    },
+    {
+      "table_name": "vendaitem022024"
+    },
+    {
+      "table_name": "vendaitem032022"
+    },
+    {
+      "table_name": "vendaitem032023"
+    },
+    {
+      "table_name": "vendaitem032024"
+    },
+    {
+      "table_name": "vendaitem042022"
+    },
+    {
+      "table_name": "vendaitem012024"
+    },
+    {
+      "table_name": "vendaitem012023"
+    },
+    {
+      "table_name": "vendaitem052024"
+    },
+    {
+      "table_name": "vendaitem062022"
+    },
+    {
+      "table_name": "vendaitem062023"
+    },
+    {
+      "table_name": "vendaitem062024"
+    },
+    {
+      "table_name": "vendaitem072022"
+    },
+    {
+      "table_name": "vendaitem072023"
+    },
+    {
+      "table_name": "vendaitem042023"
+    },
+    {
+      "table_name": "vendaitem042024"
+    },
+    {
+      "table_name": "vendaitem052023"
+    },
+    {
+      "table_name": "vendaitem092022"
+    },
+    {
+      "table_name": "vendaitem092023"
+    },
+    {
+      "table_name": "vendaitem092024"
+    },
+    {
+      "table_name": "vendaitem102022"
+    },
+    {
+      "table_name": "vendaitem102023"
+    },
+    {
+      "table_name": "vendaitem102024"
+    },
+    {
+      "table_name": "vendaitem082023"
+    },
+    {
+      "table_name": "vendaitem072024"
+    },
+    {
+      "table_name": "vendaitem082024"
+    },
+    {
+      "table_name": "simulacaoofertaitem"
+    },
+    {
+      "table_name": "vendaitem122023"
+    },
+    {
+      "table_name": "vendaitem122024"
+    },
+    {
+      "table_name": "vendaitem112023"
+    },
+    {
+      "table_name": "vendaitem112024"
+    },
+    {
+      "table_name": "vendaitemcodigobarraspeso"
+    },
+    {
+      "table_name": "vendakititem"
+    },
+    {
+      "table_name": "vendaitem122022"
+    },
+    {
+      "table_name": "vendaitemextemporanea"
+    },
+    {
+      "table_name": "vendapromocaopontuacaoitem"
+    },
+    {
+      "table_name": "associadoitem"
+    },
+    {
+      "table_name": "notasaidaitem"
+    },
+    {
+      "table_name": "notaentradaitem"
+    },
+    {
+      "table_name": "receberoutrasreceitasitem"
+    },
+    {
+      "table_name": "receberverbaitem"
+    },
+    {
+      "table_name": "centrocustoitem"
+    },
+    {
+      "table_name": "cargareposicaoitem"
+    },
+    {
+      "table_name": "conciliacaoextratoitem"
+    },
+    {
+      "table_name": "contratolancamentoitem"
+    },
+    {
+      "table_name": "cotacaoclienteitem"
+    },
+    {
+      "table_name": "cotacaofornecedoritem"
+    },
+    {
+      "table_name": "deliveryitem"
+    },
+    {
+      "table_name": "descontocondicionalitem"
+    },
+    {
+      "table_name": "descontoboletoreceberverbaitemnotaentrada"
+    },
+    {
+      "table_name": "desmembramentoitem"
+    },
+    {
+      "table_name": "escritaitem"
+    },
+    {
+      "table_name": "transformadoloteitem"
+    },
+    {
+      "table_name": "vendaitem042026"
+    },
+    {
+      "table_name": "escritaitem032025"
+    },
+    {
+      "table_name": "vendaitem032025"
+    },
+    {
+      "table_name": "escritaitemretencaotributo"
+    },
+    {
+      "table_name": "escritaitem122022"
+    },
+    {
+      "table_name": "geracaoretencaotributoitem"
+    },
+    {
+      "table_name": "geracaoretencaotributoitemnotasaida"
+    },
+    {
+      "table_name": "kititem"
+    },
+    {
+      "table_name": "listagemprodutopdvitem"
+    },
+    {
+      "table_name": "listagemselfcheckoutpdvitem"
+    },
+    {
+      "table_name": "listagembalancoitem"
+    },
+    {
+      "table_name": "maparesumoitem"
+    },
+    {
+      "table_name": "orcamentoestoquemercadologicoitem"
+    },
+    {
+      "table_name": "mudancatributacaoitem"
+    },
+    {
+      "table_name": "mudancatributacaoitemnotaentrada"
+    },
+    {
+      "table_name": "notaentradaitemdesmembramento"
+    },
+    {
+      "table_name": "notaentradaitemvalidade"
+    },
+    {
+      "table_name": "notaentradanotasaidaitem"
+    },
+    {
+      "table_name": "notasaidaimportacaonotasaidaitem"
+    },
+    {
+      "table_name": "notasaidaitemimportacaoxml"
+    },
+    {
+      "table_name": "notasaidaitemrastreabilidade"
+    },
+    {
+      "table_name": "notasaidaitempedido"
+    },
+    {
+      "table_name": "notasaidaitemretencaotributo"
+    },
+    {
+      "table_name": "notasaidadevolucaoressarcimentoitem"
+    },
+    {
+      "table_name": "nutricionaltoledoitem"
+    },
+    {
+      "table_name": "operacaopagamentoeletronicocadastroitem"
+    },
+    {
+      "table_name": "orcamentodespesaitemtipoentrada"
+    },
+    {
+      "table_name": "orcamentodespesaitemtipoplanoconta"
+    },
+    {
+      "table_name": "pedidocompraitemgerasugestao"
+    },
+    {
+      "table_name": "pedidocompradataentregaitem"
+    },
+    {
+      "table_name": "pedidodespesaitem"
+    },
+    {
+      "table_name": "pesquisalistagemitem"
+    },
+    {
+      "table_name": "pedidolimitesemanafornecedoritem"
+    },
+    {
+      "table_name": "pedidoitem"
+    },
+    {
+      "table_name": "pedidolimitesemanamercadologicoitem"
+    },
+    {
+      "table_name": "pedidoitemreposicao"
+    },
+    {
+      "table_name": "pesquisaitem"
+    },
+    {
+      "table_name": "precotacaofornecedoritemreposicao"
+    },
+    {
+      "table_name": "precotacaofornecedorlistagemitemfornecedor"
+    },
+    {
+      "table_name": "precotacaofornecedoritemfornecedor"
+    },
+    {
+      "table_name": "precotacaofornecedoritem"
+    },
+    {
+      "table_name": "prepedidoitem"
+    },
+    {
+      "table_name": "promocaoitem"
+    },
+    {
+      "table_name": "pricinganaliseitem"
+    },
+    {
+      "table_name": "producaoitem"
+    },
+    {
+      "table_name": "producaoordemitem"
+    },
+    {
+      "table_name": "produtolojavirtualitem"
+    },
+    {
+      "table_name": "recebercaixaitem"
+    },
+    {
+      "table_name": "recebercontratoitem"
+    },
+    {
+      "table_name": "rebaixanotaentradapedidoitem"
+    },
+    {
+      "table_name": "receberchequeitemrecebercaixa"
+    },
+    {
+      "table_name": "recebercontratoitemrecebercaixa"
+    },
+    {
+      "table_name": "recebercaixaitemrecebercaixa"
+    },
+    {
+      "table_name": "receberdevolucaoitem"
+    },
+    {
+      "table_name": "receberconveniadoitem"
+    },
+    {
+      "table_name": "recebercreditorotativoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberconveniadoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberdevolucaoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberoutrasreceitasitemrecebercaixa"
+    },
+    {
+      "table_name": "recebervendaprazoitem"
+    },
+    {
+      "table_name": "recebimentonfitem"
+    },
+    {
+      "table_name": "recebervendaprazoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberverbaitemrecebercaixa"
+    },
+    {
+      "table_name": "recebimentoitem"
+    },
+    {
+      "table_name": "receitaitem"
+    },
+    {
+      "table_name": "reposicaoitem"
+    },
+    {
+      "table_name": "similarprodutoitem"
+    },
+    {
+      "table_name": "tabelaprodutoitem"
+    },
+    {
+      "table_name": "transferenciaentradaitem"
+    },
+    {
+      "table_name": "transferenciasaidaitem"
+    },
+    {
+      "table_name": "vasilhameitem"
+    },
+    {
+      "table_name": "transformadoitem"
+    },
+    {
+      "table_name": "vasilhameengradadoitem"
+    },
+    {
+      "table_name": "transformadoprecadastroitem"
+    },
+    {
+      "table_name": "vasilhameitemvalidade"
+    },
+    {
+      "table_name": "veiculodespesaitem"
+    },
+    {
+      "table_name": "vendakititem"
+    },
+    {
+      "table_name": "verbaselloutitem"
+    },
+    {
+      "table_name": "vendaitem"
+    },
+    {
+      "table_name": "clustervendaitem"
+    },
+    {
+      "table_name": "escritaitem052026"
+    },
+    {
+      "table_name": "vendaitem052026"
+    },
+    {
+      "table_name": "escritaitem062026"
+    },
+    {
+      "table_name": "vendaitem062026"
+    },
+    {
+      "table_name": "escritaitem012026"
+    },
+    {
+      "table_name": "receberchequeitem"
+    },
+    {
+      "table_name": "recebercreditorotativoitem"
+    },
+    {
+      "table_name": "dmplitem"
+    },
+    {
+      "table_name": "agendamentoitemcentrocusto"
+    },
+    {
+      "table_name": "vendaitemhistorica"
+    },
+    {
+      "table_name": "vendaitem022022"
+    },
+    {
+      "table_name": "vendaitem052022"
+    },
+    {
+      "table_name": "vendaitem082022"
+    },
+    {
+      "table_name": "vendaitem112022"
+    },
+    {
+      "table_name": "fichaitem"
+    },
+    {
+      "table_name": "escritaitemhistorica"
+    },
+    {
+      "table_name": "custodiachequeitem"
+    },
+    {
+      "table_name": "notasaidaitemdesmembramento"
+    },
+    {
+      "table_name": "escritaitem022022"
+    },
+    {
+      "table_name": "escritaitem032022"
+    },
+    {
+      "table_name": "escritaitem042022"
+    },
+    {
+      "table_name": "escritaitem052022"
+    },
+    {
+      "table_name": "escritaitem062022"
+    },
+    {
+      "table_name": "escritaitem072022"
+    },
+    {
+      "table_name": "escritaitem082022"
+    },
+    {
+      "table_name": "escritaitem092022"
+    },
+    {
+      "table_name": "escritaitem102022"
+    },
+    {
+      "table_name": "escritaitem112022"
+    },
+    {
+      "table_name": "escritaitem012023"
+    },
+    {
+      "table_name": "escritaitem022023"
+    },
+    {
+      "table_name": "escritaitem032023"
+    },
+    {
+      "table_name": "escritaitem042023"
+    },
+    {
+      "table_name": "escritaitem052023"
+    },
+    {
+      "table_name": "escritaitem062023"
+    },
+    {
+      "table_name": "escritaitem072023"
+    },
+    {
+      "table_name": "escritaitem082023"
+    },
+    {
+      "table_name": "escritaitem092023"
+    },
+    {
+      "table_name": "escritaitem102023"
+    },
+    {
+      "table_name": "escritaitem112023"
+    },
+    {
+      "table_name": "escritaitem122023"
+    },
+    {
+      "table_name": "escritaitem012024"
+    },
+    {
+      "table_name": "escritaitem022024"
+    },
+    {
+      "table_name": "escritaitem032024"
+    },
+    {
+      "table_name": "escritaitem042024"
+    },
+    {
+      "table_name": "escritaitem052024"
+    },
+    {
+      "table_name": "escritaitem062024"
+    },
+    {
+      "table_name": "escritaitem072024"
+    },
+    {
+      "table_name": "escritaitem082024"
+    },
+    {
+      "table_name": "escritaitem092024"
+    },
+    {
+      "table_name": "escritaitem102024"
+    },
+    {
+      "table_name": "escritaitem112024"
+    },
+    {
+      "table_name": "escritaitem122024"
+    },
+    {
+      "table_name": "caixaitem"
+    },
+    {
+      "table_name": "nutricionalfilizolaitem"
+    },
+    {
+      "table_name": "pedidoecommerceitem"
+    },
+    {
+      "table_name": "precotacaofornecedorlistagemitem"
+    },
+    {
+      "table_name": "escritaitem042025"
+    },
+    {
+      "table_name": "escritaitem012025"
+    },
+    {
+      "table_name": "vendaitem012025"
+    },
+    {
+      "table_name": "vendaitem012026"
+    },
+    {
+      "table_name": "escritaitem022025"
+    },
+    {
+      "table_name": "vendaitem022025"
+    },
+    {
+      "table_name": "vendaitem042025"
+    },
+    {
+      "table_name": "escritaitem052025"
+    },
+    {
+      "table_name": "vendaitem052025"
+    },
+    {
+      "table_name": "escritaitem062025"
+    },
+    {
+      "table_name": "vendaitem062025"
+    },
+    {
+      "table_name": "escritaitem022026"
+    },
+    {
+      "table_name": "escritaitem072025"
+    },
+    {
+      "table_name": "vendaitem072025"
+    },
+    {
+      "table_name": "escritaitem082025"
+    },
+    {
+      "table_name": "vendaitem082025"
+    },
+    {
+      "table_name": "escritaitem092025"
+    },
+    {
+      "table_name": "vendaitem092025"
+    },
+    {
+      "table_name": "escritaitem102025"
+    },
+    {
+      "table_name": "vendaitem102025"
+    },
+    {
+      "table_name": "vendaitem022026"
+    },
+    {
+      "table_name": "produtosazonalitem"
+    },
+    {
+      "table_name": "escritaitem112025"
+    },
+    {
+      "table_name": "vendaitem112025"
+    },
+    {
+      "table_name": "escritaitem122025"
+    },
+    {
+      "table_name": "vendaitem122025"
+    },
+    {
+      "table_name": "vendaitemimposto"
+    },
+    {
+      "table_name": "escritaitem032026"
+    },
+    {
+      "table_name": "notaentradaitemimportacaoxml"
+    },
+    {
+      "table_name": "geracaoretencaotributoitemnotadespesa"
+    },
+    {
+      "table_name": "geracaoretencaotributoitempagaroutrasdespesas"
+    },
+    {
+      "table_name": "vendaitem032026"
+    },
+    {
+      "table_name": "escritaitem042026"
+    },
+    {
+      "table_name": "escritaitem072026"
+    },
+    {
+      "table_name": "vendaitem072026"
+    },
+    {
+      "table_name": "escritaitem082026"
+    },
+    {
+      "table_name": "vendaitemibscbs"
+    },
+    {
+      "table_name": "notasaidaitemcbs"
+    },
+    {
+      "table_name": "vendaitem082026"
+    },
+    {
+      "table_name": "notasaidaitemibsestadual"
+    },
+    {
+      "table_name": "notasaidaitemibsmunicipal"
+    },
+    {
+      "table_name": "escritaitemcbs"
+    },
+    {
+      "table_name": "escritaitemibsestadual"
+    },
+    {
+      "table_name": "escritaitem092026"
+    },
+    {
+      "table_name": "escritaitemibsmunicipal"
+    },
+    {
+      "table_name": "vendaitem092026"
+    },
+    {
+      "table_name": "escritaitem102026"
+    },
+    {
+      "table_name": "vendaitem102026"
+    },
+    {
+      "table_name": "simix_item_principal"
+    },
+    {
+      "table_name": "mercafacil_nota_saida_item"
+    },
+    {
+      "table_name": "simix_item_por_estabelecimento"
+    },
+    {
+      "table_name": "escritaitem112026"
+    },
+    {
+      "table_name": "vendaitem112026"
+    },
+    {
+      "table_name": "escritaitem122026"
+    },
+    {
+      "table_name": "vendaitem122026"
+    }
+  ]
+}

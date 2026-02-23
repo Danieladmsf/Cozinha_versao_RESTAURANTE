@@ -1,0 +1,109 @@
+{
+  "columns": [
+    "id_produto",
+    "quantidade",
+    "datahoraemissao"
+  ],
+  "rows": [
+    {
+      "id_produto": "102481",
+      "quantidade": "3.000",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "688",
+      "quantidade": "2.590",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "690",
+      "quantidade": "0.234",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "987",
+      "quantidade": "0.562",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "2115",
+      "quantidade": "13.752",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "4156",
+      "quantidade": "1.678",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "4176",
+      "quantidade": "2.214",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "6662",
+      "quantidade": "2.000",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "6826",
+      "quantidade": "5.000",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "7006",
+      "quantidade": "1.034",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "9017",
+      "quantidade": "5.000",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "9390",
+      "quantidade": "4.118",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "9522",
+      "quantidade": "2.000",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "9526",
+      "quantidade": "2.000",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "94333",
+      "quantidade": "4.526",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "44",
+      "quantidade": "1.058",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "286",
+      "quantidade": "1.390",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "345",
+      "quantidade": "1.502",
+      "datahoraemissao": "2026-02-02 07:02:00"
+    },
+    {
+      "id_produto": "286",
+      "quantidade": "0.270",
+      "datahoraemissao": "2026-02-02 06:51:00"
+    },
+    {
+      "id_produto": "345",
+      "quantidade": "1.544",
+      "datahoraemissao": "2026-02-02 06:51:00"
+    }
+  ]
+}

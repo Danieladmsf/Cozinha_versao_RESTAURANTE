@@ -1,0 +1,6 @@
+{
+  "api_url": "/api",
+  "updated_at": "2026-02-02T17:30:00.000Z",
+  "database_connected": true,
+  "note": "Updated to use internal Next.js proxy route"
+}

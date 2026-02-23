@@ -1,0 +1,74 @@
+'use client';
+
+import React, { useState, useEffect } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Settings, RefreshCw } from "lucide-react";
+import { RefreshButton } from "@/components/ui/refresh-button";
+import CardapioSemanal from './cardapio-semanal';
+import TabelaNutricional from './tabela-nutricional';
+import CardapioCliente from './cardapio-cliente';
+
+export default function MenuMainPage() {
+  const [activeTab, setActiveTab] = useState("weekly");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Efeito de focus removido para evitar recarregamentos desnecessários ao trocar de aba
+
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Ordem de Produção</h1>
+            <p className="text-gray-600 mt-1">Gerencie a produção semanal completa</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <RefreshButton
+              text="Atualizar Página"
+              size="sm"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/configurar-cardapio'}
+              className="gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Configurações
+            </Button>
+          </div>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="weekly">
+              Produção Semanal
+            </TabsTrigger>
+            <TabsTrigger value="nutrition">
+              Tabela Nutricional
+            </TabsTrigger>
+            <TabsTrigger value="client">
+              Produção por Cliente
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="weekly" className="mt-6">
+            <CardapioSemanal key={`weekly-${refreshKey}`} />
+          </TabsContent>
+
+          <TabsContent value="nutrition" className="mt-6">
+            <TabelaNutricional key={`nutrition-${refreshKey}`} />
+          </TabsContent>
+
+          <TabsContent value="client" className="mt-6">
+            <CardapioCliente key={`client-${refreshKey}`} />
+          </TabsContent>
+
+        </Tabs>
+      </div>
+    </div>
+  );
+}

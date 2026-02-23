@@ -1,0 +1,20 @@
+{
+  "columns": [
+    "id",
+    "descricao"
+  ],
+  "rows": [
+    {
+      "id": "1",
+      "descricao": "LOJA 01"
+    },
+    {
+      "id": "2",
+      "descricao": "BENDITO BEEF"
+    },
+    {
+      "id": "3",
+      "descricao": "CENTRO DE PRODUCAO"
+    }
+  ]
+}

@@ -1,0 +1,3958 @@
+{
+  "columns": [
+    "table_name"
+  ],
+  "rows": [
+    {
+      "table_name": "_tmp"
+    },
+    {
+      "table_name": "abastecimento"
+    },
+    {
+      "table_name": "acaocrm"
+    },
+    {
+      "table_name": "acaocrmcliente"
+    },
+    {
+      "table_name": "acaocrmfiltro"
+    },
+    {
+      "table_name": "adiarpopup"
+    },
+    {
+      "table_name": "administracaopreco"
+    },
+    {
+      "table_name": "administracaoprecoarredondamento"
+    },
+    {
+      "table_name": "administracaoprecoarredondamentointervalo"
+    },
+    {
+      "table_name": "administracaoprecoarredondamentointervalovalor"
+    },
+    {
+      "table_name": "administracaoprecoconfiguracao"
+    },
+    {
+      "table_name": "administracaoprecodivergencia"
+    },
+    {
+      "table_name": "administracaoprecoentradanf"
+    },
+    {
+      "table_name": "administracaoprecolojavirtual"
+    },
+    {
+      "table_name": "administracaoprecolojavirtualpendencia"
+    },
+    {
+      "table_name": "administracaoprecolote"
+    },
+    {
+      "table_name": "agenda"
+    },
+    {
+      "table_name": "agendabalanco"
+    },
+    {
+      "table_name": "agendabalancoalertavisualizado"
+    },
+    {
+      "table_name": "agendabalancousuario"
+    },
+    {
+      "table_name": "agendafornecedor"
+    },
+    {
+      "table_name": "agendafornecedorcomprador"
+    },
+    {
+      "table_name": "agendafornecedordivergencia"
+    },
+    {
+      "table_name": "agendafornecedorloja"
+    },
+    {
+      "table_name": "agendafornecedorlojadivergencia"
+    },
+    {
+      "table_name": "agendamentorecebimento"
+    },
+    {
+      "table_name": "agendareposicao"
+    },
+    {
+      "table_name": "agendareposicaomercadologico"
+    },
+    {
+      "table_name": "aliquota"
+    },
+    {
+      "table_name": "aliquotaobservacaoatacadista"
+    },
+    {
+      "table_name": "analisecentrocusto"
+    },
+    {
+      "table_name": "analiseestoquemercadologicoconfiguracao"
+    },
+    {
+      "table_name": "areaarmazenagem"
+    },
+    {
+      "table_name": "areacentral_estoque_view"
+    },
+    {
+      "table_name": "areacentral_produtos_view"
+    },
+    {
+      "table_name": "areacentral_view"
+    },
+    {
+      "table_name": "arquivo"
+    },
+    {
+      "table_name": "associado"
+    },
+    {
+      "table_name": "associadoitem"
+    },
+    {
+      "table_name": "atalho"
+    },
+    {
+      "table_name": "atendimentourl"
+    },
+    {
+      "table_name": "automacaolojavirtual"
+    },
+    {
+      "table_name": "avanti_view_caixa"
+    },
+    {
+      "table_name": "avanti_view_consumo"
+    },
+    {
+      "table_name": "avanti_view_entradasaida"
+    },
+    {
+      "table_name": "avanti_view_notaentradamercadologico"
+    },
+    {
+      "table_name": "avanti_view_outrasreceitas"
+    },
+    {
+      "table_name": "avanti_view_pagarfornecedor"
+    },
+    {
+      "table_name": "avanti_view_perda"
+    },
+    {
+      "table_name": "avanti_view_quebra"
+    },
+    {
+      "table_name": "avanti_view_verba"
+    },
+    {
+      "table_name": "backup"
+    },
+    {
+      "table_name": "balanco"
+    },
+    {
+      "table_name": "balancoestoque"
+    },
+    {
+      "table_name": "balancoestoqueanterior"
+    },
+    {
+      "table_name": "balancoprelancamento"
+    },
+    {
+      "table_name": "banco"
+    },
+    {
+      "table_name": "bancoconfiguracao"
+    },
+    {
+      "table_name": "bancoconta"
+    },
+    {
+      "table_name": "bancocontalojapermissao"
+    },
+    {
+      "table_name": "bandeiracartaopagamentonfe"
+    },
+    {
+      "table_name": "boleto"
+    },
+    {
+      "table_name": "caixa"
+    },
+    {
+      "table_name": "caixaconfiguracao"
+    },
+    {
+      "table_name": "caixaitem"
+    },
+    {
+      "table_name": "caixasaldo"
+    },
+    {
+      "table_name": "caixasaldoempresa"
+    },
+    {
+      "table_name": "caixavencimento"
+    },
+    {
+      "table_name": "campanha"
+    },
+    {
+      "table_name": "carga"
+    },
+    {
+      "table_name": "cargaconfiguracaoclienteeventual"
+    },
+    {
+      "table_name": "cargareposicao"
+    },
+    {
+      "table_name": "cargareposicaoitem"
+    },
+    {
+      "table_name": "cartacorrecao"
+    },
+    {
+      "table_name": "cbs"
+    },
+    {
+      "table_name": "centralizacaoicmslojaparametro"
+    },
+    {
+      "table_name": "centrocusto"
+    },
+    {
+      "table_name": "centrocustobackup"
+    },
+    {
+      "table_name": "centrocustoitem"
+    },
+    {
+      "table_name": "certificadodigital"
+    },
+    {
+      "table_name": "certificadodigitalconfiguracao"
+    },
+    {
+      "table_name": "certificadodigitalloja"
+    },
+    {
+      "table_name": "cest"
+    },
+    {
+      "table_name": "cestdivergencia"
+    },
+    {
+      "table_name": "cfop"
+    },
+    {
+      "table_name": "cfoptipoentrada"
+    },
+    {
+      "table_name": "cfoptiposaida"
+    },
+    {
+      "table_name": "chave"
+    },
+    {
+      "table_name": "chaveversao"
+    },
+    {
+      "table_name": "cheque"
+    },
+    {
+      "table_name": "chequepagarfornecedorparcela"
+    },
+    {
+      "table_name": "clienteeventual"
+    },
+    {
+      "table_name": "clienteeventualautorizacao"
+    },
+    {
+      "table_name": "clienteeventualcontato"
+    },
+    {
+      "table_name": "clienteeventualdocumento"
+    },
+    {
+      "table_name": "clienteeventualendereco"
+    },
+    {
+      "table_name": "clienteeventualprazopagamento"
+    },
+    {
+      "table_name": "clientepreferencial"
+    },
+    {
+      "table_name": "clientepreferencialbiometria"
+    },
+    {
+      "table_name": "clientepreferencialcontato"
+    },
+    {
+      "table_name": "clientepreferencialdependente"
+    },
+    {
+      "table_name": "clientepreferencialdependentebiometria"
+    },
+    {
+      "table_name": "clientepreferencialdiasbloqueioparametro"
+    },
+    {
+      "table_name": "clientepreferencialdisposicaocontratual"
+    },
+    {
+      "table_name": "clientepreferencialdocumento"
+    },
+    {
+      "table_name": "clientepreferencialemailconfiguracao"
+    },
+    {
+      "table_name": "clientepreferencialhistorico"
+    },
+    {
+      "table_name": "clientepreferencialhostconfiguracao"
+    },
+    {
+      "table_name": "clientepreferencialpromocao"
+    },
+    {
+      "table_name": "clientepreferencialpromocaovenda"
+    },
+    {
+      "table_name": "clientepreferencialtermoaceite"
+    },
+    {
+      "table_name": "clientepreferencialtermoconfiguracao"
+    },
+    {
+      "table_name": "clientepreferencialtipoclubevantagem"
+    },
+    {
+      "table_name": "clientepreferencialvalidacao"
+    },
+    {
+      "table_name": "codigoanp"
+    },
+    {
+      "table_name": "codigobeneficiocst"
+    },
+    {
+      "table_name": "codigoipm"
+    },
+    {
+      "table_name": "codigoipmfinalidade"
+    },
+    {
+      "table_name": "codigoipmloja"
+    },
+    {
+      "table_name": "codigorecolhimentoretencao"
+    },
+    {
+      "table_name": "codigorespostaregistroefdreinf"
+    },
+    {
+      "table_name": "codigosefpe"
+    },
+    {
+      "table_name": "codinformacaoadicdocumentofiscalpe"
+    },
+    {
+      "table_name": "coletorexportacaolayout"
+    },
+    {
+      "table_name": "coletorexportacaolayoutcampo"
+    },
+    {
+      "table_name": "coletorlayout"
+    },
+    {
+      "table_name": "coletorlayoutcampo"
+    },
+    {
+      "table_name": "colunatabelainformacao"
+    },
+    {
+      "table_name": "comprador"
+    },
+    {
+      "table_name": "comprovante"
+    },
+    {
+      "table_name": "concentrador"
+    },
+    {
+      "table_name": "conciliacaobancaria"
+    },
+    {
+      "table_name": "conciliacaobancariacentrocusto"
+    },
+    {
+      "table_name": "conciliacaobancarialancamento"
+    },
+    {
+      "table_name": "conciliacaoextrato"
+    },
+    {
+      "table_name": "conciliacaoextratoitem"
+    },
+    {
+      "table_name": "condicaoparcelamentoconfiguracao"
+    },
+    {
+      "table_name": "configuracao"
+    },
+    {
+      "table_name": "configuracaocartacobranca"
+    },
+    {
+      "table_name": "configuracaodaicms"
+    },
+    {
+      "table_name": "configuracaoencerramento"
+    },
+    {
+      "table_name": "configuracaologotipo"
+    },
+    {
+      "table_name": "configuracaologotipoloja"
+    },
+    {
+      "table_name": "configuracaosimilares"
+    },
+    {
+      "table_name": "configuracaousuario"
+    },
+    {
+      "table_name": "configuracaousuariovalor"
+    },
+    {
+      "table_name": "configuracaovendaperiodo"
+    },
+    {
+      "table_name": "configurarworkflow"
+    },
+    {
+      "table_name": "consultaprecoelgin"
+    },
+    {
+      "table_name": "consultaprecogertec"
+    },
+    {
+      "table_name": "consumo"
+    },
+    {
+      "table_name": "contabilidade"
+    },
+    {
+      "table_name": "contabilidadeanterior"
+    },
+    {
+      "table_name": "contabilidadelancamento"
+    },
+    {
+      "table_name": "contabilidadelancamentocentrocusto"
+    },
+    {
+      "table_name": "contacontabilfinanceiro"
+    },
+    {
+      "table_name": "contacontabilfiscal"
+    },
+    {
+      "table_name": "contrato"
+    },
+    {
+      "table_name": "contratoacordo"
+    },
+    {
+      "table_name": "contratoacordoexcecaoloja"
+    },
+    {
+      "table_name": "contratoescalacrescimento"
+    },
+    {
+      "table_name": "contratoexcecao"
+    },
+    {
+      "table_name": "contratoexcecaoacordo"
+    },
+    {
+      "table_name": "contratofornecedor"
+    },
+    {
+      "table_name": "contratofornecedorexcecao"
+    },
+    {
+      "table_name": "contratofornecedorexcecaoacordo"
+    },
+    {
+      "table_name": "contratolancamento"
+    },
+    {
+      "table_name": "contratolancamentoitem"
+    },
+    {
+      "table_name": "contratolancamentosequencia"
+    },
+    {
+      "table_name": "contratoproduto"
+    },
+    {
+      "table_name": "controlepoliciacivilconfiguracao"
+    },
+    {
+      "table_name": "conveniado"
+    },
+    {
+      "table_name": "conveniado_ant"
+    },
+    {
+      "table_name": "conveniadobiometria"
+    },
+    {
+      "table_name": "conveniadocredito"
+    },
+    {
+      "table_name": "conveniadocreditoconfiguracao"
+    },
+    {
+      "table_name": "conveniadocreditotransacaoantecipado"
+    },
+    {
+      "table_name": "conveniadofechamentoconfiguracao"
+    },
+    {
+      "table_name": "conveniadoservico"
+    },
+    {
+      "table_name": "conveniadotransacao"
+    },
+    {
+      "table_name": "conveniadotransacaoantecipado"
+    },
+    {
+      "table_name": "cotacaocliente"
+    },
+    {
+      "table_name": "cotacaoclientecoletor"
+    },
+    {
+      "table_name": "cotacaoclienteinformacao"
+    },
+    {
+      "table_name": "cotacaoclienteitem"
+    },
+    {
+      "table_name": "cotacaofornecedor"
+    },
+    {
+      "table_name": "cotacaofornecedoritem"
+    },
+    {
+      "table_name": "creditoicmsstprodutosaida"
+    },
+    {
+      "table_name": "creditooutorgadooutrosvalores"
+    },
+    {
+      "table_name": "curvaabc"
+    },
+    {
+      "table_name": "curvaabcconfiguracao"
+    },
+    {
+      "table_name": "curvaabcdata"
+    },
+    {
+      "table_name": "custodiacheque"
+    },
+    {
+      "table_name": "custodiachequeitem"
+    },
+    {
+      "table_name": "dataprocessamento"
+    },
+    {
+      "table_name": "ddvmercadologico"
+    },
+    {
+      "table_name": "delivery"
+    },
+    {
+      "table_name": "deliverycoletor"
+    },
+    {
+      "table_name": "deliveryitem"
+    },
+    {
+      "table_name": "descontoboletoreceberverbaitemnotaentrada"
+    },
+    {
+      "table_name": "descontocondicional"
+    },
+    {
+      "table_name": "descontocondicionalitem"
+    },
+    {
+      "table_name": "desmembramento"
+    },
+    {
+      "table_name": "desmembramentoitem"
+    },
+    {
+      "table_name": "dianaoutil"
+    },
+    {
+      "table_name": "diasemana"
+    },
+    {
+      "table_name": "diasestoqueprojecao"
+    },
+    {
+      "table_name": "diefconfiguracao"
+    },
+    {
+      "table_name": "divergenciasworkflowcotacaocliente"
+    },
+    {
+      "table_name": "divergenciasworkflowddvmaximo"
+    },
+    {
+      "table_name": "divergenciasworkflowentrada"
+    },
+    {
+      "table_name": "divergenciasworkflowequalizacaocusto"
+    },
+    {
+      "table_name": "divergenciasworkflownotadespesa"
+    },
+    {
+      "table_name": "divergenciasworkflowoferta"
+    },
+    {
+      "table_name": "divergenciasworkflowoutrasdespesa"
+    },
+    {
+      "table_name": "divergenciasworkflowpedido"
+    },
+    {
+      "table_name": "divergenciasworkflowproduto"
+    },
+    {
+      "table_name": "divergenciaverbanotaentrada"
+    },
+    {
+      "table_name": "divisaofornecedor"
+    },
+    {
+      "table_name": "dmaconfiguracao"
+    },
+    {
+      "table_name": "doacaoentidade"
+    },
+    {
+      "table_name": "drcstnotaentradaquantidade"
+    },
+    {
+      "table_name": "droprevisaotipoentrada"
+    },
+    {
+      "table_name": "droprevisaovenda"
+    },
+    {
+      "table_name": "drotipoentrada"
+    },
+    {
+      "table_name": "email"
+    },
+    {
+      "table_name": "emoji"
+    },
+    {
+      "table_name": "empresa"
+    },
+    {
+      "table_name": "empresacontato"
+    },
+    {
+      "table_name": "entradasaidatipodevolucaovenda"
+    },
+    {
+      "table_name": "entradasaidatipoentrada"
+    },
+    {
+      "table_name": "entradasaidatiposaida"
+    },
+    {
+      "table_name": "escrita"
+    },
+    {
+      "table_name": "escrita012023"
+    },
+    {
+      "table_name": "escrita012024"
+    },
+    {
+      "table_name": "escrita012025"
+    },
+    {
+      "table_name": "escrita012026"
+    },
+    {
+      "table_name": "escrita022022"
+    },
+    {
+      "table_name": "escrita022023"
+    },
+    {
+      "table_name": "escrita022024"
+    },
+    {
+      "table_name": "escrita022025"
+    },
+    {
+      "table_name": "escrita022026"
+    },
+    {
+      "table_name": "escrita032022"
+    },
+    {
+      "table_name": "escrita032023"
+    },
+    {
+      "table_name": "escrita032024"
+    },
+    {
+      "table_name": "escrita032025"
+    },
+    {
+      "table_name": "escrita032026"
+    },
+    {
+      "table_name": "escrita042022"
+    },
+    {
+      "table_name": "escrita042023"
+    },
+    {
+      "table_name": "escrita042024"
+    },
+    {
+      "table_name": "escrita042025"
+    },
+    {
+      "table_name": "escrita042026"
+    },
+    {
+      "table_name": "escrita052022"
+    },
+    {
+      "table_name": "escrita052023"
+    },
+    {
+      "table_name": "escrita052024"
+    },
+    {
+      "table_name": "escrita052025"
+    },
+    {
+      "table_name": "escrita052026"
+    },
+    {
+      "table_name": "escrita062022"
+    },
+    {
+      "table_name": "escrita062023"
+    },
+    {
+      "table_name": "escrita062024"
+    },
+    {
+      "table_name": "escrita062025"
+    },
+    {
+      "table_name": "escrita062026"
+    },
+    {
+      "table_name": "escrita072022"
+    },
+    {
+      "table_name": "escrita072023"
+    },
+    {
+      "table_name": "escrita072024"
+    },
+    {
+      "table_name": "escrita072025"
+    },
+    {
+      "table_name": "escrita072026"
+    },
+    {
+      "table_name": "escrita082022"
+    },
+    {
+      "table_name": "escrita082023"
+    },
+    {
+      "table_name": "escrita082024"
+    },
+    {
+      "table_name": "escrita082025"
+    },
+    {
+      "table_name": "escrita082026"
+    },
+    {
+      "table_name": "escrita092022"
+    },
+    {
+      "table_name": "escrita092023"
+    },
+    {
+      "table_name": "escrita092024"
+    },
+    {
+      "table_name": "escrita092025"
+    },
+    {
+      "table_name": "escrita092026"
+    },
+    {
+      "table_name": "escrita102022"
+    },
+    {
+      "table_name": "escrita102023"
+    },
+    {
+      "table_name": "escrita102024"
+    },
+    {
+      "table_name": "escrita102025"
+    },
+    {
+      "table_name": "escrita102026"
+    },
+    {
+      "table_name": "escrita112022"
+    },
+    {
+      "table_name": "escrita112023"
+    },
+    {
+      "table_name": "escrita112024"
+    },
+    {
+      "table_name": "escrita112025"
+    },
+    {
+      "table_name": "escrita112026"
+    },
+    {
+      "table_name": "escrita122022"
+    },
+    {
+      "table_name": "escrita122023"
+    },
+    {
+      "table_name": "escrita122024"
+    },
+    {
+      "table_name": "escrita122025"
+    },
+    {
+      "table_name": "escrita122026"
+    },
+    {
+      "table_name": "escritacentrocusto"
+    },
+    {
+      "table_name": "escritacodigoajuste"
+    },
+    {
+      "table_name": "escritacodigoajusteoutrasobrigacoes"
+    },
+    {
+      "table_name": "escritadadoscomplementaresenergiaeletrica"
+    },
+    {
+      "table_name": "escritafechamento"
+    },
+    {
+      "table_name": "escritafinalizadora"
+    },
+    {
+      "table_name": "escritafundamento"
+    },
+    {
+      "table_name": "escritagnre"
+    },
+    {
+      "table_name": "escritahistorica"
+    },
+    {
+      "table_name": "escritaitem"
+    },
+    {
+      "table_name": "escritaitem012023"
+    },
+    {
+      "table_name": "escritaitem012024"
+    },
+    {
+      "table_name": "escritaitem012025"
+    },
+    {
+      "table_name": "escritaitem012026"
+    },
+    {
+      "table_name": "escritaitem022022"
+    },
+    {
+      "table_name": "escritaitem022023"
+    },
+    {
+      "table_name": "escritaitem022024"
+    },
+    {
+      "table_name": "escritaitem022025"
+    },
+    {
+      "table_name": "escritaitem022026"
+    },
+    {
+      "table_name": "escritaitem032022"
+    },
+    {
+      "table_name": "escritaitem032023"
+    },
+    {
+      "table_name": "escritaitem032024"
+    },
+    {
+      "table_name": "escritaitem032025"
+    },
+    {
+      "table_name": "escritaitem032026"
+    },
+    {
+      "table_name": "escritaitem042022"
+    },
+    {
+      "table_name": "escritaitem042023"
+    },
+    {
+      "table_name": "escritaitem042024"
+    },
+    {
+      "table_name": "escritaitem042025"
+    },
+    {
+      "table_name": "escritaitem042026"
+    },
+    {
+      "table_name": "escritaitem052022"
+    },
+    {
+      "table_name": "escritaitem052023"
+    },
+    {
+      "table_name": "escritaitem052024"
+    },
+    {
+      "table_name": "escritaitem052025"
+    },
+    {
+      "table_name": "escritaitem052026"
+    },
+    {
+      "table_name": "escritaitem062022"
+    },
+    {
+      "table_name": "escritaitem062023"
+    },
+    {
+      "table_name": "escritaitem062024"
+    },
+    {
+      "table_name": "escritaitem062025"
+    },
+    {
+      "table_name": "escritaitem062026"
+    },
+    {
+      "table_name": "escritaitem072022"
+    },
+    {
+      "table_name": "escritaitem072023"
+    },
+    {
+      "table_name": "escritaitem072024"
+    },
+    {
+      "table_name": "escritaitem072025"
+    },
+    {
+      "table_name": "escritaitem072026"
+    },
+    {
+      "table_name": "escritaitem082022"
+    },
+    {
+      "table_name": "escritaitem082023"
+    },
+    {
+      "table_name": "escritaitem082024"
+    },
+    {
+      "table_name": "escritaitem082025"
+    },
+    {
+      "table_name": "escritaitem082026"
+    },
+    {
+      "table_name": "escritaitem092022"
+    },
+    {
+      "table_name": "escritaitem092023"
+    },
+    {
+      "table_name": "escritaitem092024"
+    },
+    {
+      "table_name": "escritaitem092025"
+    },
+    {
+      "table_name": "escritaitem092026"
+    },
+    {
+      "table_name": "escritaitem102022"
+    },
+    {
+      "table_name": "escritaitem102023"
+    },
+    {
+      "table_name": "escritaitem102024"
+    },
+    {
+      "table_name": "escritaitem102025"
+    },
+    {
+      "table_name": "escritaitem102026"
+    },
+    {
+      "table_name": "escritaitem112022"
+    },
+    {
+      "table_name": "escritaitem112023"
+    },
+    {
+      "table_name": "escritaitem112024"
+    },
+    {
+      "table_name": "escritaitem112025"
+    },
+    {
+      "table_name": "escritaitem112026"
+    },
+    {
+      "table_name": "escritaitem122022"
+    },
+    {
+      "table_name": "escritaitem122023"
+    },
+    {
+      "table_name": "escritaitem122024"
+    },
+    {
+      "table_name": "escritaitem122025"
+    },
+    {
+      "table_name": "escritaitem122026"
+    },
+    {
+      "table_name": "escritaitemcbs"
+    },
+    {
+      "table_name": "escritaitemhistorica"
+    },
+    {
+      "table_name": "escritaitemibsestadual"
+    },
+    {
+      "table_name": "escritaitemibsmunicipal"
+    },
+    {
+      "table_name": "escritaitemretencaotributo"
+    },
+    {
+      "table_name": "escritanotasaidacomplemento"
+    },
+    {
+      "table_name": "escritanotasaidacupom"
+    },
+    {
+      "table_name": "escritanotasaidanotaentrada"
+    },
+    {
+      "table_name": "escritaobservacaofiscal"
+    },
+    {
+      "table_name": "escritaobservacaofiscalajuste"
+    },
+    {
+      "table_name": "escritaoutrosvalores"
+    },
+    {
+      "table_name": "escritaoutrosvaloresincentivoatacadista"
+    },
+    {
+      "table_name": "escritaoutrosvaloreslancamento"
+    },
+    {
+      "table_name": "escritaretencaotributo"
+    },
+    {
+      "table_name": "escritasaldo"
+    },
+    {
+      "table_name": "estado"
+    },
+    {
+      "table_name": "estoque"
+    },
+    {
+      "table_name": "estoque012023"
+    },
+    {
+      "table_name": "estoque012024"
+    },
+    {
+      "table_name": "estoque012025"
+    },
+    {
+      "table_name": "estoque012026"
+    },
+    {
+      "table_name": "estoque022022"
+    },
+    {
+      "table_name": "estoque022023"
+    },
+    {
+      "table_name": "estoque022024"
+    },
+    {
+      "table_name": "estoque022025"
+    },
+    {
+      "table_name": "estoque022026"
+    },
+    {
+      "table_name": "estoque032022"
+    },
+    {
+      "table_name": "estoque032023"
+    },
+    {
+      "table_name": "estoque032024"
+    },
+    {
+      "table_name": "estoque032025"
+    },
+    {
+      "table_name": "estoque032026"
+    },
+    {
+      "table_name": "estoque042022"
+    },
+    {
+      "table_name": "estoque042023"
+    },
+    {
+      "table_name": "estoque042024"
+    },
+    {
+      "table_name": "estoque042025"
+    },
+    {
+      "table_name": "estoque042026"
+    },
+    {
+      "table_name": "estoque052022"
+    },
+    {
+      "table_name": "estoque052023"
+    },
+    {
+      "table_name": "estoque052024"
+    },
+    {
+      "table_name": "estoque052025"
+    },
+    {
+      "table_name": "estoque052026"
+    },
+    {
+      "table_name": "estoque062022"
+    },
+    {
+      "table_name": "estoque062023"
+    },
+    {
+      "table_name": "estoque062024"
+    },
+    {
+      "table_name": "estoque062025"
+    },
+    {
+      "table_name": "estoque062026"
+    },
+    {
+      "table_name": "estoque072022"
+    },
+    {
+      "table_name": "estoque072023"
+    },
+    {
+      "table_name": "estoque072024"
+    },
+    {
+      "table_name": "estoque072025"
+    },
+    {
+      "table_name": "estoque072026"
+    },
+    {
+      "table_name": "estoque082022"
+    },
+    {
+      "table_name": "estoque082023"
+    },
+    {
+      "table_name": "estoque082024"
+    },
+    {
+      "table_name": "estoque082025"
+    },
+    {
+      "table_name": "estoque082026"
+    },
+    {
+      "table_name": "estoque092022"
+    },
+    {
+      "table_name": "estoque092023"
+    },
+    {
+      "table_name": "estoque092024"
+    },
+    {
+      "table_name": "estoque092025"
+    },
+    {
+      "table_name": "estoque092026"
+    },
+    {
+      "table_name": "estoque102022"
+    },
+    {
+      "table_name": "estoque102023"
+    },
+    {
+      "table_name": "estoque102024"
+    },
+    {
+      "table_name": "estoque102025"
+    },
+    {
+      "table_name": "estoque102026"
+    },
+    {
+      "table_name": "estoque112022"
+    },
+    {
+      "table_name": "estoque112023"
+    },
+    {
+      "table_name": "estoque112024"
+    },
+    {
+      "table_name": "estoque112025"
+    },
+    {
+      "table_name": "estoque112026"
+    },
+    {
+      "table_name": "estoque122022"
+    },
+    {
+      "table_name": "estoque122023"
+    },
+    {
+      "table_name": "estoque122024"
+    },
+    {
+      "table_name": "estoque122025"
+    },
+    {
+      "table_name": "estoque122026"
+    },
+    {
+      "table_name": "estoquecongelado"
+    },
+    {
+      "table_name": "estoquecongeladoalertavisualizado"
+    },
+    {
+      "table_name": "estoquecongeladotipoentradasaida"
+    },
+    {
+      "table_name": "estoquehistorica"
+    },
+    {
+      "table_name": "estoquesegurancareposicao"
+    },
+    {
+      "table_name": "estoqueterceiro"
+    },
+    {
+      "table_name": "estornooutrosvalores"
+    },
+    {
+      "table_name": "exportacaobancariapagarfornecedorparcela"
+    },
+    {
+      "table_name": "familiafornecedor"
+    },
+    {
+      "table_name": "familiaproduto"
+    },
+    {
+      "table_name": "fatorexclusaoicmsproduto"
+    },
+    {
+      "table_name": "feriado"
+    },
+    {
+      "table_name": "filtroavancadocampo"
+    },
+    {
+      "table_name": "filtroavancadoregra"
+    },
+    {
+      "table_name": "fluxocaixaconfiguracao"
+    },
+    {
+      "table_name": "flyway_schema_history"
+    },
+    {
+      "table_name": "formulario"
+    },
+    {
+      "table_name": "formulariohorario"
+    },
+    {
+      "table_name": "formularioloja"
+    },
+    {
+      "table_name": "formulariooperacao"
+    },
+    {
+      "table_name": "fornecedor"
+    },
+    {
+      "table_name": "fornecedoradministradora"
+    },
+    {
+      "table_name": "fornecedorcnae"
+    },
+    {
+      "table_name": "fornecedorconfiguracaodatacorte"
+    },
+    {
+      "table_name": "fornecedorconfiguracaoregra"
+    },
+    {
+      "table_name": "fornecedorcontafavorecido"
+    },
+    {
+      "table_name": "fornecedorcontato"
+    },
+    {
+      "table_name": "fornecedordocumento"
+    },
+    {
+      "table_name": "fornecedorendereco"
+    },
+    {
+      "table_name": "fornecedorpagamento"
+    },
+    {
+      "table_name": "fornecedorpagamentodivisao"
+    },
+    {
+      "table_name": "fornecedorprazo"
+    },
+    {
+      "table_name": "fornecedorprazopedido"
+    },
+    {
+      "table_name": "fornecedorsaldo"
+    },
+    {
+      "table_name": "fornecedortemplatecontrato"
+    },
+    {
+      "table_name": "fornecedortemplateverba"
+    },
+    {
+      "table_name": "fornecedortipoimpostodespesa"
+    },
+    {
+      "table_name": "frequenciarepeticaotarefa"
+    },
+    {
+      "table_name": "geracaoretencaotributo"
+    },
+    {
+      "table_name": "geracaoretencaotributoitem"
+    },
+    {
+      "table_name": "geracaoretencaotributoitemnotadespesa"
+    },
+    {
+      "table_name": "geracaoretencaotributoitemnotasaida"
+    },
+    {
+      "table_name": "geracaoretencaotributoitempagaroutrasdespesas"
+    },
+    {
+      "table_name": "grupo"
+    },
+    {
+      "table_name": "grupocolunatabelainformacao"
+    },
+    {
+      "table_name": "grupopreco"
+    },
+    {
+      "table_name": "grupoprecoloja"
+    },
+    {
+      "table_name": "guiaentrega"
+    },
+    {
+      "table_name": "guiaentrega_tmp"
+    },
+    {
+      "table_name": "historicopadrao"
+    },
+    {
+      "table_name": "historicosazonalpedidocompra"
+    },
+    {
+      "table_name": "icmsfronteiraregracalculo"
+    },
+    {
+      "table_name": "icmsfronteiraregracalculocst"
+    },
+    {
+      "table_name": "icmsfronteiraregracalculoproduto"
+    },
+    {
+      "table_name": "imagempromocional"
+    },
+    {
+      "table_name": "importacaoibptconfiguracao"
+    },
+    {
+      "table_name": "indicadordeducaoicmsdesonerado"
+    },
+    {
+      "table_name": "indicadororigemprocesso"
+    },
+    {
+      "table_name": "indicadorpagamento"
+    },
+    {
+      "table_name": "indicadorpresenca"
+    },
+    {
+      "table_name": "indicativocprb"
+    },
+    {
+      "table_name": "indicativosenar"
+    },
+    {
+      "table_name": "informacaocomplementar"
+    },
+    {
+      "table_name": "inutilizacaoverba"
+    },
+    {
+      "table_name": "inventario"
+    },
+    {
+      "table_name": "inventarioicmsst"
+    },
+    {
+      "table_name": "inventarioicmsstparcela"
+    },
+    {
+      "table_name": "inventarioterceiro"
+    },
+    {
+      "table_name": "itensdivergenciasworkflowentrada"
+    },
+    {
+      "table_name": "itensdivergenciaverbaworkflowentrada"
+    },
+    {
+      "table_name": "kit"
+    },
+    {
+      "table_name": "kititem"
+    },
+    {
+      "table_name": "listagem"
+    },
+    {
+      "table_name": "listagembalanco"
+    },
+    {
+      "table_name": "listagembalancoitem"
+    },
+    {
+      "table_name": "listagemmidia"
+    },
+    {
+      "table_name": "listagemproduto"
+    },
+    {
+      "table_name": "listagemprodutopdv"
+    },
+    {
+      "table_name": "listagemprodutopdvitem"
+    },
+    {
+      "table_name": "listagemselfcheckoutpdv"
+    },
+    {
+      "table_name": "listagemselfcheckoutpdvitem"
+    },
+    {
+      "table_name": "localpesquisa"
+    },
+    {
+      "table_name": "logbusca"
+    },
+    {
+      "table_name": "logcestabasica"
+    },
+    {
+      "table_name": "logcusto"
+    },
+    {
+      "table_name": "logestoque"
+    },
+    {
+      "table_name": "loglojavirtual"
+    },
+    {
+      "table_name": "logmetodo"
+    },
+    {
+      "table_name": "logpedido"
+    },
+    {
+      "table_name": "logpreco"
+    },
+    {
+      "table_name": "logproduto"
+    },
+    {
+      "table_name": "logprodutocomplemento"
+    },
+    {
+      "table_name": "logtabela"
+    },
+    {
+      "table_name": "logtransacao"
+    },
+    {
+      "table_name": "logtransacaopedido"
+    },
+    {
+      "table_name": "logtroca"
+    },
+    {
+      "table_name": "logworkflow"
+    },
+    {
+      "table_name": "loja"
+    },
+    {
+      "table_name": "lojareposicao"
+    },
+    {
+      "table_name": "lucrodiariocliente"
+    },
+    {
+      "table_name": "maparesumo"
+    },
+    {
+      "table_name": "maparesumoconfiguracao"
+    },
+    {
+      "table_name": "maparesumoconfiguracaoaliquota"
+    },
+    {
+      "table_name": "maparesumoitem"
+    },
+    {
+      "table_name": "maparesumosequencia"
+    },
+    {
+      "table_name": "marca"
+    },
+    {
+      "table_name": "mdfecondutor"
+    },
+    {
+      "table_name": "mdfeemissao"
+    },
+    {
+      "table_name": "mdfepercurso"
+    },
+    {
+      "table_name": "mdfetipotransporte"
+    },
+    {
+      "table_name": "meiopagamentonfe"
+    },
+    {
+      "table_name": "mensagem"
+    },
+    {
+      "table_name": "mensagemgrupo"
+    },
+    {
+      "table_name": "mensagemgrupousuario"
+    },
+    {
+      "table_name": "mercadologico"
+    },
+    {
+      "table_name": "mercafacil_categorias_clientes"
+    },
+    {
+      "table_name": "mercafacil_categorias_produtos"
+    },
+    {
+      "table_name": "mercafacil_clientes"
+    },
+    {
+      "table_name": "mercafacil_clientes_eventuais"
+    },
+    {
+      "table_name": "mercafacil_compras"
+    },
+    {
+      "table_name": "mercafacil_compras_itens"
+    },
+    {
+      "table_name": "mercafacil_devolucoes"
+    },
+    {
+      "table_name": "mercafacil_devolucoes_itens"
+    },
+    {
+      "table_name": "mercafacil_fornecedores"
+    },
+    {
+      "table_name": "mercafacil_loja"
+    },
+    {
+      "table_name": "mercafacil_nota_saida"
+    },
+    {
+      "table_name": "mercafacil_nota_saida_item"
+    },
+    {
+      "table_name": "mercafacil_produtos"
+    },
+    {
+      "table_name": "mercafacil_profissionais"
+    },
+    {
+      "table_name": "mercafacil_vendas"
+    },
+    {
+      "table_name": "mercafacil_vendas_itens"
+    },
+    {
+      "table_name": "mercafacil_vendas_pagamentos"
+    },
+    {
+      "table_name": "midia"
+    },
+    {
+      "table_name": "midiaimagem"
+    },
+    {
+      "table_name": "modelo"
+    },
+    {
+      "table_name": "modelobiometria"
+    },
+    {
+      "table_name": "modulo"
+    },
+    {
+      "table_name": "motorista"
+    },
+    {
+      "table_name": "mudancatributacao"
+    },
+    {
+      "table_name": "mudancatributacaoitem"
+    },
+    {
+      "table_name": "mudancatributacaoitemnotaentrada"
+    },
+    {
+      "table_name": "municipio"
+    },
+    {
+      "table_name": "mxf_tmp_icms_entrada"
+    },
+    {
+      "table_name": "mxf_tmp_icms_entrada_sp"
+    },
+    {
+      "table_name": "mxf_tmp_icms_saida"
+    },
+    {
+      "table_name": "mxf_tmp_icms_saida_sp"
+    },
+    {
+      "table_name": "mxf_tmp_pis_cofins"
+    },
+    {
+      "table_name": "mxf_tmp_pis_cofins_lucro_presumido"
+    },
+    {
+      "table_name": "mxf_tmp_pis_cofins_lucro_real"
+    },
+    {
+      "table_name": "mxf_tmp_pis_cofins_simplesnacional"
+    },
+    {
+      "table_name": "mxf_tmp_produtos"
+    },
+    {
+      "table_name": "mxf_vw_icms"
+    },
+    {
+      "table_name": "mxf_vw_icms_entrada"
+    },
+    {
+      "table_name": "mxf_vw_pis_cofins"
+    },
+    {
+      "table_name": "mxf_vw_pis_cofins_lucro_presumido"
+    },
+    {
+      "table_name": "mxf_vw_pis_cofins_lucro_real"
+    },
+    {
+      "table_name": "mxf_vw_pis_cofins_simplesnacional"
+    },
+    {
+      "table_name": "ncm"
+    },
+    {
+      "table_name": "ncmcest"
+    },
+    {
+      "table_name": "ncmcodigogia"
+    },
+    {
+      "table_name": "nfcesequencia"
+    },
+    {
+      "table_name": "nfedestinatarioendereco"
+    },
+    {
+      "table_name": "nfefornecedorendereco"
+    },
+    {
+      "table_name": "normacompra"
+    },
+    {
+      "table_name": "normareposicao"
+    },
+    {
+      "table_name": "notadespesa"
+    },
+    {
+      "table_name": "notadespesacentrocusto"
+    },
+    {
+      "table_name": "notadespesaimposto"
+    },
+    {
+      "table_name": "notadespesavencimento"
+    },
+    {
+      "table_name": "notaentrada"
+    },
+    {
+      "table_name": "notaentradabonificacao"
+    },
+    {
+      "table_name": "notaentradabonificacaorebaixadivergencia"
+    },
+    {
+      "table_name": "notaentradacentrocusto"
+    },
+    {
+      "table_name": "notaentradacoletor"
+    },
+    {
+      "table_name": "notaentradacoletorvalidade"
+    },
+    {
+      "table_name": "notaentradadadoscomplementaresenergiaeletrica"
+    },
+    {
+      "table_name": "notaentradadesconto"
+    },
+    {
+      "table_name": "notaentradadivergencia"
+    },
+    {
+      "table_name": "notaentradadivergenciaimpostonfe"
+    },
+    {
+      "table_name": "notaentradadivergenciaprodutovalidade"
+    },
+    {
+      "table_name": "notaentradagnre"
+    },
+    {
+      "table_name": "notaentradaidentificacao"
+    },
+    {
+      "table_name": "notaentradaidentificacaodestinatario"
+    },
+    {
+      "table_name": "notaentradaidentificacaoemitente"
+    },
+    {
+      "table_name": "notaentradaitem"
+    },
+    {
+      "table_name": "notaentradaitemdesmembramento"
+    },
+    {
+      "table_name": "notaentradaitemimportacaoxml"
+    },
+    {
+      "table_name": "notaentradaitemvalidade"
+    },
+    {
+      "table_name": "notaentradanfe"
+    },
+    {
+      "table_name": "notaentradanfechavemanifestacao"
+    },
+    {
+      "table_name": "notaentradanfeevento"
+    },
+    {
+      "table_name": "notaentradanfependencia"
+    },
+    {
+      "table_name": "notaentradanfetipoevento"
+    },
+    {
+      "table_name": "notaentradanotasaida"
+    },
+    {
+      "table_name": "notaentradanotasaidaitem"
+    },
+    {
+      "table_name": "notaentradapedido"
+    },
+    {
+      "table_name": "notaentradapedidoatendido"
+    },
+    {
+      "table_name": "notaentradareferenciacoletor"
+    },
+    {
+      "table_name": "notaentradasimplesnacional"
+    },
+    {
+      "table_name": "notaentradatransportador"
+    },
+    {
+      "table_name": "notaentradavalefornecedor"
+    },
+    {
+      "table_name": "notaentradavencimento"
+    },
+    {
+      "table_name": "notafiscalmdfe"
+    },
+    {
+      "table_name": "notafiscalreferencia"
+    },
+    {
+      "table_name": "notasaida"
+    },
+    {
+      "table_name": "notasaidacfecomplemento"
+    },
+    {
+      "table_name": "notasaidacoletor"
+    },
+    {
+      "table_name": "notasaidaconfiguracao"
+    },
+    {
+      "table_name": "notasaidaconfiguracaotributacao"
+    },
+    {
+      "table_name": "notasaidacotacaocliente"
+    },
+    {
+      "table_name": "notasaidacupom"
+    },
+    {
+      "table_name": "notasaidadadostransacao"
+    },
+    {
+      "table_name": "notasaidadevolucaocupom"
+    },
+    {
+      "table_name": "notasaidadevolucaoressarcimento"
+    },
+    {
+      "table_name": "notasaidadevolucaoressarcimentoitem"
+    },
+    {
+      "table_name": "notasaidaenderecoentrega"
+    },
+    {
+      "table_name": "notasaidaimportacaonotasaida"
+    },
+    {
+      "table_name": "notasaidaimportacaonotasaidaitem"
+    },
+    {
+      "table_name": "notasaidainutilizacao"
+    },
+    {
+      "table_name": "notasaidaitem"
+    },
+    {
+      "table_name": "notasaidaitemcbs"
+    },
+    {
+      "table_name": "notasaidaitemdesmembramento"
+    },
+    {
+      "table_name": "notasaidaitemibsestadual"
+    },
+    {
+      "table_name": "notasaidaitemibsmunicipal"
+    },
+    {
+      "table_name": "notasaidaitemimportacaoxml"
+    },
+    {
+      "table_name": "notasaidaitempedido"
+    },
+    {
+      "table_name": "notasaidaitemrastreabilidade"
+    },
+    {
+      "table_name": "notasaidaitemretencaotributo"
+    },
+    {
+      "table_name": "notasaidamensagem"
+    },
+    {
+      "table_name": "notasaidanfe"
+    },
+    {
+      "table_name": "notasaidanfecnpjcpf"
+    },
+    {
+      "table_name": "notasaidanotaentrada"
+    },
+    {
+      "table_name": "notasaidapagamento"
+    },
+    {
+      "table_name": "notasaidareposicao"
+    },
+    {
+      "table_name": "notasaidaretencaotributo"
+    },
+    {
+      "table_name": "notasaidasequencia"
+    },
+    {
+      "table_name": "notasaidatrocacupom"
+    },
+    {
+      "table_name": "notasaidavencimento"
+    },
+    {
+      "table_name": "notaservico"
+    },
+    {
+      "table_name": "notaservicoimposto"
+    },
+    {
+      "table_name": "notaservicovencimento"
+    },
+    {
+      "table_name": "nutricionalfilizola"
+    },
+    {
+      "table_name": "nutricionalfilizolaitem"
+    },
+    {
+      "table_name": "nutricionaltoledo"
+    },
+    {
+      "table_name": "nutricionaltoledoitem"
+    },
+    {
+      "table_name": "observacaofiscal"
+    },
+    {
+      "table_name": "observacaofiscalatacadista"
+    },
+    {
+      "table_name": "observacaofiscaloperacao"
+    },
+    {
+      "table_name": "oferta"
+    },
+    {
+      "table_name": "ofertalote"
+    },
+    {
+      "table_name": "ofertapedidocompra"
+    },
+    {
+      "table_name": "ofertaprogramacaoprecoconjugado"
+    },
+    {
+      "table_name": "ofertarelampago"
+    },
+    {
+      "table_name": "ofertasequencia"
+    },
+    {
+      "table_name": "ofertaverbasellout"
+    },
+    {
+      "table_name": "ofertaverbaselloutworkflow"
+    },
+    {
+      "table_name": "operacaoobservacaofiscal"
+    },
+    {
+      "table_name": "operacaopagamentoeletronicocadastro"
+    },
+    {
+      "table_name": "operacaopagamentoeletronicocadastroitem"
+    },
+    {
+      "table_name": "operacoesobservacaofiscal"
+    },
+    {
+      "table_name": "orcamentodespesa"
+    },
+    {
+      "table_name": "orcamentodespesaitemtipoentrada"
+    },
+    {
+      "table_name": "orcamentodespesaitemtipoplanoconta"
+    },
+    {
+      "table_name": "orcamentoestoquemercadologico"
+    },
+    {
+      "table_name": "orcamentoestoquemercadologicoitem"
+    },
+    {
+      "table_name": "outrosvalorespiscofins"
+    },
+    {
+      "table_name": "pagaradiantamento"
+    },
+    {
+      "table_name": "pagaragendamento"
+    },
+    {
+      "table_name": "pagaragendamentoparcela"
+    },
+    {
+      "table_name": "pagardda"
+    },
+    {
+      "table_name": "pagarfechamento"
+    },
+    {
+      "table_name": "pagarfornecedor"
+    },
+    {
+      "table_name": "pagarfornecedoricmsfronteira"
+    },
+    {
+      "table_name": "pagarfornecedorparcela"
+    },
+    {
+      "table_name": "pagarfornecedorparcelaabatimento"
+    },
+    {
+      "table_name": "pagarfornecedorparcelaadiantamento"
+    },
+    {
+      "table_name": "pagarfornecedorparcelacheque"
+    },
+    {
+      "table_name": "pagarfornecedorparcelacontrato"
+    },
+    {
+      "table_name": "pagarfornecedorparceladevolucao"
+    },
+    {
+      "table_name": "pagarfornecedorparcelahistoricoboleto"
+    },
+    {
+      "table_name": "pagarfornecedorparcelaverba"
+    },
+    {
+      "table_name": "pagaroutrasdespesas"
+    },
+    {
+      "table_name": "pagaroutrasdespesascentrocusto"
+    },
+    {
+      "table_name": "pagaroutrasdespesasimposto"
+    },
+    {
+      "table_name": "pagaroutrasdespesasvencimento"
+    },
+    {
+      "table_name": "pais"
+    },
+    {
+      "table_name": "parametro"
+    },
+    {
+      "table_name": "parametroagendarecebimento"
+    },
+    {
+      "table_name": "parametrovalor"
+    },
+    {
+      "table_name": "pautafiscal"
+    },
+    {
+      "table_name": "pedido"
+    },
+    {
+      "table_name": "pedidoagendamentorecebimento"
+    },
+    {
+      "table_name": "pedidocoletor"
+    },
+    {
+      "table_name": "pedidocompracolunainformacao"
+    },
+    {
+      "table_name": "pedidocompradataentrega"
+    },
+    {
+      "table_name": "pedidocompradataentregaitem"
+    },
+    {
+      "table_name": "pedidocompraitemgerasugestao"
+    },
+    {
+      "table_name": "pedidocompraminimo"
+    },
+    {
+      "table_name": "pedidocompraregrasugestao"
+    },
+    {
+      "table_name": "pedidoconfiguracao"
+    },
+    {
+      "table_name": "pedidocrossdocking"
+    },
+    {
+      "table_name": "pedidodespesa"
+    },
+    {
+      "table_name": "pedidodespesaitem"
+    },
+    {
+      "table_name": "pedidodespesavencimento"
+    },
+    {
+      "table_name": "pedidoecommerce"
+    },
+    {
+      "table_name": "pedidoecommerceitem"
+    },
+    {
+      "table_name": "pedidoinformacao"
+    },
+    {
+      "table_name": "pedidoitem"
+    },
+    {
+      "table_name": "pedidoitemreposicao"
+    },
+    {
+      "table_name": "pedidolimitesemana"
+    },
+    {
+      "table_name": "pedidolimitesemanacomprador"
+    },
+    {
+      "table_name": "pedidolimitesemanafornecedor"
+    },
+    {
+      "table_name": "pedidolimitesemanafornecedoritem"
+    },
+    {
+      "table_name": "pedidolimitesemanamercadologico"
+    },
+    {
+      "table_name": "pedidolimitesemanamercadologicoitem"
+    },
+    {
+      "table_name": "pedidonegociacaotroca"
+    },
+    {
+      "table_name": "pedidoprecotacaofornecedor"
+    },
+    {
+      "table_name": "pedidoreativadoentrega"
+    },
+    {
+      "table_name": "pedidorebaixacustoverba"
+    },
+    {
+      "table_name": "pedidovencimento"
+    },
+    {
+      "table_name": "peps"
+    },
+    {
+      "table_name": "perda"
+    },
+    {
+      "table_name": "perdanotasaidaquantidadelancada"
+    },
+    {
+      "table_name": "permissao"
+    },
+    {
+      "table_name": "permissaoloja"
+    },
+    {
+      "table_name": "pesquisa"
+    },
+    {
+      "table_name": "pesquisaitem"
+    },
+    {
+      "table_name": "pesquisalistagem"
+    },
+    {
+      "table_name": "pesquisalistagemitem"
+    },
+    {
+      "table_name": "pesquisasatisfacaorespostas"
+    },
+    {
+      "table_name": "piscofinsoutrosvalores"
+    },
+    {
+      "table_name": "plano"
+    },
+    {
+      "table_name": "planoloja"
+    },
+    {
+      "table_name": "portariacat"
+    },
+    {
+      "table_name": "posto"
+    },
+    {
+      "table_name": "precotacaofornecedor"
+    },
+    {
+      "table_name": "precotacaofornecedorcoletor"
+    },
+    {
+      "table_name": "precotacaofornecedoritem"
+    },
+    {
+      "table_name": "precotacaofornecedoritemfornecedor"
+    },
+    {
+      "table_name": "precotacaofornecedoritemreposicao"
+    },
+    {
+      "table_name": "precotacaofornecedorlistagem"
+    },
+    {
+      "table_name": "precotacaofornecedorlistagemfornecedor"
+    },
+    {
+      "table_name": "precotacaofornecedorlistagemitem"
+    },
+    {
+      "table_name": "precotacaofornecedorlistagemitemfornecedor"
+    },
+    {
+      "table_name": "precotacaofornecedormensagem"
+    },
+    {
+      "table_name": "prepedido"
+    },
+    {
+      "table_name": "prepedidoitem"
+    },
+    {
+      "table_name": "previsaodespesa"
+    },
+    {
+      "table_name": "previsaodespesalancamento"
+    },
+    {
+      "table_name": "pricefy"
+    },
+    {
+      "table_name": "pricinganalise"
+    },
+    {
+      "table_name": "pricinganalisefiltro"
+    },
+    {
+      "table_name": "pricinganalisefiltroloja"
+    },
+    {
+      "table_name": "pricinganalisefiltropesquisa"
+    },
+    {
+      "table_name": "pricinganaliseitem"
+    },
+    {
+      "table_name": "pricinglistagem"
+    },
+    {
+      "table_name": "pricinglistagemproduto"
+    },
+    {
+      "table_name": "producao"
+    },
+    {
+      "table_name": "producaoitem"
+    },
+    {
+      "table_name": "producaoordem"
+    },
+    {
+      "table_name": "producaoordemitem"
+    },
+    {
+      "table_name": "produto"
+    },
+    {
+      "table_name": "produtoaliquota"
+    },
+    {
+      "table_name": "produtoaliquotabeneficio"
+    },
+    {
+      "table_name": "produtoaliquotainterestadual"
+    },
+    {
+      "table_name": "produtoautomacao"
+    },
+    {
+      "table_name": "produtoautomacaodesconto"
+    },
+    {
+      "table_name": "produtoautomacaodescontolote"
+    },
+    {
+      "table_name": "produtoautomacaodescontooferta"
+    },
+    {
+      "table_name": "produtocomplemento"
+    },
+    {
+      "table_name": "produtocongelado"
+    },
+    {
+      "table_name": "produtocongeladoalertavisualizado"
+    },
+    {
+      "table_name": "produtoenviaconnect"
+    },
+    {
+      "table_name": "produtoexportacaolojavirtual"
+    },
+    {
+      "table_name": "produtofornecedor"
+    },
+    {
+      "table_name": "produtofornecedorcodigoexterno"
+    },
+    {
+      "table_name": "produtofornecedorlimitecompra"
+    },
+    {
+      "table_name": "produtofornecedorprelancamento"
+    },
+    {
+      "table_name": "produtoimagem"
+    },
+    {
+      "table_name": "produtolojavirtual"
+    },
+    {
+      "table_name": "produtolojavirtualitem"
+    },
+    {
+      "table_name": "produtoobservacaofiscaloperacao"
+    },
+    {
+      "table_name": "produtopiscofins"
+    },
+    {
+      "table_name": "produtoprecotacaofornecedorpedidocompraddvminimo"
+    },
+    {
+      "table_name": "produtosazonal"
+    },
+    {
+      "table_name": "produtosazonalitem"
+    },
+    {
+      "table_name": "produtotransformavel"
+    },
+    {
+      "table_name": "programa"
+    },
+    {
+      "table_name": "programacaopreco"
+    },
+    {
+      "table_name": "programacaoprecoloja"
+    },
+    {
+      "table_name": "programacaoreposicaoproduto"
+    },
+    {
+      "table_name": "programacaoreposicaoprodutoloja"
+    },
+    {
+      "table_name": "promocao"
+    },
+    {
+      "table_name": "promocaodesconto"
+    },
+    {
+      "table_name": "promocaofinalizadora"
+    },
+    {
+      "table_name": "promocaoitem"
+    },
+    {
+      "table_name": "promocaotipoclubevantagem"
+    },
+    {
+      "table_name": "quebra"
+    },
+    {
+      "table_name": "rebaixacusto"
+    },
+    {
+      "table_name": "rebaixacustobonificacao"
+    },
+    {
+      "table_name": "rebaixacustoproduto"
+    },
+    {
+      "table_name": "rebaixacustoverba"
+    },
+    {
+      "table_name": "rebaixanotaentradapedidoitem"
+    },
+    {
+      "table_name": "receberbonificacaocontrato"
+    },
+    {
+      "table_name": "receberbonificacaodevolucao"
+    },
+    {
+      "table_name": "receberbonificacaoverba"
+    },
+    {
+      "table_name": "recebercaixa"
+    },
+    {
+      "table_name": "recebercaixaitem"
+    },
+    {
+      "table_name": "recebercaixaitemrecebercaixa"
+    },
+    {
+      "table_name": "recebercaixavendatef"
+    },
+    {
+      "table_name": "recebercheque"
+    },
+    {
+      "table_name": "receberchequehistorico"
+    },
+    {
+      "table_name": "receberchequeitem"
+    },
+    {
+      "table_name": "receberchequeitemrecebercaixa"
+    },
+    {
+      "table_name": "recebercontrato"
+    },
+    {
+      "table_name": "recebercontratohistoricoboleto"
+    },
+    {
+      "table_name": "recebercontratoitem"
+    },
+    {
+      "table_name": "recebercontratoitemrecebercaixa"
+    },
+    {
+      "table_name": "recebercontratolancamento"
+    },
+    {
+      "table_name": "receberconveniado"
+    },
+    {
+      "table_name": "receberconveniadohistoricoboleto"
+    },
+    {
+      "table_name": "receberconveniadoitem"
+    },
+    {
+      "table_name": "receberconveniadoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberconveniadotransacao"
+    },
+    {
+      "table_name": "receberconveniadotransacaoantecipado"
+    },
+    {
+      "table_name": "recebercreditorotativo"
+    },
+    {
+      "table_name": "recebercreditorotativohistoricoboleto"
+    },
+    {
+      "table_name": "recebercreditorotativoitem"
+    },
+    {
+      "table_name": "recebercreditorotativoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberdevolucao"
+    },
+    {
+      "table_name": "receberdevolucaohistoricoboleto"
+    },
+    {
+      "table_name": "receberdevolucaoitem"
+    },
+    {
+      "table_name": "receberdevolucaoitemrecebercaixa"
+    },
+    {
+      "table_name": "receberoutrasreceitas"
+    },
+    {
+      "table_name": "receberoutrasreceitashistoricoboleto"
+    },
+    {
+      "table_name": "receberoutrasreceitasitem"
+    },
+    {
+      "table_name": "receberoutrasreceitasitemrecebercaixa"
+    },
+    {
+      "table_name": "recebervendaprazo"
+    },
+    {
+      "table_name": "recebervendaprazohistoricoboleto"
+    },
+    {
+      "table_name": "recebervendaprazoitem"
+    },
+    {
+      "table_name": "recebervendaprazoitemrecebercaixa"
+    },
+    {
+      "table_name": "recebervendaprazoretencoesconfiguracao"
+    },
+    {
+      "table_name": "recebervendaprazotiposaidaconfiguracao"
+    },
+    {
+      "table_name": "receberverba"
+    },
+    {
+      "table_name": "receberverbahistoricoboleto"
+    },
+    {
+      "table_name": "receberverbaitem"
+    },
+    {
+      "table_name": "receberverbaitemrecebercaixa"
+    },
+    {
+      "table_name": "receberverbapedido"
+    },
+    {
+      "table_name": "receberverbaproduto"
+    },
+    {
+      "table_name": "receberverbatrocanegociacao"
+    },
+    {
+      "table_name": "recebimento"
+    },
+    {
+      "table_name": "recebimentohistoricosituacao"
+    },
+    {
+      "table_name": "recebimentoitem"
+    },
+    {
+      "table_name": "recebimentomensagem"
+    },
+    {
+      "table_name": "recebimentonfitem"
+    },
+    {
+      "table_name": "recebivelconfiguracao"
+    },
+    {
+      "table_name": "recebivelconfiguracaoregra"
+    },
+    {
+      "table_name": "recebivelconfiguracaoregraprepago"
+    },
+    {
+      "table_name": "recebivelconfiguracaotabela"
+    },
+    {
+      "table_name": "recebivelconfiguracaotabeladatacorte"
+    },
+    {
+      "table_name": "recebivelconfiguracaotabeladatacorteprepago"
+    },
+    {
+      "table_name": "recebivelconfiguracaotabelaprepago"
+    },
+    {
+      "table_name": "recebivelconfiguracaotabelaregra"
+    },
+    {
+      "table_name": "recebivelconfiguracaotabelaregraprepago"
+    },
+    {
+      "table_name": "receita"
+    },
+    {
+      "table_name": "receitafilizola"
+    },
+    {
+      "table_name": "receitafilizolaproduto"
+    },
+    {
+      "table_name": "receitaitem"
+    },
+    {
+      "table_name": "receitaloja"
+    },
+    {
+      "table_name": "receitaoutras"
+    },
+    {
+      "table_name": "receitaproduto"
+    },
+    {
+      "table_name": "receitatoledo"
+    },
+    {
+      "table_name": "receitatoledoloja"
+    },
+    {
+      "table_name": "receitatoledoproduto"
+    },
+    {
+      "table_name": "regiao"
+    },
+    {
+      "table_name": "regiaocliente"
+    },
+    {
+      "table_name": "registroefdreinf"
+    },
+    {
+      "table_name": "relatorio"
+    },
+    {
+      "table_name": "reposicao"
+    },
+    {
+      "table_name": "reposicaocoletor"
+    },
+    {
+      "table_name": "reposicaoconferencia"
+    },
+    {
+      "table_name": "reposicaoconferenciacoletor"
+    },
+    {
+      "table_name": "reposicaoitem"
+    },
+    {
+      "table_name": "reposicaolojacentralizado"
+    },
+    {
+      "table_name": "reposicaominimo"
+    },
+    {
+      "table_name": "reposicaoregrasugestao"
+    },
+    {
+      "table_name": "reposicaoseparacao"
+    },
+    {
+      "table_name": "reposicaoseparacaocoletor"
+    },
+    {
+      "table_name": "reservaveiculo"
+    },
+    {
+      "table_name": "retencaoperiodocompetencia"
+    },
+    {
+      "table_name": "retencaotributoconfiguracao"
+    },
+    {
+      "table_name": "retornohttpregistroefdreinf"
+    },
+    {
+      "table_name": "retornoregistroefdreinf"
+    },
+    {
+      "table_name": "romaneio"
+    },
+    {
+      "table_name": "rupturacoletor"
+    },
+    {
+      "table_name": "saldopiscofins"
+    },
+    {
+      "table_name": "sefazwebservice"
+    },
+    {
+      "table_name": "servico"
+    },
+    {
+      "table_name": "setorbalancafilizola"
+    },
+    {
+      "table_name": "setorbalancatoledo"
+    },
+    {
+      "table_name": "similarproduto"
+    },
+    {
+      "table_name": "similarprodutoitem"
+    },
+    {
+      "table_name": "simix_item_por_estabelecimento"
+    },
+    {
+      "table_name": "simix_item_principal"
+    },
+    {
+      "table_name": "simplesoutrosvalores"
+    },
+    {
+      "table_name": "simulacaooferta"
+    },
+    {
+      "table_name": "simulacaoofertaitem"
+    },
+    {
+      "table_name": "simulacaoofertavendaconjugada"
+    },
+    {
+      "table_name": "situacaoabastecimento"
+    },
+    {
+      "table_name": "situacaobalanco"
+    },
+    {
+      "table_name": "situacaoboleto"
+    },
+    {
+      "table_name": "situacaocadastro"
+    },
+    {
+      "table_name": "situacaocaixa"
+    },
+    {
+      "table_name": "situacaocarga"
+    },
+    {
+      "table_name": "situacaocartacorrecao"
+    },
+    {
+      "table_name": "situacaocheque"
+    },
+    {
+      "table_name": "situacaoconciliacaobancaria"
+    },
+    {
+      "table_name": "situacaocotacaocliente"
+    },
+    {
+      "table_name": "situacaocustodiacheque"
+    },
+    {
+      "table_name": "situacaodelivery"
+    },
+    {
+      "table_name": "situacaodoacaoentidade"
+    },
+    {
+      "table_name": "situacaogeracaoretencaotributo"
+    },
+    {
+      "table_name": "situacaomanifestacaonfe"
+    },
+    {
+      "table_name": "situacaomdfe"
+    },
+    {
+      "table_name": "situacaonfe"
+    },
+    {
+      "table_name": "situacaonotadespesa"
+    },
+    {
+      "table_name": "situacaonotaentrada"
+    },
+    {
+      "table_name": "situacaonotasaida"
+    },
+    {
+      "table_name": "situacaonotaservico"
+    },
+    {
+      "table_name": "situacaooferta"
+    },
+    {
+      "table_name": "situacaoofertalote"
+    },
+    {
+      "table_name": "situacaopagaradiantamento"
+    },
+    {
+      "table_name": "situacaopagarfornecedorparcela"
+    },
+    {
+      "table_name": "situacaopagaroutrasdespesas"
+    },
+    {
+      "table_name": "situacaopedido"
+    },
+    {
+      "table_name": "situacaopedidodespesa"
+    },
+    {
+      "table_name": "situacaoprecotacaofornecedor"
+    },
+    {
+      "table_name": "situacaoprepedido"
+    },
+    {
+      "table_name": "situacaoprevisao"
+    },
+    {
+      "table_name": "situacaopromocaoacumulada"
+    },
+    {
+      "table_name": "situacaopromocaopontuacao"
+    },
+    {
+      "table_name": "situacaorebaixacusto"
+    },
+    {
+      "table_name": "situacaorecebercaixa"
+    },
+    {
+      "table_name": "situacaorecebercheque"
+    },
+    {
+      "table_name": "situacaorecebercontrato"
+    },
+    {
+      "table_name": "situacaoreceberconveniado"
+    },
+    {
+      "table_name": "situacaorecebercreditorotativo"
+    },
+    {
+      "table_name": "situacaoreceberdevolucao"
+    },
+    {
+      "table_name": "situacaoreceberoutrasreceitas"
+    },
+    {
+      "table_name": "situacaorecebervendaprazo"
+    },
+    {
+      "table_name": "situacaoreceberverba"
+    },
+    {
+      "table_name": "situacaorecebimento"
+    },
+    {
+      "table_name": "situacaoreceitaoutras"
+    },
+    {
+      "table_name": "situacaoregistroefdreinf"
+    },
+    {
+      "table_name": "situacaoreposicao"
+    },
+    {
+      "table_name": "situacaoreservaveiculo"
+    },
+    {
+      "table_name": "situacaotransacaoconveniado"
+    },
+    {
+      "table_name": "situacaotransferenciaentrada"
+    },
+    {
+      "table_name": "situacaotransferenciasaida"
+    },
+    {
+      "table_name": "situacaotransformado"
+    },
+    {
+      "table_name": "situacaotrocanegociacao"
+    },
+    {
+      "table_name": "situacaovalidacaocliente"
+    },
+    {
+      "table_name": "situacaovasilhame"
+    },
+    {
+      "table_name": "situacaoverba"
+    },
+    {
+      "table_name": "situacaoverbasellout"
+    },
+    {
+      "table_name": "situacaoworkflow"
+    },
+    {
+      "table_name": "softwarehouse"
+    },
+    {
+      "table_name": "sqlconsulta"
+    },
+    {
+      "table_name": "subtarefa"
+    },
+    {
+      "table_name": "tabcest"
+    },
+    {
+      "table_name": "tabelaproduto"
+    },
+    {
+      "table_name": "tabelaprodutoitem"
+    },
+    {
+      "table_name": "tabelasubstituicaoestadual"
+    },
+    {
+      "table_name": "tabelasubstituicaoestadualexterior"
+    },
+    {
+      "table_name": "tabelasubstituicaotributaria"
+    },
+    {
+      "table_name": "tarefa"
+    },
+    {
+      "table_name": "tarefapendencia"
+    },
+    {
+      "table_name": "tarefaprecadastro"
+    },
+    {
+      "table_name": "tarefaprioridade"
+    },
+    {
+      "table_name": "tarefastatus"
+    },
+    {
+      "table_name": "tarefasubtarefa"
+    },
+    {
+      "table_name": "tarefatipoexibicao"
+    },
+    {
+      "table_name": "tecladobalancatoledo"
+    },
+    {
+      "table_name": "telefone"
+    },
+    {
+      "table_name": "tipoabatimento"
+    },
+    {
+      "table_name": "tipoacordo"
+    },
+    {
+      "table_name": "tipoadicionarretirar"
+    },
+    {
+      "table_name": "tipoadministracaopreco"
+    },
+    {
+      "table_name": "tipoagendabalanco"
+    },
+    {
+      "table_name": "tipoagendafornecedor"
+    },
+    {
+      "table_name": "tipoagendamento"
+    },
+    {
+      "table_name": "tipoalinea"
+    },
+    {
+      "table_name": "tipoaliquotaicmsobsfiscal"
+    },
+    {
+      "table_name": "tipoambientesefaz"
+    },
+    {
+      "table_name": "tipoarredondamentorecebivel"
+    },
+    {
+      "table_name": "tipoatendidopedido"
+    },
+    {
+      "table_name": "tipobaixapontuacao"
+    },
+    {
+      "table_name": "tipobalanca"
+    },
+    {
+      "table_name": "tipobalanco"
+    },
+    {
+      "table_name": "tipobalancoestoque"
+    },
+    {
+      "table_name": "tipobasecalculocredito"
+    },
+    {
+      "table_name": "tipobasecalculoobsfiscal"
+    },
+    {
+      "table_name": "tipoboleto"
+    },
+    {
+      "table_name": "tipocalculoddv"
+    },
+    {
+      "table_name": "tipocampoacaocrm"
+    },
+    {
+      "table_name": "tipocampocoletor"
+    },
+    {
+      "table_name": "tipocampocoletorexportacao"
+    },
+    {
+      "table_name": "tipocarroceria"
+    },
+    {
+      "table_name": "tipocartaotef"
+    },
+    {
+      "table_name": "tipocatergoriaselfcheckout"
+    },
+    {
+      "table_name": "tipocentrocusto"
+    },
+    {
+      "table_name": "tipocentrocustobackup"
+    },
+    {
+      "table_name": "tipoclasserisco"
+    },
+    {
+      "table_name": "tipoclubevantagem"
+    },
+    {
+      "table_name": "tipocobrancajuros"
+    },
+    {
+      "table_name": "tipocombustivel"
+    },
+    {
+      "table_name": "tipocompra"
+    },
+    {
+      "table_name": "tipocondicaoacaocrm"
+    },
+    {
+      "table_name": "tipoconsultacheque"
+    },
+    {
+      "table_name": "tipoconsumo"
+    },
+    {
+      "table_name": "tipocontato"
+    },
+    {
+      "table_name": "tipocontrato"
+    },
+    {
+      "table_name": "tipoconvenio"
+    },
+    {
+      "table_name": "tipocreditoconvenio"
+    },
+    {
+      "table_name": "tipocrt"
+    },
+    {
+      "table_name": "tipocurvaabc"
+    },
+    {
+      "table_name": "tipocustodevolucaotroca"
+    },
+    {
+      "table_name": "tipocustodiacheque"
+    },
+    {
+      "table_name": "tipodataorcamentodespesa"
+    },
+    {
+      "table_name": "tipodescontoatacado"
+    },
+    {
+      "table_name": "tipodespesaveiculo"
+    },
+    {
+      "table_name": "tipodevolucao"
+    },
+    {
+      "table_name": "tipodiferencialaliquota"
+    },
+    {
+      "table_name": "tipodivergenciaentrada"
+    },
+    {
+      "table_name": "tipodocumento"
+    },
+    {
+      "table_name": "tipoembalagem"
+    },
+    {
+      "table_name": "tipoempresa"
+    },
+    {
+      "table_name": "tipoentrada"
+    },
+    {
+      "table_name": "tipoentradacfopxml"
+    },
+    {
+      "table_name": "tipoentradacontabilidade"
+    },
+    {
+      "table_name": "tipoentradaexclusaoicmspiscofins"
+    },
+    {
+      "table_name": "tipoentradaretencao"
+    },
+    {
+      "table_name": "tipoentradasaida"
+    },
+    {
+      "table_name": "tipoentradatipocentrocusto"
+    },
+    {
+      "table_name": "tipoentradavalorpagarfornecedorparcela"
+    },
+    {
+      "table_name": "tipoenvioregistroefdreinf"
+    },
+    {
+      "table_name": "tipoespecieboleto"
+    },
+    {
+      "table_name": "tipoestadocivil"
+    },
+    {
+      "table_name": "tipoestoquebalanco"
+    },
+    {
+      "table_name": "tipoexportacaolayout"
+    },
+    {
+      "table_name": "tipoformaimportacao"
+    },
+    {
+      "table_name": "tipoformatocampocoletorexportacao"
+    },
+    {
+      "table_name": "tipofornecedor"
+    },
+    {
+      "table_name": "tipofretenotafiscal"
+    },
+    {
+      "table_name": "tipofretepedido"
+    },
+    {
+      "table_name": "tipoguia"
+    },
+    {
+      "table_name": "tipoimpostodespesa"
+    },
+    {
+      "table_name": "tipoimpostoprodutorrural"
+    },
+    {
+      "table_name": "tipoimpostoservico"
+    },
+    {
+      "table_name": "tipoindicadorie"
+    },
+    {
+      "table_name": "tipoinscricao"
+    },
+    {
+      "table_name": "tipoinspecao"
+    },
+    {
+      "table_name": "tipointegracaopagamentonfe"
+    },
+    {
+      "table_name": "tipolancamentooutrosvalorespiscofins"
+    },
+    {
+      "table_name": "tipolayoutexportacaobalancatoledo"
+    },
+    {
+      "table_name": "tipolayoutnotapaulista"
+    },
+    {
+      "table_name": "tipolocalcobranca"
+    },
+    {
+      "table_name": "tipolocaldestinotrocanegociacao"
+    },
+    {
+      "table_name": "tipolocaltroca"
+    },
+    {
+      "table_name": "tipomargempadrao"
+    },
+    {
+      "table_name": "tipomedida"
+    },
+    {
+      "table_name": "tipomedidadecimal"
+    },
+    {
+      "table_name": "tipomercadoria"
+    },
+    {
+      "table_name": "tipometodolojavirtual"
+    },
+    {
+      "table_name": "tipomodelo"
+    },
+    {
+      "table_name": "tipomotivofornecedor"
+    },
+    {
+      "table_name": "tipomotivoperda"
+    },
+    {
+      "table_name": "tipomotivoquebra"
+    },
+    {
+      "table_name": "tipomotivotroca"
+    },
+    {
+      "table_name": "tipomovimentacao"
+    },
+    {
+      "table_name": "tiponaturezareceita"
+    },
+    {
+      "table_name": "tiponegociacao"
+    },
+    {
+      "table_name": "tiponegociacaocompra"
+    },
+    {
+      "table_name": "tiponota"
+    },
+    {
+      "table_name": "tiponotanf3e"
+    },
+    {
+      "table_name": "tipooferta"
+    },
+    {
+      "table_name": "tipooperacao"
+    },
+    {
+      "table_name": "tipoorcamentocompra"
+    },
+    {
+      "table_name": "tipoorcamentodespesa"
+    },
+    {
+      "table_name": "tipoorgaopublico"
+    },
+    {
+      "table_name": "tipoorigemapuracao"
+    },
+    {
+      "table_name": "tipoorigemcadastro"
+    },
+    {
+      "table_name": "tipoorigemcontabilidade"
+    },
+    {
+      "table_name": "tipoorigemimagem"
+    },
+    {
+      "table_name": "tipoorigemmercadoria"
+    },
+    {
+      "table_name": "tipoorigemoperacaopagamentoeletronico"
+    },
+    {
+      "table_name": "tipoorigemverba"
+    },
+    {
+      "table_name": "tipooutrosvalores"
+    },
+    {
+      "table_name": "tipopagamento"
+    },
+    {
+      "table_name": "tipoparcelamento"
+    },
+    {
+      "table_name": "tipopedido"
+    },
+    {
+      "table_name": "tipopercentualvalor"
+    },
+    {
+      "table_name": "tipoperiodoapuracaocontrato"
+    },
+    {
+      "table_name": "tipopiscofins"
+    },
+    {
+      "table_name": "tipoplanoconta"
+    },
+    {
+      "table_name": "tipoplanoconta_temp"
+    },
+    {
+      "table_name": "tipoplanocontasaida"
+    },
+    {
+      "table_name": "tipoplanojuros"
+    },
+    {
+      "table_name": "tipoprecolojavirtual"
+    },
+    {
+      "table_name": "tipoprioridadeoferta"
+    },
+    {
+      "table_name": "tipoproduto"
+    },
+    {
+      "table_name": "tipoprodutonaocadastrado"
+    },
+    {
+      "table_name": "tipopromocao"
+    },
+    {
+      "table_name": "tipoproprietario"
+    },
+    {
+      "table_name": "tiporecebimento"
+    },
+    {
+      "table_name": "tiporecebivel"
+    },
+    {
+      "table_name": "tiporecebivelfinalizadora"
+    },
+    {
+      "table_name": "tiporeceita"
+    },
+    {
+      "table_name": "tiporeceitacontabilidade"
+    },
+    {
+      "table_name": "tiporegistroefdreinf"
+    },
+    {
+      "table_name": "tiporegraacaocrm"
+    },
+    {
+      "table_name": "tiporegrasugestao"
+    },
+    {
+      "table_name": "tiporesidencia"
+    },
+    {
+      "table_name": "tiporestricaocliente"
+    },
+    {
+      "table_name": "tiporodado"
+    },
+    {
+      "table_name": "tiposacadoboleto"
+    },
+    {
+      "table_name": "tiposaida"
+    },
+    {
+      "table_name": "tiposaidaaliquota"
+    },
+    {
+      "table_name": "tiposaidacontabilidade"
+    },
+    {
+      "table_name": "tiposaidaconversaoaliquota"
+    },
+    {
+      "table_name": "tiposaidaimportacaocupom"
+    },
+    {
+      "table_name": "tiposaidanotasaidasequencia"
+    },
+    {
+      "table_name": "tiposaidaoperacao"
+    },
+    {
+      "table_name": "tiposaidaretencaotributo"
+    },
+    {
+      "table_name": "tiposervico"
+    },
+    {
+      "table_name": "tiposervicocontabilidade"
+    },
+    {
+      "table_name": "tiposervicoconvenio"
+    },
+    {
+      "table_name": "tiposerviconotadespesa"
+    },
+    {
+      "table_name": "tiposervicosefaz"
+    },
+    {
+      "table_name": "tiposetor"
+    },
+    {
+      "table_name": "tiposexo"
+    },
+    {
+      "table_name": "tiposimnao"
+    },
+    {
+      "table_name": "tiposolicitacaolgpd"
+    },
+    {
+      "table_name": "tipotarefa"
+    },
+    {
+      "table_name": "tipotelefone"
+    },
+    {
+      "table_name": "tipotempoexibicao"
+    },
+    {
+      "table_name": "tipotransacao"
+    },
+    {
+      "table_name": "tipotransferenciainterna"
+    },
+    {
+      "table_name": "tipotroca"
+    },
+    {
+      "table_name": "tipounidadeporcao"
+    },
+    {
+      "table_name": "tipoutilizacaovasilhame"
+    },
+    {
+      "table_name": "tipovalorcontabilidade"
+    },
+    {
+      "table_name": "tipovaloricmsobsfiscal"
+    },
+    {
+      "table_name": "tipovaloroutrasobsfiscal"
+    },
+    {
+      "table_name": "tipovencimentorecebivel"
+    },
+    {
+      "table_name": "tipovencimentorecebivelregra"
+    },
+    {
+      "table_name": "tipoverba"
+    },
+    {
+      "table_name": "tipoverbacontabilidade"
+    },
+    {
+      "table_name": "tipoversaoservicosefaz"
+    },
+    {
+      "table_name": "tipoviatransporteinternacional"
+    },
+    {
+      "table_name": "tipovistaprazo"
+    },
+    {
+      "table_name": "tipoworkflow"
+    },
+    {
+      "table_name": "tipoworkflowloja"
+    },
+    {
+      "table_name": "transferenciaentrada"
+    },
+    {
+      "table_name": "transferenciaentradaitem"
+    },
+    {
+      "table_name": "transferenciainterna"
+    },
+    {
+      "table_name": "transferenciasaida"
+    },
+    {
+      "table_name": "transferenciasaidaitem"
+    },
+    {
+      "table_name": "transferenciasaidanotaentradaproduto"
+    },
+    {
+      "table_name": "transformado"
+    },
+    {
+      "table_name": "transformadoitem"
+    },
+    {
+      "table_name": "transformadolote"
+    },
+    {
+      "table_name": "transformadoloteitem"
+    },
+    {
+      "table_name": "transformadoprecadastro"
+    },
+    {
+      "table_name": "transformadoprecadastroitem"
+    },
+    {
+      "table_name": "trocanegociacao"
+    },
+    {
+      "table_name": "usuario"
+    },
+    {
+      "table_name": "usuariobanco"
+    },
+    {
+      "table_name": "usuarioloja"
+    },
+    {
+      "table_name": "usuariovisualizoualerta"
+    },
+    {
+      "table_name": "usuariovizualizoudivergencia"
+    },
+    {
+      "table_name": "v_pagpouco"
+    },
+    {
+      "table_name": "validade"
+    },
+    {
+      "table_name": "vasilhame"
+    },
+    {
+      "table_name": "vasilhameengradado"
+    },
+    {
+      "table_name": "vasilhameengradadoitem"
+    },
+    {
+      "table_name": "vasilhameitem"
+    },
+    {
+      "table_name": "vasilhameitemvalidade"
+    },
+    {
+      "table_name": "vasilhamevalidade"
+    },
+    {
+      "table_name": "veiculo"
+    },
+    {
+      "table_name": "veiculodespesa"
+    },
+    {
+      "table_name": "veiculodespesaitem"
+    },
+    {
+      "table_name": "venda"
+    },
+    {
+      "table_name": "venda012023"
+    },
+    {
+      "table_name": "venda012024"
+    },
+    {
+      "table_name": "venda012025"
+    },
+    {
+      "table_name": "venda012026"
+    },
+    {
+      "table_name": "venda022022"
+    },
+    {
+      "table_name": "venda022023"
+    },
+    {
+      "table_name": "venda022024"
+    },
+    {
+      "table_name": "venda022025"
+    },
+    {
+      "table_name": "venda022026"
+    },
+    {
+      "table_name": "venda032022"
+    },
+    {
+      "table_name": "venda032023"
+    },
+    {
+      "table_name": "venda032024"
+    },
+    {
+      "table_name": "venda032025"
+    },
+    {
+      "table_name": "venda032026"
+    },
+    {
+      "table_name": "venda042022"
+    },
+    {
+      "table_name": "venda042023"
+    },
+    {
+      "table_name": "venda042024"
+    },
+    {
+      "table_name": "venda042025"
+    },
+    {
+      "table_name": "venda042026"
+    },
+    {
+      "table_name": "venda052022"
+    },
+    {
+      "table_name": "venda052023"
+    },
+    {
+      "table_name": "venda052024"
+    },
+    {
+      "table_name": "venda052025"
+    },
+    {
+      "table_name": "venda052026"
+    },
+    {
+      "table_name": "venda062022"
+    },
+    {
+      "table_name": "venda062023"
+    },
+    {
+      "table_name": "venda062024"
+    },
+    {
+      "table_name": "venda062025"
+    },
+    {
+      "table_name": "venda062026"
+    },
+    {
+      "table_name": "venda072022"
+    },
+    {
+      "table_name": "venda072023"
+    },
+    {
+      "table_name": "venda072024"
+    },
+    {
+      "table_name": "venda072025"
+    },
+    {
+      "table_name": "venda072026"
+    },
+    {
+      "table_name": "venda082022"
+    },
+    {
+      "table_name": "venda082023"
+    },
+    {
+      "table_name": "venda082024"
+    },
+    {
+      "table_name": "venda082025"
+    },
+    {
+      "table_name": "venda082026"
+    },
+    {
+      "table_name": "venda092022"
+    },
+    {
+      "table_name": "venda092023"
+    },
+    {
+      "table_name": "venda092024"
+    },
+    {
+      "table_name": "venda092025"
+    },
+    {
+      "table_name": "venda092026"
+    },
+    {
+      "table_name": "venda102022"
+    },
+    {
+      "table_name": "venda102023"
+    },
+    {
+      "table_name": "venda102024"
+    },
+    {
+      "table_name": "venda102025"
+    },
+    {
+      "table_name": "venda102026"
+    },
+    {
+      "table_name": "venda112022"
+    },
+    {
+      "table_name": "venda112023"
+    },
+    {
+      "table_name": "venda112024"
+    },
+    {
+      "table_name": "venda112025"
+    },
+    {
+      "table_name": "venda112026"
+    },
+    {
+      "table_name": "venda122022"
+    },
+    {
+      "table_name": "venda122023"
+    },
+    {
+      "table_name": "venda122024"
+    },
+    {
+      "table_name": "venda122025"
+    },
+    {
+      "table_name": "venda122026"
+    },
+    {
+      "table_name": "vendaatacado"
+    },
+    {
+      "table_name": "vendacupommedio"
+    },
+    {
+      "table_name": "vendaecommerce"
+    },
+    {
+      "table_name": "vendahistorica"
+    },
+    {
+      "table_name": "vendakit"
+    },
+    {
+      "table_name": "vendakititem"
+    },
+    {
+      "table_name": "vendamedia"
+    },
+    {
+      "table_name": "vendamediacalculalojavendanf"
+    },
+    {
+      "table_name": "vendamediadata"
+    },
+    {
+      "table_name": "vendamediaexecucaonota"
+    },
+    {
+      "table_name": "vendamedialojasemconsistenciapdv"
+    },
+    {
+      "table_name": "vendasintetica"
+    },
+    {
+      "table_name": "vendasinteticaprevisao"
+    },
+    {
+      "table_name": "vendasinteticaprevisaodia"
+    },
+    {
+      "table_name": "verba"
+    },
+    {
+      "table_name": "verbasellout"
+    },
+    {
+      "table_name": "verbaselloutconfiguracao"
+    },
+    {
+      "table_name": "verbaselloutitem"
+    },
+    {
+      "table_name": "verbaselloutloja"
+    },
+    {
+      "table_name": "verbavencimento"
+    },
+    {
+      "table_name": "versao"
+    },
+    {
+      "table_name": "versaolayoutadministracaopreco"
+    },
+    {
+      "table_name": "versaolayoutpedidocompra"
+    },
+    {
+      "table_name": "wikiurl"
+    },
+    {
+      "table_name": "workflow"
+    },
+    {
+      "table_name": "workflowdivergenciamensagem"
+    },
+    {
+      "table_name": "workflowusuario"
+    },
+    {
+      "table_name": "workflowusuarioloja"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "columns": [
+    "id",
+    "id_notasaida",
+    "numerocupom",
+    "data",
+    "ecf"
+  ],
+  "rows": [
+    {
+      "id": "2",
+      "id_notasaida": "8",
+      "numerocupom": "12955",
+      "data": "2015-04-07",
+      "ecf": "5"
+    },
+    {
+      "id": "182",
+      "id_notasaida": "45",
+      "numerocupom": "309008",
+      "data": "2015-05-15",
+      "ecf": "3"
+    },
+    {
+      "id": "4",
+      "id_notasaida": "9",
+      "numerocupom": "13134",
+      "data": "2015-04-08",
+      "ecf": "5"
+    },
+    {
+      "id": "6",
+      "id_notasaida": "10",
+      "numerocupom": "13136",
+      "data": "2015-04-08",
+      "ecf": "5"
+    },
+    {
+      "id": "184",
+      "id_notasaida": "46",
+      "numerocupom": "354260",
+      "data": "2015-05-19",
+      "ecf": "2"
+    }
+  ]
+}

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup Receituário - Arroz Branco</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden print:shadow-none print:w-full">
+
+        <!-- Header com Foto e Título -->
+        <div class="relative h-64 bg-gray-200">
+            <div class="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100">
+                <div class="text-center">
+                    <svg class="w-16 h-16 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                    <span class="font-medium">Foto do Prato</span>
+                </div>
+            </div>
+            <!-- Overlay com Título -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-20">
+                <h1 class="text-3xl font-bold text-white mb-1">Arroz Branco Tipo 1</h1>
+                <div class="flex items-center text-white/90 gap-4 text-sm">
+                    <span class="bg-blue-600 px-2 py-0.5 rounded text-xs font-semibold">Acompanhamentos</span>
+                    <span><span class="font-semibold">Rendimento:</span> 350g (1 Cuba)</span>
+                    <span><span class="font-semibold">Tempo:</span> 25 min</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row">
+
+            <!-- Coluna Esquerda: Ingredientes (Mise en Place) -->
+            <div class="md:w-1/3 bg-gray-50 border-r border-gray-100 p-6">
+                <h3 class="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                        </path>
+                    </svg>
+                    Ingredientes
+                </h3>
+
+                <ul class="space-y-3 text-sm">
+                    <!-- Ingredientes Principais -->
+                    <li class="flex justify-between items-start pb-2 border-b border-gray-200 border-dashed">
+                        <span>Arroz Branco Tipo 1</span>
+                        <span class="font-semibold">0,072 kg</span>
+                    </li>
+                    <li class="flex justify-between items-start pb-2 border-b border-gray-200 border-dashed">
+                        <span>Água Filtrada</span>
+                        <span class="font-semibold">0,143 L</span>
+                    </li>
+                    <li class="flex justify-between items-start pb-2 border-b border-gray-200 border-dashed">
+                        <span>Óleo de Soja</span>
+                        <span class="font-semibold">0,002 kg</span>
+                    </li>
+                    <li class="flex justify-between items-start pb-2 border-b border-gray-200 border-dashed">
+                        <span>Cebola Branca</span>
+                        <span class="font-semibold">0,005 kg</span>
+                    </li>
+                    <li class="flex justify-between items-start pb-2 border-b border-gray-200 border-dashed">
+                        <span>Alho Fresco</span>
+                        <span class="font-semibold">0,001 kg</span>
+                    </li>
+                    <li class="flex justify-between items-start pb-2 border-b border-gray-200 border-dashed">
+                        <span>Sal Refinado</span>
+                        <span class="font-semibold">0,001 kg</span>
+                    </li>
+                </ul>
+
+                <!-- Embalagem -->
+                <div class="mt-8">
+                    <h3 class="text-xs uppercase tracking-wider text-gray-500 font-bold mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        Montagem
+                    </h3>
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-500">Recipiente</div>
+                                <div class="text-sm font-semibold">Embalagem Para Bolo</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-400 text-center">Peso Final: 350g</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Coluna Direita: Modo de Preparo -->
+            <div class="md:w-2/3 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                            </path>
+                        </svg>
+                        Modo de Preparo
+                    </h2>
+                </div>
+
+                <div class="space-y-6">
+
+                    <!-- Passo 1 -->
+                    <div class="relative pl-8 border-l-2 border-orange-100 hover:border-orange-400 transition-colors">
+                        <div
+                            class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-orange-500 border-4 border-white shadow-sm">
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-1 text-sm">1. Preparo Inicial</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Lavar o arroz em água corrente até a água sair clara (opcional, remove excesso de amido).
+                            Descascar e picar a cebola em cubos pequenos. Descascar e picar o alho finamente.
+                        </p>
+                    </div>
+
+                    <!-- Passo 2 -->
+                    <div class="relative pl-8 border-l-2 border-orange-100 hover:border-orange-400 transition-colors">
+                        <div
+                            class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-orange-100 border-4 border-white shadow-sm">
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-1 text-sm">2. Refogado</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Aquecer o óleo em panela grossa. Refogar cebola até dourar levemente (~2 min). Adicionar
+                            alho e refogar por mais 30 segundos (não deixar queimar).
+                        </p>
+                        <div class="mt-2 flex gap-2">
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                    </path>
+                                </svg>
+                                Atenção: Não queimar o alho
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Passo 3 -->
+                    <div class="relative pl-8 border-l-2 border-orange-100 hover:border-orange-400 transition-colors">
+                        <div
+                            class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-orange-100 border-4 border-white shadow-sm">
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-1 text-sm">3. Cocção</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Adicionar o arroz e mexer bem, tostando levemente (~1 min). Adicionar a água FERVENTE e o
+                            sal. Tampar e cozinhar em fogo BAIXO por 15-18 minutos.
+                        </p>
+                    </div>
+
+                    <!-- Passo 4 -->
+                    <div class="relative pl-8 border-l-2 border-orange-100 hover:border-orange-400 transition-colors">
+                        <div
+                            class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-green-500 border-4 border-white shadow-sm">
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-1 text-sm">4. Finalização</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Desligar o fogo e deixar descansar tampado por 5 minutos. Soltar com garfo antes de servir.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Seção: Controle de Qualidade e Especificações (Novo - Modelo Varejo) -->
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h3 class="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Controle de Qualidade e Logística
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50/50 p-3 rounded border border-gray-100">
+                            <div class="text-xs text-gray-400 mb-1">Validade (Shelf Life)</div>
+                            <div class="text-sm font-semibold text-gray-700">24 horas</div>
+                            <div class="text-xs text-gray-500 mt-1">Após preparo</div>
+                        </div>
+                        <div class="bg-gray-50/50 p-3 rounded border border-gray-100">
+                            <div class="text-xs text-gray-400 mb-1">Armazenamento</div>
+                            <div class="text-sm font-semibold text-gray-700">Refrigerado</div>
+                            <div class="text-xs text-gray-500 mt-1">0°C a 5°C</div>
+                        </div>
+                        <div class="bg-gray-50/50 p-3 rounded border border-gray-100">
+                            <div class="text-xs text-gray-400 mb-1">PCC (Ponto Crítico)</div>
+                            <div class="text-sm font-semibold text-gray-700">Cozimento > 75°C</div>
+                            <div class="text-xs text-gray-500 mt-1">Manter > 60°C na distribuição</div>
+                        </div>
+                        <div class="bg-gray-50/50 p-3 rounded border border-gray-100">
+                            <div class="text-xs text-gray-400 mb-1">Alergênicos</div>
+                            <div class="text-sm font-semibold text-red-600">NÃO CONTÉM GLÚTEN</div>
+                            <div class="text-xs text-gray-500 mt-1">Pode conter traços de soja</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

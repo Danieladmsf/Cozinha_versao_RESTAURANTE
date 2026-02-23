@@ -1,0 +1,30 @@
+{
+  "columns": [
+    "id",
+    "descricao",
+    "id_fornecedor",
+    "id_situacaocadastro",
+    "nomeservidor",
+    "id_regiao",
+    "servidorcentral",
+    "geraconcentrador",
+    "estoqueterceiro",
+    "lojavirtual",
+    "atacado"
+  ],
+  "rows": [
+    {
+      "id": "2",
+      "descricao": "BENDITO BEEF",
+      "id_fornecedor": "1809",
+      "id_situacaocadastro": "1",
+      "nomeservidor": "192.168.0.100",
+      "id_regiao": "0",
+      "servidorcentral": "f",
+      "geraconcentrador": "t",
+      "estoqueterceiro": "f",
+      "lojavirtual": "f",
+      "atacado": "f"
+    }
+  ]
+}

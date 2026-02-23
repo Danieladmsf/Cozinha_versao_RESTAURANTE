@@ -1,0 +1,312 @@
+{
+  "columns": [
+    "column_name",
+    "data_type"
+  ],
+  "rows": [
+    {
+      "column_name": "id",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "id_notasaida",
+      "data_type": "bigint"
+    },
+    {
+      "column_name": "id_produto",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "quantidade",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "qtdembalagem",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valor",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valortotal",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoripi",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "id_aliquota",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valorbasecalculo",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricms",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorbasesubstituicao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricmssubstituicao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorpiscofins",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorbaseipi",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "cfop",
+      "data_type": "character varying"
+    },
+    {
+      "column_name": "tipoiva",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "id_aliquotapautafiscal",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valordesconto",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorisento",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoroutras",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "situacaotributaria",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valoricmsdispensado",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "id_aliquotadispensado",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "tiponaturezareceita",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "datadesembaraco",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "column_name": "id_estadodesembaraco",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "numeroadicao",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "localdesembaraco",
+      "data_type": "character varying"
+    },
+    {
+      "column_name": "id_tiposaida",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "id_aliquotainterestadual",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "id_aliquotadestino",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valorbasefcp",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorfcp",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorbasefcpst",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorfcpst",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "id_tipoorigemapuracao",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "id_escritafundamento",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "id_escritacodigoajuste",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valoricmsdesonerado",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "idmotivodesoneracao",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valorbasecalculoicmsdesonerado",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricmsdiferido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "basecalculoicmsstretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "porcentagemicmsstretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricmsstretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "basecalculofcpstretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "porcentagemfcpstretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorfcpstretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorbasesubstituicaoefetivo",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "percentualicmsstefetivo",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricmssubstituicaoefetivo",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "importadonotaentrada",
+      "data_type": "boolean"
+    },
+    {
+      "column_name": "percentualipidevolucao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "porcentagemfcp",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "porcentagemfcpst",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricmsoperacao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "codigobeneficio",
+      "data_type": "character varying"
+    },
+    {
+      "column_name": "valoricmssubstitutoretido",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "alteradopaf",
+      "data_type": "boolean"
+    },
+    {
+      "column_name": "valorpisret",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorcofinsret",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "id_tiposaidaconversaoaliquota",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "valorfrete",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorpis",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorcofins",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorbasecalculopiscofins",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "id_tipoembalagem",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "basecalculoimportacao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "iofimportacao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "despesasaduaneirasimportacao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "impostoimportacao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorbasecalculoicmsmonofasico",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valoricmsmonofasico",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "valorretencao",
+      "data_type": "numeric"
+    },
+    {
+      "column_name": "aliquotareduzidapauta",
+      "data_type": "numeric"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "columns": [
+    "id_loja",
+    "datahoraemissao",
+    "id_produto"
+  ],
+  "rows": [
+    {
+      "id_loja": "3",
+      "datahoraemissao": "2026-01-06 10:49:00",
+      "id_produto": "7768"
+    },
+    {
+      "id_loja": "3",
+      "datahoraemissao": "2026-01-08 07:01:00",
+      "id_produto": "7768"
+    },
+    {
+      "id_loja": "1",
+      "datahoraemissao": "2025-12-01 14:13:00",
+      "id_produto": "7768"
+    },
+    {
+      "id_loja": "3",
+      "datahoraemissao": "2025-11-24 15:01:00",
+      "id_produto": "7768"
+    },
+    {
+      "id_loja": "3",
+      "datahoraemissao": "2025-12-03 13:47:00",
+      "id_produto": "7768"
+    },
+    {
+      "id_loja": "3",
+      "datahoraemissao": "2025-11-25 12:46:00",
+      "id_produto": "7768"
+    },
+    {
+      "id_loja": "3",
+      "datahoraemissao": "2025-12-18 13:05:00",
+      "id_produto": "7768"
+    }
+  ]
+}

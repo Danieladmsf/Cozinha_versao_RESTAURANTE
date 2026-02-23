@@ -1,0 +1,30 @@
+{
+  "columns": [
+    "id_loja",
+    "numerocupom",
+    "id_venda",
+    "numero_caixa",
+    "data_venda",
+    "hora_venda",
+    "valor_total_sem_desc",
+    "valor_desconto",
+    "valor_total_com_desc",
+    "id_cliente_1",
+    "id_cliente_2"
+  ],
+  "rows": [
+    {
+      "id_loja": "1",
+      "numerocupom": "197511",
+      "id_venda": "2302301",
+      "numero_caixa": "103",
+      "data_venda": "2021-07-31",
+      "hora_venda": "12:29:10",
+      "valor_total_sem_desc": "40.68",
+      "valor_desconto": "0.00",
+      "valor_total_com_desc": "40.68",
+      "id_cliente_1": null,
+      "id_cliente_2": null
+    }
+  ]
+}

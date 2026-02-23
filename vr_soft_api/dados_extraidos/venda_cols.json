@@ -1,0 +1,508 @@
+{
+  "columns": [
+    "column_name"
+  ],
+  "rows": [
+    {
+      "column_name": "solucaotef"
+    },
+    {
+      "column_name": "id_loja"
+    },
+    {
+      "column_name": "id_situacaovenda"
+    },
+    {
+      "column_name": "datahoraemissao"
+    },
+    {
+      "column_name": "datavencimento"
+    },
+    {
+      "column_name": "id_vendedor"
+    },
+    {
+      "column_name": "id_clienteeventual"
+    },
+    {
+      "column_name": "id_usuario"
+    },
+    {
+      "column_name": "id_notasaida"
+    },
+    {
+      "column_name": "id_recebervendaprazo"
+    },
+    {
+      "column_name": "separado"
+    },
+    {
+      "column_name": "id_loja"
+    },
+    {
+      "column_name": "id_situacaovenda"
+    },
+    {
+      "column_name": "datahoraemissao"
+    },
+    {
+      "column_name": "id_afiliado"
+    },
+    {
+      "column_name": "id_usuario"
+    },
+    {
+      "column_name": "id_recebervendaprazo"
+    },
+    {
+      "column_name": "id_notasaida"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "nsuadministradora"
+    },
+    {
+      "column_name": "redeadquirente"
+    },
+    {
+      "column_name": "redecaptura"
+    },
+    {
+      "column_name": "data"
+    },
+    {
+      "column_name": "codigoloja"
+    },
+    {
+      "column_name": "codigoestabelecimento"
+    },
+    {
+      "column_name": "valor"
+    },
+    {
+      "column_name": "nrparcelas"
+    },
+    {
+      "column_name": "codigoproduto"
+    },
+    {
+      "column_name": "modalidade"
+    },
+    {
+      "column_name": "banco"
+    },
+    {
+      "column_name": "agencia"
+    },
+    {
+      "column_name": "conta"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "utilizado"
+    },
+    {
+      "column_name": "permitereutilizacao"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_loja"
+    },
+    {
+      "column_name": "id_vendedor"
+    },
+    {
+      "column_name": "id_venda"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_venda"
+    },
+    {
+      "column_name": "id_vendaconfere"
+    },
+    {
+      "column_name": "id_vendatef"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_loja"
+    },
+    {
+      "column_name": "id_cliente"
+    },
+    {
+      "column_name": "id_tipopagamento"
+    },
+    {
+      "column_name": "datahora"
+    },
+    {
+      "column_name": "troco"
+    },
+    {
+      "column_name": "desconto"
+    },
+    {
+      "column_name": "entrega"
+    },
+    {
+      "column_name": "id_usuario"
+    },
+    {
+      "column_name": "importado"
+    },
+    {
+      "column_name": "id_situacaovenda"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_loja"
+    },
+    {
+      "column_name": "numerocupom"
+    },
+    {
+      "column_name": "ecf"
+    },
+    {
+      "column_name": "data"
+    },
+    {
+      "column_name": "id_clientepreferencial"
+    },
+    {
+      "column_name": "matricula"
+    },
+    {
+      "column_name": "horainicio"
+    },
+    {
+      "column_name": "horatermino"
+    },
+    {
+      "column_name": "cancelado"
+    },
+    {
+      "column_name": "subtotalimpressora"
+    },
+    {
+      "column_name": "matriculacancelamento"
+    },
+    {
+      "column_name": "id_tipocancelamento"
+    },
+    {
+      "column_name": "cpf"
+    },
+    {
+      "column_name": "contadordoc"
+    },
+    {
+      "column_name": "valordesconto"
+    },
+    {
+      "column_name": "valoracrescimo"
+    },
+    {
+      "column_name": "canceladoemvenda"
+    },
+    {
+      "column_name": "mfadicional"
+    },
+    {
+      "column_name": "numerousuario"
+    },
+    {
+      "column_name": "id_clienteeventual"
+    },
+    {
+      "column_name": "cpfcrm"
+    },
+    {
+      "column_name": "datahoraemissaonfce"
+    },
+    {
+      "column_name": "datahorarecebimentonfce"
+    },
+    {
+      "column_name": "cpfcnpjentidade"
+    },
+    {
+      "column_name": "id_tipodesconto"
+    },
+    {
+      "column_name": "percentualstpauta"
+    },
+    {
+      "column_name": "valorbasesubstituicaoretido"
+    },
+    {
+      "column_name": "valoricmssubstituicaoretido"
+    },
+    {
+      "column_name": "valoricmsstretido"
+    },
+    {
+      "column_name": "basefcpstretido"
+    },
+    {
+      "column_name": "valorfcpstretido"
+    },
+    {
+      "column_name": "valorbasesubstituicaoefetivo"
+    },
+    {
+      "column_name": "valoricmssubstituicaoefetivo"
+    },
+    {
+      "column_name": "alteradopaf"
+    },
+    {
+      "column_name": "nfe"
+    },
+    {
+      "column_name": "modelo"
+    },
+    {
+      "column_name": "rateioaplicado"
+    },
+    {
+      "column_name": "indicadorpagamento"
+    },
+    {
+      "column_name": "vendaecommerce"
+    },
+    {
+      "column_name": "numeronota"
+    },
+    {
+      "column_name": "vendaecommercemercafacil"
+    },
+    {
+      "column_name": "vendaecommercesitemercado"
+    },
+    {
+      "column_name": "id_pedidoecommerce"
+    },
+    {
+      "column_name": "vendaecommerceapi"
+    },
+    {
+      "column_name": "cupomverde"
+    },
+    {
+      "column_name": "baixaestoque"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_loja"
+    },
+    {
+      "column_name": "id_produto"
+    },
+    {
+      "column_name": "data"
+    },
+    {
+      "column_name": "precovenda"
+    },
+    {
+      "column_name": "quantidade"
+    },
+    {
+      "column_name": "id_comprador"
+    },
+    {
+      "column_name": "custocomimposto"
+    },
+    {
+      "column_name": "piscofins"
+    },
+    {
+      "column_name": "operacional"
+    },
+    {
+      "column_name": "icmscredito"
+    },
+    {
+      "column_name": "icmsdebito"
+    },
+    {
+      "column_name": "valortotal"
+    },
+    {
+      "column_name": "custosemimposto"
+    },
+    {
+      "column_name": "oferta"
+    },
+    {
+      "column_name": "perda"
+    },
+    {
+      "column_name": "customediosemimposto"
+    },
+    {
+      "column_name": "customediocomimposto"
+    },
+    {
+      "column_name": "piscofinscredito"
+    },
+    {
+      "column_name": "cupomfiscal"
+    },
+    {
+      "column_name": "id_tipooferta"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_venda"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "id_operadora"
+    },
+    {
+      "column_name": "id_produto"
+    },
+    {
+      "column_name": "nsu"
+    },
+    {
+      "column_name": "datavenda"
+    },
+    {
+      "column_name": "datacreditoprevisao"
+    },
+    {
+      "column_name": "plano"
+    },
+    {
+      "column_name": "parcela"
+    },
+    {
+      "column_name": "valorbruto"
+    },
+    {
+      "column_name": "valortaxaadminprevisao"
+    },
+    {
+      "column_name": "valorliquidoprevisao"
+    },
+    {
+      "column_name": "id_situacaopagto"
+    },
+    {
+      "column_name": "datacreditopagto"
+    },
+    {
+      "column_name": "valorbrutopagto"
+    },
+    {
+      "column_name": "valortaxaadminpagto"
+    },
+    {
+      "column_name": "valortaxaantecipacaopagto"
+    },
+    {
+      "column_name": "valorliquidopagto"
+    },
+    {
+      "column_name": "id_vendatef"
+    },
+    {
+      "column_name": "valorbrutototalvenda"
+    },
+    {
+      "column_name": "considerado"
+    },
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "observacao"
+    },
+    {
+      "column_name": "produto"
+    },
+    {
+      "column_name": "modeloimpressora"
+    },
+    {
+      "column_name": "chavevenda"
+    },
+    {
+      "column_name": "nomecliente"
+    },
+    {
+      "column_name": "enderecocliente"
+    },
+    {
+      "column_name": "nrcartao"
+    },
+    {
+      "column_name": "chavecfe"
+    },
+    {
+      "column_name": "observacao"
+    },
+    {
+      "column_name": "xml"
+    },
+    {
+      "column_name": "chavenfce"
+    },
+    {
+      "column_name": "protocolorecebimentonfce"
+    },
+    {
+      "column_name": "loja"
+    },
+    {
+      "column_name": "numeroestabelecimento"
+    },
+    {
+      "column_name": "recibonfce"
+    },
+    {
+      "column_name": "nsuorigem"
+    },
+    {
+      "column_name": "tempoentrega"
+    },
+    {
+      "column_name": "razaosocialentidade"
+    },
+    {
+      "column_name": "bandeira"
+    },
+    {
+      "column_name": "nrautorizacao"
+    },
+    {
+      "column_name": "formacaptura"
+    },
+    {
+      "column_name": "numeroserie"
+    }
+  ]
+}
