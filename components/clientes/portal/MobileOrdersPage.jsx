@@ -360,7 +360,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     } catch (error) {
     }
-  }, [customer, weekNumber, year, selectedDay, isEditMode]);
+  }, [customer, weekNumber, year, selectedDay]);
 
 
 
@@ -1109,6 +1109,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             tech_sheet_container_type: containerType, // Explicit container type from Tech Sheet
             vr_product_code: productCode ? parseInt(productCode) : null, // Código do produto para exibição no portal
             shelf_life: shelfLifeFinal, // Validade da Ficha Técnica para sugerir e exibir na Tag
+            sales_window: item.sales_window || recipe.sales_window || 'all_day', // ✅ Herdar janela do cardápio ou da receita
 
             adjustment_percentage: 0,
             recipe: recipe, // Adicionado para que o weightCalculator possa acessar os pesos da receita
@@ -1411,8 +1412,15 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       if (!prev?.items) return prev;
       const newItems = prev.items.map(item => {
         if (item.unique_id === uniqueId) {
+          if (field === 'sales_window') {
+            console.log(`[updateOrderItem] Alterando ${item.recipe_name} (${item.unique_id}). sales_window: ${item.sales_window} -> ${value}`);
+          }
           // Usar lógica centralizada para calcular valores
-          return CategoryLogic.calculateItemValues(item, field, value, 0);
+          const calcItem = CategoryLogic.calculateItemValues(item, field, value, 0);
+          if (field === 'sales_window') {
+            console.log(`[updateOrderItem] Item pós-calculo:`, calcItem.sales_window);
+          }
+          return calcItem;
         }
         return item;
       });
@@ -1485,6 +1493,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             adjustment_percentage: existingItem.adjustment_percentage || 0,
             notes: existingItem.notes || "",
             suggestion: existingItem.suggestion || null,
+            sales_window: existingItem.sales_window || currentMenuItem.sales_window || 'all_day',
           };
 
           // Recalcula totais com base nas quantidades salvas
@@ -1531,7 +1540,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
     } else {
       setCurrentOrder(null);
     }
-  }, [hasInitializedDay, orderItems, selectedDay, weekNumber, year, existingOrders, isEditMode]);
+  }, [hasInitializedDay, orderItems, selectedDay, weekNumber, year, existingOrders]);
 
   // Sincronizar wasteItems com orderItems atualizados (mesma lógica dos pedidos)
   useEffect(() => {
@@ -1781,7 +1790,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             const currentUnitType = getRecipeUnitType(recipe);
             return {
               ...item,
-              unit_type: currentUnitType // Sincronizar com ficha técnica atual
+              unit_type: currentUnitType, // Sincronizar com ficha técnica atual
+              sales_window: item.sales_window // ✅ GARANTIR QUE SALVA A JANELA
             };
           }
           return item;
@@ -2155,6 +2165,67 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
   }, [customer, currentOrder, isEditMode, toast, isProcessingSuggestions, selectedDay, recipes]);
 
 
+
+  // Função específica para recalcular sugestão de um único item (usado pela Janela de Oferta)
+  const refreshSuggestionForItem = useCallback(async (uniqueId, newSalesWindow) => {
+    if (!customer || !currentOrder?.items) return;
+
+    // Obter o item modificado
+    const itemToRefresh = currentOrder.items.find(i => i.unique_id === uniqueId);
+    if (!itemToRefresh) return;
+
+    // Criar uma cópia com a janela nova para passar para o gerador
+    const tempItem = { ...itemToRefresh, sales_window: newSalesWindow };
+
+    setIsProcessingSuggestions(true);
+
+    try {
+      const suggestionResult = await OrderSuggestionManager.generateOrderSuggestions(
+        customer.id,
+        [tempItem], // Só passa o item alterado
+        0,
+        {
+          dayOfWeek: selectedDay,
+          useVrSales: true,
+          fullRecipes: recipes,
+          lookbackWeeks: 12,
+          rawValues: true,
+          storeId: customer?.vr_store_id || customer?.store_id
+        }
+      );
+
+      if (suggestionResult.success && suggestionResult.items.length > 0) {
+        const newSuggestion = suggestionResult.items[0].suggestion;
+
+        setCurrentOrder(prevOrder => {
+          if (!prevOrder?.items) return prevOrder;
+
+          const newItems = prevOrder.items.map(item => {
+            if (item.unique_id === uniqueId) {
+              return {
+                ...item,
+                suggestion: newSuggestion
+              };
+            }
+            return item;
+          });
+
+          return { ...prevOrder, items: newItems };
+        });
+
+        toast({
+          title: "Sugestão Recalculada",
+          description: `Nova sugestão baseada na janela de oferta.`,
+          duration: 3000,
+          className: "bg-blue-50 border-blue-200 text-blue-800"
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao recalcular sugestão para item:', error);
+    } finally {
+      setIsProcessingSuggestions(false);
+    }
+  }, [customer, currentOrder, selectedDay, recipes, toast]);
 
   // Wrapper personalizado para injetar as cores corretas das categorias
   const portalGroupItemsByCategory = useCallback((items, keyExtractor) => {
@@ -2538,6 +2609,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             generateCategoryStyles={generateCategoryStyles}
             filterItemsByCategoryGroup={filterItemsByCategoryGroup}
             isSuggestionsLoading={isProcessingSuggestions}
+            refreshSuggestionForItem={refreshSuggestionForItem}
           />
         )}
 

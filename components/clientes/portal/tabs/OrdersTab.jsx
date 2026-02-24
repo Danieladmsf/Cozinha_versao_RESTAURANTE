@@ -38,7 +38,8 @@ const OrdersTab = ({
   getOrderedCategories,
   generateCategoryStyles,
   filterItemsByCategoryGroup,
-  isSuggestionsLoading // ✅ Prop para indicar carregamento
+  isSuggestionsLoading, // ✅ Prop para indicar carregamento
+  refreshSuggestionForItem // ✅ Prop para recalcular sugestões baseado na janela
 }) => {
   const { registerInput, handleKeyDown } = useKeyboardNavigation();
 
@@ -70,6 +71,12 @@ const OrdersTab = ({
     if (editingItemForWindow) {
       const newWindow = `${tempWindowStart}-${tempWindowEnd}`;
       updateOrderItem(editingItemForWindow.unique_id, 'sales_window', newWindow);
+
+      // ✅ Recalcular sugestões para este item específico
+      if (refreshSuggestionForItem) {
+        refreshSuggestionForItem(editingItemForWindow.unique_id, newWindow);
+      }
+
       if (!isEditMode) enableEditMode();
       setWindowModalOpen(false);
       setEditingItemForWindow(null);
@@ -79,6 +86,12 @@ const OrdersTab = ({
   const clearWindowModal = () => {
     if (editingItemForWindow) {
       updateOrderItem(editingItemForWindow.unique_id, 'sales_window', 'all_day');
+
+      // ✅ Recalcular sugestões para este item específico
+      if (refreshSuggestionForItem) {
+        refreshSuggestionForItem(editingItemForWindow.unique_id, 'all_day');
+      }
+
       if (!isEditMode) enableEditMode();
       setWindowModalOpen(false);
       setEditingItemForWindow(null);
@@ -209,6 +222,11 @@ const OrdersTab = ({
                       const percentInputId = `pct-${categoryIndex}-${index}`;
                       const windowInputId = `window-${categoryIndex}-${index}`;
 
+                      // TODO: Remover após verificar o state de sales_window
+                      if (item.recipe_name && item.recipe_name.includes('Marmita') || item.recipe_name.includes('Refeicao')) {
+                        console.log(`[OrdersTab Render] ${item.recipe_name} | sales_window:`, item.sales_window);
+                      }
+
                       return (
                         <tr key={item.unique_id} className="border-b border-blue-50">
                           <td className="p-2">
@@ -335,8 +353,8 @@ const OrdersTab = ({
                               variant="outline"
                               size="sm"
                               className={`w-full text-xs h-8 px-2 flex justify-center items-center gap-1 border rounded-md truncate ${isEditMode
-                                  ? 'border-blue-300 bg-white text-blue-900 hover:bg-blue-50'
-                                  : 'border-transparent bg-purple-50 text-purple-700 hover:border-purple-200'
+                                ? 'border-blue-300 bg-white text-blue-900 hover:bg-blue-50'
+                                : 'border-transparent bg-purple-50 text-purple-700 hover:border-purple-200'
                                 }`}
                               onClick={() => openWindowModal(item)}
                             >
