@@ -1,0 +1,402 @@
+[
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "numeronota",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_tiponota",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_fornecedordestinatario",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_clienteeventualdestinatario",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_tiposaida",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "datahoraemissao",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "datasaida",
+    "data_type": "date"
+  },
+  {
+    "column_name": "valoripi",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorfrete",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoroutrasdespesas",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorproduto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valortotal",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorbasecalculo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricms",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorbasesubstituicao",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmssubstituicao",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorseguro",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valordesconto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "impressao",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_situacaonotasaida",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_motoristatransportador",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_fornecedortransportador",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_clienteeventualtransportador",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "placa",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "id_tipodevolucao",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "informacaocomplementar",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "senha",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "tipolocalbaixa",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valorbaseipi",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "volume",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "pesoliquido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_situacaonfe",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "chavenfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "recibonfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "motivorejeicaonfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "protocolorecebimentonfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "datahorarecebimentonfe",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "justificativacancelamentonfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "protocolocancelamentonfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "datahoracancelamentonfe",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "id_tipofretenotafiscal",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_notasaidacomplemento",
+    "data_type": "bigint"
+  },
+  {
+    "column_name": "emailnfe",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "contingencianfe",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_notaentrada",
+    "data_type": "bigint"
+  },
+  {
+    "column_name": "aplicaicmsdesconto",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "aplicaicmsencargo",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "pesobruto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "datahoraalteracao",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "id_localentrega",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valoricmsusoconsumo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "aplicaicmsipi",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_tipoviatransporteinternacional",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valorafrmm",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_tipoformaimportacao",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "aplicaicmsstipi",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "especie",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "marca",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "numeracao",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "aplicapiscofinsdesconto",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "aplicapiscofinsencargo",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "serie",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "id_escritasaldo",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valorfcp",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorfcpst",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmsdesonerado",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "basecalculoicmsstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmsstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "basecalculofcpstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorfcpstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorbasesubstituicaoefetivo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmssubstituicaoefetivo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "aplicadescontoicmsdesonerado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_estadoplaca",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valoricmssubstitutoretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "alteradopaf",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "notaempenho",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "id_tipoorgaopublico",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "habilitaredicaovalores",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "notausoconsumo",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "valorfunruralinss",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorfunruraloutrasentidades",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorfunruralsenar",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_indicadorpresenca",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_meiopagamento",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valoricmsmonofasico",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valortotalretencao",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "aplicafretebasecalculoicms",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "aplicasegurobasecalculoicms",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "aplicaoutrasdespesasbasecalculoicms",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "aplicadescontobasecalculoicms",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_produto",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "senha",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "data",
+    "data_type": "date"
+  },
+  {
+    "column_name": "quantidade",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "qtdembalagem",
+    "data_type": "integer"
+  }
+]

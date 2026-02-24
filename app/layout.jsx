@@ -21,7 +21,8 @@ import {
   ClipboardList,
   DollarSign,
   Wrench,
-  GitBranch
+  GitBranch,
+  ShoppingBag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SidebarNav from "@/components/shared/navigation";
@@ -50,12 +51,13 @@ export default function RootLayout({ children }) {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Quadro de Equipe", href: "/quadro-de-equipe", icon: Users },
     { name: "Fluxo de Trabalho", href: "/fluxo-de-trabalho", icon: GitBranch },
-    { name: "Receitas", href: "/receitas", icon: ChefHat },
+    { name: "Receitas Base (BOM)", href: "/receitas", icon: ChefHat },
+    { name: "Produtos (SKU)", href: "/produtos", icon: ShoppingBag },
     { name: "Ficha Técnica", href: "/ficha-tecnica", icon: Clipboard },
     { name: "POP's", href: "/ferramentas", icon: Wrench },
     { name: "Ordem de Produção", href: "/cardapio", icon: Utensils },
     { name: "Programação", href: "/programacao", icon: ClipboardList },
-    { name: "Insumos", href: "/ingredientes", icon: Package },
+    { name: "Insumos cru", href: "/ingredientes", icon: Package },
     { name: "Categorias", href: "/categorias", icon: Tag },
     { name: "Fornecedores e Serviços", href: "/fornecedores-e-servicos", icon: Building2 },
     { name: "Clientes", href: "/clientes", icon: Users },

@@ -1,0 +1,670 @@
+[
+  {
+    "column_name": "solucaotef",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_situacaovenda",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "datahoraemissao",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "datavencimento",
+    "data_type": "date"
+  },
+  {
+    "column_name": "id_vendedor",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_clienteeventual",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_usuario",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_notasaida",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_recebervendaprazo",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "separado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_situacaovenda",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "datahoraemissao",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "id_afiliado",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_usuario",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_recebervendaprazo",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_notasaida",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "nsuadministradora",
+    "data_type": "bigint"
+  },
+  {
+    "column_name": "redeadquirente",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "redecaptura",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "data",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "codigoloja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "codigoestabelecimento",
+    "data_type": "bigint"
+  },
+  {
+    "column_name": "valor",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "nrparcelas",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "codigoproduto",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "modalidade",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "banco",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "agencia",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "conta",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "utilizado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "permitereutilizacao",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_vendedor",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_venda",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_venda",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_vendaconfere",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_vendatef",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_cliente",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_tipopagamento",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "datahora",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "troco",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "desconto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "entrega",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_usuario",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "importado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_situacaovenda",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "numerocupom",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "ecf",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "data",
+    "data_type": "date"
+  },
+  {
+    "column_name": "id_clientepreferencial",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "matricula",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "horainicio",
+    "data_type": "time without time zone"
+  },
+  {
+    "column_name": "horatermino",
+    "data_type": "time without time zone"
+  },
+  {
+    "column_name": "cancelado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "subtotalimpressora",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "matriculacancelamento",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_tipocancelamento",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "cpf",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "contadordoc",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valordesconto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoracrescimo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "canceladoemvenda",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "mfadicional",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "numerousuario",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_clienteeventual",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "cpfcrm",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "datahoraemissaonfce",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "datahorarecebimentonfce",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "column_name": "cpfcnpjentidade",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_tipodesconto",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "percentualstpauta",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorbasesubstituicaoretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmssubstituicaoretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmsstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "basefcpstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorfcpstretido",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorbasesubstituicaoefetivo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valoricmssubstituicaoefetivo",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "alteradopaf",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "nfe",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "modelo",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "rateioaplicado",
+    "data_type": "smallint"
+  },
+  {
+    "column_name": "indicadorpagamento",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "vendaecommerce",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "numeronota",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "vendaecommercemercafacil",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "vendaecommercesitemercado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_pedidoecommerce",
+    "data_type": "bigint"
+  },
+  {
+    "column_name": "vendaecommerceapi",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "cupomverde",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "baixaestoque",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_loja",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_produto",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "data",
+    "data_type": "date"
+  },
+  {
+    "column_name": "precovenda",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "quantidade",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_comprador",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "custocomimposto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "piscofins",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "operacional",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "icmscredito",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "icmsdebito",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valortotal",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "custosemimposto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "oferta",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "perda",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "customediosemimposto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "customediocomimposto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "piscofinscredito",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "cupomfiscal",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id_tipooferta",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_venda",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_operadora",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "id_produto",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "nsu",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "datavenda",
+    "data_type": "date"
+  },
+  {
+    "column_name": "datacreditoprevisao",
+    "data_type": "date"
+  },
+  {
+    "column_name": "plano",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "parcela",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valorbruto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valortaxaadminprevisao",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorliquidoprevisao",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_situacaopagto",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "datacreditopagto",
+    "data_type": "date"
+  },
+  {
+    "column_name": "valorbrutopagto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valortaxaadminpagto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valortaxaantecipacaopagto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "valorliquidopagto",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "id_vendatef",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "valorbrutototalvenda",
+    "data_type": "numeric"
+  },
+  {
+    "column_name": "considerado",
+    "data_type": "boolean"
+  },
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "observacao",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "produto",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "modeloimpressora",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "chavevenda",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "nomecliente",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "enderecocliente",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "nrcartao",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "chavecfe",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "observacao",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "xml",
+    "data_type": "text"
+  },
+  {
+    "column_name": "chavenfce",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "protocolorecebimentonfce",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "loja",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "numeroestabelecimento",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "recibonfce",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "nsuorigem",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "tempoentrega",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "razaosocialentidade",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "bandeira",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "nrautorizacao",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "formacaptura",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "numeroserie",
+    "data_type": "character varying"
+  }
+]

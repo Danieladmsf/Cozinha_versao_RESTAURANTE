@@ -377,6 +377,7 @@ export const OrderReceiving = createEntity('OrderReceiving');
 export const OrderWaste = createEntity('OrderWaste');
 export const OrderRupture = createEntity('OrderRupture');
 export const PriceHistory = createEntity('PriceHistory');
+export const Product = createEntity('Product');
 export const Recipe = createEntity('Recipe');
 export const RecipeIngredient = createEntity('RecipeIngredient');
 export const RecipeNutritionConfig = createEntity('RecipeNutritionConfig');
@@ -389,9 +390,8 @@ export const WeeklyMenu = createEntity('WeeklyMenu');
 export const AppSettings = createEntity('AppSettings');
 export const Employee = createEntity('Employee');
 export const WorkStation = createEntity('WorkStation');
-export const DailyAssignment = createEntity('DailyAssignment');
 export const WorkflowProcess = createEntity('WorkflowProcess');
-export const VrSalesSync = createEntity('vr_sales_sync');
+export const SalesHistory = createEntity('sales_history');
 
 // User entity
 export const UserEntity = createEntity('User');

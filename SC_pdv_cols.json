@@ -1,0 +1,14 @@
+[
+  {
+    "column_name": "id",
+    "data_type": "integer"
+  },
+  {
+    "column_name": "descricao",
+    "data_type": "character varying"
+  },
+  {
+    "column_name": "ordem",
+    "data_type": "integer"
+  }
+]

@@ -1081,6 +1081,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           // Extrair código do produto da receita
           const productCode = recipe.code || recipe.product_code || recipe.external_code;
 
+          // ✅ OVERRIDE VISUAL EMERGENCIAL: Se a Categoria for de ALMOÇO, travar validade em 1 dia
+          const categoryName = recipe.category || categoryId || '';
+          let shelfLifeFinal = recipe.shelf_life ? parseInt(recipe.shelf_life, 10) : null;
+          if (categoryName.toUpperCase().includes('(ALMOÇO)')) {
+            shelfLifeFinal = 1;
+          }
+
           const baseItem = {
             unique_id: `${item.recipe_id}_${uniqueCounter++}`,
             recipe_id: item.recipe_id,
@@ -1101,6 +1108,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             tech_sheet_units_quantity: unitsQuantity,
             tech_sheet_container_type: containerType, // Explicit container type from Tech Sheet
             vr_product_code: productCode ? parseInt(productCode) : null, // Código do produto para exibição no portal
+            shelf_life: shelfLifeFinal, // Validade da Ficha Técnica para sugerir e exibir na Tag
 
             adjustment_percentage: 0,
             recipe: recipe, // Adicionado para que o weightCalculator possa acessar os pesos da receita
@@ -1935,6 +1943,27 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         }
       }
 
+      // Sincronizar as opções de Janela de Vendas (sales_window) de volta para o Banco de Receitas
+      // para o Sistema 'lembrar' dessa configuração na próxima programação
+      if (orderData.items && orderData.items.length > 0) {
+        setTimeout(async () => {
+          try {
+            const { Recipe } = await import('@/app/api/entities');
+            for (const item of orderData.items) {
+              if (item.recipe_id && item.sales_window) {
+                const recipe = recipes.find(r => r.id === item.recipe_id);
+                if (recipe && recipe.sales_window !== item.sales_window) {
+                  await Recipe.update(item.recipe_id, { sales_window: item.sales_window });
+                  console.log(`♻️ [Sync] A Ficha da Receita ${item.recipe_name} gravou a nova Janela Padrão: ${item.sales_window}`);
+                }
+              }
+            }
+          } catch (e) {
+            console.error("❌ Erro ao sincronizar janelas com receitas", e);
+          }
+        }, 500);
+      }
+
       // Ativar efeito de sucesso e depois sair do modo de edição
       setShowSuccessEffect(true);
       setTimeout(() => {
@@ -2082,17 +2111,6 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
       const itemsWithSuggestions = suggestionResult.items;
 
-      // 🚨 DEBUG: Inspecionar sugestões retornadas
-      const suggestionsDebug = itemsWithSuggestions
-        .filter(i => i.suggestion?.has_suggestion)
-        .map(i => ({
-          name: i.recipe_name,
-          id: i.unique_id,
-          sug: i.suggestion.suggested_base_quantity,
-          src: i.suggestion.source
-        }));
-      console.log('📊 [AutoSuggestions DEBUG] Itens com sugestão:', suggestionsDebug);
-
       // Aplicar sugestões PRESERVANDO valores originais dos inputs
       setCurrentOrder(prevOrder => {
         const newItems = prevOrder.items.map(item => {
@@ -2118,11 +2136,11 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         };
       });
 
-      // Se a fonte foi VR Sales, mostrar um toast informativo
-      if (suggestionResult.metadata.source === 'vr_real_sales') {
+      // Se a fonte foi VR Sales nativo, mostrar um toast informativo
+      if (suggestionResult.metadata.source === 'vr_real_sales_native') {
         toast({
-          title: "Sugestões de Venda Reais 🛒",
-          description: "Baseado no histórico de vendas do sistema VR.",
+          title: "Sugestões do Caixa 🛒",
+          description: "Baseado no histórico do seu supermercado (90 Dias).",
           duration: 4000,
           className: "bg-blue-50 border-blue-200 text-blue-800"
         });

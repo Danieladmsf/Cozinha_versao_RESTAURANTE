@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Recipe, Ingredient, Category, CategoryTree, CategoryType, MenuConfig } from "@/app/api/entities";
+import { Product, Recipe, Ingredient, Category, CategoryTree, CategoryType, MenuConfig } from "@/app/api/entities";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +25,8 @@ import {
   CheckSquare,
   Square,
   X,
-  Loader2
+  Loader2,
+  Plus
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -180,11 +181,18 @@ export default function Recipes() {
   const loadRecipes = async () => {
     try {
       const recipesData = await Recipe.list();
-      setRecipes(recipesData);
+      const productsData = await Product.list();
+
+      // Inject type so we can differentiate when creating the merged list
+      const merged = [
+        ...recipesData.map(r => ({ ...r, entityType: 'recipe' })),
+        ...productsData.map(p => ({ ...p, entityType: 'product' }))
+      ];
+      setRecipes(merged);
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Erro ao carregar receitas.",
+        description: "Erro ao carregar receitas e produtos.",
         variant: "destructive"
       });
     }
@@ -895,6 +903,14 @@ export default function Recipes() {
                               >
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Editar
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => router.push(`/produtos?export=${recipe.id}`)}
+                                className="flex items-center cursor-pointer text-blue-600 focus:text-blue-600"
+                              >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Exportar para SKU
                               </DropdownMenuItem>
 
                               <DropdownMenuItem

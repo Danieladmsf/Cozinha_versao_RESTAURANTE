@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Utensils, CheckCircle, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Utensils, CheckCircle, Loader2, Clock } from "lucide-react";
 import {
   parseQuantity as utilParseQuantity,
   formattedQuantity as utilFormattedQuantity,
@@ -40,6 +41,49 @@ const OrdersTab = ({
   isSuggestionsLoading // ✅ Prop para indicar carregamento
 }) => {
   const { registerInput, handleKeyDown } = useKeyboardNavigation();
+
+  // Estados do Modal de Janela de Vendas
+  const [windowModalOpen, setWindowModalOpen] = useState(false);
+  const [editingItemForWindow, setEditingItemForWindow] = useState(null);
+  const [tempWindowStart, setTempWindowStart] = useState("08:00");
+  const [tempWindowEnd, setTempWindowEnd] = useState("13:00");
+
+  const openWindowModal = (item) => {
+    setEditingItemForWindow(item);
+    if (item.sales_window && item.sales_window !== 'all_day') {
+      const parts = item.sales_window.split('-');
+      if (parts.length === 2) {
+        setTempWindowStart(parts[0]);
+        setTempWindowEnd(parts[1]);
+      } else {
+        setTempWindowStart("08:00");
+        setTempWindowEnd(item.sales_window); // fallback se for só hora final
+      }
+    } else {
+      setTempWindowStart("08:00");
+      setTempWindowEnd("14:00");
+    }
+    setWindowModalOpen(true);
+  };
+
+  const applyWindowModal = () => {
+    if (editingItemForWindow) {
+      const newWindow = `${tempWindowStart}-${tempWindowEnd}`;
+      updateOrderItem(editingItemForWindow.unique_id, 'sales_window', newWindow);
+      if (!isEditMode) enableEditMode();
+      setWindowModalOpen(false);
+      setEditingItemForWindow(null);
+    }
+  };
+
+  const clearWindowModal = () => {
+    if (editingItemForWindow) {
+      updateOrderItem(editingItemForWindow.unique_id, 'sales_window', 'all_day');
+      if (!isEditMode) enableEditMode();
+      setWindowModalOpen(false);
+      setEditingItemForWindow(null);
+    }
+  };
 
   // Função para formatar peso baseado na unidade
   const formatWeightByUnit = (item) => {
@@ -163,19 +207,26 @@ const OrdersTab = ({
                       const categoryIndex = orderedCategories.findIndex(cat => cat.name === categoryName);
                       const baseInputId = `qty-${categoryIndex}-${index}`;
                       const percentInputId = `pct-${categoryIndex}-${index}`;
-                      const notesInputId = `notes-${categoryIndex}-${index}`;
+                      const windowInputId = `window-${categoryIndex}-${index}`;
 
                       return (
                         <tr key={item.unique_id} className="border-b border-blue-50">
                           <td className="p-2">
                             <div>
-                              <p className="font-medium text-blue-900 text-xs">
-                                {item.vr_product_code && (
-                                  <span className="text-orange-500 font-bold mr-1">
-                                    #{String(item.vr_product_code).padStart(6, '0')}
+                              <p className="font-medium text-blue-900 text-xs flex items-center gap-2">
+                                <span>
+                                  {item.vr_product_code && (
+                                    <span className="text-orange-500 font-bold mr-1">
+                                      #{String(item.vr_product_code).padStart(6, '0')}
+                                    </span>
+                                  )}
+                                  {item.recipe_name}
+                                </span>
+                                {item.shelf_life && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800 border border-green-200" title="Validade (Shelf Life)">
+                                    ⏳ {item.shelf_life} {item.shelf_life > 1 ? 'dias' : 'dia'}
                                   </span>
                                 )}
-                                {item.recipe_name}
                               </p>
                               <p className="text-xs text-blue-600">
                                 {item.tech_sheet_units_quantity > 0 && item.tech_sheet_unit_weight > 0 && (() => {
@@ -239,17 +290,6 @@ const OrdersTab = ({
                               disabled={!isEditMode}
                             />
                           </td>
-                          <td className="p-2">
-                            <div className="text-center text-xs font-medium">
-                              {item.unit_type ? (
-                                <span className="text-blue-700">
-                                  {item.unit_type.charAt(0).toUpperCase() + item.unit_type.slice(1)}
-                                </span>
-                              ) : (
-                                <span className="text-red-500">-</span>
-                              )}
-                            </div>
-                          </td>
                           {columnConfig.showPorcionamento && (
                             <>
                               {/* Coluna de Input de Porcionamento */}
@@ -291,20 +331,24 @@ const OrdersTab = ({
                             </div>
                           </td>
                           <td className="p-2">
-                            {isEditMode ? (
-                              <Input
-                                ref={(ref) => registerInput(notesInputId, ref)}
-                                type="text"
-                                value={item.notes || ''}
-                                onChange={(e) => isEditMode && updateOrderItem(item.unique_id, 'notes', e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(e, notesInputId)}
-                                className="text-xs h-8 w-full border-blue-300 focus:border-blue-500"
-                                placeholder="Observações..."
-                                disabled={!isEditMode}
-                              />
-                            ) : (
-                              <NoteViewer note={item.notes} className="text-xs" />
-                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`w-full text-xs h-8 px-2 flex justify-center items-center gap-1 border rounded-md truncate ${isEditMode
+                                  ? 'border-blue-300 bg-white text-blue-900 hover:bg-blue-50'
+                                  : 'border-transparent bg-purple-50 text-purple-700 hover:border-purple-200'
+                                }`}
+                              onClick={() => openWindowModal(item)}
+                            >
+                              <Clock className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">
+                                {item.sales_window === 'all_day' || !item.sales_window
+                                  ? 'Dia Todo'
+                                  : item.sales_window.includes('-')
+                                    ? item.sales_window
+                                    : `Até ${item.sales_window}`}
+                              </span>
+                            </Button>
                           </td>
                         </tr>
                       );
@@ -370,6 +414,59 @@ const OrdersTab = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de Range de Horários para Janela de Oferta */}
+      <Dialog open={windowModalOpen} onOpenChange={setWindowModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Configurar Janela de Oferta</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-500 mb-4">
+              Defina o intervalo de tempo em que o produto "{editingItemForWindow?.recipe_name}" fica disponível na vitrine durante o dia.
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Início</label>
+                <div className="flex items-center">
+                  <Input
+                    type="time"
+                    value={tempWindowStart}
+                    onChange={(e) => setTempWindowStart(e.target.value)}
+                    className="h-10 text-center font-medium"
+                  />
+                </div>
+              </div>
+              <div className="text-gray-400 font-bold px-2 pt-5">às</div>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Fim</label>
+                <div className="flex items-center">
+                  <Input
+                    type="time"
+                    value={tempWindowEnd}
+                    onChange={(e) => setTempWindowEnd(e.target.value)}
+                    className="h-10 text-center font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex items-center justify-between sm:justify-between">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={clearWindowModal}
+              className="text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-200"
+            >
+              Livre / Dia Todo
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="ghost" onClick={() => setWindowModalOpen(false)}>Cancelar</Button>
+              <Button type="button" onClick={applyWindowModal} className="bg-blue-600 hover:bg-blue-700">Confirmar</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

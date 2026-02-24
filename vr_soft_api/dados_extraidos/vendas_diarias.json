@@ -127,13 +127,6 @@
       "ultima_venda": "2025-12-05 21:09:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "2430",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2025-11-27",
       "produto_id": "8263",
       "quantidade_total": "34.495",
@@ -610,13 +603,6 @@
       "ultima_venda": "2025-12-02 08:20:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "11200",
-      "quantidade_total": "20.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2026-02-06",
       "produto_id": "89591",
       "quantidade_total": "24.000",
@@ -1007,13 +993,6 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-10 16:29:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8398",
-      "quantidade_total": "0.522",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 16:30:00"
     },
     {
       "data": "2026-01-16",
@@ -1674,18 +1653,18 @@
       "ultima_venda": "2025-11-27 14:56:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "107602",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-01-15",
       "produto_id": "7034",
       "quantidade_total": "93.365",
       "numero_vendas": "2",
       "ultima_venda": "2026-01-15 11:46:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "419",
-      "quantidade_total": "1.320",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2026-01-29",
@@ -2052,13 +2031,6 @@
       "ultima_venda": "2025-12-02 16:22:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "34439",
-      "quantidade_total": "8.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2025-11-27",
       "produto_id": "7930",
       "quantidade_total": "1.000",
@@ -2190,6 +2162,13 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-23 09:35:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "18252",
+      "quantidade_total": "1.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 06:56:00"
     },
     {
       "data": "2025-11-27",
@@ -2575,6 +2554,13 @@
       "quantidade_total": "13.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-10 11:14:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "32705",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-12-02",
@@ -3333,6 +3319,13 @@
       "ultima_venda": "2025-11-27 14:56:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "28161",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-10",
       "produto_id": "89557",
       "quantidade_total": "12.000",
@@ -3480,6 +3473,13 @@
       "ultima_venda": "2026-02-06 09:31:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "29545",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-02-19",
       "produto_id": "13174",
       "quantidade_total": "12.000",
@@ -3576,13 +3576,6 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-30 09:02:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "36094",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2026-01-16",
@@ -3879,13 +3872,6 @@
       "ultima_venda": "2026-01-21 11:01:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "15634",
-      "quantidade_total": "72.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-27",
       "produto_id": "33925",
       "quantidade_total": "4.000",
@@ -3898,13 +3884,6 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-31 08:15:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "1347",
-      "quantidade_total": "2.435",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2026-01-21",
@@ -3977,6 +3956,13 @@
       "ultima_venda": "2025-12-31 08:15:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "19644",
+      "quantidade_total": "1.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-11-29",
       "produto_id": "98479",
       "quantidade_total": "48.000",
@@ -4024,6 +4010,13 @@
       "quantidade_total": "24.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-23 22:29:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "23118",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-11-27",
@@ -4115,13 +4108,6 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-24 14:22:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "89589",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-11-25",
@@ -4999,13 +4985,6 @@
       "ultima_venda": "2026-02-06 15:31:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "7064",
-      "quantidade_total": "5.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2025-12-18",
       "produto_id": "15549",
       "quantidade_total": "2.000",
@@ -5410,13 +5389,6 @@
       "quantidade_total": "0.392",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-04 07:11:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "90972",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2026-01-19",
@@ -5902,13 +5874,6 @@
       "ultima_venda": "2025-12-17 14:55:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "4789",
-      "quantidade_total": "29.800",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 16:30:00"
-    },
-    {
       "data": "2026-01-19",
       "produto_id": "34264",
       "quantidade_total": "6.000",
@@ -5942,6 +5907,13 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-27 10:48:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "1035",
+      "quantidade_total": "10.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:55:00"
     },
     {
       "data": "2026-01-06",
@@ -6021,13 +5993,6 @@
       "ultima_venda": "2025-12-20 09:25:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "5951",
-      "quantidade_total": "25.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2025-11-27",
       "produto_id": "3129",
       "quantidade_total": "0.968",
@@ -6075,6 +6040,13 @@
       "quantidade_total": "5.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-28 14:55:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "4789",
+      "quantidade_total": "29.798",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:54:00"
     },
     {
       "data": "2026-02-11",
@@ -7722,13 +7694,6 @@
       "ultima_venda": "2025-12-15 09:18:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "9124",
-      "quantidade_total": "2.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 11:52:00"
-    },
-    {
       "data": "2026-01-09",
       "produto_id": "34848",
       "quantidade_total": "1.000",
@@ -8100,25 +8065,11 @@
       "ultima_venda": "2025-12-22 15:31:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "30758",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2026-01-24",
       "produto_id": "31580",
       "quantidade_total": "360.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-24 17:18:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "9477",
-      "quantidade_total": "0.294",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 20:54:00"
     },
     {
       "data": "2025-12-26",
@@ -8427,13 +8378,6 @@
       "quantidade_total": "12.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-19 16:01:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "31580",
-      "quantidade_total": "1560.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2026-01-12",
@@ -9143,13 +9087,6 @@
       "ultima_venda": "2026-01-02 16:36:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "1194",
-      "quantidade_total": "1.172",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:29:00"
-    },
-    {
       "data": "2026-02-04",
       "produto_id": "4573",
       "quantidade_total": "9.914",
@@ -9836,18 +9773,18 @@
       "ultima_venda": "2026-01-08 15:13:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "34925",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-31",
       "produto_id": "35772",
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-31 08:15:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "34440",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2026-02-13",
@@ -10002,6 +9939,13 @@
       "quantidade_total": "2.220",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-11 11:06:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "22688",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-12-30",
@@ -10914,13 +10858,6 @@
       "ultima_venda": "2026-01-27 10:48:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "93050",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2026-01-21",
       "produto_id": "2934",
       "quantidade_total": "4.000",
@@ -11040,13 +10977,6 @@
       "ultima_venda": "2026-01-17 10:14:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "102430",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2025-11-27",
       "produto_id": "104457",
       "quantidade_total": "17.867",
@@ -11059,13 +10989,6 @@
       "quantidade_total": "0.404",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-24 18:53:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8966",
-      "quantidade_total": "2.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-12-11",
@@ -11180,13 +11103,6 @@
       "ultima_venda": "2026-01-27 08:37:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "7499",
-      "quantidade_total": "0.314",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
-    },
-    {
       "data": "2026-01-27",
       "produto_id": "7104",
       "quantidade_total": "5.000",
@@ -11227,6 +11143,13 @@
       "quantidade_total": "4.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-27 10:48:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "26153",
+      "quantidade_total": "1.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-12-08",
@@ -11432,6 +11355,13 @@
       "ultima_venda": "2025-11-27 15:15:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "31502",
+      "quantidade_total": "2.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:20:00"
+    },
+    {
       "data": "2026-01-15",
       "produto_id": "4037",
       "quantidade_total": "30.000",
@@ -11465,6 +11395,13 @@
       "quantidade_total": "4.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-21 16:43:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "2320",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 06:56:00"
     },
     {
       "data": "2025-11-27",
@@ -11640,13 +11577,6 @@
       "quantidade_total": "87.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-07 09:09:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "89623",
-      "quantidade_total": "5.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2025-12-04",
@@ -11836,13 +11766,6 @@
       "quantidade_total": "12.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-25 09:33:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "98357",
-      "quantidade_total": "24.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2026-01-16",
@@ -12153,13 +12076,6 @@
       "ultima_venda": "2026-01-21 11:24:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "98121",
-      "quantidade_total": "72.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2025-12-23",
       "produto_id": "8245",
       "quantidade_total": "2.017",
@@ -12447,6 +12363,13 @@
       "ultima_venda": "2026-02-04 11:05:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "1743",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-01-16",
       "produto_id": "93167",
       "quantidade_total": "1.000",
@@ -12571,13 +12494,6 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-30 11:08:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "33911",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2025-12-06",
@@ -12783,13 +12699,6 @@
       "ultima_venda": "2026-01-13 15:11:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "29952",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2026-02-03",
       "produto_id": "32614",
       "quantidade_total": "25.000",
@@ -12881,11 +12790,11 @@
       "ultima_venda": "2026-01-29 14:54:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "89934",
-      "quantidade_total": "12.000",
+      "data": "2026-02-23",
+      "produto_id": "28948",
+      "quantidade_total": "1.000",
       "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-12-14",
@@ -12935,13 +12844,6 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-29 20:54:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "5693",
-      "quantidade_total": "2.214",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:29:00"
     },
     {
       "data": "2026-02-11",
@@ -13117,13 +13019,6 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-29 13:43:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "90040",
-      "quantidade_total": "16.310",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:37:00"
     },
     {
       "data": "2026-02-04",
@@ -13369,13 +13264,6 @@
       "quantidade_total": "1.186",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-11 11:06:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "111906",
-      "quantidade_total": "3.056",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 20:54:00"
     },
     {
       "data": "2026-02-05",
@@ -13917,11 +13805,11 @@
       "ultima_venda": "2025-11-25 11:37:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "35013",
+      "data": "2026-02-23",
+      "produto_id": "94741",
       "quantidade_total": "3.000",
       "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-11-27",
@@ -14055,6 +13943,13 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-07 21:09:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "103006",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-01-05",
@@ -15996,6 +15891,13 @@
       "ultima_venda": "2026-01-08 21:08:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "21749",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-02-10",
       "produto_id": "34079",
       "quantidade_total": "36.000",
@@ -16108,6 +16010,13 @@
       "ultima_venda": "2026-02-05 09:29:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "25994",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-01-24",
       "produto_id": "32719",
       "quantidade_total": "12.000",
@@ -16127,13 +16036,6 @@
       "quantidade_total": "4.964",
       "numero_vendas": "2",
       "ultima_venda": "2025-11-27 14:56:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "23298",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-12-10",
@@ -16234,13 +16136,6 @@
       "ultima_venda": "2025-12-19 15:04:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "21123",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2025-12-18",
       "produto_id": "105968",
       "quantidade_total": "6.000",
@@ -16325,13 +16220,6 @@
       "ultima_venda": "2025-12-06 13:05:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "93004",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-02",
       "produto_id": "107395",
       "quantidade_total": "20.000",
@@ -16379,13 +16267,6 @@
       "quantidade_total": "24.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-19 10:53:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8396",
-      "quantidade_total": "1.030",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 11:54:00"
     },
     {
       "data": "2025-12-03",
@@ -17086,6 +16967,13 @@
       "quantidade_total": "9.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-05 15:46:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "8629",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-11-28",
@@ -18348,6 +18236,13 @@
       "ultima_venda": "2026-02-06 16:18:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "92567",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-17",
       "produto_id": "6785",
       "quantidade_total": "18.150",
@@ -18500,13 +18395,6 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-04 10:21:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "35015",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2026-02-04",
@@ -19713,6 +19601,13 @@
       "ultima_venda": "2026-02-20 20:26:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "94407",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 06:56:00"
+    },
+    {
       "data": "2026-01-05",
       "produto_id": "31290",
       "quantidade_total": "3.000",
@@ -19958,18 +19853,18 @@
       "ultima_venda": "2025-12-01 14:13:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "7068",
-      "quantidade_total": "0.230",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 20:54:00"
-    },
-    {
       "data": "2026-01-20",
       "produto_id": "6308",
       "quantidade_total": "8.840",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-20 11:53:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "14637",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-12-19",
@@ -20245,6 +20140,13 @@
       "ultima_venda": "2026-01-16 20:18:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "32749",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-02",
       "produto_id": "9864",
       "quantidade_total": "2.154",
@@ -20341,13 +20243,6 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-18 11:32:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "98022",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2025-12-04",
@@ -20777,6 +20672,13 @@
       "ultima_venda": "2026-01-12 15:06:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "14868",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-05",
       "produto_id": "2152",
       "quantidade_total": "10.000",
@@ -21099,13 +21001,6 @@
       "ultima_venda": "2026-01-26 17:47:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "106178",
-      "quantidade_total": "2.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-21",
       "produto_id": "15033",
       "quantidade_total": "5.000",
@@ -21307,6 +21202,13 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-03 11:33:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "7357",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2026-01-31",
@@ -21524,6 +21426,13 @@
       "quantidade_total": "15.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-24 11:10:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "18735",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-02-03",
@@ -21748,13 +21657,6 @@
       "quantidade_total": "4.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-06 16:18:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "100845",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2025-12-02",
@@ -22049,13 +21951,6 @@
       "quantidade_total": "9.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-12 17:11:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "27699",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2025-12-13",
@@ -22378,13 +22273,6 @@
       "quantidade_total": "14.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-04 10:21:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "111120",
-      "quantidade_total": "5.252",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:29:00"
     },
     {
       "data": "2025-12-22",
@@ -22772,13 +22660,6 @@
       "ultima_venda": "2025-12-19 15:22:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "110663",
-      "quantidade_total": "10.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2026-01-19",
       "produto_id": "13377",
       "quantidade_total": "2.000",
@@ -22912,13 +22793,6 @@
       "ultima_venda": "2026-02-04 08:13:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "19680",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-02-04",
       "produto_id": "3366",
       "quantidade_total": "38.000",
@@ -22996,13 +22870,6 @@
       "ultima_venda": "2026-02-04 11:05:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "4770",
-      "quantidade_total": "0.450",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:29:00"
-    },
-    {
       "data": "2025-12-01",
       "produto_id": "8349",
       "quantidade_total": "4.690",
@@ -23050,13 +22917,6 @@
       "quantidade_total": "24.000",
       "numero_vendas": "2",
       "ultima_venda": "2026-02-20 14:45:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8242",
-      "quantidade_total": "1.390",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-12-17",
@@ -23281,6 +23141,13 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-27 14:56:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "99980",
+      "quantidade_total": "11.200",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 12:11:00"
     },
     {
       "data": "2025-12-13",
@@ -24116,6 +23983,13 @@
       "ultima_venda": "2026-01-21 16:43:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "31261",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 12:10:00"
+    },
+    {
       "data": "2025-12-01",
       "produto_id": "92450",
       "quantidade_total": "16.000",
@@ -24338,6 +24212,13 @@
       "quantidade_total": "20.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-12 16:11:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "92508",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-11-27",
@@ -24590,13 +24471,6 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-31 09:38:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8519",
-      "quantidade_total": "0.682",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 16:30:00"
     },
     {
       "data": "2025-12-30",
@@ -24877,13 +24751,6 @@
       "quantidade_total": "19.100",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-12 15:06:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "31819",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2025-11-27",
@@ -25313,6 +25180,13 @@
       "ultima_venda": "2025-11-27 14:56:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "2916",
+      "quantidade_total": "21.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2025-12-06",
       "produto_id": "93566",
       "quantidade_total": "15.840",
@@ -25332,6 +25206,13 @@
       "quantidade_total": "174.000",
       "numero_vendas": "2",
       "ultima_venda": "2026-02-19 16:26:23"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "4451",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2026-01-20",
@@ -25465,13 +25346,6 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-14 10:53:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "28488",
-      "quantidade_total": "5.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2026-02-11",
@@ -25670,13 +25544,6 @@
       "ultima_venda": "2026-02-04 11:05:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "103459",
-      "quantidade_total": "24.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-13",
       "produto_id": "8242",
       "quantidade_total": "5.700",
@@ -25738,6 +25605,13 @@
       "quantidade_total": "36.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-03 10:21:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "5043",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-11-26",
@@ -25836,13 +25710,6 @@
       "quantidade_total": "12.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-21 16:43:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "29327",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2025-12-02",
@@ -27147,13 +27014,6 @@
       "ultima_venda": "2026-01-21 11:01:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "13592",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 20:54:00"
-    },
-    {
       "data": "2025-11-28",
       "produto_id": "5690",
       "quantidade_total": "36.000",
@@ -27439,13 +27299,6 @@
       "quantidade_total": "6.894",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-02 08:33:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "141",
-      "quantidade_total": "4.824",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-11-27",
@@ -27749,18 +27602,18 @@
       "ultima_venda": "2025-12-03 12:46:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "23905",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-01-24",
       "produto_id": "27064",
       "quantidade_total": "8.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-24 10:55:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "442",
-      "quantidade_total": "0.530",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2026-01-03",
@@ -28477,6 +28330,13 @@
       "ultima_venda": "2026-01-21 11:01:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "108150",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-01-26",
       "produto_id": "33822",
       "quantidade_total": "1.000",
@@ -28510,6 +28370,13 @@
       "quantidade_total": "0.804",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-14 15:57:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "26732",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2026-01-05",
@@ -28727,13 +28594,6 @@
       "quantidade_total": "0.790",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-27 15:15:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "108517",
-      "quantidade_total": "5.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2026-02-02",
@@ -30134,13 +29994,6 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-27 08:37:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "35063",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-12-31",
@@ -32187,13 +32040,6 @@
       "ultima_venda": "2025-12-02 08:30:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "24077",
-      "quantidade_total": "10.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-02-16",
       "produto_id": "26448",
       "quantidade_total": "3.000",
@@ -32311,6 +32157,13 @@
       "quantidade_total": "4.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-09 15:03:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "18476",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-01-12",
@@ -32586,13 +32439,6 @@
       "ultima_venda": "2026-01-12 15:06:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "93569",
-      "quantidade_total": "14.366",
-      "numero_vendas": "2",
-      "ultima_venda": "2025-11-24 15:55:00"
-    },
-    {
       "data": "2026-01-27",
       "produto_id": "29684",
       "quantidade_total": "6.000",
@@ -32689,13 +32535,6 @@
       "quantidade_total": "15.190",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-06 16:44:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "36140",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2026-01-16",
@@ -32801,13 +32640,6 @@
       "quantidade_total": "29.400",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-07 08:28:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "32719",
-      "quantidade_total": "4.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-12-04",
@@ -32962,6 +32794,13 @@
       "quantidade_total": "20.825",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-19 06:40:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "11578",
+      "quantidade_total": "5.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 06:56:00"
     },
     {
       "data": "2026-02-06",
@@ -33321,13 +33160,6 @@
       "ultima_venda": "2025-12-01 18:40:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "29760",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-02-05",
       "produto_id": "2320",
       "quantidade_total": "10.000",
@@ -33368,6 +33200,13 @@
       "quantidade_total": "5.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-17 11:49:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "27973",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2026-01-05",
@@ -33762,6 +33601,13 @@
       "ultima_venda": "2026-01-08 06:30:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "18164",
+      "quantidade_total": "48.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-02-04",
       "produto_id": "8230",
       "quantidade_total": "4.000",
@@ -33844,13 +33690,6 @@
       "quantidade_total": "5.192",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-17 10:59:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "94140",
-      "quantidade_total": "4.798",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2026-01-19",
@@ -33963,13 +33802,6 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-12 15:06:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "23695",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-11-28",
@@ -34250,6 +34082,13 @@
       "quantidade_total": "15.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-22 16:52:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "33261",
+      "quantidade_total": "2.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-01-30",
@@ -34847,6 +34686,13 @@
       "ultima_venda": "2026-01-02 16:36:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "27954",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-02-04",
       "produto_id": "28381",
       "quantidade_total": "24.000",
@@ -35197,13 +35043,6 @@
       "ultima_venda": "2026-01-03 10:34:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "2893",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
-    },
-    {
       "data": "2026-01-17",
       "produto_id": "6712",
       "quantidade_total": "6.000",
@@ -35223,13 +35062,6 @@
       "quantidade_total": "1.800",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-12 09:05:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8361",
-      "quantidade_total": "1.724",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 16:30:00"
     },
     {
       "data": "2026-01-15",
@@ -35946,13 +35778,6 @@
       "ultima_venda": "2026-01-26 16:50:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "7039",
-      "quantidade_total": "23.200",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:37:00"
-    },
-    {
       "data": "2026-01-31",
       "produto_id": "8244",
       "quantidade_total": "0.855",
@@ -36014,13 +35839,6 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-08 06:30:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "97312",
-      "quantidade_total": "120.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2026-02-13",
@@ -36149,13 +35967,6 @@
       "ultima_venda": "2026-01-21 16:43:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "31187",
-      "quantidade_total": "4.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2025-12-04",
       "produto_id": "9095",
       "quantidade_total": "18.000",
@@ -36168,6 +35979,13 @@
       "quantidade_total": "15.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-04 16:33:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "28990",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-02-02",
@@ -36329,6 +36147,13 @@
       "quantidade_total": "80.000",
       "numero_vendas": "2",
       "ultima_venda": "2026-01-14 10:20:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "95407",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-01-06",
@@ -36681,13 +36506,6 @@
       "ultima_venda": "2026-01-10 09:01:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "7062",
-      "quantidade_total": "7.100",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:37:00"
-    },
-    {
       "data": "2026-02-19",
       "produto_id": "29092",
       "quantidade_total": "2.000",
@@ -36763,13 +36581,6 @@
       "quantidade_total": "1.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-27 10:25:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "92444",
-      "quantidade_total": "5.096",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 15:55:00"
     },
     {
       "data": "2026-01-06",
@@ -37465,13 +37276,6 @@
       "ultima_venda": "2026-01-05 13:04:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "8393",
-      "quantidade_total": "1.496",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 11:54:00"
-    },
-    {
       "data": "2025-12-18",
       "produto_id": "8278",
       "quantidade_total": "1.004",
@@ -37918,13 +37722,6 @@
       "quantidade_total": "30.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-05 14:55:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "17946",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2026-02-20",
@@ -38578,6 +38375,13 @@
       "ultima_venda": "2026-01-08 09:29:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "29524",
+      "quantidade_total": "240.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-01-15",
       "produto_id": "35423",
       "quantidade_total": "50.000",
@@ -38823,13 +38627,6 @@
       "ultima_venda": "2025-12-30 09:02:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "23913",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2026-02-16",
       "produto_id": "101039",
       "quantidade_total": "1.000",
@@ -38970,13 +38767,6 @@
       "ultima_venda": "2026-01-12 15:06:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "110073",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-26",
       "produto_id": "34986",
       "quantidade_total": "5.000",
@@ -39031,13 +38821,6 @@
       "quantidade_total": "16.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-27 14:56:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "93513",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2025-12-24",
@@ -39621,13 +39404,6 @@
       "ultima_venda": "2025-12-04 16:33:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "5690",
-      "quantidade_total": "24.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-05",
       "produto_id": "10968",
       "quantidade_total": "0.688",
@@ -39738,13 +39514,6 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-13 10:21:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8263",
-      "quantidade_total": "1.745",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 20:54:00"
     },
     {
       "data": "2025-12-26",
@@ -40291,13 +40060,6 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-05 09:29:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "34911",
-      "quantidade_total": "4.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2025-12-29",
@@ -41140,6 +40902,13 @@
       "ultima_venda": "2025-12-21 07:57:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "15613",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2026-02-03",
       "produto_id": "4030",
       "quantidade_total": "7.000",
@@ -41840,6 +41609,13 @@
       "ultima_venda": "2025-12-06 13:05:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "24752",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-02-16",
       "produto_id": "102276",
       "quantidade_total": "4.000",
@@ -41931,13 +41707,6 @@
       "ultima_venda": "2025-12-29 18:16:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "35664",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2025-11-27",
       "produto_id": "33249",
       "quantidade_total": "1.000",
@@ -41978,6 +41747,13 @@
       "quantidade_total": "3.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-27 08:37:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "98740",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-11-27",
@@ -42519,13 +42295,6 @@
       "ultima_venda": "2026-01-07 21:09:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "26361",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2026-02-08",
       "produto_id": "8400",
       "quantidade_total": "1.226",
@@ -42890,6 +42659,13 @@
       "ultima_venda": "2025-11-27 14:56:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "34726",
+      "quantidade_total": "2.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-01-09",
       "produto_id": "9587",
       "quantidade_total": "2.650",
@@ -43058,13 +42834,6 @@
       "ultima_venda": "2025-12-18 11:32:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "3756",
-      "quantidade_total": "2.146",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2025-12-02",
       "produto_id": "34558",
       "quantidade_total": "3.000",
@@ -43175,13 +42944,6 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-19 16:01:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "7930",
-      "quantidade_total": "2.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2026-01-27",
@@ -43513,6 +43275,13 @@
       "ultima_venda": "2026-01-06 07:20:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "32701",
+      "quantidade_total": "4.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-26",
       "produto_id": "102118",
       "quantidade_total": "8.000",
@@ -43688,13 +43457,6 @@
       "ultima_venda": "2026-02-09 06:45:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "92904",
-      "quantidade_total": "60.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-19",
       "produto_id": "6296",
       "quantidade_total": "6.000",
@@ -43807,6 +43569,13 @@
       "ultima_venda": "2026-02-03 15:57:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "19624",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2026-02-11",
       "produto_id": "8245",
       "quantidade_total": "0.750",
@@ -43854,13 +43623,6 @@
       "quantidade_total": "10.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-11-28 10:36:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "209",
-      "quantidade_total": "0.616",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-12-15",
@@ -44106,6 +43868,13 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-01 17:39:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "104096",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2026-01-21",
@@ -44416,13 +44185,6 @@
       "ultima_venda": "2025-12-02 08:59:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "32408",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 20:54:00"
-    },
-    {
       "data": "2026-01-19",
       "produto_id": "110802",
       "quantidade_total": "5.000",
@@ -44575,13 +44337,6 @@
       "quantidade_total": "1980.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-09 08:34:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "29873",
-      "quantidade_total": "270.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:00:00"
     },
     {
       "data": "2025-12-30",
@@ -44855,6 +44610,13 @@
       "quantidade_total": "10.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-14 11:57:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "109349",
+      "quantidade_total": "6.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-12-16",
@@ -45198,13 +44960,6 @@
       "quantidade_total": "70.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-13 10:21:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "8480",
-      "quantidade_total": "0.424",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-11-27",
@@ -46348,6 +46103,13 @@
       "ultima_venda": "2026-02-05 09:29:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "7130",
+      "quantidade_total": "5.166",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 12:11:00"
+    },
+    {
       "data": "2026-01-15",
       "produto_id": "18656",
       "quantidade_total": "1.000",
@@ -46626,13 +46388,6 @@
       "quantidade_total": "10.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-16 11:52:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "100633",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-11-26",
@@ -47706,6 +47461,13 @@
       "ultima_venda": "2026-02-19 09:25:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "97349",
+      "quantidade_total": "54.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2025-12-23",
       "produto_id": "35056",
       "quantidade_total": "1.000",
@@ -47837,6 +47599,13 @@
       "quantidade_total": "1.056",
       "numero_vendas": "2",
       "ultima_venda": "2025-12-29 11:19:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "18675",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2026-02-05",
@@ -48224,13 +47993,6 @@
       "ultima_venda": "2025-12-31 08:15:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "34510",
-      "quantidade_total": "30.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 16:51:00"
-    },
-    {
       "data": "2025-12-04",
       "produto_id": "30279",
       "quantidade_total": "15.000",
@@ -48348,6 +48110,13 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-12 16:15:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "106050",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-12-27",
@@ -49050,6 +48819,13 @@
       "ultima_venda": "2026-01-05 15:48:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "1894",
+      "quantidade_total": "264.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 09:03:00"
+    },
+    {
       "data": "2025-11-27",
       "produto_id": "36146",
       "quantidade_total": "3.000",
@@ -49302,13 +49078,6 @@
       "ultima_venda": "2025-12-17 16:31:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "33009",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
-    },
-    {
       "data": "2025-12-30",
       "produto_id": "22802",
       "quantidade_total": "3.000",
@@ -49335,13 +49104,6 @@
       "quantidade_total": "33.000",
       "numero_vendas": "2",
       "ultima_venda": "2026-01-06 11:59:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "94668",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-12-10",
@@ -49412,13 +49174,6 @@
       "quantidade_total": "20.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-19 09:27:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "20471",
-      "quantidade_total": "24.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-11-27",
@@ -49510,6 +49265,13 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-30 11:08:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "31097",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2025-11-27",
@@ -50000,13 +49762,6 @@
       "quantidade_total": "1.844",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-31 10:36:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "28871",
-      "quantidade_total": "3.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-12-01",
@@ -50716,13 +50471,6 @@
       "ultima_venda": "2026-02-13 14:51:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "888",
-      "quantidade_total": "2.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-01-27",
       "produto_id": "32082",
       "quantidade_total": "10.000",
@@ -51045,13 +50793,6 @@
       "ultima_venda": "2025-12-09 10:11:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "93567",
-      "quantidade_total": "0.752",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
-    },
-    {
       "data": "2025-11-26",
       "produto_id": "91932",
       "quantidade_total": "2.000",
@@ -51127,6 +50868,13 @@
       "quantidade_total": "14.000",
       "numero_vendas": "2",
       "ultima_venda": "2025-12-02 09:34:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "110376",
+      "quantidade_total": "3.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-12-10",
@@ -51367,13 +51115,6 @@
       "ultima_venda": "2025-12-31 08:15:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "110664",
-      "quantidade_total": "10.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
-    },
-    {
       "data": "2026-01-03",
       "produto_id": "865",
       "quantidade_total": "17.230",
@@ -51554,13 +51295,6 @@
       "quantidade_total": "6.000",
       "numero_vendas": "1",
       "ultima_venda": "2025-12-11 11:01:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "90450",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
     },
     {
       "data": "2025-12-22",
@@ -51750,6 +51484,13 @@
       "quantidade_total": "10.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-02 16:18:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "106904",
+      "quantidade_total": "12.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
     },
     {
       "data": "2026-02-16",
@@ -53460,13 +53201,6 @@
       "ultima_venda": "2026-01-17 10:59:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "35884",
-      "quantidade_total": "2.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2026-02-16",
       "produto_id": "2753",
       "quantidade_total": "18.000",
@@ -54006,11 +53740,11 @@
       "ultima_venda": "2026-01-24 10:55:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "97744",
-      "quantidade_total": "19.180",
+      "data": "2026-02-23",
+      "produto_id": "93109",
+      "quantidade_total": "24.000",
       "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 16:30:00"
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-11-27",
@@ -54545,6 +54279,13 @@
       "ultima_venda": "2026-01-30 20:55:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "97744",
+      "quantidade_total": "3.596",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 11:53:00"
+    },
+    {
       "data": "2025-12-29",
       "produto_id": "95115",
       "quantidade_total": "4.000",
@@ -54620,13 +54361,6 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-10 09:07:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "3035",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 14:54:00"
     },
     {
       "data": "2026-02-20",
@@ -54711,13 +54445,6 @@
       "quantidade_total": "1.076",
       "numero_vendas": "1",
       "ultima_venda": "2026-02-03 16:49:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "11299",
-      "quantidade_total": "6.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 10:38:00"
     },
     {
       "data": "2026-02-05",
@@ -55306,6 +55033,13 @@
       "quantidade_total": "2.000",
       "numero_vendas": "1",
       "ultima_venda": "2026-01-27 10:48:00"
+    },
+    {
+      "data": "2026-02-23",
+      "produto_id": "18087",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
     },
     {
       "data": "2025-12-30",
@@ -57478,13 +57212,6 @@
       "ultima_venda": "2025-11-25 11:37:00"
     },
     {
-      "data": "2025-11-24",
-      "produto_id": "108369",
-      "quantidade_total": "12.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 09:39:00"
-    },
-    {
       "data": "2025-12-16",
       "produto_id": "29561",
       "quantidade_total": "6.000",
@@ -57793,6 +57520,13 @@
       "ultima_venda": "2026-01-06 13:02:00"
     },
     {
+      "data": "2026-02-23",
+      "produto_id": "107669",
+      "quantidade_total": "24.000",
+      "numero_vendas": "1",
+      "ultima_venda": "2026-02-23 14:53:00"
+    },
+    {
       "data": "2025-12-04",
       "produto_id": "25770",
       "quantidade_total": "2.000",
@@ -57882,13 +57616,6 @@
       "quantidade_total": "7.000",
       "numero_vendas": "2",
       "ultima_venda": "2025-11-27 15:15:00"
-    },
-    {
-      "data": "2025-11-24",
-      "produto_id": "7874",
-      "quantidade_total": "1.000",
-      "numero_vendas": "1",
-      "ultima_venda": "2025-11-24 06:25:00"
     },
     {
       "data": "2025-12-21",

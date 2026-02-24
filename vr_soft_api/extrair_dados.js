@@ -280,6 +280,9 @@ async function extractViaDirect() {
                                 GROUP BY ns.datahoraemissao::date, nsi.id_produto
                             `, 'vendas_diarias');
 
+                            // Extrair complemento de produto (onde fica a validade da balança)
+                            sendQuery('SELECT id_produto, id_loja, validade FROM produtocomplemento', 'produtocomplemento');
+
                             // Produtos por último (tabela gigante)
                             let produtoSql = 'SELECT * FROM produto';
                             const FILTER_FILE = path.join(__dirname, 'filtro_produtos.txt');

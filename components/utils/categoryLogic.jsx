@@ -67,9 +67,9 @@ export class CategoryLogic {
 
     } else if (field === 'adjustment_percentage') {
       updatedItem.adjustment_percentage = parseQuantity(value) || 0;
-    } else if (field === 'notes') {
-      updatedItem.notes = value;
-      return updatedItem; // Observações não afetam cálculos
+    } else if (field === 'sales_window') {
+      updatedItem.sales_window = value;
+      return updatedItem; // Janela não afeta cálculos imediatos de peso
     } else {
       updatedItem[field] = value;
     }
@@ -133,8 +133,7 @@ export class CategoryLogic {
     const baseHeaders = [
       { key: 'item', label: 'Item', className: 'text-left p-2 text-xs font-medium text-blue-700 min-w-[150px]' },
       { key: 'suggestion_quantity', label: 'Sugestão', className: 'text-center p-2 text-xs font-medium text-amber-600 min-w-[60px]' },
-      { key: 'quantity', label: 'Quantidade', className: 'text-center p-2 text-xs font-medium text-blue-700 min-w-[60px]' },
-      { key: 'unit', label: 'Unidade', className: 'text-center p-2 text-xs font-medium text-blue-700 min-w-[50px]' }
+      { key: 'quantity', label: 'Quantidade', className: 'text-center p-2 text-xs font-medium text-blue-700 min-w-[60px]' }
     ];
 
     const carneHeaders = [
@@ -145,7 +144,7 @@ export class CategoryLogic {
     const endHeaders = [
       { key: 'subtotal', label: 'Subtotal', className: 'text-center p-2 text-xs font-medium text-blue-700 min-w-[70px]' },
       { key: 'peso_total', label: 'Peso Total', className: 'text-center p-2 text-xs font-medium text-blue-700 min-w-[70px]' },
-      { key: 'notes', label: 'Observações', className: 'text-left p-2 text-xs font-medium text-blue-700 min-w-[150px]' }
+      { key: 'sales_window', label: 'Janela de Oferta', className: 'text-center p-2 text-xs font-medium text-blue-700 min-w-[130px]' }
     ];
 
     if (isCarneCategory) {
@@ -166,10 +165,9 @@ export class CategoryLogic {
    */
   static formatExportRow(item, isCarneCategory, formatCurrency, formattedQuantity, formatWeight) {
     const baseQty = formattedQuantity(item.base_quantity || 0);
-    const unitType = (item.unit_type || '').charAt(0).toUpperCase() + (item.unit_type || '').slice(1);
     const subtotal = formatCurrency(item.total_price || 0);
     const pesoTotal = formatWeight ? formatWeight(item.total_weight || 0) : '0 kg';
-    const notes = item.notes || '';
+    const salesWindow = item.sales_window || 'Dia Todo';
     const unitPrice = formatCurrency(item.unit_price || 0);
     const itemHeader = `${item.recipe_name}\n${unitPrice}/${item.unit_type}`;
 
@@ -177,9 +175,9 @@ export class CategoryLogic {
       const adjustmentPct = formattedQuantity(item.adjustment_percentage || 0);
       const totalQty = formattedQuantity(item.quantity || 0);
 
-      return `${itemHeader} | ${baseQty} | ${unitType} | ${adjustmentPct}% | ${totalQty} ${item.unit_type} | ${subtotal} | ${pesoTotal} | ${notes}`;
+      return `${itemHeader} | ${baseQty} | ${adjustmentPct}% | ${totalQty} ${item.unit_type} | ${subtotal} | ${pesoTotal} | ${salesWindow}`;
     } else {
-      return `${itemHeader} | ${baseQty} | ${unitType} | ${subtotal} | ${pesoTotal} | ${notes}`;
+      return `${itemHeader} | ${baseQty} | ${subtotal} | ${pesoTotal} | ${salesWindow}`;
     }
   }
 
@@ -190,9 +188,9 @@ export class CategoryLogic {
    */
   static getExportHeader(isCarneCategory) {
     if (isCarneCategory) {
-      return "Item | Quantidade | Unidade | Porcionamento | Total Pedido | Subtotal | Peso Total | Observações";
+      return "Item | Quantidade | Porcionamento | Total Pedido | Subtotal | Peso Total | Janela de Venda";
     } else {
-      return "Item | Quantidade | Unidade | Subtotal | Peso Total | Observações";
+      return "Item | Quantidade | Subtotal | Peso Total | Janela de Venda";
     }
   }
 }
