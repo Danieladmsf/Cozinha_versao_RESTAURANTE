@@ -392,6 +392,7 @@ export const Employee = createEntity('Employee');
 export const WorkStation = createEntity('WorkStation');
 export const WorkflowProcess = createEntity('WorkflowProcess');
 export const SalesHistory = createEntity('sales_history');
+export const DailyAssignment = createEntity('DailyAssignment');
 
 // User entity
 export const UserEntity = createEntity('User');
