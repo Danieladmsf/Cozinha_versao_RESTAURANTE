@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CategoryType, User, Recipe } from '@/app/api/entities';
+import { CategoryType, User, Recipe, Product } from '@/app/api/entities';
 import { useToast } from '@/components/ui';
 import { processTypes, defaultConfig, validationRules } from '@/lib/recipeConstants';
 
@@ -228,6 +228,62 @@ export function useRecipeConfig() {
           title: "Receita criada",
           description: `"${recipeData.name}" foi criada com sucesso.`
         });
+      }
+
+      // NOVO: Sincronizar com Produtos Comerciais (SKU) se for pertinente
+      try {
+        const isProductCategory =
+          sanitizedRecipe.type === 'produtos' ||
+          (sanitizedRecipe.category && sanitizedRecipe.category.toUpperCase().includes('PRODUTO'));
+
+        if (isProductCategory) {
+          // Buscar se já existe produto espelhado
+          const existingProducts = await Product.query([{ field: 'recipe_link_id', operator: '==', value: result.id }]);
+
+          // Tentar extrair unidade
+          let unitType = 'un';
+          if (sanitizedRecipe.cuba_weight && !sanitizedRecipe.portion_weight) {
+            unitType = 'kg';
+          }
+
+          // Extrair dias de validade só números
+          let shelfLifeValue = '';
+          if (sanitizedRecipe.shelf_life) {
+            const match = String(sanitizedRecipe.shelf_life).match(/\d+/);
+            if (match) shelfLifeValue = Number(match[0]);
+          }
+
+          const productData = {
+            name: sanitizedRecipe.name,
+            category: sanitizedRecipe.category || '',
+            unit_type: unitType,
+            shelf_life_days: shelfLifeValue,
+            recipe_link_id: result.id,
+            components: [{
+              recipe_id: result.id,
+              weight_kg: parseFloat(sanitizedRecipe.yield_weight) || parseFloat(sanitizedRecipe.cuba_weight) || 1
+            }]
+          };
+
+          if (existingProducts && existingProducts.length > 0) {
+            // Mantém o código VR original
+            await Product.update(existingProducts[0].id, {
+              ...productData,
+              updatedAt: new Date()
+            });
+            console.log(`[useRecipeConfig] Produto comercial sincronizado (ID: ${existingProducts[0].id})`);
+          } else {
+            await Product.create({
+              ...productData,
+              code: '', // Deixa vazio para preencher dps no SKU
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
+            console.log(`[useRecipeConfig] Produto comercial criado (Recipe ID: ${result.id})`);
+          }
+        }
+      } catch (syncError) {
+        console.error("Erro ao sincronizar Produto/SKU:", syncError);
       }
 
       return { success: true, recipe: result, preparations: preparationsData };

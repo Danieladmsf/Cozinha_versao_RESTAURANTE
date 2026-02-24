@@ -391,9 +391,7 @@ export default function ProductsList() {
                         </AnimatePresence>
                     </div>
 
-                    {loading ? (
-                        <div className="p-8 text-center text-gray-500">Carregando catálogo...</div>
-                    ) : error ? (
+                    {error ? (
                         <div className="p-8 text-center text-red-500">Erro: {error}</div>
                     ) : (
                         <div className={cn(

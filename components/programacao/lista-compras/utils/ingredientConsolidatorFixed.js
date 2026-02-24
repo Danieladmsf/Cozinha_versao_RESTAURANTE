@@ -195,15 +195,32 @@ const calculateRecipeQuantities = (orders, recipes) => {
               const asm = recipe.assemblies[0];
               if (asm.units_quantity) units_qty = parseFloat(asm.units_quantity);
             }
-            // Se a receita gera units_qty unidades, e o usuário pediu itemQuantity unidades:
+
+            // Garantir que units_qty seja pelo menos 1 para evitar divisão por zero ou multiplicadores infinitos
+            units_qty = Math.max(1, units_qty);
+
             // Multiplicador da receita inteira = itemQuantity / units_qty
             recipeMultiplier = itemQuantity / units_qty;
 
           } else if (unitType === 'kg') {
-            const yieldWeight = parseFloat(recipe.yield_weight) || parseFloat(recipe.cuba_weight) || 1;
+            // Se pedir 5kg e a receita rende 2.5kg, precisamos fazer 2 receitas
+            let yieldWeight = parseFloat(recipe.yield_weight);
+            if (!yieldWeight || yieldWeight <= 0) {
+              // Fallback tentar pegar de uma preparacao final
+              if (recipe.preparations && recipe.preparations.length > 0) {
+                const last = recipe.preparations[recipe.preparations.length - 1];
+                yieldWeight = parseFloat(last.weight_portioned || last.weight_cooked || last.weight_clean);
+              }
+            }
+            if (!yieldWeight || yieldWeight <= 0) {
+              yieldWeight = parseFloat(recipe.cuba_weight) || 1; // Último caso
+            }
+            // Garantir que está em KG (se for > 10, provavelmente é gramas)
+            if (yieldWeight > 10) yieldWeight = yieldWeight / 1000;
+
             recipeMultiplier = itemQuantity / yieldWeight;
           } else {
-            // Fallback: assumir que é cuba
+            // Fallback: assumir proporção de 1:1
             recipeMultiplier = itemQuantity;
           }
 

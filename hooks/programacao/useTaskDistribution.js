@@ -107,7 +107,12 @@ function processIngredientOrExplode(ing, parentScale, onLeafFound, allRecipes, o
     if (weightRaw <= 0) return;
 
     const ingName = (ing.name || '').trim();
-    if (!ingName || /^\d+\.\s/.test(ingName)) return;
+    if (!ingName || /^\d+\.\s/.test(ingName) || ingName.length > 80) return;
+
+    // Filtro aprimorado para evitar que notas entrem na lista final
+    if (ingName.toLowerCase().includes('refrigerado') || ingName.toLowerCase().includes('congelado') || ingName.toLowerCase().includes('fogo médio')) return;
+    const isClearlyNote = !parseFloat(ing.weight_raw) && !ing.unit && (ingName.match(/[;.!]$/) || ingName.split(' ').length > 6);
+    if (isClearlyNote) return;
 
     // Check for Implicit Link (Recipe with same name)
     const matchingRecipe = allRecipes.find(r => r.name === ingName);
@@ -282,7 +287,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
             return emptyResult;
         }
 
-        const dayOrders = orders.filter(o => o.day_of_week === selectedDay);
+        const dayOrders = orders.filter(o => Number(o.day_of_week) === Number(selectedDay));
         if (dayOrders.length === 0) return emptyResult;
 
         // Flat maps for consolidated totals
@@ -386,16 +391,20 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                 const touchedTaskTypes = new Set();
 
                 leafIngredients.forEach(({ ing, scaledWeight, contextStr, originId }) => {
-                    let taskTypes = Array.isArray(ing.task_type)
-                        ? ing.task_type
-                        : (ing.task_type ? [ing.task_type] : []);
+                    let taskTypes = [];
+                    // Check local configuration:
+                    // If undefined -> never configured (inherit from base)
+                    // If null -> explicitly cleared by user (keep empty)
+                    // If array -> explicitly set by user (keep array)
+                    const hasLocalEdit = ing.task_type !== undefined;
+
+                    if (hasLocalEdit) {
+                        taskTypes = Array.isArray(ing.task_type) ? ing.task_type : (ing.task_type ? [ing.task_type] : []);
+                    }
 
                     // DYNAMIC INHERITANCE: NATIVE RELATIONAL MODE
-                    // Se o ingrediente estiver dentro de uma etapa que foi importada
-                    // de outra receita (marcada nativamente com origin_id), nós SEMPRE
-                    // puxamos fisicamente a receita verdadeira do banco de dados (by ID) 
-                    // e copiamos suas marcações, ignorando qualquer clone residual.
-                    if (originId) {
+                    // Se o ingrediente estiver dentro de uma etapa matriz E não houver edição local
+                    if (!hasLocalEdit && originId) {
                         const baseRecipe = recipes.find(r => r.id === originId);
                         if (baseRecipe) {
                             for (const bp of baseRecipe.preparations || []) {
@@ -406,11 +415,8 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                                 );
                                 if (foundIng) {
                                     const baseTaskTypes = Array.isArray(foundIng.task_type) ? foundIng.task_type : (foundIng.task_type ? [foundIng.task_type] : []);
-                                    // SOBRESCREVE incondicionalmente pelo que está na raiz
+                                    // SOBRESCREVE apenas porque não houve edição local
                                     taskTypes = baseTaskTypes;
-                                    if (isTargetDebug) {
-                                        console.log(`[DEBUG INHERITANCE] Inherited via origin_id! ${ing.name} puxou task_type ${taskTypes} da receita base (ID: ${originId})`);
-                                    }
                                     break;
                                 }
                             }
@@ -422,7 +428,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                     }
 
                     if (isTargetDebug && (ing.name || '').toLowerCase().includes('farinha')) {
-                        console.log(`[DEBUG PROCESSING LEAF] Farinha found in ${contextStr}. Assigned task types:`, taskTypes);
+                        console.log(`[DEBUG PROCESSING LEAF] Farinha found in ${contextStr}. Assigned task types:`, taskTypes, '| originId:', originId, '| hasLocalEdit:', hasLocalEdit);
                     }
 
                     const ingName = (ing.name || '').trim();

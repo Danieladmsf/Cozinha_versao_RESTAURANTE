@@ -80,6 +80,32 @@ const EscalaCozinhaTab = () => {
     const selectedDayInfo = weekDays?.find(d => d.dayNumber === selectedDay);
     const dateLabel = selectedDayInfo?.fullDate || format(currentDate, 'dd/MM/yyyy', { locale: ptBR });
 
+    // Extrair IDs das receitas que estão ativas no dia selecionado, expandindo as sub-receitas (Matrizes)
+    const activeRecipeIds = React.useMemo(() => {
+        if (!orders || orders.length === 0) return new Set();
+
+        const dayOrders = orders.filter(o => Number(o.day_of_week) === Number(selectedDay));
+        if (dayOrders.length === 0) return new Set();
+
+        const ids = new Set();
+        const queue = [];
+
+        dayOrders.forEach(order => {
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    if (item.recipe_id) {
+                        ids.add(item.recipe_id);
+                        queue.push(item.recipe_id);
+                    }
+                });
+            }
+        });
+
+        // Não expandir para Matrizes: a aba Configuração deve mostrar apenas os Produtos finais vendidos.
+
+        return ids;
+    }, [orders, recipes, selectedDay]);
+
     // =========================================
     // PRINT: Gera folha por cargo
     // =========================================
@@ -273,8 +299,8 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                     {/* Column headers */}
                     <div className="flex items-center px-4 py-1.5 border-b border-gray-200 bg-gray-50/50">
                         <span className="flex-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Item</span>
-                        <span className="w-24 text-[10px] font-semibold text-gray-400 uppercase tracking-wider text-right">Peso</span>
-                        <span className="w-24 text-[10px] font-semibold text-gray-400 uppercase tracking-wider text-right">Consolidado</span>
+                        <span className="w-24 text-[10px] font-bold text-blue-600 uppercase tracking-wider text-right" title="Quantidade exata para usar apenas nesta receita">USAR NA RECEITA</span>
+                        <span className="w-28 text-[9px] font-semibold text-gray-400 uppercase tracking-wider text-right" title="Quantidade total necessária para o dia todo">Total do Dia</span>
                     </div>
 
                     {categoriesList.map(category => (
@@ -319,13 +345,13 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                                                     <span className="flex-1 text-gray-600 text-sm">
                                                         {ing.displayName}
                                                     </span>
-                                                    <span className="w-24 text-right font-semibold text-gray-800 text-sm tabular-nums">
+                                                    <span className="w-24 text-right font-bold text-blue-700 text-sm tabular-nums">
                                                         {formatWeight(ing.totalWeight)}
                                                     </span>
-                                                    <span className={`w-24 text-right text-sm tabular-nums ${hasMultiple
-                                                        ? 'font-bold text-gray-800'
+                                                    <span className={`w-28 text-right text-[11px] tabular-nums ${hasMultiple
+                                                        ? 'font-medium text-gray-500'
                                                         : 'text-gray-300'
-                                                        }`}>
+                                                        }`} title="Total que precisa ser retirado do estoque para o dia todo">
                                                         {consolidated ? formatWeight(consolidated.totalWeight) : '—'}
                                                     </span>
                                                 </div>
@@ -471,6 +497,9 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                         updateIngredientTaskType={updateIngredientTaskType}
                         saving={saving}
                         configStats={configStats}
+                        activeRecipeIds={activeRecipeIds}
+                        categories={categories}
+                        getCategoryInfo={getCategoryInfo}
                     />
                 </TabsContent>
             </Tabs>
