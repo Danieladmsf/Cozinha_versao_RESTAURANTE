@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Trash, MoreVertical, Pencil, Box, Plus, Settings } from "lucide-react";
+import { Search, Trash, MoreVertical, Pencil, Box, Plus, Settings, FileText, Printer, Eye, EyeOff } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -441,7 +441,81 @@ export default function ProductsList() {
                                                             className="flex items-center cursor-pointer"
                                                         >
                                                             <Pencil className="mr-2 h-4 w-4" />
-                                                            Editar SKU
+                                                            Editar
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                setEditingProduct({
+                                                                    ...product,
+                                                                    id: null,
+                                                                    name: product.name + " (Cópia)",
+                                                                    code: ''
+                                                                });
+                                                                setIsModalOpen(true);
+                                                            }}
+                                                            className="flex items-center cursor-pointer text-blue-600 focus:text-blue-600"
+                                                        >
+                                                            <Plus className="mr-2 h-4 w-4" />
+                                                            Exportar para SKU
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                const recipeId = product.components?.[0]?.recipe_id;
+                                                                if (recipeId) {
+                                                                    window.location.href = `/ficha-tecnica?id=${recipeId}`;
+                                                                } else {
+                                                                    alert("Este produto não possui uma ficha técnica associada.");
+                                                                }
+                                                            }}
+                                                            className="flex items-center cursor-pointer"
+                                                        >
+                                                            <FileText className="mr-2 h-4 w-4" />
+                                                            Ficha Técnica
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                const recipeId = product.components?.[0]?.recipe_id;
+                                                                if (recipeId) {
+                                                                    alert("Acesse a Ficha Técnica para imprimir a receita.");
+                                                                    window.location.href = `/ficha-tecnica?id=${recipeId}`;
+                                                                } else {
+                                                                    alert("Este produto não possui uma receita para imprimir.");
+                                                                }
+                                                            }}
+                                                            className="flex items-center cursor-pointer"
+                                                        >
+                                                            <Printer className="mr-2 h-4 w-4" />
+                                                            Imprimir Receita
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateProduct(product.id, {
+                                                                        ...product,
+                                                                        active: product.active === false ? true : false
+                                                                    });
+                                                                    fetchProducts();
+                                                                } catch (e) {
+                                                                    console.error(e);
+                                                                }
+                                                            }}
+                                                            className="flex items-center cursor-pointer"
+                                                        >
+                                                            {product.active === false ? (
+                                                                <>
+                                                                    <Eye className="mr-2 h-4 w-4" />
+                                                                    Marcar como Ativo
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <EyeOff className="mr-2 h-4 w-4" />
+                                                                    Marcar como Inativo
+                                                                </>
+                                                            )}
                                                         </DropdownMenuItem>
 
                                                         <DropdownMenuItem
