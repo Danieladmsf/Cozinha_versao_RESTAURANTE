@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { RecipeEngine as RecipeCalculator } from '@/lib/recipe-engine/RecipeEngine';
+import { DemandCalculator, getCanonicalIngredientName } from '@/lib/production-engine/DemandCalculator';
 const parseNumber = RecipeCalculator.parseValue;
 /**
  * TASK TYPES:
@@ -69,111 +70,6 @@ export const TASK_TYPES = {
         recipeBg: 'bg-red-50/30',
     },
 };
-
-/**
- * Normaliza nomes de ingredientes para consolidação global
- * Ex: "Alho Triturado" -> "alho"
- *     "Cebola Picada" -> "cebola"
- */
-export function getCanonicalIngredientName(name) {
-    if (!name) return '';
-    const lower = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-
-    // Mapeamentos diretos de variações comuns
-    if (lower.includes('alho')) return 'alho';
-    if (lower.includes('cebola')) return 'cebola';
-    if (lower.includes('cenoura')) return 'cenoura';
-    if (lower.includes('tomate')) return 'tomate';
-
-    return lower;
-}
-
-/**
- * Calcula o peso de rendimento de uma receita (helper)
- */
-function getRecipeYieldWeight(recipe) {
-    if (!recipe) return 0;
-    const metrics = RecipeCalculator.calculateRecipeMetrics(recipe, recipe.preparations || []);
-    return metrics.yield_weight || 0;
-}
-
-/**
- * Process a single ingredient recursively.
- * Checks if it matches a Recipe (Implicit Link) and explodes it if so.
- * Otherwise adds it as a leaf ingredient via callback.
- */
-function processIngredientOrExplode(ing, parentScale, onLeafFound, allRecipes, orderCustomerName, visitedIds, originId = null) {
-    const weightRaw = RecipeCalculator.getInitialWeight(ing);
-    if (weightRaw <= 0) return;
-
-    const ingName = (ing.name || '').trim();
-    if (!ingName || /^\d+\.\s/.test(ingName) || ingName.length > 80) return;
-
-    // Filtro aprimorado para evitar que notas entrem na lista final
-    if (ingName.toLowerCase().includes('refrigerado') || ingName.toLowerCase().includes('congelado') || ingName.toLowerCase().includes('fogo médio')) return;
-    const isClearlyNote = !parseFloat(ing.weight_raw) && !ing.unit && (ingName.match(/[;.!]$/) || ingName.split(' ').length > 6);
-    if (isClearlyNote) return;
-
-    // Check for Implicit Link (Recipe with same name)
-    const matchingRecipe = allRecipes.find(r => r.name === ingName);
-
-    if (matchingRecipe) {
-        // Prevent infinite loops
-        if (visitedIds.has(matchingRecipe.id)) return;
-        const defYield = getRecipeYieldWeight(matchingRecipe);
-        if (defYield > 0) {
-            const subScale = (weightRaw / defYield) * parentScale;
-            recursiveExplode(matchingRecipe, subScale, onLeafFound, allRecipes, `${orderCustomerName} > ${ingName}`, new Set(visitedIds));
-            return; // Done
-        }
-    }
-
-    // Leaf Ingredient: Execute Callback
-    const scaledWeight = weightRaw * parentScale;
-    if (orderCustomerName.toLowerCase().includes('panqueca')) {
-        console.log(`[DEBUG EXPLODE] Leaf found: ${ingName} | weight: ${scaledWeight} | context: ${orderCustomerName} | task_types:`, ing.task_type, '| originId:', originId);
-    }
-    onLeafFound(ing, scaledWeight, orderCustomerName, originId);
-}
-
-/**
- * Explodes a Recipe Definition recursively.
- * Iterates Ingredients and Explicit Sub-Recipes.
- */
-function recursiveExplode(def, currentScale, onLeafFound, allRecipes, contextStr, visitedIds) {
-    visitedIds.add(def.id);
-
-    if (def.preparations && Array.isArray(def.preparations)) {
-        def.preparations.forEach(prep => {
-            const originId = prep.origin_id || null;
-            if (prep.ingredients && Array.isArray(prep.ingredients)) {
-                prep.ingredients.forEach(ing => {
-                    processIngredientOrExplode(ing, currentScale, onLeafFound, allRecipes, contextStr, visitedIds, originId);
-                });
-            }
-
-            if (prep.recipes && Array.isArray(prep.recipes)) {
-                prep.recipes.forEach(sub => {
-                    const subDef = allRecipes.find(r => r.id === sub.recipe_id) || allRecipes.find(r => r.name === sub.name);
-                    if (!subDef) return;
-
-                    if (visitedIds.has(subDef.id)) return;
-                    const subYield = getRecipeYieldWeight(subDef);
-                    const used = parseNumber(sub.used_weight);
-                    if (subYield > 0 && used > 0) {
-                        const nextScale = (used / subYield) * currentScale;
-                        recursiveExplode(subDef, nextScale, onLeafFound, allRecipes, `${contextStr} > ${subDef.name}`, new Set(visitedIds));
-                    }
-                });
-            }
-        });
-    }
-}
-
-// Helper para gerar key simples (caso canônico falhe ou não exista)
-function getNameKey(name) {
-    return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-}
 
 /**
  * Hook principal: classifica ingredientes e gera relatórios.
@@ -309,207 +205,145 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
             sem_categoria: {},
         };
 
-        dayOrders.forEach(order => {
-            if (!order.items || !Array.isArray(order.items)) return;
+        // EXPLODIR PEDIDOS USANDO O NOVO MOTOR BLINDADO
+        const leafIngredients = DemandCalculator.explodeOrders(dayOrders, recipes, categoryMap);
 
-            order.items.forEach(orderItem => {
-                if (!orderItem.recipe_id) return;
+        // Track task groups touched to increment orderQty exactly once per unique top-level item
+        const touchedTaskTypes = new Set();
 
-                const recipe = recipes.find(r => r.id === orderItem.recipe_id);
-                if (!recipe?.preparations) return;
+        leafIngredients.forEach(({
+            ingredient: ing,
+            scaledQty: scaledWeight,
+            contextStr,
+            originId,
+            topLevelCategory: category,
+            topLevelRecipeId: recipeId,
+            topLevelRecipeName: recipeName,
+            topLevelOrderedQty: orderedQty,
+            topLevelIsSoldByWeight: isSoldByWeight,
+            topLevelAssemblyUnit,
+            topLevelPortionWeight
+        }) => {
+            let taskTypes = [];
+            // Check local configuration:
+            // If undefined -> never configured (inherit from base)
+            // If null -> explicitly cleared by user (keep empty)
+            // If array -> explicitly set by user (keep array)
+            const hasLocalEdit = ing.task_type !== undefined;
 
-                const orderedQty = parseNumber(orderItem.quantity);
-                if (orderedQty <= 0) return;
+            if (hasLocalEdit) {
+                taskTypes = Array.isArray(ing.task_type) ? ing.task_type : (ing.task_type ? [ing.task_type] : []);
+            }
 
-                const recipeYieldWeight = getRecipeYieldWeight(recipe);
-                if (recipeYieldWeight <= 0) return;
-
-                let unitsQuantity = 1;
-                const lastPrep = recipe.preparations[recipe.preparations.length - 1];
-                if (lastPrep?.assembly_config?.units_quantity) {
-                    unitsQuantity = parseNumber(lastPrep.assembly_config.units_quantity) || 1;
-                }
-
-                // Detect if product is sold by weight using the assembly_config.unit_type
-                // from the Porcionamento step ("kg" = Quilo, "un" = Unidade)
-                const assemblyUnitType = (lastPrep?.assembly_config?.unit_type || '').toLowerCase();
-                const orderUnitType = (orderItem.unit_type || recipe.unit_type || recipe.container_type || '').toLowerCase();
-                const isSoldByWeight = assemblyUnitType === 'kg'
-                    || orderUnitType === 'kg'
-                    || orderUnitType.includes('cuba');
-
-                let scaleFactor;
-                if (isSoldByWeight) {
-                    // Weight-based: ordered qty in kg ÷ recipe yield in kg
-                    scaleFactor = orderedQty / recipeYieldWeight;
-                } else {
-                    // Unit-based: ordered units ÷ recipe units per batch
-                    scaleFactor = orderedQty / unitsQuantity;
-                }
-                if (scaleFactor <= 0 || !isFinite(scaleFactor)) return;
-
-                // DYNAMIC CATEGORY RESOLUTION
-                let categoryName = recipe.category || 'Outros';
-
-                // 1. Try ID lookup (Best)
-                if (recipe.category_id && categoryMap.has(recipe.category_id)) {
-                    categoryName = categoryMap.get(recipe.category_id);
-                }
-                // 2. Try Name lookup (Fallback for legacy items without ID)
-                else if (recipe.category) {
-                    // Reverse lookup: Find if any category name matches the recipe.category string (normalized)
-                    // This is expensive O(N) inside loop, but N (categories) is small (~50).
-                    // Optimization: Pre-compute name->name map could be better if performance issues arise.
-                    const normalizedStatic = recipe.category.trim().toLowerCase();
-                    for (const [id, name] of categoryMap.entries()) {
-                        if (name.trim().toLowerCase() === normalizedStatic) {
-                            categoryName = name; // Use the canonical name from config
+            // DYNAMIC INHERITANCE: NATIVE RELATIONAL MODE
+            // Se o ingrediente estiver dentro de uma etapa matriz E não houver edição local
+            if (!hasLocalEdit && originId) {
+                const baseRecipe = recipes.find(r => r.id === originId);
+                if (baseRecipe) {
+                    for (const bp of baseRecipe.preparations || []) {
+                        // Double check against ingredient_id primarily for exact matching, fallback to name
+                        const foundIng = bp.ingredients?.find(bi =>
+                            (bi.ingredient_id && ing.ingredient_id && bi.ingredient_id === ing.ingredient_id) ||
+                            bi.name === ing.name
+                        );
+                        if (foundIng) {
+                            const baseTaskTypes = Array.isArray(foundIng.task_type) ? foundIng.task_type : (foundIng.task_type ? [foundIng.task_type] : []);
+                            // SOBRESCREVE apenas porque não houve edição local
+                            taskTypes = baseTaskTypes;
                             break;
                         }
                     }
                 }
-                const category = categoryName.toUpperCase();
+            }
 
-                const orderCustomerName = `${recipe.name} (${order.customer_name})`;
-                const isTargetDebug = orderCustomerName.toLowerCase().includes('panqueca');
+            if (taskTypes.length === 0) {
+                taskTypes = ['sem_categoria'];
+            }
 
-                if (isTargetDebug) {
-                    console.log(`\n\n[DEBUG MAIN] Start processing main order: ${orderCustomerName}`);
+            const isTargetDebug = contextStr.toLowerCase().includes('panqueca');
+            if (isTargetDebug && (ing.name || '').toLowerCase().includes('farinha')) {
+                console.log(`[DEBUG PROCESSING LEAF] Farinha found in ${contextStr}. Assigned task types:`, taskTypes, '| originId:', originId, '| hasLocalEdit:', hasLocalEdit);
+            }
+
+            const ingName = (ing.name || '').trim();
+            const key = ingName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+            // === GLOBAL CONSOLIDATED ===
+            const canonicalName = getCanonicalIngredientName(ingName);
+            const globalKey = canonicalName || key;
+            if (globalConsolidated.has(globalKey)) {
+                const entry = globalConsolidated.get(globalKey);
+                entry.totalWeight += scaledWeight;
+                if (!entry.sourceRecipes.includes(contextStr)) {
+                    entry.sourceRecipes.push(contextStr);
                 }
+            } else {
+                globalConsolidated.set(globalKey, {
+                    name: canonicalName.charAt(0).toUpperCase() + canonicalName.slice(1),
+                    totalWeight: scaledWeight,
+                    sourceRecipes: [contextStr],
+                });
+            }
 
-                // 1. Traverse and extract all leaf ingredients (deep nested sub-recipes)
-                const leafIngredients = [];
-                recursiveExplode(recipe, scaleFactor, (ing, scaledWeight, contextStr, originId) => {
-                    leafIngredients.push({ ing, scaledWeight, contextStr, originId });
-                }, recipes, orderCustomerName, new Set());
+            // === INDIVIDUAL TASK MAPPING ===
+            taskTypes.forEach(taskType => {
+                if (!taskMaps[taskType]) return;
 
-                if (isTargetDebug) {
-                    console.log(`[DEBUG MAIN] Total leaf ingredients found for ${recipe.name}:`, leafIngredients.length, leafIngredients.map(l => l.ing.name));
-                }
+                // === GROUPED: category -> TOP LEVEL recipe -> ingredients ===
+                const groupTarget = grouped[taskType];
+                if (groupTarget) {
+                    if (!groupTarget[category]) groupTarget[category] = {};
+                    const recipeKey = recipeName;
+                    if (!groupTarget[category][recipeKey]) {
+                        groupTarget[category][recipeKey] = {
+                            recipeName: recipeName,
+                            recipeId: recipeId,
+                            orderQty: 0,
+                            unitType: isSoldByWeight ? 'kg' : (topLevelAssemblyUnit || 'un'),
+                            portionWeight: topLevelPortionWeight || 0,
+                            ingredients: new Map(),
+                        };
+                    }
+                    const rg = groupTarget[category][recipeKey];
 
-                // Track task groups touched to increment orderQty exactly once per unique top-level item
-                const touchedTaskTypes = new Set();
-
-                leafIngredients.forEach(({ ing, scaledWeight, contextStr, originId }) => {
-                    let taskTypes = [];
-                    // Check local configuration:
-                    // If undefined -> never configured (inherit from base)
-                    // If null -> explicitly cleared by user (keep empty)
-                    // If array -> explicitly set by user (keep array)
-                    const hasLocalEdit = ing.task_type !== undefined;
-
-                    if (hasLocalEdit) {
-                        taskTypes = Array.isArray(ing.task_type) ? ing.task_type : (ing.task_type ? [ing.task_type] : []);
+                    if (!touchedTaskTypes.has(taskType)) {
+                        rg.orderQty += orderedQty;
+                        touchedTaskTypes.add(taskType);
                     }
 
-                    // DYNAMIC INHERITANCE: NATIVE RELATIONAL MODE
-                    // Se o ingrediente estiver dentro de uma etapa matriz E não houver edição local
-                    if (!hasLocalEdit && originId) {
-                        const baseRecipe = recipes.find(r => r.id === originId);
-                        if (baseRecipe) {
-                            for (const bp of baseRecipe.preparations || []) {
-                                // Double check against ingredient_id primarily for exact matching, fallback to name
-                                const foundIng = bp.ingredients?.find(bi =>
-                                    (bi.ingredient_id && ing.ingredient_id && bi.ingredient_id === ing.ingredient_id) ||
-                                    bi.name === ing.name
-                                );
-                                if (foundIng) {
-                                    const baseTaskTypes = Array.isArray(foundIng.task_type) ? foundIng.task_type : (foundIng.task_type ? [foundIng.task_type] : []);
-                                    // SOBRESCREVE apenas porque não houve edição local
-                                    taskTypes = baseTaskTypes;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (taskTypes.length === 0) {
-                        taskTypes = ['sem_categoria'];
-                    }
-
-                    if (isTargetDebug && (ing.name || '').toLowerCase().includes('farinha')) {
-                        console.log(`[DEBUG PROCESSING LEAF] Farinha found in ${contextStr}. Assigned task types:`, taskTypes, '| originId:', originId, '| hasLocalEdit:', hasLocalEdit);
-                    }
-
-                    const ingName = (ing.name || '').trim();
-                    const key = ingName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-                    // === GLOBAL CONSOLIDATED ===
-                    const canonicalName = getCanonicalIngredientName(ingName);
-                    const globalKey = canonicalName || key;
-                    if (globalConsolidated.has(globalKey)) {
-                        const entry = globalConsolidated.get(globalKey);
-                        entry.totalWeight += scaledWeight;
-                        if (!entry.sourceRecipes.includes(orderCustomerName)) {
-                            entry.sourceRecipes.push(orderCustomerName);
-                        }
+                    if (rg.ingredients.has(key)) {
+                        rg.ingredients.get(key).totalWeight += scaledWeight;
                     } else {
-                        globalConsolidated.set(globalKey, {
-                            name: canonicalName.charAt(0).toUpperCase() + canonicalName.slice(1),
+                        rg.ingredients.set(key, {
+                            name: ingName,
+                            displayName: ingName.charAt(0).toUpperCase() + ingName.slice(1),
                             totalWeight: scaledWeight,
-                            sourceRecipes: [orderCustomerName],
+                            unit: ing.canonical_unit || 'kg',
+                            itemType: ing.item_type || 'food'
                         });
                     }
+                }
 
-                    // === INDIVIDUAL TASK MAPPING ===
-                    taskTypes.forEach(taskType => {
-                        if (!taskMaps[taskType]) return;
-
-                        // === GROUPED: category -> TOP LEVEL recipe -> ingredients ===
-                        const groupTarget = grouped[taskType];
-                        if (groupTarget) {
-                            if (!groupTarget[category]) groupTarget[category] = {};
-                            const recipeKey = recipe.name;
-                            if (!groupTarget[category][recipeKey]) {
-                                groupTarget[category][recipeKey] = {
-                                    recipeName: recipe.name,
-                                    recipeId: recipe.id,
-                                    orderQty: 0,
-                                    unitType: isSoldByWeight ? 'kg' : (assemblyUnitType || orderUnitType || 'un'),
-                                    portionWeight: recipe.portion_weight_calculated || 0,
-                                    ingredients: new Map(),
-                                };
-                            }
-                            const rg = groupTarget[category][recipeKey];
-
-                            if (!touchedTaskTypes.has(taskType)) {
-                                rg.orderQty += orderedQty;
-                                touchedTaskTypes.add(taskType);
-                            }
-
-                            if (rg.ingredients.has(key)) {
-                                rg.ingredients.get(key).totalWeight += scaledWeight;
-                            } else {
-                                rg.ingredients.set(key, {
-                                    name: ingName,
-                                    displayName: ingName.charAt(0).toUpperCase() + ingName.slice(1),
-                                    totalWeight: scaledWeight,
-                                    unit: 'kg',
-                                });
-                            }
-                        }
-
-                        // === FLAT MAP (per task type) ===
-                        const targetMap = taskMaps[taskType];
-                        if (targetMap.has(key)) {
-                            const existing = targetMap.get(key);
-                            existing.totalWeight += scaledWeight;
-                            if (!existing.sourceRecipes.includes(contextStr)) {
-                                existing.sourceRecipes.push(contextStr);
-                            }
-                        } else {
-                            targetMap.set(key, {
-                                name: ingName,
-                                displayName: ingName.charAt(0).toUpperCase() + ingName.slice(1),
-                                totalWeight: scaledWeight,
-                                unit: 'kg',
-                                sourceRecipes: [contextStr],
-                                recipeName: recipe.name,
-                                prepTitle: '',
-                            });
-                        }
+                // === FLAT MAP (per task type) ===
+                const targetMap = taskMaps[taskType];
+                if (targetMap.has(key)) {
+                    const existing = targetMap.get(key);
+                    existing.totalWeight += scaledWeight;
+                    if (!existing.sourceRecipes.includes(contextStr)) {
+                        existing.sourceRecipes.push(contextStr);
+                    }
+                } else {
+                    targetMap.set(key, {
+                        name: ingName,
+                        displayName: ingName.charAt(0).toUpperCase() + ingName.slice(1),
+                        totalWeight: scaledWeight,
+                        unit: ing.canonical_unit || 'kg',
+                        itemType: ing.item_type || 'food',
+                        sourceRecipes: [contextStr],
+                        recipeName: recipeName,
+                        prepTitle: '',
                     });
-                });
+                }
             });
         });
 

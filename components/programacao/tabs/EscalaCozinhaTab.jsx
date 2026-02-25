@@ -18,7 +18,8 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import { useTaskDistribution, TASK_TYPES, getCanonicalIngredientName } from '@/hooks/programacao/useTaskDistribution';
+import { useTaskDistribution, TASK_TYPES } from '@/hooks/programacao/useTaskDistribution';
+import { getCanonicalIngredientName } from '@/lib/production-engine/DemandCalculator';
 import { useProgramacaoRealtimeData } from '@/hooks/programacao/useProgramacaoRealtimeData';
 import { useAvailableDays } from '@/hooks/useAvailableDays';
 import { useCategoryDisplay } from '@/hooks/shared/useCategoryDisplay';
