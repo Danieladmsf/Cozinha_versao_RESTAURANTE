@@ -13,6 +13,24 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        "primary": "#13ec80",
+        "primary-dark": "#0ea65a",
+        "secondary": "#111814",
+        "background-light": "#f6f8f7",
+        "background-dark": "#102219",
+        "surface-light": "#ffffff",
+        "surface-dark": "#1a3326",
+        "border-light": "#e0e7e4",
+        "border-dark": "#2a4d3a",
+      },
+      fontFamily: {
+        "display": ["Work Sans", "sans-serif"],
+        "body": ["Work Sans", "sans-serif"],
+      },
+      boxShadow: {
+        'soft': '0 2px 10px rgba(0, 0, 0, 0.03)',
+      },
       screens: {
         'xs': '475px',
       },

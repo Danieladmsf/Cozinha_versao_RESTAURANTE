@@ -31,7 +31,7 @@ export function useRecipePopOperations({
         }
 
         if (popData.type === 'equipment') {
-            setPendingPopDrop({ popData, insertPos, targetId });
+            setPendingPopDrop({ popData, insertPos, targetId, isEdit: false });
             setEquipmentModalOpen(true);
         } else if (popData.type === 'labor') {
             // Calcular tempo sugerido se a preparação for válida
@@ -42,7 +42,7 @@ export function useRecipePopOperations({
             }
 
             setSuggestedLaborTime(calculatedTime);
-            setPendingPopDrop({ popData, insertPos, targetId });
+            setPendingPopDrop({ popData, insertPos, targetId, isEdit: false });
             setLaborModalOpen(true);
         } else {
             // Direct insertion for non-equipment
@@ -56,6 +56,34 @@ export function useRecipePopOperations({
         }
     }, [preparationsData, setPendingPopDrop, setEquipmentModalOpen, setSuggestedLaborTime, setLaborModalOpen, setEditorCommand]);
 
+
+    const handleEditPop = useCallback((popData, editPos, targetId) => {
+        console.log("✏️ [useRecipePopOperations] handleEditPop triggered", { popData, editPos, targetId });
+
+        // Add existing values from attributes
+        const populatedData = {
+            ...popData,
+            initialDuration: popData.duration,
+            initialCapacity: popData.capacity
+        };
+
+        if (popData.type === 'equipment') {
+            setPendingPopDrop({ popData: populatedData, insertPos: editPos, targetId, isEdit: true });
+            setEquipmentModalOpen(true);
+        } else if (popData.type === 'labor') {
+            let calculatedTime = 0;
+            const prepMatch = targetId.match(/prep-(\d+)/);
+            let prepIndex = prepMatch ? parseInt(prepMatch[1]) : -1;
+
+            if (prepIndex >= 0 && preparationsData[prepIndex]) {
+                const metrics = RecipeEngine.calculatePreparationMetrics(preparationsData[prepIndex]);
+                calculatedTime = metrics.totalPrepTime || 0;
+            }
+            setSuggestedLaborTime(calculatedTime);
+            setPendingPopDrop({ popData: populatedData, insertPos: editPos, targetId, isEdit: true });
+            setLaborModalOpen(true);
+        }
+    }, [preparationsData, setPendingPopDrop, setEquipmentModalOpen, setSuggestedLaborTime, setLaborModalOpen]);
 
     const handleEquipmentConfirm = useCallback((data) => {
         if (pendingPopDrop) {
@@ -96,16 +124,48 @@ export function useRecipePopOperations({
                         currentPrep.equipment_costs = [];
                     }
 
-                    currentPrep.equipment_costs = [
-                        ...currentPrep.equipment_costs,
-                        {
-                            pop_id: pendingPopDrop.popData.id,
-                            name: pendingPopDrop.popData.name,
-                            cost: data.calculatedCost,
-                            duration: data.duration,
-                            timestamp: Date.now()
+                    if (pendingPopDrop.isEdit) {
+                        // Find the existing pop and update it
+                        const existingIdx = currentPrep.equipment_costs.findIndex(eq => eq.pop_id === pendingPopDrop.popData.id);
+                        if (existingIdx !== -1) {
+                            currentPrep.equipment_costs[existingIdx] = {
+                                ...currentPrep.equipment_costs[existingIdx],
+                                cost: data.calculatedCost,
+                                duration: data.duration,
+                                ratio: data.ratio || 1,
+                                capacity: data.capacity,
+                                recipeYield: data.recipeYield,
+                                timestamp: Date.now()
+                            };
+                        } else {
+                            // Fallback if not found (shouldn't happen typically on edit)
+                            currentPrep.equipment_costs.push({
+                                pop_id: pendingPopDrop.popData.id,
+                                name: pendingPopDrop.popData.name,
+                                cost: data.calculatedCost,
+                                duration: data.duration,
+                                ratio: data.ratio || 1,
+                                capacity: data.capacity,
+                                recipeYield: data.recipeYield,
+                                timestamp: Date.now()
+                            });
                         }
-                    ];
+                    } else {
+                        // New insertion
+                        currentPrep.equipment_costs = [
+                            ...currentPrep.equipment_costs,
+                            {
+                                pop_id: pendingPopDrop.popData.id,
+                                name: pendingPopDrop.popData.name,
+                                cost: data.calculatedCost,
+                                duration: data.duration,
+                                ratio: data.ratio || 1,
+                                capacity: data.capacity,
+                                recipeYield: data.recipeYield,
+                                timestamp: Date.now()
+                            }
+                        ];
+                    }
 
                     updatedPreps[prepIndex] = currentPrep;
                     return updatedPreps;
@@ -116,7 +176,7 @@ export function useRecipePopOperations({
             });
 
             setEditorCommand({
-                type: 'insertPop',
+                type: pendingPopDrop.isEdit ? 'updatePop' : 'insertPop',
                 payload: popPayload,
                 pos: pendingPopDrop.insertPos,
                 targetId: pendingPopDrop.targetId,
@@ -125,12 +185,10 @@ export function useRecipePopOperations({
 
             setRecipeData(prev => {
                 const currentOperationalCost = parseFloat(prev.operational_cost) || 0;
-                const newCost = data.calculatedCost || 0;
-                const updatedOperationalCost = currentOperationalCost + newCost;
-                return {
-                    ...prev,
-                    operational_cost: updatedOperationalCost
-                };
+                // If edit, we should ideally subtract old cost and add new. 
+                // However RecipeEngine recalculates it entirely from preparations anyway on save/effect.
+                // We'll just trigger a dirty state.
+                return { ...prev };
             });
 
             setPendingPopDrop(null);
@@ -175,17 +233,38 @@ export function useRecipePopOperations({
 
                     if (!currentPrep.labor_costs) currentPrep.labor_costs = [];
 
-                    currentPrep.labor_costs = [
-                        ...currentPrep.labor_costs,
-                        {
-                            employee_id: pendingPopDrop.popData.id,
-                            name: pendingPopDrop.popData.name,
-                            role: pendingPopDrop.popData.role,
-                            cost: data.calculatedCost,
-                            duration: data.duration,
-                            timestamp: Date.now()
+                    if (pendingPopDrop.isEdit) {
+                        const existingIdx = currentPrep.labor_costs.findIndex(lb => lb.employee_id === pendingPopDrop.popData.id);
+                        if (existingIdx !== -1) {
+                            currentPrep.labor_costs[existingIdx] = {
+                                ...currentPrep.labor_costs[existingIdx],
+                                cost: data.calculatedCost,
+                                duration: data.duration,
+                                timestamp: Date.now()
+                            };
+                        } else {
+                            currentPrep.labor_costs.push({
+                                employee_id: pendingPopDrop.popData.id,
+                                name: pendingPopDrop.popData.name,
+                                role: pendingPopDrop.popData.role,
+                                cost: data.calculatedCost,
+                                duration: data.duration,
+                                timestamp: Date.now()
+                            });
                         }
-                    ];
+                    } else {
+                        currentPrep.labor_costs = [
+                            ...currentPrep.labor_costs,
+                            {
+                                employee_id: pendingPopDrop.popData.id,
+                                name: pendingPopDrop.popData.name,
+                                role: pendingPopDrop.popData.role,
+                                cost: data.calculatedCost,
+                                duration: data.duration,
+                                timestamp: Date.now()
+                            }
+                        ];
+                    }
 
                     updatedPreps[prepIndex] = currentPrep;
                     return updatedPreps;
@@ -194,7 +273,7 @@ export function useRecipePopOperations({
             });
 
             setEditorCommand({
-                type: 'insertPop',
+                type: pendingPopDrop.isEdit ? 'updatePop' : 'insertPop',
                 payload: popPayload,
                 pos: pendingPopDrop.insertPos,
                 targetId: pendingPopDrop.targetId,

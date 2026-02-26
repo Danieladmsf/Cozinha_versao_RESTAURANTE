@@ -5,6 +5,7 @@ import { Employee, DailyAssignment, CategoryTree, MenuConfig, WeeklyMenu as Week
 import { useToast } from '@/components/ui/use-toast';
 import { useProgramacaoRealtimeData } from '@/hooks/programacao/useProgramacaoRealtimeData';
 import { APP_CONSTANTS } from '@/lib/constants';
+import { DemandCalculator } from '@/lib/production-engine/DemandCalculator';
 
 // Setores disponíveis
 export const SECTORS = [
@@ -67,6 +68,7 @@ export function useWorkflow() {
     const [selectedDay, setSelectedDay] = useState(1); // 0=dom, 1=seg
     const [activeSector, setActiveSector] = useState(null);
     const [loadingExtra, setLoadingExtra] = useState(true);
+    const [explodeProducts, setExplodeProducts] = useState(true);
 
     const loading = programacaoLoading.initial || programacaoLoading.orders || loadingExtra;
 
@@ -161,13 +163,244 @@ export function useWorkflow() {
 
     // ===== EXTRACT RECIPES FROM ORDERS + WEEKLY MENU =====
     // Receitas de um dia (dos pedidos E da Ordem de Produção)
-    const getRecipesForDay = useCallback((dayIndex) => {
+    const getRecipesForDay = useCallback((dayIndex, explodeProducts = true) => {
         const recipesMap = new Map(); // key: recipe_id
+
+        const isProduto = (recipe) => {
+            let mainCategory = null;
+            if (recipe.category_id && categoryMap[recipe.category_id]) {
+                mainCategory = categoryMap[recipe.category_id];
+            } else if (recipe.category?.id && categoryMap[recipe.category.id]) {
+                mainCategory = categoryMap[recipe.category.id];
+            } else if (typeof recipe.category === 'string' && categoryMap[recipe.category.toLowerCase()]) {
+                mainCategory = categoryMap[recipe.category.toLowerCase()];
+            }
+            if (mainCategory) {
+                return mainCategory.type === 'produtos' || mainCategory.category_type === 'produtos';
+            }
+            if (typeof recipe.category === 'string' && recipe.category.toLowerCase().includes('produto')) return true;
+            return false;
+        };
+
+        const addToMap = (r, qt, ut, cName, src) => {
+            let mainCategory = null;
+            if (r.category_id && categoryMap[r.category_id]) mainCategory = categoryMap[r.category_id];
+            else if (r.category?.id && categoryMap[r.category.id]) mainCategory = categoryMap[r.category.id];
+            else if (typeof r.category === 'string' && categoryMap[r.category.toLowerCase()]) mainCategory = categoryMap[r.category.toLowerCase()];
+
+            const categoryLabel = r.category_name || mainCategory?.name || (typeof r.category === 'string' ? r.category : r.category?.name) || 'Sem categoria';
+
+            const existing = recipesMap.get(r.id);
+            if (existing) {
+                existing.totalQuantity += qt;
+                if (cName) {
+                    existing.customers.push({ name: cName, quantity: qt, unit_type: ut });
+                }
+            } else {
+                recipesMap.set(r.id, {
+                    recipe_id: r.id,
+                    recipe_name: r.name || 'Sem nome',
+                    recipe: r,
+                    category: mainCategory,
+                    category_id: r.category_id || r.category?.id || mainCategory?.id,
+                    category_name: categoryLabel,
+                    totalQuantity: qt,
+                    unit_type: ut || 'kg',
+                    customers: cName ? [{ name: cName, quantity: qt, unit_type: ut }] : [],
+                    source: src
+                });
+            }
+        };
+
+        const processRecipeEntry = (recipe, orderedQty, unitType, customerName, source, depth = 0) => {
+            if (!recipe) return;
+
+            // Se NÃO for produto OU a explosão estiver desativada, adiciona direto
+            if (!explodeProducts || !isProduto(recipe)) {
+                if (explodeProducts && depth === 0) console.log(`[Explode] 🛑 Aborting explosion for ${recipe.name}: isProduto=${isProduto(recipe)}`);
+                addToMap(recipe, orderedQty, unitType, customerName, source);
+                return;
+            }
+
+            if (depth === 0) console.log(`[Explode] 💥 Exploding Product: ${recipe.name}`);
+
+            // SE FOR PRODUTO E EXPLOSÃO ATIVADA, EXPLODE NAS RECEITAS INTERNAS
+            if (!recipe.preparations || recipe.preparations.length === 0) {
+                if (depth === 0) console.log(`[Explode] ⚠️ No preparations found for ${recipe.name}`);
+                addToMap(recipe, orderedQty, unitType, customerName, source);
+                return;
+            }
+
+            // --- NOVO: Preservar o Produto Pai na lista ---
+            if (depth === 0) {
+                console.log(`[Explode] 📦 Keeping parent Product in the list: ${recipe.name}`);
+                // Clone the recipe object to add the flag safely
+                const parentHolder = { ...recipe, isExplicitProductHolder: true };
+                addToMap(parentHolder, orderedQty, unitType, customerName, source);
+            }
+            // ----------------------------------------------
+
+            const recipeYieldWeight = DemandCalculator.getRecipeYieldWeight(recipe, allRecipes);
+            if (recipeYieldWeight <= 0) {
+                addToMap(recipe, orderedQty, unitType, customerName, source);
+                return;
+            }
+
+            let unitsQuantity = 1;
+            const lastPrep = recipe.preparations[recipe.preparations.length - 1];
+            if (lastPrep?.assembly_config?.units_quantity) {
+                unitsQuantity = DemandCalculator.parseNumber(lastPrep.assembly_config.units_quantity) || 1;
+            }
+
+            const assemblyUnitType = (lastPrep?.assembly_config?.unit_type || '').toLowerCase();
+            const orderUnitType = (unitType || recipe.unit_type || recipe.container_type || '').toLowerCase();
+            const isSoldByWeight = assemblyUnitType === 'kg' || orderUnitType === 'kg' || orderUnitType.includes('cuba');
+
+            let scaleFactor = 1;
+            if (isSoldByWeight) {
+                scaleFactor = orderedQty / recipeYieldWeight;
+            } else {
+                scaleFactor = orderedQty / unitsQuantity;
+            }
+
+            if (!isFinite(scaleFactor)) {
+                scaleFactor = 0;
+            }
+            if (scaleFactor < 0) scaleFactor = 0;
+
+            console.log(`[Explode]   -> Scale Factor for ${recipe.name}: ${scaleFactor} (ordered: ${orderedQty}, yield: ${recipeYieldWeight}, units: ${unitsQuantity})`);
+
+            let addedSubRecipes = 0;
+
+            recipe.preparations.forEach((prep, index) => {
+                let foundSubRecipesInThisPrep = 0;
+
+                if (prep.recipes && Array.isArray(prep.recipes)) {
+                    prep.recipes.forEach(sub => {
+                        const subDef = allRecipes.find(r => r.id === sub.recipe_id) || allRecipes.find(r => r.name === sub.name);
+                        if (subDef) {
+                            const subYield = DemandCalculator.getRecipeYieldWeight(subDef, allRecipes);
+                            const used = DemandCalculator.parseNumber(sub.used_weight);
+                            if (subYield > 0 && used > 0) {
+                                const neededQty = used * scaleFactor;
+                                console.log(`[Explode]   -> Found nested recipe [${subDef.name}] (used unit: ${used}, subYield: ${subYield}, neededQty: ${neededQty})`);
+                                processRecipeEntry(subDef, neededQty, subDef.unit_type || 'kg', customerName, source, depth + 1);
+                                foundSubRecipesInThisPrep++;
+                            } else {
+                                console.log(`[Explode]   -> Skipped nested recipe [${subDef.name}] because subYield=${subYield} or used=${used}`);
+                            }
+                        } else {
+                            console.log(`[Explode]   -> 🔥 Unlinked Recipe in prep.recipes: id=${sub.recipe_id}, name="${sub.name}" (Not Found in allRecipes)`);
+                        }
+                    });
+                }
+
+                if (prep.ingredients && Array.isArray(prep.ingredients)) {
+                    prep.ingredients.forEach(ing => {
+                        const ingName = (ing.name || '').trim();
+                        const subDef = allRecipes.find(r => r.name === ingName);
+                        if (subDef) {
+                            console.log(`[Explode]   -> 🎉 Ingredient matched recipe: [${subDef.name}]`);
+                            const isPkg = ing.isPackaging || ing.is_packaging || (ing.unit === 'un' && !Object.keys(ing).some(k => k.includes('weight') && ing[k] > 0));
+                            if (!isPkg) {
+                                let qtyRaw = 0;
+                                const cand = [ing.weight_raw, ing.weight_frozen, ing.weight_thawed, ing.quantity];
+                                for (let c of cand) {
+                                    const val = DemandCalculator.parseNumber(c);
+                                    if (val > 0) { qtyRaw = val; break; }
+                                }
+                                if (qtyRaw >= 0) {
+                                    console.log(`[Explode]   -> Exploding nested ingredient recipe: ${subDef.name} (qty: ${qtyRaw * scaleFactor})`);
+                                    processRecipeEntry(subDef, qtyRaw * scaleFactor, subDef.unit_type || 'kg', customerName, source, depth + 1);
+                                    foundSubRecipesInThisPrep++;
+                                } else {
+                                    console.log(`[Explode]   -> Skipped matched ingredient [${subDef.name}] because qtyRaw=${qtyRaw}`);
+                                }
+                            } else {
+                                console.log(`[Explode]   -> Skipped packging ingredient [${subDef.name}]`);
+                            }
+                        } else {
+                            console.log(`[Explode]   -> 🥔 Raw Ingredient found: "${ingName}" (Not found as a recipe in allRecipes)`);
+                        }
+                    });
+                }
+
+                // MAGIC EXTRACTOR HOOK
+                if (foundSubRecipesInThisPrep === 0) {
+                    let prepName = prep.title ? prep.title.replace(/^\d+[º°ªaoe\.\-]?\s*[Ee]tapa.*?:?-?\s*/i, '').trim() : '';
+                    if (!prepName) prepName = `Preparo ${index + 1} (${recipe.name})`;
+
+                    // Estimate the yield of this step by summing its raw ingredients
+                    let stepWeight = 0;
+                    if (prep.ingredients && Array.isArray(prep.ingredients)) {
+                        prep.ingredients.forEach(ing => {
+                            const isPkg = ing.isPackaging || ing.is_packaging || (ing.unit === 'un' && !Object.keys(ing).some(k => k.includes('weight') && ing[k] > 0));
+                            if (!isPkg) {
+                                const cand = [ing.weight_raw, ing.weight_frozen, ing.weight_thawed, ing.quantity];
+                                for (let c of cand) {
+                                    const val = DemandCalculator.parseNumber(c);
+                                    if (val > 0) { stepWeight += val; break; }
+                                }
+                            }
+                        });
+                    }
+
+                    const neededQty = stepWeight > 0 ? (stepWeight * scaleFactor) : scaleFactor;
+                    const unitLabel = stepWeight > 0 ? 'kg' : 'un';
+
+                    console.log(`[Explode]   -> 🪄 Magic Hook creating Virtual Recipe for Etapa: [${prepName}]`);
+
+                    const safeIdName = prepName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+                    const virtualId = `virtual-${safeIdName}`;
+
+                    const virtualRecipe = {
+                        id: virtualId,
+                        name: prepName,
+                        category: recipe.category, // inherit to get sector
+                        category_id: recipe.category_id,
+                        category_name: 'RECEITAS', // Override display name in Kanban
+                        category_type: 'receitas', // act as a recipe
+                        parent_id: recipe.parent_id,
+                        unit_type: unitLabel,
+                        isVirtual: true,
+                        sourceProduct: recipe.name
+                    };
+
+                    addToMap(virtualRecipe, neededQty, unitLabel, customerName, source);
+                    addedSubRecipes++;
+                } else {
+                    addedSubRecipes += foundSubRecipesInThisPrep;
+                }
+
+            });
+
+            // Fallback for ingredients in the root if preparations are empty
+            if (addedSubRecipes === 0 && recipe.ingredients && Array.isArray(recipe.ingredients)) {
+                recipe.ingredients.forEach(ing => {
+                    const ingName = (ing.name || '').trim();
+                    const subDef = allRecipes.find(r => r.name === ingName);
+                    if (subDef) {
+                        let qtyRaw = DemandCalculator.parseNumber(ing.quantity);
+                        if (qtyRaw > 0) {
+                            console.log(`[Explode]   -> Found root ingredient linked to recipe [${subDef.name}]`);
+                            processRecipeEntry(subDef, qtyRaw * scaleFactor, subDef.unit_type || 'kg', customerName, source, depth + 1);
+                            addedSubRecipes++;
+                        }
+                    } else {
+                        console.log(`[Explode]   -> 🥔 Root Raw Ingredient found: "${ingName}"`);
+                    }
+                });
+            }
+
+            if (addedSubRecipes === 0) {
+                console.log(`[Explode] ⚠️ 0 sub-recipes added for ${recipe.name}. Added as final item instead.`);
+                addToMap(recipe, orderedQty, unitType, customerName, source);
+            }
+        };
 
         // --- SOURCE 1: WeeklyMenu (Ordem de Produção) ---
         if (weeklyMenu?.menu_data) {
             const menuData = weeklyMenu.menu_data;
-            // menu_data pode ter estrutura [mealType][dayIndex][categoryId] ou [dayIndex][categoryId]
             const processMenuDay = (dayData) => {
                 if (!dayData || typeof dayData !== 'object') return;
                 Object.entries(dayData).forEach(([categoryId, items]) => {
@@ -176,42 +409,11 @@ export function useWorkflow() {
                         if (!item?.recipe_id) return;
                         const recipe = allRecipes.find(r => r.id === item.recipe_id);
                         if (!recipe) return;
-                        if (recipesMap.has(item.recipe_id)) return; // Avoid duplicates
-
-                        let mainCategory = null;
-                        if (recipe.category_id && categoryMap[recipe.category_id]) {
-                            mainCategory = categoryMap[recipe.category_id];
-                        } else if (recipe.category?.id && categoryMap[recipe.category.id]) {
-                            mainCategory = categoryMap[recipe.category.id];
-                        } else if (typeof recipe.category === 'string' && categoryMap[recipe.category.toLowerCase()]) {
-                            mainCategory = categoryMap[recipe.category.toLowerCase()];
-                        }
-                        // Also try the categoryId from menu_data
-                        if (!mainCategory && categoryMap[categoryId]) {
-                            mainCategory = categoryMap[categoryId];
-                        }
-
-                        const categoryLabel = mainCategory?.name
-                            || (typeof recipe.category === 'string' ? recipe.category : recipe.category?.name)
-                            || 'Sem categoria';
-
-                        recipesMap.set(item.recipe_id, {
-                            recipe_id: item.recipe_id,
-                            recipe_name: recipe.name || 'Sem nome',
-                            recipe,
-                            category: mainCategory,
-                            category_id: recipe.category_id || recipe.category?.id || mainCategory?.id,
-                            category_name: categoryLabel,
-                            totalQuantity: item.quantity || 0,
-                            unit_type: item.unit_type || recipe.unit_type || '',
-                            customers: [],
-                            source: 'menu'
-                        });
+                        processRecipeEntry(recipe, item.quantity || 0, item.unit_type || recipe.unit_type, null, 'menu');
                     });
                 });
             };
 
-            // Try each mealType group (PRODUTOS, CONFEITÁRIA, etc.)
             let foundMealTypes = false;
             Object.entries(menuData).forEach(([key, value]) => {
                 if (value && typeof value === 'object' && value[dayIndex]) {
@@ -219,7 +421,6 @@ export function useWorkflow() {
                     processMenuDay(value[dayIndex]);
                 }
             });
-            // Fallback: try direct dayIndex access
             if (!foundMealTypes && menuData[dayIndex]) {
                 processMenuDay(menuData[dayIndex]);
             }
@@ -227,53 +428,13 @@ export function useWorkflow() {
 
         // --- SOURCE 2: Orders (pedidos com quantidades por cliente) ---
         const dayOrders = orders.filter(order => order.day_of_week === dayIndex);
-        console.log('🔍 [getRecipesForDay] dayIndex:', dayIndex, 'menu recipes:', recipesMap.size, 'orders:', dayOrders.length);
 
         dayOrders.forEach(order => {
             order.items?.forEach(item => {
                 if (!item.recipe_id) return;
                 const recipe = allRecipes.find(r => r.id === item.recipe_id);
                 if (!recipe) return;
-
-                const existing = recipesMap.get(item.recipe_id);
-                if (existing) {
-                    existing.totalQuantity += (item.quantity || 0);
-                    existing.customers.push({
-                        name: order.customer_name,
-                        quantity: item.quantity || 0,
-                        unit_type: item.unit_type || recipe.unit_type
-                    });
-                } else {
-                    // Resolve main category
-                    let mainCategory = null;
-                    if (recipe.category_id && categoryMap[recipe.category_id]) {
-                        mainCategory = categoryMap[recipe.category_id];
-                    } else if (recipe.category?.id && categoryMap[recipe.category.id]) {
-                        mainCategory = categoryMap[recipe.category.id];
-                    } else if (typeof recipe.category === 'string' && categoryMap[recipe.category.toLowerCase()]) {
-                        mainCategory = categoryMap[recipe.category.toLowerCase()];
-                    }
-
-                    const categoryLabel = mainCategory?.name
-                        || (typeof recipe.category === 'string' ? recipe.category : recipe.category?.name)
-                        || 'Sem categoria';
-
-                    recipesMap.set(item.recipe_id, {
-                        recipe_id: item.recipe_id,
-                        recipe_name: recipe.name || 'Sem nome',
-                        recipe,
-                        category: mainCategory,
-                        category_id: recipe.category_id || recipe.category?.id || mainCategory?.id,
-                        category_name: categoryLabel,
-                        totalQuantity: item.quantity || 0,
-                        unit_type: item.unit_type || recipe.unit_type || '',
-                        customers: [{
-                            name: order.customer_name,
-                            quantity: item.quantity || 0,
-                            unit_type: item.unit_type || recipe.unit_type
-                        }]
-                    });
-                }
+                processRecipeEntry(recipe, item.quantity || 0, item.unit_type || recipe.unit_type, order.customer_name, 'orders');
             });
         });
 
@@ -281,11 +442,11 @@ export function useWorkflow() {
     }, [orders, allRecipes, categoryMap, weeklyMenu]);
 
     // Receitas do dia atual (produção)
-    const todayRecipes = useMemo(() => getRecipesForDay(selectedDay), [getRecipesForDay, selectedDay]);
+    const todayRecipes = useMemo(() => getRecipesForDay(selectedDay, explodeProducts), [getRecipesForDay, selectedDay, explodeProducts]);
 
     // Receitas do dia seguinte (pré-preparo)
     const tomorrowDay = selectedDay >= 6 ? 0 : selectedDay + 1;
-    const tomorrowRecipes = useMemo(() => getRecipesForDay(tomorrowDay), [getRecipesForDay, tomorrowDay]);
+    const tomorrowRecipes = useMemo(() => getRecipesForDay(tomorrowDay, explodeProducts), [getRecipesForDay, tomorrowDay, explodeProducts]);
 
     // Guess sector from category (using config map if available)
     const guessSector = useCallback((recipe) => {
@@ -299,18 +460,18 @@ export function useWorkflow() {
             mainCategory = categoryMap[recipe.category.toLowerCase()];
         }
 
-        // Se tiver mapa configurado, usar ele primeiro (Busca por ID da categoria)
+        // Se tiver mapa configurado, usar ele primeiro (Busca por ID da categoria ou parent_id)
         if (menuConfig?.workflow_sector_map && mainCategory) {
-            // Buscar em qual setor esse ID de categoria está mapeado
             for (const [sectorId, categoryIds] of Object.entries(menuConfig.workflow_sector_map)) {
-                if (categoryIds.includes(mainCategory.id)) {
+                if (categoryIds.includes(mainCategory.id) || (mainCategory.parent_id && categoryIds.includes(mainCategory.parent_id))) {
                     return sectorId;
                 }
             }
         }
 
         // Fallback para lógica antiga (guessing por nome)
-        const categoryName = (mainCategory?.name || recipe?.category?.name || recipe?.category_name || '').toLowerCase();
+        const parentCatName = mainCategory?.parent_id ? (categoryMap[mainCategory.parent_id]?.name || '') : '';
+        const categoryName = (mainCategory?.name || parentCatName || recipe?.category?.name || recipe?.category_name || '').toLowerCase();
         const categoryId = (mainCategory?.id || recipe?.category?.id || '').toLowerCase();
 
         for (const [key, sector] of Object.entries(CATEGORY_TO_SECTOR)) {
@@ -535,6 +696,8 @@ export function useWorkflow() {
         menuConfig,
         updateConfigMap,
         categories,
+        explodeProducts,
+        setExplodeProducts,
         loading,
         SECTORS,
         TIMELINE_HOURS

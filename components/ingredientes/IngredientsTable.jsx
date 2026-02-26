@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCapitalize } from "@/lib/textUtils";
@@ -16,6 +16,10 @@ import PriceUpdateModal from "./PriceUpdateModal";
 
 export default function IngredientsTable({ ingredients, onDelete, updateIngredientPrice, updateIngredient, itemType = 'ingrediente' }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const highlightId = searchParams.get('highlight');
+  const highlightedRowRef = useRef(null);
+
   const [selectedIngredientForHistory, setSelectedIngredientForHistory] = useState(null);
   const [selectedIngredientForPriceUpdate, setSelectedIngredientForPriceUpdate] = useState(null);
 
@@ -65,6 +69,17 @@ export default function IngredientsTable({ ingredients, onDelete, updateIngredie
 
     return filtered;
   }, [ingredients, sortConfig]);
+
+  // Efeito para rolar até a linha destacada
+  useEffect(() => {
+    if (highlightId && highlightedRowRef.current) {
+      setTimeout(() => {
+        highlightedRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Clean up the URL after highlighting (optional, to avoid re-highlighting on refresh)
+        window.history.replaceState(null, '', window.location.pathname + (itemType === 'embalagem' ? '?tab=embalagens' : ''));
+      }, 500); // Aguarda a renderização inicial
+    }
+  }, [highlightId, sortedIngredients, itemType]);
 
   // Função para mudar ordenação
   const handleSort = (key) => {
@@ -213,160 +228,167 @@ export default function IngredientsTable({ ingredients, onDelete, updateIngredie
                 </tr>
               </thead>
               <tbody>
-                {sortedIngredients.map((ingredient, index) => (
-                  <tr key={ingredient.id || `ingredient-${index}`} className="border-b border-slate-100 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-emerald-50/50 group transition-all duration-200">
-                    <td className="px-3 py-2 font-mono text-xs max-w-[200px]">
-                      <div className="space-y-1">
-                        <div
-                          className="font-semibold text-slate-800 group-hover:text-emerald-700 transition-colors duration-200 truncate cursor-pointer hover:underline"
-                          title="Clique para editar"
-                          onClick={() => router.push(`/ingredientes/editor?id=${ingredient.id}`)}
-                        >
-                          {formatCapitalize(ingredient.name)}
+                {sortedIngredients.map((ingredient, index) => {
+                  const isHighlighted = ingredient.id === highlightId;
+                  return (
+                    <tr
+                      key={ingredient.id || `ingredient-${index}`}
+                      ref={isHighlighted ? highlightedRowRef : null}
+                      className={`border-b border-slate-100 group transition-all duration-500 ${isHighlighted ? 'bg-indigo-50/80 border-indigo-200 shadow-sm relative z-10' : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-emerald-50/50'}`}
+                    >
+                      <td className="px-3 py-2 font-mono text-xs max-w-[200px]">
+                        <div className="space-y-1">
+                          <div
+                            className="font-semibold text-slate-800 group-hover:text-emerald-700 transition-colors duration-200 truncate cursor-pointer hover:underline"
+                            title="Clique para editar"
+                            onClick={() => router.push(`/ingredientes/editor?id=${ingredient.id}`)}
+                          >
+                            {formatCapitalize(ingredient.name)}
+                          </div>
+                          {ingredient.taco_variations && ingredient.taco_variations.length > 0 && (
+                            <span className="text-emerald-700 font-medium text-xs flex items-center gap-1">
+                              <Leaf className="w-3 h-3" />
+                              {ingredient.taco_variations.length} TACO
+                            </span>
+                          )}
                         </div>
-                        {ingredient.taco_variations && ingredient.taco_variations.length > 0 && (
-                          <span className="text-emerald-700 font-medium text-xs flex items-center gap-1">
-                            <Leaf className="w-3 h-3" />
-                            {ingredient.taco_variations.length} TACO
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
-                      <span className="text-slate-600 font-medium">
-                        {formatCapitalize(ingredient.unit)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs max-w-[150px]">
-                      <span
-                        className="text-purple-700 font-medium truncate block"
-                        title={ingredient.category || 'N/A'}
-                      >
-                        {ingredient.category ? formatCapitalize(ingredient.category) : (
-                          <span className="flex items-center gap-1 text-slate-500">
-                            <Package className="w-3 h-3" />
-                            N/A
-                          </span>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs max-w-[150px]">
-                      <span
-                        className="text-slate-600 font-medium truncate block"
-                        title={ingredient.displayBrand}
-                      >
-                        {formatCapitalize(ingredient.displayBrand)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
-                      <PriceEditor
-                        ingredient={ingredient}
-                        onEdit={() => setSelectedIngredientForPriceUpdate(ingredient)}
-                      />
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs max-w-[180px]">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
-                        <span
-                          className="text-slate-600 font-medium truncate"
-                          title={ingredient.displaySupplier}
-                        >
-                          {formatCapitalize(ingredient.displaySupplier)}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
+                        <span className="text-slate-600 font-medium">
+                          {formatCapitalize(ingredient.unit)}
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
-                      <span className="text-slate-500 text-xs font-medium flex items-center gap-1">
-                        {(() => {
-                          const date = ingredient.last_update ? new Date(ingredient.last_update) : null;
-                          const isValidDate = date && !isNaN(date.getTime());
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs max-w-[150px]">
+                        <span
+                          className="text-purple-700 font-medium truncate block"
+                          title={ingredient.category || 'N/A'}
+                        >
+                          {ingredient.category ? formatCapitalize(ingredient.category) : (
+                            <span className="flex items-center gap-1 text-slate-500">
+                              <Package className="w-3 h-3" />
+                              N/A
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs max-w-[150px]">
+                        <span
+                          className="text-slate-600 font-medium truncate block"
+                          title={ingredient.displayBrand}
+                        >
+                          {formatCapitalize(ingredient.displayBrand)}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
+                        <PriceEditor
+                          ingredient={ingredient}
+                          onEdit={() => setSelectedIngredientForPriceUpdate(ingredient)}
+                        />
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs max-w-[180px]">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
+                          <span
+                            className="text-slate-600 font-medium truncate"
+                            title={ingredient.displaySupplier}
+                          >
+                            {formatCapitalize(ingredient.displaySupplier)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
+                        <span className="text-slate-500 text-xs font-medium flex items-center gap-1">
+                          {(() => {
+                            const date = ingredient.last_update ? new Date(ingredient.last_update) : null;
+                            const isValidDate = date && !isNaN(date.getTime());
 
-                          if (isValidDate) {
+                            if (isValidDate) {
+                              return (
+                                <>
+                                  <Calendar className="w-3 h-3" />
+                                  {date.toLocaleDateString('pt-BR')}
+                                </>
+                              );
+                            }
                             return (
                               <>
-                                <Calendar className="w-3 h-3" />
-                                {date.toLocaleDateString('pt-BR')}
+                                <Calendar className="w-3 h-3 text-slate-300" />
+                                <span className="text-slate-400">N/A</span>
                               </>
                             );
+                          })()}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
+                        <span
+                          className={ingredient.active
+                            ? "text-green-700 font-semibold flex items-center gap-1"
+                            : "text-red-700 font-semibold flex items-center gap-1"
                           }
-                          return (
+                        >
+                          {ingredient.active ? (
                             <>
-                              <Calendar className="w-3 h-3 text-slate-300" />
-                              <span className="text-slate-400">N/A</span>
+                              <Check className="w-3 h-3" />
+                              Ativo
                             </>
-                          );
-                        })()}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
-                      <span
-                        className={ingredient.active
-                          ? "text-green-700 font-semibold flex items-center gap-1"
-                          : "text-red-700 font-semibold flex items-center gap-1"
-                        }
-                      >
-                        {ingredient.active ? (
-                          <>
-                            <Check className="w-3 h-3" />
-                            Ativo
-                          </>
-                        ) : (
-                          <>
-                            <X className="w-3 h-3" />
-                            Inativo
-                          </>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="hover:bg-slate-100 rounded-lg opacity-60 group-hover:opacity-100 transition-all duration-200 hover:scale-110 h-7 w-7"
-                          >
-                            <MoreHorizontal className="h-3 w-3 text-slate-600" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="rounded-xl shadow-xl border-0 bg-white/95 backdrop-blur-sm">
-                          <DropdownMenuItem
-                            onClick={() => router.push(`/ingredientes/editor?id=${ingredient.id}`)}
-                            className="rounded-lg hover:bg-blue-50 cursor-pointer group/item"
-                          >
-                            <Edit className="mr-3 h-4 w-4 text-blue-600 group-hover/item:scale-110 transition-transform duration-200" />
-                            <span className="text-slate-700 font-medium">Editar</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setSelectedIngredientForPriceUpdate(ingredient)}
-                            className="rounded-lg hover:bg-green-50 cursor-pointer group/item"
-                          >
-                            <DollarSign className="mr-3 h-4 w-4 text-green-600 group-hover/item:scale-110 transition-transform duration-200" />
-                            <span className="text-slate-700 font-medium">Atualizar Preço</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setSelectedIngredientForHistory(ingredient)}
-                            className="rounded-lg hover:bg-purple-50 cursor-pointer group/item"
-                          >
-                            <TrendingUp className="mr-3 h-4 w-4 text-purple-600 group-hover/item:scale-110 transition-transform duration-200" />
-                            <span className="text-slate-700 font-medium">Histórico de Preços</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              onDelete(ingredient);
-                            }}
-                            className="rounded-lg hover:bg-red-50 cursor-pointer group/item"
-                          >
-                            <Trash2 className="mr-3 h-4 w-4 text-red-600 group-hover/item:scale-110 transition-transform duration-200" />
-                            <span className="text-red-700 font-medium">Excluir</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))}
+                          ) : (
+                            <>
+                              <X className="w-3 h-3" />
+                              Inativo
+                            </>
+                          )}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-slate-100 rounded-lg opacity-60 group-hover:opacity-100 transition-all duration-200 hover:scale-110 h-7 w-7"
+                            >
+                              <MoreHorizontal className="h-3 w-3 text-slate-600" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="rounded-xl shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/ingredientes/editor?id=${ingredient.id}`)}
+                              className="rounded-lg hover:bg-blue-50 cursor-pointer group/item"
+                            >
+                              <Edit className="mr-3 h-4 w-4 text-blue-600 group-hover/item:scale-110 transition-transform duration-200" />
+                              <span className="text-slate-700 font-medium">Editar</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setSelectedIngredientForPriceUpdate(ingredient)}
+                              className="rounded-lg hover:bg-green-50 cursor-pointer group/item"
+                            >
+                              <DollarSign className="mr-3 h-4 w-4 text-green-600 group-hover/item:scale-110 transition-transform duration-200" />
+                              <span className="text-slate-700 font-medium">Atualizar Preço</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setSelectedIngredientForHistory(ingredient)}
+                              className="rounded-lg hover:bg-purple-50 cursor-pointer group/item"
+                            >
+                              <TrendingUp className="mr-3 h-4 w-4 text-purple-600 group-hover/item:scale-110 transition-transform duration-200" />
+                              <span className="text-slate-700 font-medium">Histórico de Preços</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onDelete(ingredient);
+                              }}
+                              className="rounded-lg hover:bg-red-50 cursor-pointer group/item"
+                            >
+                              <Trash2 className="mr-3 h-4 w-4 text-red-600 group-hover/item:scale-110 transition-transform duration-200" />
+                              <span className="text-red-700 font-medium">Excluir</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

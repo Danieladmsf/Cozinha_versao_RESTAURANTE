@@ -62,8 +62,8 @@ import {
     orderBy
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-
 import { useSearchParams } from 'next/navigation'; // Adicionado
+import { syncEquipmentAcrossRecipes } from '@/lib/services/ingredientSyncService';
 
 export default function FerramentasComponent({ categoria }) {
     // Se não recebeu categoria, usa valores padrão para ferramentas
@@ -411,10 +411,26 @@ export default function FerramentasComponent({ categoria }) {
                 console.log('Item criado com ID:', docRef.id);
                 setCurrentFerramentaId(docRef.id);
                 toast({ title: 'Sucesso', description: `${categoriaNome} cadastrado(a) com sucesso!` });
+
+                // Cascata
+                try {
+                    await syncEquipmentAcrossRecipes(docRef.id, dataToSave);
+                } catch (e) { console.error(e); }
             } else {
                 await updateDoc(doc(db, colecaoNome, currentFerramentaId), dataToSave);
                 console.log('Item atualizado:', currentFerramentaId);
                 toast({ title: 'Sucesso', description: `${categoriaNome} atualizado(a) com sucesso!` });
+
+                // Disparar sincronização em cascata para as fichas técnicas
+                try {
+                    const { updatedCount } = await syncEquipmentAcrossRecipes(currentFerramentaId, dataToSave);
+                    if (updatedCount > 0) {
+                        toast({
+                            title: 'Fichas Técnicas Atualizadas',
+                            description: `${updatedCount} receita(s) recalculada(s) devido a esse POP.`
+                        });
+                    }
+                } catch (e) { console.error(e); }
             }
 
             setIsEditing(false);

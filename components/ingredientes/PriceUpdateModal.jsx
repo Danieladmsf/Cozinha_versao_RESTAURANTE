@@ -24,6 +24,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { formatCurrency } from "@/lib/formatUtils";
 import { Ingredient, PriceHistory, Supplier, Brand } from "@/app/api/entities";
+import { syncIngredientAcrossRecipes } from '@/lib/services/ingredientSyncService';
 
 export default function PriceUpdateModal({
   ingredient,
@@ -244,10 +245,29 @@ export default function PriceUpdateModal({
       const changeText = priceCalc.change > 0 ? `+R$ ${priceCalc.change.toFixed(2)}` : `R$ ${priceCalc.change.toFixed(2)}`;
       const percentText = `${priceCalc.percentChange > 0 ? '+' : ''}${priceCalc.percentChange.toFixed(1)}%`;
 
-      toast({
-        title: "Preço atualizado com sucesso!",
-        description: `${ingredient.name}: R$ ${priceCalc.oldPrice.toFixed(2).replace('.', ',')} → R$ ${priceCalc.newPrice.toFixed(2).replace('.', ',')} (${changeText} / ${percentText})`
-      });
+      // Sincronizar em cascata nas receitas envolvidas
+      try {
+        const fieldsToSync = {
+          current_price: priceCalc.newPrice,
+          category: formData.category,
+          unit: ingredient.unit // manter o que já estava lá
+        };
+        const { updatedCount, logs } = await syncIngredientAcrossRecipes(ingredient.id, fieldsToSync, ingredient.name);
+        if (updatedCount > 0) {
+          toast({
+            title: "Preço atualizado e Fichas Técnicas recalculadas!",
+            description: `${ingredient.name}: R$ ${priceCalc.oldPrice.toFixed(2).replace('.', ',')} → R$ ${priceCalc.newPrice.toFixed(2).replace('.', ',')} (${changeText} / ${percentText}). ${updatedCount} Receitas impactadas.`,
+            className: "bg-blue-50 border-blue-200"
+          });
+        } else {
+          toast({
+            title: "Preço atualizado com sucesso!",
+            description: `${ingredient.name}: R$ ${priceCalc.oldPrice.toFixed(2).replace('.', ',')} → R$ ${priceCalc.newPrice.toFixed(2).replace('.', ',')} (${changeText} / ${percentText})`
+          });
+        }
+      } catch (syncError) {
+        console.error("[PriceUpdateModal] Erro ao sincronizar receitas:", syncError);
+      }
 
       // Garantir que o modal feche após salvar com sucesso
 

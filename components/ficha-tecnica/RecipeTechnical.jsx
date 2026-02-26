@@ -98,7 +98,7 @@ import {
   updatePreparationsMetrics
 } from "@/lib/recipeMetricsCalculator";
 import { highlightSearchTerm } from "@/lib/searchUtils";
-
+import { syncRecipeAcrossRecipes } from "@/lib/services/ingredientSyncService";
 
 // Componentes organizados
 import RecipeMenuActions from "./RecipeMenuActions";
@@ -194,6 +194,7 @@ export default function RecipeTechnical() {
 
   const {
     handleDropPop,
+    handleEditPop,
     handleEquipmentConfirm,
     handleLaborConfirm
   } = useRecipePopOperations({
@@ -367,6 +368,27 @@ export default function RecipeTechnical() {
 
       // 6. Chamar save original
       await saveRecipeConfig(finalRecipeData, finalPreparationsData);
+
+      // 7. SINCRONIZAÇÃO EM CASCATA: Se essa Ficha Técnica estiver inserida dentro de outras Fichas Técnicas, atualize-as!
+      try {
+        if (finalRecipeData.id) {
+          const fullDataForSync = { ...finalRecipeData, preparations: finalPreparationsData };
+          const { updatedCount, logs } = await syncRecipeAcrossRecipes(finalRecipeData.id, fullDataForSync, recipeData?.name);
+          if (updatedCount > 0) {
+            console.group("🔍 [Rastreador] Cascata de Receitas Matrizes");
+            logs.forEach(log => console.info(log));
+            console.groupEnd();
+
+            toast({
+              title: "Cascata Concluída!",
+              description: `${updatedCount} receitas dependentes foram atualizadas com sucesso.`,
+            });
+          }
+        }
+      } catch (syncErr) {
+        console.error("Erro na cascata de receitas matrizes:", syncErr);
+        // Não quebrar o save principal se a cascata falhar
+      }
 
       toast({ title: "Sucesso", description: "Receita salva e sincronizada com sucesso!" });
       setIsDirty(false);
@@ -1032,6 +1054,7 @@ export default function RecipeTechnical() {
 
               handleSyncPreparation={handleSyncPreparation}
               handleDropPop={handleDropPop}
+              handleEditPop={handleEditPop}
               editorCommand={editorCommand}
 
               updateIngredient={updateIngredient}

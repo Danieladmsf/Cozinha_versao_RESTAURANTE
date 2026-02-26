@@ -408,13 +408,20 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
 
             {/* Mode Switcher */}
             <Tabs value={mode} onValueChange={setMode}>
-                <TabsList className="grid w-full grid-cols-2 bg-white border border-gray-200 p-1 rounded-lg">
+                <TabsList className="grid w-full grid-cols-3 bg-white border border-gray-200 p-1 rounded-lg">
                     <TabsTrigger
                         value="report"
                         className="flex items-center gap-2 data-[state=active]:bg-gray-800 data-[state=active]:text-white data-[state=active]:border-gray-900 border border-transparent hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-sm"
                     >
                         <BarChart3 className="w-4 h-4" />
                         Relatório do Dia
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="pre_preparo_list"
+                        className="flex items-center gap-2 data-[state=active]:bg-gray-800 data-[state=active]:text-white data-[state=active]:border-gray-900 border border-transparent hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-sm"
+                    >
+                        <ClipboardList className="w-4 h-4" />
+                        Listas Consolidadas
                     </TabsTrigger>
                     <TabsTrigger
                         value="config"
@@ -489,6 +496,92 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                             </Card>
                         );
                     })()}
+                </TabsContent>
+
+                {/* LISTAS CONSOLIDADAS MODE */}
+                <TabsContent value="pre_preparo_list" className="mt-6 flex flex-col gap-6">
+                    {['rendimento', 'pre_preparo', 'processamento'].map(taskKey => {
+                        const items = taskReports[taskKey] || [];
+                        const taskDef = TASK_TYPES[taskKey];
+
+                        return (
+                            <Card key={taskKey} className={`border ${taskDef.borderClass} bg-white`}>
+                                <CardHeader className={`${taskDef.headerClass} border-b ${taskDef.borderClass} py-4 px-6`}>
+                                    <CardTitle className={`flex items-center justify-between ${taskDef.textClass}`}>
+                                        <div className="flex items-center gap-2">
+                                            <ClipboardList className="w-5 h-5" />
+                                            {taskDef.label} (Consolidada)
+                                        </div>
+                                        <div className="text-sm font-medium">
+                                            {dateLabel}
+                                        </div>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                    {items.length === 0 ? (
+                                        <div className="p-8 text-center text-slate-500">
+                                            Nenhum item de {taskDef.label.toLowerCase()} para este dia.
+                                        </div>
+                                    ) : (
+                                        <div className="w-full">
+                                            {/* Table Header */}
+                                            <div className={`grid grid-cols-[120px_2fr_2fr_4fr] divide-x border-b ${taskDef.borderClass} ${taskDef.categoryBg} border-t-0 font-semibold text-xs tracking-wider uppercase ${taskDef.textClass}`}>
+                                                <div className="text-right px-4 py-3">Valor</div>
+                                                <div className="px-4 py-3">Nome do Insumo</div>
+                                                <div className="px-4 py-3">Categoria</div>
+                                                <div className="px-4 py-3">Receitas</div>
+                                            </div>
+
+                                            {/* Table Body */}
+                                            <div className={`divide-y ${taskDef.borderClass}`}>
+                                                {items.map((ing, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className={`grid grid-cols-[120px_2fr_2fr_4fr] divide-x divide-slate-200 items-stretch hover:bg-slate-50 transition-colors text-sm`}
+                                                    >
+                                                        <div className="text-right font-bold tabular-nums text-blue-700 px-4 py-3 flex items-center justify-end">
+                                                            {formatWeight(ing.totalWeight)}
+                                                        </div>
+                                                        <div className="font-medium text-slate-800 px-4 py-3 flex items-center">
+                                                            {ing.displayName}
+                                                        </div>
+                                                        <div className="px-4 py-3 flex flex-wrap content-center gap-1">
+                                                            {ing.sourceCategories && ing.sourceCategories.length > 0 ? (
+                                                                [...ing.sourceCategories]
+                                                                    .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
+                                                                    .map((cat, catIdx) => (
+                                                                        <Badge key={catIdx} variant="secondary" className="bg-slate-100 text-slate-600 font-normal px-1.5 py-0 text-[10px]">
+                                                                            {cat}
+                                                                        </Badge>
+                                                                    ))
+                                                            ) : (
+                                                                <span className="text-xs text-slate-400 italic">—</span>
+                                                            )}
+                                                        </div>
+                                                        <div className="px-4 py-3">
+                                                            <div className="flex flex-col text-xs text-slate-600 leading-tight border border-slate-200 rounded-md overflow-hidden bg-white">
+                                                                {ing.sourceRecipes && ing.sourceRecipes.length > 0 ? (
+                                                                    [...ing.sourceRecipes]
+                                                                        .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
+                                                                        .map((rec, rIdx) => (
+                                                                            <div key={rIdx} className="w-full px-2 py-1.5 border-b border-slate-200 last:border-0 hover:bg-slate-50 transition-colors">
+                                                                                • {rec}
+                                                                            </div>
+                                                                        ))
+                                                                ) : (
+                                                                    <div className="px-2 py-1.5 italic text-slate-400">—</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
                 </TabsContent>
 
                 {/* CONFIG MODE */}

@@ -8,7 +8,7 @@ import {
     Loader2, Clock, Users, GitBranch, AlertTriangle,
     User, ChefHat, Utensils, Package, Trash2, GripVertical,
     ArrowRight, Sun, Moon, Settings, ChevronDown, ChevronUp,
-    Plus, X, ClipboardList
+    Plus, X, ClipboardList, Search
 } from 'lucide-react';
 import { useWorkflow, SECTORS, TIMELINE_HOURS, TIMELINE_START, TIMELINE_MINUTES } from '@/hooks/workflow/useWorkflow';
 import { useWorkflowProcesses } from '@/hooks/workflow/useWorkflowProcesses';
@@ -361,80 +361,159 @@ function EmployeeTimelineRow({ employee, isOff, sectorColor, assignments, allRec
 
     const empAssignments = assignments.filter(a => a.employee_id === employee.id);
 
+    // --- Footer Calculations ---
+    const sortedAssignments = useMemo(() => {
+        return [...empAssignments].sort((a, b) => {
+            const [aH, aM] = a.start_time.split(':').map(Number);
+            const [bH, bM] = b.start_time.split(':').map(Number);
+            return (aH * 60 + aM) - (bH * 60 + bM);
+        });
+    }, [empAssignments]);
+
+    const footerData = useMemo(() => {
+        if (sortedAssignments.length === 0) return null;
+
+        let totalWorkedMinutes = 0;
+        const details = [];
+
+        for (let i = 0; i < sortedAssignments.length; i++) {
+            const current = sortedAssignments[i];
+            const [csH, csM] = current.start_time.split(':').map(Number);
+            const [ceH, ceM] = current.end_time.split(':').map(Number);
+            const durationArr = (ceH * 60 + ceM) - (csH * 60 + csM);
+            const duration = durationArr > 0 ? durationArr : 0;
+
+            totalWorkedMinutes += duration;
+
+            let interval = null;
+            if (i < sortedAssignments.length - 1) {
+                const next = sortedAssignments[i + 1];
+                const [nsH, nsM] = next.start_time.split(':').map(Number);
+                const diff = (nsH * 60 + nsM) - (ceH * 60 + ceM);
+                if (diff > 0) {
+                    interval = diff;
+                }
+            }
+
+            const recipe = allRecipes?.find(r => r.id === current.recipe_id);
+            details.push({
+                recipeName: recipe?.name || current.recipe_name || 'Receita',
+                duration,
+                interval
+            });
+        }
+
+        const hours = Math.floor(totalWorkedMinutes / 60);
+        const mins = totalWorkedMinutes % 60;
+        const totalStr = `${hours}h ${mins > 0 ? `${mins}m` : ''}`.trim();
+
+        return { totalWorkedMinutes, totalStr, details };
+
+    }, [sortedAssignments, allRecipes]);
+
     return (
-        <div className={`flex items-stretch gap-0 relative group/row ${isOff ? 'opacity-50' : ''}`} style={{ minHeight: '42px' }}>
-            {/* Employee name */}
-            <div className="w-[140px] flex-shrink-0 pr-2 flex items-center">
-                <div className="flex items-center gap-1.5 w-full">
-                    <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
-                        style={{ backgroundColor: isOff ? '#94a3b8' : sectorColor }}
-                    >
-                        {employee.name?.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <div className="text-[11px] font-semibold text-gray-800 truncate">{employee.name}</div>
-                        <div className="text-[10px] text-gray-400 truncate">
-                            {isOff ? '⚠️ Folga' : employee.role || ''}
+        <div className="flex flex-col relative group/row border-b border-gray-100 last:border-0">
+            <div className={`flex items-stretch gap-0 w-full ${isOff ? 'opacity-50' : ''}`} style={{ minHeight: '42px' }}>
+                {/* Employee name */}
+                <div className="w-[140px] flex-shrink-0 pr-2 flex items-center">
+                    <div className="flex items-center gap-1.5 w-full">
+                        <div
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
+                            style={{ backgroundColor: isOff ? '#94a3b8' : sectorColor }}
+                        >
+                            {employee.name?.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <div className="text-[11px] font-semibold text-gray-800 truncate">{employee.name}</div>
+                            <div className="text-[10px] text-gray-400 truncate">
+                                {isOff ? '⚠️ Folga' : employee.role || ''}
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Timeline drop zone */}
+                <div
+                    ref={timelineRef}
+                    className={`flex-1 relative rounded-lg transition-all ${dragOver
+                        ? 'bg-indigo-50 ring-2 ring-indigo-300 ring-dashed'
+                        : 'bg-gray-50/50 hover:bg-gray-50'
+                        }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                >
+                    {/* Grid lines */}
+                    <div className="absolute inset-0 flex pointer-events-none">
+                        {TIMELINE_HOURS.map(h => (
+                            <div key={h.hour} className="flex-1 border-l border-gray-100" />
+                        ))}
+                    </div>
+
+                    {/* Current time indicator */}
+                    {(() => {
+                        const now = new Date();
+                        const ch = now.getHours();
+                        if (ch >= 5 && ch < 14) {
+                            const pos = ((ch - 5) * 60 + now.getMinutes()) / (9 * 60) * 100;
+                            return <div className="absolute top-0 bottom-0 w-px bg-red-400 z-20 pointer-events-none" style={{ left: `${pos}%` }} />;
+                        }
+                        return null;
+                    })()}
+
+                    {/* Assignment blocks */}
+                    {empAssignments.map(a => {
+                        const recipe = allRecipes.find(r => r.id === a.recipe_id);
+                        return (
+                            <TimelineBlock
+                                key={a.id}
+                                assignment={a}
+                                recipe={recipe}
+                                sectorColor={sectorColor}
+                                onRemove={onRemoveAssignment}
+                                onUpdate={onUpdateAssignment}
+                                timeToPercent={timeToPercent}
+                                getTimelineWidth={getTimelineWidth}
+                                percentToTime={percentToTime}
+                            />
+                        );
+                    })}
+
+                    {/* Drop hint */}
+                    {dragOver && empAssignments.length === 0 && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span className="text-xs text-indigo-400 font-medium">Solte aqui para agendar</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Timeline drop zone */}
-            <div
-                ref={timelineRef}
-                className={`flex-1 relative rounded-lg transition-all ${dragOver
-                    ? 'bg-indigo-50 ring-2 ring-indigo-300 ring-dashed'
-                    : 'bg-gray-50/50 hover:bg-gray-50'
-                    }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-            >
-                {/* Grid lines */}
-                <div className="absolute inset-0 flex pointer-events-none">
-                    {TIMELINE_HOURS.map(h => (
-                        <div key={h.hour} className="flex-1 border-l border-gray-100" />
+            {/* Footer Summary */}
+            {footerData && footerData.details.length > 0 && (
+                <div className="flex flex-wrap gap-x-4 gap-y-1 py-1.5 px-3 bg-gray-50/50 border-t border-gray-100 text-[10px] text-gray-500 ml-[140px]">
+                    <div className="font-semibold text-gray-700 mr-2 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-indigo-500" />
+                        Total: {footerData.totalStr}
+                    </div>
+                    {footerData.details.map((d, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                            <span className="flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-300"></span>
+                                <span className="truncate max-w-[120px]" title={d.recipeName}>{d.recipeName}</span>
+                                <span className="font-medium text-gray-600">
+                                    ({Math.floor(d.duration / 60)}h {d.duration % 60 > 0 ? `${d.duration % 60}m` : ''})
+                                </span>
+                            </span>
+                            {d.interval !== null && (
+                                <span className="text-orange-500 flex items-center gap-0.5 mx-1" title="Intervalo livre">
+                                    <Clock className="w-2.5 h-2.5" />
+                                    {Math.floor(d.interval / 60) > 0 ? `${Math.floor(d.interval / 60)}h ` : ''}{d.interval % 60}m
+                                </span>
+                            )}
+                        </div>
                     ))}
                 </div>
-
-                {/* Current time indicator */}
-                {(() => {
-                    const now = new Date();
-                    const ch = now.getHours();
-                    if (ch >= 5 && ch < 14) {
-                        const pos = ((ch - 5) * 60 + now.getMinutes()) / (9 * 60) * 100;
-                        return <div className="absolute top-0 bottom-0 w-px bg-red-400 z-20 pointer-events-none" style={{ left: `${pos}%` }} />;
-                    }
-                    return null;
-                })()}
-
-                {/* Assignment blocks */}
-                {empAssignments.map(a => {
-                    const recipe = allRecipes.find(r => r.id === a.recipe_id);
-                    return (
-                        <TimelineBlock
-                            key={a.id}
-                            assignment={a}
-                            recipe={recipe}
-                            sectorColor={sectorColor}
-                            onRemove={onRemoveAssignment}
-                            onUpdate={onUpdateAssignment}
-                            timeToPercent={timeToPercent}
-                            getTimelineWidth={getTimelineWidth}
-                            percentToTime={percentToTime}
-                        />
-                    );
-                })}
-
-                {/* Drop hint */}
-                {dragOver && empAssignments.length === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className="text-xs text-indigo-400 font-medium">Solte aqui para agendar</span>
-                    </div>
-                )}
-            </div>
+            )}
         </div>
     );
 }
@@ -492,9 +571,44 @@ export default function WorkflowBoard() {
     const [processesCollapsed, setProcessesCollapsed] = useState(true);
     const [processModalOpen, setProcessModalOpen] = useState(false);
     const [processForm, setProcessForm] = useState({ title: '', description: '' });
+    const [recipeFilter, setRecipeFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Use custom hook for processes
     const { processes, loading: processesLoading, addProcess, removeProcess } = useWorkflowProcesses();
+
+    // Classification helpers
+    const isRecipeMatch = useCallback((r) => {
+        if (r.recipe?.isVirtual) return true;
+        // Se o item for explicitamente um produto (tem o marcador adicionado no useWorkflow), NÃO é receita.
+        if (r.isExplicitProductHolder) return false;
+
+        const catName = (r.category_name || '').toUpperCase();
+        if (catName.includes('RECEITA') || catName.includes('PREPARO')) return true;
+        const type = (r.category?.type || '').toLowerCase();
+        const catType = (r.category?.category_type || '').toLowerCase();
+        if (type === 'receitas' || catType === 'receitas') return true;
+        if (r.recipe?.category_type === 'receitas') return true;
+        return false;
+    }, []);
+
+    const isProductMatch = useCallback((r) => {
+        // Se foi explicitamente marcado como o Produto Pai mantido, é produto.
+        if (r.isExplicitProductHolder) return true;
+        // Fallback unknowns as products
+        return !isRecipeMatch(r);
+    }, [isRecipeMatch]);
+
+    // O filtro "Todos" deve esconder o Produto Pai se ele já foi explodido em Etapas (para não duplicar cards na tela).
+    // Para simplificar, "Todos" = Mostrar tudo que não é um Produto Pai Explodido, ou seja, mostrar virtual recipes, sub-receitas e produtos normais sem explosão.
+    // Mas, se deixarmos assim fica confuso. Melhor deixar "Todos" mostrar *tudo* e o usuário foca usando os botões, 
+    // ou "Todos" = Mostrar "Receitas" + "Produtos NÃO explodidos".
+    // Vamos usar a opção de "Todos" exibir Receitas e Produtos Genéricos, escondendo o Produto Pai *apenas* se ele explodiu.
+    const isVisibleInAll = useCallback((r) => {
+        // Se for o holder do Produto Pai, ele SÓ aparece no filtro "Produtos", sendo escondido no "Todos" para não poluir.
+        if (r.isExplicitProductHolder) return false;
+        return true;
+    }, []);
 
     // Employee Tabs State
     const [activeEmployeeId, setActiveEmployeeId] = useState(null);
@@ -529,6 +643,22 @@ export default function WorkflowBoard() {
     const sectorEmployees = employeesBySector[activeSector] || [];
     const sectorTodayRecipes = todayBySector[activeSector] || [];
     const sectorTomorrowRecipes = tomorrowBySector[activeSector] || [];
+
+    // Debug Filter Log
+    useEffect(() => {
+        if (!currentSector) return;
+        console.log(`[DEBUG WORKFLOW] Sector: ${currentSector.name} | Today: ${sectorTodayRecipes.length} | Filter: ${recipeFilter}`);
+        sectorTodayRecipes.forEach(r => {
+            const isRec = isRecipeMatch(r);
+            const isProd = isProductMatch(r);
+            console.log(`> "${r.recipe_name}" | isRecipeMatch: ${isRec} | isProductMatch: ${isProd}`, {
+                isVirtual: r.recipe?.isVirtual,
+                category_name: r.category_name,
+                category_type: r.category?.type,
+                raw_recipe_category_type: r.recipe?.category_type
+            });
+        });
+    }, [currentSector, sectorTodayRecipes, recipeFilter, isRecipeMatch, isProductMatch]);
 
     // Default to first employee when sector changes
     useEffect(() => {
@@ -698,26 +828,81 @@ export default function WorkflowBoard() {
                                 </Badge>
                                 {productionCollapsed ? <ChevronDown className="w-3.5 h-3.5 text-gray-400" /> : <ChevronUp className="w-3.5 h-3.5 text-gray-400" />}
                             </div>
+
+                            {/* RECIPE FILTER BUTTONS */}
+                            {!productionCollapsed && (
+                                <div className="px-3 py-1.5 flex gap-2 border-b border-gray-100 bg-gray-50/50">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setRecipeFilter('all'); }}
+                                        className={`flex-1 text-[10px] font-medium py-1 rounded transition-colors ${recipeFilter === 'all' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                                    >
+                                        Todos
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setRecipeFilter('produtos'); }}
+                                        className={`flex-1 text-[10px] font-medium py-1 rounded transition-colors ${recipeFilter === 'produtos' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                                    >
+                                        Produtos
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setRecipeFilter('receitas'); }}
+                                        className={`flex-1 text-[10px] font-medium py-1 rounded transition-colors ${recipeFilter === 'receitas' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                                    >
+                                        Receitas
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* SEARCH BAR (TODAY) */}
+                            {!productionCollapsed && (
+                                <div className="px-3 py-1.5 border-b border-gray-100 bg-gray-50/30">
+                                    <div className="relative">
+                                        <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar receita ou produto..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full pl-7 pr-3 py-1.5 text-[10px] sm:text-xs rounded border-gray-200 outline-none focus:ring-1 focus:ring-indigo-300 focus:border-indigo-300 transition-shadow bg-white"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             {!productionCollapsed && <div className="p-2 space-y-1.5 max-h-[280px] overflow-y-auto">
-                                {sectorTodayRecipes.length === 0 ? (
+                                {sectorTodayRecipes.filter(r => {
+                                    if (searchQuery && !r.recipe_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                                    if (recipeFilter === 'all') return isVisibleInAll(r);
+                                    if (recipeFilter === 'receitas') return isRecipeMatch(r);
+                                    if (recipeFilter === 'produtos') return isProductMatch(r);
+                                    return true;
+                                }).length === 0 ? (
                                     <div className="text-center py-4">
                                         <Utensils className="w-6 h-6 text-gray-300 mx-auto mb-1" />
                                         <p className="text-[10px] text-gray-400">Sem receitas</p>
                                     </div>
                                 ) : (
-                                    sectorTodayRecipes.map(r => {
-                                        const isAssigned = dayAssignments.some(a => a.recipe_id === r.recipe_id && a.source_day === 'today');
-                                        return (
-                                            <RecipeCard
-                                                key={r.recipe_id}
-                                                recipe={r}
-                                                sourceDay="today"
-                                                sectorColor={currentSector.color}
-                                                onDragStart={() => setIsDragging(true)}
-                                                isAssigned={isAssigned}
-                                            />
-                                        );
+                                    sectorTodayRecipes.filter(r => {
+                                        if (searchQuery && !r.recipe_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                                        if (recipeFilter === 'all') return isVisibleInAll(r);
+                                        if (recipeFilter === 'receitas') return isRecipeMatch(r);
+                                        if (recipeFilter === 'produtos') return isProductMatch(r);
+                                        return true;
                                     })
+                                        .sort((a, b) => (a.recipe_name || '').localeCompare(b.recipe_name || ''))
+                                        .map(r => {
+                                            const isAssigned = dayAssignments.some(a => a.recipe_id === r.recipe_id && a.source_day === 'today');
+                                            return (
+                                                <RecipeCard
+                                                    key={r.recipe_id}
+                                                    recipe={r}
+                                                    sourceDay="today"
+                                                    sectorColor={currentSector.color}
+                                                    onDragStart={() => setIsDragging(true)}
+                                                    isAssigned={isAssigned}
+                                                />
+                                            );
+                                        })
                                 )}
                             </div>}
                         </div>
@@ -735,26 +920,81 @@ export default function WorkflowBoard() {
                                 </Badge>
                                 {prepCollapsed ? <ChevronDown className="w-3.5 h-3.5 text-gray-400" /> : <ChevronUp className="w-3.5 h-3.5 text-gray-400" />}
                             </div>
+
+                            {/* RECIPE FILTER BUTTONS FOR TOMORROW */}
+                            {!prepCollapsed && (
+                                <div className="px-3 py-1.5 flex gap-2 border-b border-purple-100 bg-purple-50/50">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setRecipeFilter('all'); }}
+                                        className={`flex-1 text-[10px] font-medium py-1 rounded transition-colors ${recipeFilter === 'all' ? 'bg-purple-200 text-purple-800' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                                    >
+                                        Todos
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setRecipeFilter('produtos'); }}
+                                        className={`flex-1 text-[10px] font-medium py-1 rounded transition-colors ${recipeFilter === 'produtos' ? 'bg-purple-200 text-purple-800' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                                    >
+                                        Produtos
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setRecipeFilter('receitas'); }}
+                                        className={`flex-1 text-[10px] font-medium py-1 rounded transition-colors ${recipeFilter === 'receitas' ? 'bg-purple-200 text-purple-800' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                                    >
+                                        Receitas
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* SEARCH BAR (TOMORROW) */}
+                            {!prepCollapsed && (
+                                <div className="px-3 py-1.5 border-b border-purple-100 bg-purple-50/30">
+                                    <div className="relative">
+                                        <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-purple-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar receita ou produto..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full pl-7 pr-3 py-1.5 text-[10px] sm:text-xs rounded border-purple-200 outline-none focus:ring-1 focus:ring-purple-300 focus:border-purple-300 transition-shadow bg-white"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             {!prepCollapsed && <div className="p-2 space-y-1.5 max-h-[280px] overflow-y-auto">
-                                {sectorTomorrowRecipes.length === 0 ? (
+                                {sectorTomorrowRecipes.filter(r => {
+                                    if (searchQuery && !r.recipe_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                                    if (recipeFilter === 'all') return isVisibleInAll(r);
+                                    if (recipeFilter === 'receitas') return isRecipeMatch(r);
+                                    if (recipeFilter === 'produtos') return isProductMatch(r);
+                                    return true;
+                                }).length === 0 ? (
                                     <div className="text-center py-4">
                                         <Utensils className="w-6 h-6 text-gray-300 mx-auto mb-1" />
                                         <p className="text-[10px] text-gray-400">Sem receitas</p>
                                     </div>
                                 ) : (
-                                    sectorTomorrowRecipes.map(r => {
-                                        const isAssigned = dayAssignments.some(a => a.recipe_id === r.recipe_id && a.source_day === 'tomorrow');
-                                        return (
-                                            <RecipeCard
-                                                key={r.recipe_id}
-                                                recipe={r}
-                                                sourceDay="tomorrow"
-                                                sectorColor={currentSector.color}
-                                                onDragStart={() => setIsDragging(true)}
-                                                isAssigned={isAssigned}
-                                            />
-                                        );
+                                    sectorTomorrowRecipes.filter(r => {
+                                        if (searchQuery && !r.recipe_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                                        if (recipeFilter === 'all') return isVisibleInAll(r);
+                                        if (recipeFilter === 'receitas') return isRecipeMatch(r);
+                                        if (recipeFilter === 'produtos') return isProductMatch(r);
+                                        return true;
                                     })
+                                        .sort((a, b) => (a.recipe_name || '').localeCompare(b.recipe_name || ''))
+                                        .map(r => {
+                                            const isAssigned = dayAssignments.some(a => a.recipe_id === r.recipe_id && a.source_day === 'tomorrow');
+                                            return (
+                                                <RecipeCard
+                                                    key={r.recipe_id}
+                                                    recipe={r}
+                                                    sourceDay="tomorrow"
+                                                    sectorColor={currentSector.color}
+                                                    onDragStart={() => setIsDragging(true)}
+                                                    isAssigned={isAssigned}
+                                                />
+                                            );
+                                        })
                                 )}
                             </div>}
                         </div>
@@ -969,7 +1209,7 @@ export default function WorkflowBoard() {
                                         return ai - bi;
                                     });
 
-                                    return sortedTracks.map((track, idx) => {
+                                    const renderedTracks = sortedTracks.map((track, idx) => {
                                         const recipe = allRecipes.find(r => r.id === track.recipe_id);
                                         return (
                                             <TimelineTrackRow
@@ -996,6 +1236,90 @@ export default function WorkflowBoard() {
                                             />
                                         );
                                     });
+
+                                    // --- Footer Calculations for Employee ---
+                                    const sortedAssignmentsAll = [...activeAssignments].sort((a, b) => {
+                                        const [aH, aM] = a.start_time.split(':').map(Number);
+                                        const [bH, bM] = b.start_time.split(':').map(Number);
+                                        return (aH * 60 + aM) - (bH * 60 + bM);
+                                    });
+
+                                    let totalWorkedMinutes = 0;
+                                    const details = [];
+
+                                    for (let i = 0; i < sortedAssignmentsAll.length; i++) {
+                                        const current = sortedAssignmentsAll[i];
+                                        const [csH, csM] = current.start_time.split(':').map(Number);
+                                        const [ceH, ceM] = current.end_time.split(':').map(Number);
+                                        let durationArr = (ceH * 60 + ceM) - (csH * 60 + csM);
+                                        let duration = durationArr > 0 ? durationArr : 0;
+
+                                        totalWorkedMinutes += duration;
+
+                                        let interval = null;
+                                        if (i < sortedAssignmentsAll.length - 1) {
+                                            const next = sortedAssignmentsAll[i + 1];
+                                            const [nsH, nsM] = next.start_time.split(':').map(Number);
+                                            const diff = (nsH * 60 + nsM) - (ceH * 60 + ceM);
+                                            if (diff > 0) {
+                                                interval = diff;
+                                            }
+                                        }
+
+                                        const recipe = allRecipes?.find(r => r.id === current.recipe_id);
+                                        details.push({
+                                            recipeName: recipe?.name || current.recipe_name || 'Receita',
+                                            duration,
+                                            interval
+                                        });
+                                    }
+
+                                    const hours = Math.floor(totalWorkedMinutes / 60);
+                                    const mins = totalWorkedMinutes % 60;
+                                    const totalStr = `${hours}h ${mins > 0 ? `${mins}m` : ''}`.trim();
+
+                                    return (
+                                        <>
+                                            {renderedTracks}
+
+                                            {/* Employee Footer Summary */}
+                                            {details.length > 0 && (
+                                                <div className="mt-4 mb-2 flex flex-wrap gap-x-4 gap-y-3 py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500 pointer-events-auto border-t-2 shadow-sm" style={{ borderTopColor: currentSector.color }}>
+                                                    <div className="font-semibold text-gray-800 mr-2 flex items-center gap-1.5 whitespace-nowrap">
+                                                        <Clock className="w-4 h-4 text-indigo-500" />
+                                                        TOTAL: {totalStr}
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+                                                        {details.map((d, i) => (
+                                                            <div key={i} className="flex items-center gap-2 relative bg-white px-2.5 py-1 rounded border border-gray-200 shadow-sm transition-all hover:bg-gray-50">
+                                                                <span className="flex items-center gap-1.5">
+                                                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: currentSector.color }}></span>
+                                                                    <span className="max-w-[150px] font-semibold text-gray-700 truncate" title={d.recipeName}>{d.recipeName}</span>
+                                                                    <span className="font-medium text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded text-[10px]">
+                                                                        {Math.floor(d.duration / 60)}h{d.duration % 60 > 0 ? ` ${String(d.duration % 60).padStart(2, '0')}m` : ''}
+                                                                    </span>
+                                                                </span>
+                                                                {d.interval !== null && (
+                                                                    <span className="text-orange-600 flex items-center gap-1 absolute -right-4 top-1/2 -translate-y-1/2 bg-white px-1.5 py-0.5 rounded-full border border-orange-200 z-10 shadow-sm mr-[-6px]" title="Intervalo livre">
+                                                                        <Clock className="w-2.5 h-2.5" />
+                                                                        <span className="text-[9px] font-bold whitespace-nowrap">
+                                                                            {Math.floor(d.interval / 60) > 0 ? `${Math.floor(d.interval / 60)}h ` : ''}{String(d.interval % 60).padStart(2, '0')}m
+                                                                        </span>
+                                                                    </span>
+                                                                )}
+                                                                {i < details.length - 1 && d.interval === null && (
+                                                                    <span className="w-6 h-px bg-gray-300 absolute -right-6 top-1/2 z-0" />
+                                                                )}
+                                                                {i < details.length - 1 && d.interval !== null && (
+                                                                    <span className="w-6 h-px bg-orange-200 absolute -right-6 top-1/2 z-0" />
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
                                 })()}
                             </div>
                         </div>

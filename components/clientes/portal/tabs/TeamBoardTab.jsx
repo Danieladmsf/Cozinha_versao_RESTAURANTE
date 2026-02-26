@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Employee } from "@/app/api/entities";
+import { syncLaborAcrossRecipes } from "@/lib/services/ingredientSyncService";
 
 // Setores disponíveis
 const SECTORS = [
@@ -402,6 +403,19 @@ const TeamBoardTab = () => {
                     title: "Funcionário atualizado",
                     description: `${formData.name} foi atualizado com sucesso.`
                 });
+
+                // Disparar sincronização em cascata para as fichas técnicas
+                try {
+                    const { updatedCount } = await syncLaborAcrossRecipes(editingEmployee.id, employeeData);
+                    if (updatedCount > 0) {
+                        toast({
+                            title: "Fichas Técnicas Atualizadas",
+                            description: `${updatedCount} receita(s) recalculada(s) devido ao reajuste de Mão de Obra.`
+                        });
+                    }
+                } catch (err) {
+                    console.error("Erro na cascata de Mão de Obra:", err);
+                }
             } else {
                 await Employee.create(employeeData);
                 toast({
@@ -983,8 +997,8 @@ const TeamBoardTab = () => {
                                                                     style={{ backgroundColor: sectorOffsCount > 0 ? `${sector.color}10` : undefined }}
                                                                 >
                                                                     <span className={`px-1.5 py-0.5 rounded ${sectorOffsCount > 0
-                                                                            ? 'bg-red-100 text-red-700'
-                                                                            : 'text-gray-500'
+                                                                        ? 'bg-red-100 text-red-700'
+                                                                        : 'text-gray-500'
                                                                         }`}>
                                                                         {sectorActiveCount}/{sectorEmployees.length}
                                                                     </span>

@@ -52,6 +52,7 @@ const DraggablePreparationList = ({
     removeRecipeWrapper,
     removePreparationWrapper,
     onDropPop,
+    onEditPop,
     prioritizedCommand,
     onBatchUpdatePreparations
 }) => {
@@ -86,18 +87,16 @@ const DraggablePreparationList = ({
         items.splice(result.destination.index, 0, reorderedItem);
 
         const reorderedWithNewTitles = items.map((item, index) => {
-            // Check if title starts with standard prefix format ("1º Etapa: ")
-            const prefixRegex = /^\d+º Etapa:\s*/;
+            // Check if title starts with standard prefix format
+            const prefixRegex = /^\d+[º°]?\s*Etapa:\s*/i;
             const hasStandardPrefix = prefixRegex.test(item.title);
 
             let newTitle = item.title;
             if (hasStandardPrefix) {
                 // Replace existing prefix with new index correctly
                 newTitle = item.title.replace(prefixRegex, `${index + 1}º Etapa: `);
-            } else {
-                // If the user manually removed the prefix, just re-add it cleanly
-                newTitle = `${index + 1}º Etapa: ${item.title}`;
             }
+            // If the user manually removed the prefix, DO NOT force it back!
 
             return {
                 ...item,
@@ -624,6 +623,7 @@ const DraggablePreparationList = ({
                                                                                 placeholder="Descreva as informações importantes desta etapa (use @ para mencionar POPs ou arraste da barra lateral)..."
                                                                                 minHeight="150px"
                                                                                 onDropPop={onDropPop}
+                                                                                onEditPop={onEditPop}
                                                                                 id={`prep-${index}-note-${editingNote.noteIndex}`} // Unique ID for targeting
                                                                                 command={prioritizedCommand?.targetId === `prep-${index}-note-${editingNote.noteIndex}` ? prioritizedCommand : null}
                                                                                 recipeYield={1} // Pass yield if available

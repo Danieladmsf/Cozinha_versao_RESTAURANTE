@@ -31,6 +31,7 @@ export function RecipeIngredientsTab({
     // Operações Avançadas
     handleSyncPreparation,
     handleDropPop,
+    handleEditPop,
     editorCommand,
 
     // Wrappers de Operações do CRUD
@@ -87,6 +88,7 @@ export function RecipeIngredientsTab({
                             onSyncPreparation={handleSyncPreparation}
                             onOpenAddAssemblyItemModal={openAddAssemblyItemModal}
                             onDropPop={handleDropPop}
+                            onEditPop={handleEditPop}
                             prioritizedCommand={editorCommand}
                             onUpdatePreparation={(prepIdx, field, value) => {
                                 setPreparationsData(prev => {

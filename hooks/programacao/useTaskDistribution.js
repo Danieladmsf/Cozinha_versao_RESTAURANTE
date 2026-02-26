@@ -170,6 +170,15 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
         };
     }, [recipes, optimisticTick]);
 
+    // Helper to format names nicely with Title Case
+    const titleCaseName = (str) => {
+        if (!str) return '';
+        return str.toLowerCase().split(' ').map(word => {
+            if (['e', 'de', 'do', 'da', 'dos', 'das', 'para', 'com'].includes(word)) return word;
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(' ');
+    };
+
     // =============================================
     // RELATÓRIO: Gerar listas por task_type
     // =============================================
@@ -196,6 +205,39 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
 
         // Global consolidated: sums ingredient weights across ALL task types
         const globalConsolidated = new Map();
+
+        // Helper to parse recipe name and client
+        const parseRecipeContext = (context) => {
+            const match = context.match(/^(.*?)\s*\((.*?)\)$/);
+            if (match) {
+                return { baseName: match[1].trim(), client: match[2].trim() };
+            }
+            return { baseName: context.trim(), client: null };
+        };
+
+        const addRecipeSource = (sourceArray, contextStr) => {
+            const parsed = parseRecipeContext(contextStr);
+            const existing = sourceArray.find(r => r.baseName === parsed.baseName);
+            if (existing) {
+                if (parsed.client && !existing.clients.includes(parsed.client)) {
+                    existing.clients.push(parsed.client);
+                }
+            } else {
+                sourceArray.push({
+                    baseName: parsed.baseName,
+                    clients: parsed.client ? [parsed.client] : []
+                });
+            }
+        };
+
+        const formatRecipeSources = (sourceArray) => {
+            return sourceArray.map(r => {
+                if (r.clients.length > 0) {
+                    return `${r.baseName} (${r.clients.join(', ')})`;
+                }
+                return r.baseName;
+            });
+        };
 
         // Grouped: { taskType -> { category -> { recipeName -> { ... } } } }
         const grouped = {
@@ -274,14 +316,14 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
             if (globalConsolidated.has(globalKey)) {
                 const entry = globalConsolidated.get(globalKey);
                 entry.totalWeight += scaledWeight;
-                if (!entry.sourceRecipes.includes(contextStr)) {
-                    entry.sourceRecipes.push(contextStr);
-                }
+                addRecipeSource(entry.sourceRecipesRaw, contextStr);
             } else {
+                const rawSources = [];
+                addRecipeSource(rawSources, contextStr);
                 globalConsolidated.set(globalKey, {
-                    name: canonicalName.charAt(0).toUpperCase() + canonicalName.slice(1),
+                    name: titleCaseName(canonicalName),
                     totalWeight: scaledWeight,
-                    sourceRecipes: [contextStr],
+                    sourceRecipesRaw: rawSources,
                 });
             }
 
@@ -316,7 +358,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                     } else {
                         rg.ingredients.set(key, {
                             name: ingName,
-                            displayName: ingName.charAt(0).toUpperCase() + ingName.slice(1),
+                            displayName: titleCaseName(ingName),
                             totalWeight: scaledWeight,
                             unit: ing.canonical_unit || 'kg',
                             itemType: ing.item_type || 'food'
@@ -329,17 +371,21 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                 if (targetMap.has(key)) {
                     const existing = targetMap.get(key);
                     existing.totalWeight += scaledWeight;
-                    if (!existing.sourceRecipes.includes(contextStr)) {
-                        existing.sourceRecipes.push(contextStr);
+                    addRecipeSource(existing.sourceRecipesRaw, contextStr);
+                    if (category && !existing.sourceCategories.includes(category)) {
+                        existing.sourceCategories.push(category);
                     }
                 } else {
+                    const rawSources = [];
+                    addRecipeSource(rawSources, contextStr);
                     targetMap.set(key, {
                         name: ingName,
-                        displayName: ingName.charAt(0).toUpperCase() + ingName.slice(1),
+                        displayName: titleCaseName(ingName),
                         totalWeight: scaledWeight,
                         unit: ing.canonical_unit || 'kg',
                         itemType: ing.item_type || 'food',
-                        sourceRecipes: [contextStr],
+                        sourceRecipesRaw: rawSources,
+                        sourceCategories: category ? [category] : [],
                         recipeName: recipeName,
                         prepTitle: '',
                     });
@@ -352,7 +398,11 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
         for (const [taskType, map] of Object.entries(taskMaps)) {
             result[taskType] = Array.from(map.values())
                 .filter(item => item.totalWeight > 0.001)
-                .sort((a, b) => b.totalWeight - a.totalWeight);
+                .map(item => ({
+                    ...item,
+                    sourceRecipes: formatRecipeSources(item.sourceRecipesRaw)
+                }))
+                .sort((a, b) => a.displayName.localeCompare(b.displayName, 'pt-BR', { sensitivity: 'base' }));
         }
 
         // Convert grouped Maps to arrays (ALL types)
@@ -364,7 +414,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                     ...rg,
                     ingredients: Array.from(rg.ingredients.values())
                         .filter(i => i.totalWeight > 0.001)
-                        .sort((a, b) => b.totalWeight - a.totalWeight),
+                        .sort((a, b) => a.displayName.localeCompare(b.displayName, 'pt-BR', { sensitivity: 'base' })),
                 }));
             }
         }
@@ -374,7 +424,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
         result.globalConsolidated = Object.fromEntries(
             Array.from(globalConsolidated.entries()).map(([k, v]) => [
                 k,
-                { totalWeight: v.totalWeight, sourceCount: v.sourceRecipes.length }
+                { totalWeight: v.totalWeight, sourceCount: (v.sourceRecipesRaw || []).length }
             ])
         );
 

@@ -2,11 +2,8 @@
 
 
 import React, { useState, useEffect } from "react";
-import { Ingredient } from "@/app/api/entities";
-import { Supplier } from "@/app/api/entities";
-import { NutritionFood } from "@/app/api/entities";
-import { Brand } from "@/app/api/entities";
-import { Category, CategoryTree, PriceHistory } from "@/app/api/entities"; // Added Category, CategoryTree and PriceHistory import
+import { syncIngredientAcrossRecipes } from '@/lib/services/ingredientSyncService';
+import { Recipe, Ingredient, PriceHistory, Category, Brand, Supplier, CategoryTree, CategoryType, NutritionFood } from '@/app/api/entities'; // Added Category, CategoryTree and PriceHistory import
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,7 +23,8 @@ import {
   Trash2,
   Search,
   Eye,
-  Package
+  Package,
+  Utensils
 } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { useRouter } from "next/navigation";
@@ -80,6 +78,8 @@ export default function IngredientEditor() {
   const [activeTab, setActiveTab] = useState("general");
   const [tacoSearchTerm, setTacoSearchTerm] = useState("");
   const [loadingTaco, setLoadingTaco] = useState(false); // ✅ Novo estado para loading TACO
+  const [ingredientRecipes, setIngredientRecipes] = useState([]);
+  const [loadingRecipes, setLoadingRecipes] = useState(false);
   const [initialPrice, setInitialPrice] = useState(null); // Store initial price for comparison
   const [itemType, setItemType] = useState("ingrediente"); // ingrediente ou embalagem
 
@@ -142,6 +142,28 @@ export default function IngredientEditor() {
       toast({ variant: "destructive", title: "Erro ao carregar TACO", description: err.message });
     } finally {
       setLoadingTaco(false);
+    }
+  };
+
+  const loadIngredientRecipes = async () => {
+    if (!currentIngredientId || ingredientRecipes.length > 0 || loadingRecipes) return;
+    try {
+      setLoadingRecipes(true);
+      const allRecipes = await Recipe.list();
+
+      const related = allRecipes.filter(recipe => {
+        if (!recipe.preparations) return false;
+        return recipe.preparations.some(prep =>
+          prep.ingredients && prep.ingredients.some(ing =>
+            ing.ingredient_id === currentIngredientId || ing.id === currentIngredientId
+          )
+        );
+      });
+      setIngredientRecipes(related);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao carregar receitas", description: err.message });
+    } finally {
+      setLoadingRecipes(false);
     }
   };
 
@@ -497,8 +519,10 @@ export default function IngredientEditor() {
   useEffect(() => {
     if (activeTab === 'taco') {
       loadTacoFoods();
+    } else if (activeTab === 'recipes' && isEditing) {
+      loadIngredientRecipes();
     }
-  }, [activeTab]);
+  }, [activeTab, isEditing]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -545,7 +569,9 @@ export default function IngredientEditor() {
         });
       } else {
         // Criar novo ingrediente
+        console.log(`[IngredientEditor] Creating new ingredient...`);
         result = await Ingredient.create(ingredientDataToSave);
+        console.log(`[IngredientEditor] Create result:`, result);
 
         // Criar histórico inicial para novo ingrediente (Opcional, mas bom para consistência)
         if (ingredientDataToSave.current_price > 0) {
@@ -597,7 +623,7 @@ export default function IngredientEditor() {
               brand_id: formData.brand_id || null,
               category: formData.category,
               unit: formData.unit,
-              ingredient_name: formData.name,
+              ingredient_name: formData.name, // Will use new name
               change_type: 'manual_update',
               change_source: 'ingredient_editor',
               user_id: 'mock-user-id', // Should be dynamic in real app
@@ -610,15 +636,58 @@ export default function IngredientEditor() {
             // For now, just log.
           }
         }
+
+        // Sincronizar nome, unidade, categoria e preço nas receitas envolvidas
+        try {
+          console.log(`[IngredientEditor] Acionando motor de cascata para o ingrediente...`);
+
+          let oldName = formData.name; // Fallback para manter o que tiver na tela
+          if (currentIngredientId) {
+            try {
+              const oldIngDb = await Ingredient.getById(currentIngredientId);
+              if (oldIngDb && oldIngDb.name) {
+                oldName = oldIngDb.name;
+              }
+            } catch (e) { console.warn("Erro ao buscar nome antigo:", e); }
+          }
+
+          const fieldsToSync = {
+            name: formData.name,
+            unit: formData.unit,
+            category: formData.category,
+            current_price: newPrice !== undefined ? newPrice : parseFloat(formData.current_price)
+          };
+
+          const { updatedCount, logs } = await syncIngredientAcrossRecipes(currentIngredientId, fieldsToSync, oldName);
+
+          console.group("🔍 [Rastreador] Cascata de Ingredientes");
+          logs.forEach(log => console.info(log));
+          console.groupEnd();
+
+          if (updatedCount > 0) {
+            toast({
+              title: "Receitas atualizadas!",
+              description: `O ingrediente reflitu em ${updatedCount} Fichas Técnicas impactadas, com custos recalculados.`,
+              className: "bg-blue-50 border-blue-200"
+            });
+          }
+        } catch (syncError) {
+          console.error("[IngredientEditor] Erro ao sincronizar receitas:", syncError);
+        }
       }
 
-      // Redirecionar para a lista com a aba correta
-      const tabParam = itemType === 'embalagem' ? '?tab=embalagens' : '';
-      router.push(`/ingredientes${tabParam}`);
+      console.log(`[IngredientEditor] Save complete, redirecting...`);
+      // Redirecionar para a lista com a aba correta com um pequeno atraso para o usuário ler o Toast de sucesso
+      setTimeout(() => {
+        const tabParam = itemType === 'embalagem' ? 'tab=embalagens' : '';
+        const highlightParam = `highlight=${result ? result.id : currentIngredientId}`;
+        const finalUrl = `/ingredientes?${tabParam}${tabParam ? '&' : ''}${highlightParam}`;
+        router.push(finalUrl);
+      }, 1500);
 
     } catch (err) {
+      console.error(`[IngredientEditor] Save error:`, err);
       setError(err.message || "Erro desconhecido ao salvar.");
-    } finally {
       setSaving(false);
     }
   };
@@ -690,7 +759,7 @@ export default function IngredientEditor() {
       <form onSubmit={handleSave} className="space-y-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {itemType !== 'embalagem' && (
-            <TabsList className="grid w-full grid-cols-3 mb-4 h-9 bg-gradient-to-r from-slate-100 to-slate-50">
+            <TabsList className={`grid w-full ${isEditing ? 'grid-cols-4' : 'grid-cols-3'} mb-4 h-9 bg-gradient-to-r from-slate-100 to-slate-50`}>
               <TabsTrigger value="general" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md">
                 <CircleCheckBig className="h-3 w-3" />
                 <span className="hidden sm:inline">Dados Gerais</span>
@@ -702,6 +771,14 @@ export default function IngredientEditor() {
                 <span className="hidden sm:inline">Variações TACO</span>
                 <span className="sm:hidden">TACO</span>
               </TabsTrigger>
+
+              {isEditing && (
+                <TabsTrigger value="recipes" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-violet-500 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <Utensils className="h-3 w-3" />
+                  <span className="hidden sm:inline">Receitas</span>
+                </TabsTrigger>
+              )}
+
               <TabsTrigger value="preview" className="flex items-center gap-2 text-xs h-7 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-md">
                 <Eye className="h-3 w-3" />
                 Preview
@@ -1069,6 +1146,54 @@ export default function IngredientEditor() {
                         ))}
                       </div>
                     )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="recipes" className="space-y-4 mt-0">
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-base flex justify-between items-center">
+                  <span>Receitas que usam este ingrediente</span>
+                  <Badge variant="secondary">{ingredientRecipes.length}</Badge>
+                </CardTitle>
+                <p className="text-xs text-slate-500 mb-2">
+                  Todas as Fichas Técnicas cadastradas que contêm este ingrediente em pelo menos uma de suas preparações.
+                </p>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                {loadingRecipes ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-indigo-600 mx-auto mb-3"></div>
+                      <p className="text-sm text-slate-600">Procurando receitas...</p>
+                    </div>
+                  </div>
+                ) : ingredientRecipes.length === 0 ? (
+                  <div className="text-center p-8 text-slate-500 text-sm bg-slate-50 border border-slate-100 rounded-lg">
+                    Este ingrediente não está sendo utilizado em nenhuma receita no momento.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2">
+                    {ingredientRecipes.sort((a, b) => a.name.localeCompare(b.name)).map(recipe => (
+                      <div
+                        key={recipe.id}
+                        onClick={() => window.open(`/ficha-tecnica?id=${recipe.id}`, '_blank')}
+                        className="p-3 border rounded-lg hover:border-indigo-300 hover:bg-indigo-50/50 cursor-pointer transition-colors group flex flex-col justify-between"
+                      >
+                        <div>
+                          <h4 className="font-semibold text-sm text-slate-800 group-hover:text-indigo-700">{recipe.name}</h4>
+                          <div className="text-xs text-slate-500 mt-1">
+                            Rendimento: {recipe.yield_amount} {recipe.yield_unit || 'un'}
+                          </div>
+                        </div>
+                        <div className="text-indigo-600 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+                          Abrir Ficha Técnica →
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </CardContent>

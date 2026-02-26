@@ -3,7 +3,7 @@
 import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { TextStyle, Color } from '@tiptap/extension-text-style';
-import { Bold, Italic, Strikethrough, Palette, Settings2, Trash2 } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Palette, Settings2, Trash2, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Node, mergeAttributes } from '@tiptap/core'; // TipTap Core imports
@@ -51,6 +51,18 @@ const PopNode = Node.create({
             calculatedCost: {
                 default: 0,
                 parseHTML: element => parseFloat(element.getAttribute('data-calculated-cost')) || 0
+            },
+            role: {
+                default: '',
+                parseHTML: element => element.getAttribute('data-role') || ''
+            },
+            capacity: {
+                default: 0,
+                parseHTML: element => parseFloat(element.getAttribute('data-capacity')) || 0
+            },
+            recipeYield: {
+                default: 1,
+                parseHTML: element => parseFloat(element.getAttribute('data-recipe-yield')) || 1
             }
         }
     },
@@ -66,6 +78,9 @@ const PopNode = Node.create({
             'data-cost': HTMLAttributes.cost,
             'data-calculated-cost': HTMLAttributes.calculatedCost,
             'data-duration': HTMLAttributes.duration,
+            'data-role': HTMLAttributes.role,
+            'data-capacity': HTMLAttributes.capacity,
+            'data-recipe-yield': HTMLAttributes.recipeYield,
             style: `background-color: ${HTMLAttributes.color}20; color: ${HTMLAttributes.color}; border: 1px solid ${HTMLAttributes.color}40; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500; display: inline-block; vertical-align: middle; margin: 0 2px;`
         }), HTMLAttributes.name]
     },
@@ -78,10 +93,11 @@ const PopNode = Node.create({
 // === POP NODE VIEW (The React Component inside Editor) ===
 const PopNodeView = ({ node, getPos, editor }) => {
     const { name, code, type, calculatedCost, color, cost } = node.attrs;
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <NodeViewWrapper as="span" className="inline-flex items-center align-middle mx-1">
-            <Popover>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                     <span
                         className="inline-flex items-center px-1.5 py-0.5 rounded textxs font-medium cursor-pointer border hover:opacity-80 transition-opacity select-none"
@@ -118,13 +134,32 @@ const PopNodeView = ({ node, getPos, editor }) => {
                             )}
                         </div>
                     </div>
-                    <div className="pt-2 border-t mt-2 flex justify-end">
+                    <div className="pt-2 border-t mt-2 flex justify-between">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 text-xs px-2"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsOpen(false);
+                                const pos = typeof getPos === 'function' ? getPos() : getPos;
+                                console.log("🔘 [RichTextEditor] 'Editar' clicked", { attrs: node.attrs, pos, targetId: editor.options.editorProps.targetId, hasHandler: !!editor.options.editorProps.onEditPop });
+                                if (editor.options.editorProps.onEditPop) {
+                                    editor.options.editorProps.onEditPop(node.attrs, pos, editor.options.editorProps.targetId);
+                                }
+                            }}
+                        >
+                            <Edit2 className="w-3 h-3 mr-1" />
+                            Editar
+                        </Button>
                         <Button
                             variant="destructive"
                             size="sm"
                             className="h-6 text-xs px-2"
                             onClick={() => {
-                                const pos = getPos();
+                                setIsOpen(false);
+                                const pos = typeof getPos === 'function' ? getPos() : getPos;
                                 if (typeof pos === 'number') {
                                     editor.commands.deleteRange({ from: pos, to: pos + 1 });
                                 }
@@ -162,6 +197,7 @@ export default function RichTextEditor({
     className = '',
     minHeight = '80px',
     onDropPop, // Callback for when a POP is dropped (to handle modals outside)
+    onEditPop, // Callback for editing existing POPs
     command, // New prop for external commands
     recipeYield = 1, // Recebe o rendimento atual para passar ao modal
     id // Unique ID for this editor instance
@@ -184,6 +220,8 @@ export default function RichTextEditor({
             attributes: {
                 class: `prose prose-sm max-w-none focus:outline-none min-h-[${minHeight}] p-3 border border-gray-200 rounded-md bg-white text-sm`,
             },
+            targetId: id,
+            onEditPop: onEditPop,
             // Handle Drop
             handleDrop: (view, event, slice, moved) => {
                 if (!moved && event.dataTransfer && event.dataTransfer.getData('application/react-pop-data')) {
@@ -224,6 +262,20 @@ export default function RichTextEditor({
         },
     });
 
+    // Sync external props into TipTap state
+    useEffect(() => {
+        if (editor && !editor.isDestroyed) {
+            editor.setOptions({
+                editorProps: {
+                    ...editor.options.editorProps,
+                    onEditPop,
+                    onDropPop,
+                    targetId: id
+                }
+            });
+        }
+    }, [editor, onEditPop, onDropPop, id]);
+
     // ... (Sync external value effect omitted - unchanged)
     useEffect(() => {
         if (editor && value !== editor.getHTML()) {
@@ -251,9 +303,32 @@ export default function RichTextEditor({
                         type: command.payload.type,
                         cost: command.payload.cost,
                         calculatedCost: command.payload.calculatedCost,
-                        duration: command.payload.duration
+                        duration: command.payload.duration,
+                        role: command.payload.role,
+                        capacity: command.payload.capacity,
+                        recipeYield: command.payload.recipeYield
                     }
                 }).insertContent(' ').run(); // Add space after
+            } else if (command.type === 'updatePop') {
+                // Delete the old node and insert the new one
+                editor.chain().focus()
+                    .deleteRange({ from: command.pos, to: command.pos + 1 })
+                    .insertContentAt(command.pos, {
+                        type: 'popNode',
+                        attrs: {
+                            id: command.payload.id,
+                            name: command.payload.name,
+                            code: command.payload.code,
+                            color: command.payload.color,
+                            type: command.payload.type,
+                            cost: command.payload.cost,
+                            calculatedCost: command.payload.calculatedCost,
+                            duration: command.payload.duration,
+                            role: command.payload.role,
+                            capacity: command.payload.capacity,
+                            recipeYield: command.payload.recipeYield
+                        }
+                    }).run();
             }
         }
     }, [command, editor, id]); // Added id dependency
