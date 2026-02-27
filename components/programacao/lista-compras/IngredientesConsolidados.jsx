@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 
 // Utilitário para consolidação de ingredientes (VERSÃO CORRIGIDA)
 import { consolidateIngredientsFromRecipes } from './utils/ingredientConsolidatorFixed';
+
+// Utilitário de impressão via nova janela (mesmo padrão da Escala Cozinha)
+import { printShoppingList } from './utils/printShoppingList';
 
 const IngredientesConsolidados = ({
   orders = [],
@@ -279,10 +282,31 @@ const IngredientesConsolidados = ({
     );
   }
 
+  // Debugging de impressão
+  useEffect(() => {
+    const handleBeforePrint = () => {
+      console.log('--- PREPARANDO PARA IMPRESSÃO ---');
+      console.log('Aba Ativa:', activeTab);
+      console.log('Qtd Ingredientes:', ingredientesConsolidados.length);
+      console.log('Qtd Fornecedores:', Object.keys(ingredientesPorFornecedor).length);
+
+      // Forçar a visualização da aba ativa ao imprimir para não quebrar tabelas
+      const activeContent = document.querySelector(`[data-state="active"][role="tabpanel"]`);
+      if (activeContent) {
+        console.log('Painel ativo encontrado para impressão:', activeContent.id);
+      } else {
+        console.log('AVISO: Nenhum painel ativo encontrado!');
+      }
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    return () => window.removeEventListener('beforeprint', handleBeforePrint);
+  }, [activeTab, ingredientesConsolidados.length]);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 print:space-y-0 print:block">
       {/* Sistema de abas para visualizações diferentes */}
-      <Card className="border-2 border-teal-400 shadow-xl bg-white print:border-none print:shadow-none">
+      <Card className="border-2 border-teal-400 shadow-xl bg-white print:border-none print:shadow-none print:bg-transparent print:m-0 print:p-0">
         <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-600 border-b-2 border-teal-700 flex flex-col md:flex-row flex-wrap justify-between items-center py-4 print:hidden gap-4">
           <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
             <Package className="w-5 h-5" />
@@ -323,7 +347,12 @@ const IngredientesConsolidados = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={handlePrint}
+              onClick={() => printShoppingList({
+                activeTab,
+                ingredientesPorFornecedor,
+                ingredientesPorCategoria,
+                ingredientesConsolidados
+              })}
               disabled={printing}
               className="gap-2 h-9 bg-white text-teal-700 hover:bg-teal-50 border-none shadow-sm print:hidden transition-colors"
             >
@@ -336,7 +365,9 @@ const IngredientesConsolidados = ({
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
+
+        {/* --- TELA NORMAL: SISTEMA DE ABAS (Oculto na impressão) --- */}
+        <CardContent className="p-6 print:hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="por-fornecedor" className="flex items-center gap-2">
@@ -353,7 +384,6 @@ const IngredientesConsolidados = ({
               </TabsTrigger>
             </TabsList>
 
-            {/* Nova Aba 3: Por Fornecedor */}
             <TabsContent value="por-fornecedor">
               <div className="space-y-8">
                 {Object.entries(ingredientesPorFornecedor).map(([supId, supData], supIndex) => {
@@ -370,7 +400,7 @@ const IngredientesConsolidados = ({
 
                   return (
                     <div key={supId} className={`rounded-lg border-2 ${colors.border} ${colors.bg} p-4 shadow-md`}>
-                      <div className="mb-4">
+                      <div className="mb-4 text-center">
                         <h3 className={`text-lg font-bold ${colors.text} mb-3 border-b-2 ${colors.border} pb-2`}>
                           FORNECEDOR: {supData.name.toUpperCase()}
                         </h3>
@@ -378,7 +408,7 @@ const IngredientesConsolidados = ({
                       <div className="overflow-x-auto rounded-lg">
                         <table className={`w-full border-2 ${colors.border} bg-white`}>
                           <thead>
-                            <tr className={colors.header}>
+                            <tr className={`${colors.header}`}>
                               <th className={`border ${colors.border} px-4 py-3 text-left font-bold ${colors.text}`}>INGREDIENTE</th>
                               <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>QUANTIDADE TOTAL</th>
                               <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>UNIDADE</th>
@@ -419,12 +449,9 @@ const IngredientesConsolidados = ({
               </div>
             </TabsContent>
 
-            {/* Aba 1: Por Categoria */}
             <TabsContent value="por-categoria">
               <div className="space-y-8">
-                {/* ✅ ATUALIZADO: Categorias na ordem do cardápio */}
                 {Object.entries(ingredientesPorCategoria).map(([catId, catData], categoryIndex) => {
-                  // Definir cores alternadas para cada categoria
                   const categoryColors = [
                     { bg: 'bg-blue-50', border: 'border-blue-300', header: 'bg-blue-100', text: 'text-blue-900', hover: 'hover:bg-blue-100' },
                     { bg: 'bg-purple-50', border: 'border-purple-300', header: 'bg-purple-100', text: 'text-purple-900', hover: 'hover:bg-purple-100' },
@@ -436,57 +463,34 @@ const IngredientesConsolidados = ({
 
                   return (
                     <div key={catId} className={`rounded-lg border-2 ${colors.border} ${colors.bg} p-4 shadow-md`}>
-                      {/* Nome da categoria */}
-                      <div className="mb-4">
+                      <div className="mb-4 text-center">
                         <h3 className={`text-lg font-bold ${colors.text} mb-3 border-b-2 ${colors.border} pb-2`}>
                           {catData.name.toUpperCase()}
                         </h3>
                       </div>
-
-                      {/* Tabela de ingredientes */}
                       <div className="overflow-x-auto rounded-lg">
                         <table className={`w-full border-2 ${colors.border} bg-white`}>
                           <thead>
-                            <tr className={colors.header}>
-                              <th className={`border ${colors.border} px-4 py-3 text-left font-bold ${colors.text}`}>
-                                INGREDIENTE
-                              </th>
-                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                                QUANTIDADE TOTAL
-                              </th>
-                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                                UNIDADE
-                              </th>
-                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                                PESO TOTAL (kg)
-                              </th>
-                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>
-                                RECEITAS
-                              </th>
+                            <tr className={`${colors.header}`}>
+                              <th className={`border ${colors.border} px-4 py-3 text-left font-bold ${colors.text}`}>INGREDIENTE</th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>QUANTIDADE TOTAL</th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>UNIDADE</th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>PESO TOTAL (kg)</th>
+                              <th className={`border ${colors.border} px-4 py-3 text-center font-bold ${colors.text}`}>RECEITAS</th>
                             </tr>
                           </thead>
                           <tbody>
                             {catData.ingredientes.map((ingrediente, index) => (
                               <tr key={`${ingrediente.name}_${index}`} className={`${colors.hover} transition-colors`}>
-                                <td className={`border ${colors.border} px-4 py-2 font-semibold text-gray-800`}>
-                                  {ingrediente.name}
-                                </td>
-                                <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>
-                                  {ingrediente.totalQuantity.toFixed(3)}
-                                </td>
-                                <td className={`border ${colors.border} px-4 py-2 text-center text-gray-700`}>
-                                  {ingrediente.unit}
-                                </td>
-                                <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>
-                                  {ingrediente.totalWeight.toFixed(3)}
-                                </td>
+                                <td className={`border ${colors.border} px-4 py-2 font-semibold text-gray-800`}>{ingrediente.name}</td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>{ingrediente.totalQuantity.toFixed(3)}</td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center text-gray-700`}>{ingrediente.unit}</td>
+                                <td className={`border ${colors.border} px-4 py-2 text-center font-bold text-gray-900`}>{ingrediente.totalWeight.toFixed(3)}</td>
                                 <td className={`border ${colors.border} px-4 py-2 text-center text-sm text-gray-600`}>
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger asChild>
-                                        <span className="cursor-help underline decoration-dotted">
-                                          {ingrediente.usedInRecipes} receitas
-                                        </span>
+                                        <span className="cursor-help underline decoration-dotted">{ingrediente.usedInRecipes} receitas</span>
                                       </TooltipTrigger>
                                       <TooltipContent className="max-w-xs bg-slate-800 text-white p-3">
                                         <p className="font-semibold mb-2">Receitas que usam {ingrediente.name}:</p>
@@ -510,56 +514,32 @@ const IngredientesConsolidados = ({
               </div>
             </TabsContent>
 
-            {/* Aba 2: Ordem Alfabética */}
             <TabsContent value="alfabetica">
               <div className="space-y-4">
                 <div className="overflow-x-auto rounded-lg">
                   <table className="w-full border-2 border-slate-300 bg-white">
                     <thead>
                       <tr className="bg-gradient-to-r from-slate-100 to-gray-100">
-                        <th className="border border-slate-300 px-4 py-3 text-left font-bold text-slate-900">
-                          INGREDIENTE
-                        </th>
-                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">
-                          QUANTIDADE TOTAL
-                        </th>
-                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">
-                          UNIDADE
-                        </th>
-                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">
-                          PESO TOTAL (kg)
-                        </th>
-                        <th className="border border-slate-300 px-4 py-3 text-left font-bold text-slate-900">
-                          CATEGORIAS QUE USAM
-                        </th>
-                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">
-                          Nº RECEITAS
-                        </th>
+                        <th className="border border-slate-300 px-4 py-3 text-left font-bold text-slate-900">INGREDIENTE</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">QUANTIDADE TOTAL</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">UNIDADE</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">PESO TOTAL (kg)</th>
+                        <th className="border border-slate-300 px-4 py-3 text-left font-bold text-slate-900">CATEGORIAS QUE USAM</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center font-bold text-slate-900">Nº RECEITAS</th>
                       </tr>
                     </thead>
                     <tbody>
                       {ingredientesConsolidados.map((ingrediente, index) => (
                         <tr key={`${ingrediente.name}_${index}`} className="hover:bg-slate-50 transition-colors">
-                          <td className="border border-slate-300 px-4 py-2 font-semibold text-gray-800">
-                            {ingrediente.name}
-                          </td>
-                          <td className="border border-slate-300 px-4 py-2 text-center font-bold text-gray-900">
-                            {ingrediente.totalQuantity.toFixed(3)}
-                          </td>
-                          <td className="border border-slate-300 px-4 py-2 text-center text-gray-700">
-                            {ingrediente.unit}
-                          </td>
-                          <td className="border border-slate-300 px-4 py-2 text-center font-bold text-gray-900">
-                            {ingrediente.totalWeight.toFixed(3)}
-                          </td>
+                          <td className="border border-slate-300 px-4 py-2 font-semibold text-gray-800">{ingrediente.name}</td>
+                          <td className="border border-slate-300 px-4 py-2 text-center font-bold text-gray-900">{ingrediente.totalQuantity.toFixed(3)}</td>
+                          <td className="border border-slate-300 px-4 py-2 text-center text-gray-700">{ingrediente.unit}</td>
+                          <td className="border border-slate-300 px-4 py-2 text-center font-bold text-gray-900">{ingrediente.totalWeight.toFixed(3)}</td>
                           <td className="border border-slate-300 px-4 py-2">
                             <div className="flex flex-wrap gap-1">
                               {ingrediente.recipeCategories && ingrediente.recipeCategories.length > 0 ? (
                                 ingrediente.recipeCategories.map((category, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200"
-                                  >
+                                  <span key={idx} className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
                                     {category}
                                   </span>
                                 ))
@@ -572,9 +552,7 @@ const IngredientesConsolidados = ({
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span className="cursor-help underline decoration-dotted">
-                                    {ingrediente.usedInRecipes} receitas
-                                  </span>
+                                  <span className="cursor-help underline decoration-dotted">{ingrediente.usedInRecipes} receitas</span>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs bg-slate-800 text-white p-3">
                                   <p className="font-semibold mb-2">Receitas que usam {ingrediente.name}:</p>
@@ -596,6 +574,106 @@ const IngredientesConsolidados = ({
             </TabsContent>
           </Tabs>
         </CardContent>
+
+        {/* --- TELA DE IMPRESSÃO: ESPELHO DA ABA ATIVA (Exclusivo para print) --- */}
+        <div className="hidden print:block print:w-full print:p-6 bg-white">
+          <div className="mb-6 text-center border-b-2 border-black pb-4">
+            <h2 className="text-2xl font-bold uppercase">
+              {activeTab === 'por-fornecedor' ? 'Lista de Compras por Fornecedor' :
+                activeTab === 'por-categoria' ? 'Lista de Compras por Categoria' :
+                  'Lista de Compras Alfabética'}
+            </h2>
+          </div>
+
+          {activeTab === 'por-fornecedor' && (
+            <div className="space-y-8">
+              {Object.entries(ingredientesPorFornecedor).map(([supId, supData], supIndex) => (
+                <div key={`print-${supId}`} className="break-inside-avoid shadow-none border border-gray-300 rounded-lg p-4 mb-6">
+                  <h3 className="text-lg font-bold mb-3 border-b border-gray-300 pb-2 text-black">
+                    FORNECEDOR: {supData.name.toUpperCase()}
+                  </h3>
+                  <table className="w-full border-collapse border border-gray-300 text-black">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-bold">INGREDIENTE</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center font-bold">QTD</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center font-bold">UNID</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center font-bold">PESO (kg)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {supData.ingredientes.map((ingrediente, index) => (
+                        <tr key={`print-row-${index}`} className="break-inside-avoid">
+                          <td className="border border-gray-300 px-4 py-2 font-semibold">{ingrediente.name}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-bold">{ingrediente.totalQuantity.toFixed(3)}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{ingrediente.unit}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-bold">{ingrediente.totalWeight.toFixed(3)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'por-categoria' && (
+            <div className="space-y-8">
+              {Object.entries(ingredientesPorCategoria).map(([catId, catData], categoryIndex) => (
+                <div key={`print-${catId}`} className="break-inside-avoid shadow-none border border-gray-300 rounded-lg p-4 mb-6">
+                  <h3 className="text-lg font-bold mb-3 border-b border-gray-300 pb-2 text-black">
+                    {catData.name.toUpperCase()}
+                  </h3>
+                  <table className="w-full border-collapse border border-gray-300 text-black">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-bold">INGREDIENTE</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center font-bold">QTD</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center font-bold">UNID</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center font-bold">PESO (kg)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {catData.ingredientes.map((ingrediente, index) => (
+                        <tr key={`print-row-${index}`} className="break-inside-avoid">
+                          <td className="border border-gray-300 px-4 py-2 font-semibold">{ingrediente.name}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-bold">{ingrediente.totalQuantity.toFixed(3)}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{ingrediente.unit}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-bold">{ingrediente.totalWeight.toFixed(3)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'alfabetica' && (
+            <div className="space-y-4">
+              <table className="w-full border-collapse border border-gray-300 text-black">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-4 py-2 text-left font-bold">INGREDIENTE</th>
+                    <th className="border border-gray-300 px-4 py-2 text-center font-bold">QTD</th>
+                    <th className="border border-gray-300 px-4 py-2 text-center font-bold">UNID</th>
+                    <th className="border border-gray-300 px-4 py-2 text-center font-bold">PESO (kg)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ingredientesConsolidados.map((ingrediente, index) => (
+                    <tr key={`print-row-${index}`} className="break-inside-avoid">
+                      <td className="border border-gray-300 px-4 py-2 font-semibold">{ingrediente.name}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center font-bold">{ingrediente.totalQuantity.toFixed(3)}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center">{ingrediente.unit}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center font-bold">{ingrediente.totalWeight.toFixed(3)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   );

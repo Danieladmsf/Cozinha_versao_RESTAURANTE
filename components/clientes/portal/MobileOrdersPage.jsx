@@ -416,7 +416,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         if (!isEmpty) {
           const newRupture = await OrderRupture.create({
             customer_id: customer.id, customer_name: customer.name, week_number: weekNumber, year: year, day_of_week: selectedDay,
-            date: format(addDays(weekStart, selectedDay - 1), "yyyy-MM-dd"), items: ruptureItems, general_notes: ruptureNotes
+            date: format(addDays(weekStart, selectedDay), "yyyy-MM-dd"), items: ruptureItems, general_notes: ruptureNotes
           });
           setExistingRupture(newRupture);
         }
@@ -525,7 +525,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             week_number: weekNumber,
             year: year,
             day_of_week: selectedDay,
-            date: format(addDays(weekStart, selectedDay - 1), "yyyy-MM-dd"),
+            date: format(addDays(weekStart, selectedDay), "yyyy-MM-dd"),
             items: receivingItems,
             general_notes: receivingNotes
           });
@@ -631,7 +631,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
             week_number: weekNumber,
             year: year,
             day_of_week: selectedDay,
-            date: format(addDays(weekStart, selectedDay - 1), "yyyy-MM-dd"),
+            date: format(addDays(weekStart, selectedDay), "yyyy-MM-dd"),
             items: wasteItems,
             general_notes: wasteNotes
           });
@@ -1755,7 +1755,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         day_of_week: selectedDay,
         week_number: weekNumber,
         year: year,
-        date: format(addDays(weekStart, selectedDay - 1), "yyyy-MM-dd"),
+        date: format(addDays(weekStart, selectedDay), "yyyy-MM-dd"),
         total_meals_expected: 0,
         general_notes: generalNotes,
         items: orderItems.map(item => ({ ...item })),

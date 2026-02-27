@@ -12,9 +12,9 @@ export default function ProgramacaoPage() {
   const [activeTab, setActiveTab] = useState("programacao-cozinha");
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
+    <div className="min-h-screen print:min-h-0 print:bg-white bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6 print:p-0 print:m-0">
+        <div className="flex justify-between items-center mb-6 print:hidden">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <ClipboardList className="w-8 h-8 text-blue-600" />
@@ -24,8 +24,8 @@ export default function ProgramacaoPage() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="print:block print:w-full">
+          <TabsList className="grid w-full grid-cols-3 print:hidden">
             <TabsTrigger value="programacao-cozinha">
               Programação Cozinha
             </TabsTrigger>

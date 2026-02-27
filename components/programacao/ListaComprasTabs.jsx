@@ -157,13 +157,9 @@ const ListaComprasTabs = () => {
     refreshAllData();
   }, [weekNumber, year]);
 
-  // Função de impressão
+  // Função de impressão - agora delegada ao IngredientesConsolidados
   const handlePrint = () => {
-    setPrinting(true);
-    setTimeout(() => {
-      window.print();
-      setPrinting(false);
-    }, 100);
+    // Não faz nada aqui - a lógica de impressão é interna ao componente
   };
 
   // Navegação de semana

@@ -318,11 +318,11 @@
     background-color: white !important;
     width: 100% !important;
     height: auto !important;
+    min-height: 100vh !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: visible !important;
-    position: relative !important;
-    display: block !important;
+    position: static !important;
   }
 
   /* Reset overflow containers without breaking flex layouts */

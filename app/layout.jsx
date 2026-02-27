@@ -153,7 +153,7 @@ export default function RootLayout({ children }) {
         <title>Cozinha - Descontão - Sistema de Gestão para Restaurantes</title>
       </head>
       <body>
-        <div className="flex h-full bg-gray-100 main-app-container">
+        <div className="flex h-full bg-gray-100 main-app-container print:h-auto print:overflow-visible">
 
           {sidebarOpen && (
             <div
@@ -174,8 +174,8 @@ export default function RootLayout({ children }) {
             handleMouseLeave={handleMouseLeave}
           />
 
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <header className="lg:hidden bg-white border-b px-4 py-3">
+          <div className="flex-1 flex flex-col overflow-hidden print:overflow-visible">
+            <header className="lg:hidden bg-white border-b px-4 py-3 print:hidden">
               <Button
                 variant="ghost"
                 size="icon"
@@ -185,7 +185,7 @@ export default function RootLayout({ children }) {
               </Button>
             </header>
 
-            <main className="flex-1 overflow-y-auto bg-gray-100 compact-ui">
+            <main className="flex-1 overflow-y-auto bg-gray-100 compact-ui print:overflow-visible print:bg-white print:h-auto print:w-full">
               {children}
             </main>
           </div>
