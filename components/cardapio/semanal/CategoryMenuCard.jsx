@@ -102,7 +102,7 @@ export default function CategoryMenuCard({
               {items.map((item, itemIndex) => {
                 const isOpen = menuInterface.isDropdownOpen(category.id, itemIndex);
                 const currentSearchTerm = menuInterface.getSearchTerm(category.id, itemIndex);
-                const filteredRecipes = menuHelpers.filterRecipesBySearch(recipes, category.name, currentSearchTerm, categories);
+                const filteredRecipes = menuHelpers.filterRecipesBySearch(recipes, category, currentSearchTerm, categories);
 
                 return (
                   <Draggable

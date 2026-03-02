@@ -102,6 +102,13 @@ export default function Recipes() {
     loadVisibilitySettings();
   }, []);
 
+  // Recarregar receitas quando as configurações de visibilidade mudarem
+  useEffect(() => {
+    if (Object.keys(visibleTypes).length > 0) {
+      loadRecipes();
+    }
+  }, [visibleTypes]);
+
   // Reload categories when activeType changes
   useEffect(() => {
     loadRecipeCategories();
@@ -181,7 +188,13 @@ export default function Recipes() {
   const loadRecipes = async () => {
     try {
       const recipesData = await Recipe.list();
-      const productsData = await Product.list();
+
+      // Só carregar Products se o tipo 'produtos' estiver visível nas configurações
+      const isProductsVisible = Object.keys(visibleTypes).length === 0 || visibleTypes['produtos'] === true;
+      let productsData = [];
+      if (isProductsVisible) {
+        productsData = await Product.list();
+      }
 
       // Inject type so we can differentiate when creating the merged list
       const merged = [
@@ -210,13 +223,17 @@ export default function Recipes() {
   const handleDelete = async (recipe) => {
     if (window.confirm(`Tem certeza que deseja excluir a receita "${recipe.name}"?`)) {
       try {
-        await Recipe.delete(recipe.id);
+        const entity = recipe.entityType === 'product' ? Product : Recipe;
+        console.log(`[Delete] Excluindo "${recipe.name}" (ID: ${recipe.id}) da collection: ${recipe.entityType === 'product' ? 'Product' : 'Recipe'}`);
+        await entity.delete(recipe.id);
+        console.log(`[Delete] ✅ Excluída com sucesso`);
         await loadRecipes();
         toast({
           title: "Receita excluída",
           description: `A receita "${recipe.name}" foi excluída com sucesso.`,
         });
       } catch (error) {
+        console.error(`[Delete] ❌ Erro:`, error);
         toast({
           title: "Erro ao excluir",
           description: `Erro ao excluir a receita "${recipe.name}": ${error.message}`,
@@ -260,19 +277,33 @@ export default function Recipes() {
 
   const handleBulkDelete = async () => {
     if (bulkSelected.size === 0) return;
-    const count = bulkSelected.size;
+    // Snapshot: collect both ID and entityType for each selected item
+    const itemsToDelete = Array.from(bulkSelected).map(id => {
+      const item = recipes.find(r => r.id === id);
+      return { id, entityType: item?.entityType || 'recipe', name: item?.name || id };
+    });
+    const count = itemsToDelete.length;
     if (!window.confirm(`Tem certeza que deseja excluir ${count} receita(s)? Esta ação não pode ser desfeita.`)) return;
 
     setIsBulkProcessing(true);
     let successCount = 0;
     let failCount = 0;
-    for (const id of bulkSelected) {
+    const errors = [];
+    for (const item of itemsToDelete) {
       try {
-        await Recipe.delete(id);
+        const entity = item.entityType === 'product' ? Product : Recipe;
+        console.log(`[BulkDelete] Excluindo "${item.name}" (ID: ${item.id}) da collection: ${item.entityType === 'product' ? 'Product' : 'Recipe'}`);
+        await entity.delete(item.id);
+        console.log(`[BulkDelete] ✅ "${item.name}" excluída`);
         successCount++;
-      } catch {
+      } catch (error) {
         failCount++;
+        errors.push({ id: item.id, name: item.name, error: error.message });
+        console.error(`[BulkDelete] ❌ Falha ao excluir "${item.name}" (${item.id}):`, error);
       }
+    }
+    if (errors.length > 0) {
+      console.warn('[BulkDelete] Erros:', errors);
     }
     await loadRecipes();
     setIsBulkProcessing(false);
@@ -298,7 +329,8 @@ export default function Recipes() {
       try {
         const recipe = recipes.find(r => r.id === id);
         if (recipe) {
-          await Recipe.update(id, { ...recipe, active: bulkToggleTarget });
+          const entity = recipe.entityType === 'product' ? Product : Recipe;
+          await entity.update(id, { ...recipe, active: bulkToggleTarget });
           successCount++;
         }
       } catch {
@@ -319,7 +351,8 @@ export default function Recipes() {
 
   const handleToggleActive = async (recipe) => {
     try {
-      await Recipe.update(recipe.id, {
+      const entity = recipe.entityType === 'product' ? Product : Recipe;
+      await entity.update(recipe.id, {
         ...recipe,
         active: !recipe.active
       });
@@ -412,8 +445,16 @@ export default function Recipes() {
   const getFilteredRecipes = () => {
     let filtered = recipes;
 
-    // IMPORTANT: If searching, we search across ALL types and categories.
-    // If NOT searching, we filter by activeType.
+    // Filtrar por tipos visíveis — items de tipos desabilitados nunca aparecem
+    const hasVisibilityConfig = Object.keys(visibleTypes).length > 0;
+    if (hasVisibilityConfig) {
+      filtered = filtered.filter(recipe => {
+        const type = getRootCategoryType(recipe.category, recipe.category_id);
+        return visibleTypes[type] === true;
+      });
+    }
+
+    // If NOT searching, filter by activeType tab
     if (!searchTerm) {
       filtered = filtered.filter(recipe => {
         const type = getRootCategoryType(recipe.category, recipe.category_id);
@@ -573,12 +614,24 @@ export default function Recipes() {
   const handleSaveQuickEdit = async () => {
     if (!editingRecipe) return;
     try {
-      await Recipe.update(editingRecipe.id, {
+      // Find the selected category details from our combined tree
+      const selectedCat = editGroupedCategories.flatMap(g => g.items).find(c => c.originalName === editForm.category);
+
+      const updateData = {
         ...editingRecipe,
         name: editForm.name,
         code: editForm.code,
-        category: editForm.category,
-      });
+        category: editForm.category, // legacy field
+        category_name: editForm.category // new display field priority
+      };
+
+      if (selectedCat) {
+        updateData.category_id = selectedCat.id;
+        // Optionally update type if needed based on the group it came from, 
+        // but recipes usually stay as 'receitas' or 'produtos' based on their root.
+      }
+
+      await Recipe.update(editingRecipe.id, updateData);
       await loadRecipes();
       setIsEditModalOpen(false);
       setEditingRecipe(null);
@@ -884,7 +937,7 @@ export default function Recipes() {
                               {recipe.active ? "Ativo" : "Inativo"}
                             </Badge>
                             <span className="text-xs text-gray-500 capitalize">
-                              {recipe.category}
+                              {recipe.category_name || recipe.category}
                             </span>
                           </div>
                         </div>

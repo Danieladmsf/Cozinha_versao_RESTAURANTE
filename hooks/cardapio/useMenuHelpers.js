@@ -81,7 +81,7 @@ export const useMenuHelpers = () => {
     return names;
   };
 
-  const filterRecipesBySearch = useCallback((recipes, categoryName, searchTerm, categories = []) => {
+  const filterRecipesBySearch = useCallback((recipes, category, searchTerm, categories = []) => {
     if (!Array.isArray(recipes) || recipes.length === 0) {
       return [];
     }
@@ -96,6 +96,23 @@ export const useMenuHelpers = () => {
         .trim();
     };
 
+    // Para retrocompatibilidade caso ainda passem string, recuperar o node
+    const categoryNode = typeof category === 'string'
+      ? categories?.find(c => c.name === category)
+      : category;
+
+    const categoryName = typeof category === 'string' ? category : category?.name;
+    const categoryType = categoryNode?.type;
+
+    // Mapa nativo inter-relações de Tipo de Categoria -> Coleção do Firestore
+    const ENTITY_TYPE_MAP = {
+      'produtos': 'product',
+      'receitas_-_base': 'recipe',
+    };
+
+    // Fallback nativo: se não mapeado, assume 'recipe'
+    const expectedEntityType = ENTITY_TYPE_MAP[categoryType] || 'recipe';
+
     // Mapeamento de nomes de categorias do sistema para categorias das receitas
     const categoryMapping = {
       'Acompanhamento': 'Acompanhamento',
@@ -109,7 +126,7 @@ export const useMenuHelpers = () => {
     // Se temos categorias, buscar todas as subcategorias também
     if (categories && categories.length > 0) {
       const descendantNames = getDescendantCategoryNames(categoryName, categories);
-      targetRecipeCategories = [categoryName, ...descendantNames];
+      targetRecipeCategories = [...targetRecipeCategories, ...descendantNames];
     }
 
     // Aplicar mapeamento de categorias se existir
@@ -127,8 +144,14 @@ export const useMenuHelpers = () => {
 
     const availableRecipes = recipes.filter(r => {
       const isActive = r?.active !== false;
-      const matchesCategory = targetRecipeCategories.includes(r?.category);
-      return isActive && matchesCategory;
+      const matchesCategory = targetRecipeCategories.includes(r?.category) || targetRecipeCategories.includes(r?.category_name);
+
+      let matchesType = true;
+      if (r.entityType) {
+        matchesType = (r.entityType === expectedEntityType);
+      }
+
+      return isActive && matchesCategory && matchesType;
     });
 
     // Se não há termo de busca, retorna todas as receitas da categoria ordenadas alfabeticamente

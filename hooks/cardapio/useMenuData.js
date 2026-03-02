@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CategoryTree } from "@/app/api/entities";
 import { WeeklyMenu as WeeklyMenuEntity } from "@/app/api/entities";
 import { Recipe } from "@/app/api/entities";
+import { Product } from "@/app/api/entities";
 import { MenuConfig } from "@/app/api/entities";
 import { Customer } from "@/app/api/entities";
 import { APP_CONSTANTS } from "@/lib/constants";
@@ -99,12 +100,18 @@ export const useMenuData = (currentDate) => {
       console.log('🔍 [useMenuData] Cache inválido ou ausente, carregando do banco...');
       setLoading(true);
 
-      const [categoriesData, recipesData, customersData, configData] = await Promise.all([
+      const [categoriesData, recipesList, productsList, customersData, configData] = await Promise.all([
         CategoryTree.list(),
         Recipe.list(),
+        Product.list(),
         Customer.list(),
         loadMenuConfig()
       ]);
+
+      const recipesData = [
+        ...(recipesList || []).map(r => ({ ...r, entityType: 'recipe' })),
+        ...(productsList || []).map(p => ({ ...p, entityType: 'product' }))
+      ];
 
       console.log('📦 [useMenuData] Dados carregados do banco:', {
         categories: categoriesData?.length || 0,

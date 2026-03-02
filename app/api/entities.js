@@ -51,8 +51,9 @@ const createEntity = (collectionName) => {
     // Alias for getAll (for compatibility)
     list: async () => {
       try {
-        // Usa getDocs para aproveitar o cache offline primeiro
-        const querySnapshot = await getDocs(collection(db, collectionName));
+        // CORRIGIDO: Usar getDocsFromServer para garantir dados frescos do servidor
+        // getDocs usava o cache offline, causando bug de "exclusão fantasma"
+        const querySnapshot = await getDocsFromServer(collection(db, collectionName));
 
         const docs = querySnapshot.docs.map(doc => {
           // IMPORTANTE: Colocar id: doc.id DEPOIS do spread para garantir que o ID do Firestore seja usado
@@ -269,20 +270,14 @@ const createEntity = (collectionName) => {
       try {
         const docRef = doc(db, collectionName, id);
 
-        // Verificar se o documento existe antes de deletar
-        const docSnapshot = await getDoc(docRef);
+        // Verificar se o documento existe antes de deletar (forçar leitura do servidor)
+        const docSnapshot = await getDocFromServer(docRef);
         if (!docSnapshot.exists()) {
           // Retornar sucesso se já foi excluído (idempotente)
           return { id, deleted: true, alreadyDeleted: true };
         }
 
         await deleteDoc(docRef);
-
-        // Verificar se realmente foi deletado
-        const verifyDoc = await getDoc(docRef);
-        if (verifyDoc.exists()) {
-          throw new Error(`Document was not deleted successfully`);
-        }
 
         return { id, deleted: true };
       } catch (error) {

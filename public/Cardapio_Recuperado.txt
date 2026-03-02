@@ -1,0 +1,96 @@
+Segunda:
+  - Rotisseria Pure de Batata Bendito KG
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Rotisseria Medalhao Frango Bendito KG
+
+Terça:
+  - Rotisseria Macarrao Alho e Oleo Bendito KG
+  - Rotisseria Macarrao ao Sugo Bendito KG
+  - Rotisseria Couve Flor Empanada Bendito KG
+  - Rotisseria Polenta ao Molho Carne Moida Bendito KG
+  - Rotisseria Arroz Branco Bendito KG
+  - Rotisseria Arroz a Grega Bendito KG
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Medalhao Frango Bendito KG
+  - Rotisseria Frango Xadrez Bendito KG
+  - Rotisseria Strogonoff de Carne Bendito KG
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Refeicao: Arroz, Farofa, [legumes], Lagarto M. Madeira
+  - Refeição: Arroz, Farofa, [creme/purê] e Iscas Milanesa
+  - Rotisseria Abobrinha Gratinada Bendito Kg
+
+Quarta:
+  - Rotisseria Arroz Branco Bendito KG
+  - Rotisseria Arroz a Grega Bendito KG
+  - Rotisseria Batata Assada Bendito KG
+  - Rotisseria Bife a Role Bendito KG
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Rotisseria Medalhao Frango Bendito KG
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Abobrinha Gratinada Bendito Kg
+  - Refeição: Arroz, Farofa, [creme/pure] e File Sobre-coxa Assada Bendito UN
+  - Rotisseria Strogonoff de Carne Bendito KG
+  - Refeicao: Arroz, Farofa, Purê de Batata e Tirinha Carne Chinesa Bendito UN
+
+Quinta:
+  - Rotisseria Macarrao Alho e Oleo Bendito KG
+  - Rotisseria Macarrao ao Sugo Bendito KG
+  - Rotisseria Arroz Branco Bendito KG
+  - Rotisseria Arroz a Grega Bendito KG
+  - Pate de Azeitona Verde Bendito KG
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Pate de Nozes Bendito KG
+  - Rotisseria Strogonoff de Carne Bendito KG
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Pure de Batata Bendito KG
+  - Rotisseria Legumes Bendito KG
+  - Rotisseria Creme de Milho Bendito KG
+  - Molho Pesto Bendito KG
+  - Refeicao: Arroz, Farofa, Ervilha Fresca, File Frango Parmegiana Bendito UN
+  - Refeição: Arroz, Farofa, Feijão e Pernil ao Molho Ferrugem Bendito UN
+  - Rotisseria Abobrinha Gratinada Bendito Kg
+  - Rotisseria Frango Xadrez Bendito KG
+
+Sexta:
+  - Rotisseria Batata Assada Bendito KG
+  - Rotisseria Bife a Role Bendito KG
+  - Rotisseria Arroz Branco Bendito KG
+  - Rotisseria Strogonoff de Carne Bendito KG
+  - Refeicao: Arroz, Farofa, Abobrinha Gratinada e Carne Panela Bendito UN
+  - Refeição: Arroz, Farofa, Feijão e Linguiça Assada Bendito UN
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Abobrinha Gratinada Bendito Kg
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Molho Pesto Bendito KG
+  - Refeicao: Arroz, Farofa, Feijão e Medalhao Frango Bendito UN
+
+Sábado:
+  - Rotisseria Polenta ao Molho Carne Moida Bendito KG
+  - Rotisseria Macarrao ao Sugo Bendito KG
+  - Rotisseria Macarrao Alho e Oleo Bendito KG
+  - Rotisseria Arroz Branco Bendito KG
+  - Rotisseria Strogonoff de Carne Bendito KG
+  - Refeição: Arroz, Farofa, Feijão e Kafta Recheada com Queijo Bendito UN
+  - Rotisseria Isca de Frango a Milanesa Bendito KG
+  - Rotisseria File Sobrecoxa Assada Bendito kg
+  - Rotisseria Pure de Batata Bendito KG
+  - Rotisseria Abobrinha Gratinada Bendito Kg
+  - Rotisseria Creme de Milho Bendito KG
+  - Rotisseria Legumes Bendito KG
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Rotisseria Medalhao Frango Bendito KG
+  - Rotisseria Frango Xadrez Bendito KG
+  - Refeicao: Arroz, Farofa, Purê de Catotia e Isca de Frango a Acebolada Bendito UN
+
+Domingo:
+  - Rotisseria Arroz Branco Bendito KG
+  - Rotisseria Bife a Role Bendito KG
+  - Rotisseria Strogonoff de Carne Bendito KG
+  - Refeicao: Arroz, Farofa, Ervilha Fresca, File Frango Parmegiana Bendito UN
+  - Refeicao: Arroz, Farofa, Couve Refogada e Feijoada Bendito UN
+  - Rotisseria Feijao Bendito KG
+  - Rotisseria Creme de Milho Bendito KG
+  - Rotisseria Lasanha a Bolonhesa Bendito  KG
+  - Rotisseria Frango Xadrez Bendito KG

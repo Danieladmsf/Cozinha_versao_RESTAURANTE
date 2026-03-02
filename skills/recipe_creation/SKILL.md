@@ -9,6 +9,39 @@ Esta skill define as regras para criação de fichas técnicas profissionais. To
 
 ---
 
+## 0. Busca Obrigatória no Banco (ANTES DE TUDO)
+
+**NUNCA crie uma receita nova sem antes verificar se ela já existe no Firestore.**
+
+### Fluxo obrigatório:
+
+```
+1. Recebe pedido de receita (ex: "Strogonoff de Carne")
+│
+2. BUSCAR no Firestore: query(collection(db, "Recipe"), where(...))
+│   → Pesquisar por nome exato E por nome parcial (contains/similar)
+│
+├── ENCONTROU? → Usar o documento existente (updateDoc)
+│   └── Apenas popular/atualizar o campo `preparations` 
+│   └── NÃO criar novo documento (addDoc)
+│
+└── NÃO ENCONTROU? → Criar novo documento (addDoc)
+```
+
+### Regras:
+- **Buscar por nome** usando `getDocs` com filtro ou iteração. Conferir nomes similares (ex: "Strogonoff de Carne" vs "Strogonoff Carne Bovina").
+- **Receitas existentes sem etapas** são receitas legítimas esperando para receber suas preparações. Use `updateDoc` para preenchê-las.
+- **Receitas existentes COM etapas** devem ser confirmadas com o usuário antes de sobrescrever.
+- **Preservar os campos originais** da receita existente (`name`, `code`, `category`, `type`, `shelf_life`, etc). Apenas adicionar/atualizar o campo `preparations`.
+
+### Também para Ingredientes:
+A mesma regra se aplica aos ingredientes referenciados nas etapas:
+- BUSCAR no Firestore pelo nome antes de criar.
+- Usar o `ingredient_id` real do banco.
+- Se não existir, criar o ingrediente usando a skill `ingredient_seeding`.
+
+---
+
 ## 1. Princípio Fundamental: Fidelidade ao Pedido
 
 **Crie EXATAMENTE o que foi solicitado. Nada mais, nada menos.**
