@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Order, Customer, Recipe } from "@/app/api/entities";
+import { Order, Customer, Recipe, Product } from "@/app/api/entities";
 import { getWeek, getYear, startOfWeek, addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAvailableDays } from '@/hooks/useAvailableDays';
@@ -9,8 +9,17 @@ export const useProgramacaoRealtimeData = () => {
   const [loading, setLoading] = useState({ initial: true, orders: false });
   const [connectionStatus, setConnectionStatus] = useState('connecting');
   const [customers, setCustomers] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+  const [firebaseRecipes, setFirebaseRecipes] = useState([]);
+  const [firebaseProducts, setFirebaseProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+
+  // Combina receitas e produtos em uma única lista
+  const recipes = useMemo(() => {
+    return [
+      ...firebaseRecipes.map(r => ({ ...r, entityType: 'recipe' })),
+      ...firebaseProducts.map(p => ({ ...p, entityType: 'product' }))
+    ];
+  }, [firebaseRecipes, firebaseProducts]);
 
   // Hook centralizado para dias disponíveis
   const availableDays = useAvailableDays();
@@ -19,6 +28,7 @@ export const useProgramacaoRealtimeData = () => {
   const unsubscribeOrders = useRef(null);
   const unsubscribeCustomers = useRef(null);
   const unsubscribeRecipes = useRef(null);
+  const unsubscribeProducts = useRef(null);
 
   // Começar a semana no domingo para suportar todos os dias
   const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 0 }), [currentDate]);
@@ -65,7 +75,17 @@ export const useProgramacaoRealtimeData = () => {
           setConnectionStatus('disconnected');
           return;
         }
-        setRecipes(recipesData);
+        setFirebaseRecipes(recipesData);
+      });
+
+      // Listen to products in real-time
+      unsubscribeProducts.current = Product.listen((productsData, error) => {
+        if (error) {
+          console.error('Erro ao ouvir products:', error);
+          setConnectionStatus('disconnected');
+          return;
+        }
+        setFirebaseProducts(productsData);
       });
 
       setConnectionStatus('connected');
@@ -83,6 +103,9 @@ export const useProgramacaoRealtimeData = () => {
       }
       if (unsubscribeRecipes.current) {
         unsubscribeRecipes.current();
+      }
+      if (unsubscribeProducts.current) {
+        unsubscribeProducts.current();
       }
     };
   }, []); // Empty dependency - setup once
@@ -146,7 +169,6 @@ export const useProgramacaoRealtimeData = () => {
     connectionStatus,
     customers,
     recipes,
-    setRecipes,
     orders,
     navigateWeek,
     // No need for refresh or loadOrdersForWeek - data updates automatically!

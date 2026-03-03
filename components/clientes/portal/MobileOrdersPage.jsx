@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 import {
   Customer,
   Recipe,
+  Product,
   CategoryTree,
   WeeklyMenu,
   Order,
@@ -745,7 +746,13 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           delayPromise,
           (async () => { // Função auto-executável para agrupar as chamadas assíncronas
             const recipesData = await Recipe.list();
-            setRecipes(recipesData.filter(r => r.active !== false)); // Filtrar ativas aqui
+            const productsData = await Product.list();
+            const combinedData = [
+              ...recipesData.map(r => ({ ...r, entityType: 'recipe' })),
+              ...productsData.map(p => ({ ...p, entityType: 'product' }))
+            ].filter(r => r.active !== false);
+
+            setRecipes(combinedData); // Guarda a lista combinada no state existing de recipes
 
             const appSettingsDoc = await AppSettings.getById('global');
             let newAppSettings = { operational_cost_per_kg: 0, profit_margin: 0 };
@@ -808,15 +815,14 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
       const weekNumberForFetch = getWeek(dateToFetch, { weekStartsOn: 1 });
       const yearForFetch = getYear(dateToFetch);
 
-      // 1. Recarregar Receitas
+      // 1. Recarregar Receitas e Produtos
       const recipesData = await Recipe.list();
-      const saladaAbobrinhaRecipe = recipesData.find(r => r.name === 'S. Abobrinha'); // Assuming 'S. Abobrinha' is the exact name
-      if (saladaAbobrinhaRecipe) {
-      }
-      // Assuming currentConfig is available in scope, otherwise this line might cause an error.
-      // If currentConfig is not defined, this line should be removed or defined elsewhere.
-      // setAvailableDays(currentConfig?.available_days || [1, 2, 3, 4, 5]); // This line was not in the original code, adding it as per instruction.
-      setRecipes(recipesData);
+      const productsData = await Product.list();
+      const combinedData = [
+        ...recipesData.map(r => ({ ...r, entityType: 'recipe' })),
+        ...productsData.map(p => ({ ...p, entityType: 'product' }))
+      ];
+      setRecipes(combinedData.filter(r => r.active !== false));
 
       // 1.1 Recarregar Categorias e Configurações de Menu (Cores)
       const categoriesData = await CategoryTree.list();
@@ -1807,7 +1813,7 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
 
 
-      const orderData = {
+      const rawOrderData = {
         ...syncedOrder,
         total_meals_expected: 0,
         general_notes: generalNotes,
@@ -1817,6 +1823,25 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
         original_amount: orderTotals.originalAmount,
         depreciation_amount: orderTotals.depreciationAmount
       };
+
+      // 🧹 SANITIZAÇÃO DE DADOS PARA FIRESTORE:
+      // Remove campos 'undefined' e objetos 'recipe' aninhados que causam erro "Unsupported field value: undefined"
+      const sanitizeForFirestore = (obj) => {
+        if (obj === undefined) return null;
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(sanitizeForFirestore);
+
+        const result = {};
+        for (const [k, v] of Object.entries(obj)) {
+          if (v === undefined) continue; // Remove campos undefined
+          // Remove objeto 'recipe' completo para evitar excesso de dados e datas inválidas (Timestamp) aninhadas
+          if (k === 'recipe' && typeof v === 'object' && v !== null) continue;
+          result[k] = sanitizeForFirestore(v);
+        }
+        return result;
+      };
+
+      const orderData = sanitizeForFirestore(rawOrderData);
 
 
       const startTime = Date.now();

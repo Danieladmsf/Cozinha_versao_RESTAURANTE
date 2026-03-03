@@ -1,0 +1,298 @@
+=================================================
+          RELATÓRIO DE RECEITAS ATIVAS
+=================================================
+
+
+[ ACOMPANHAMENTO ]
+- Creme de Milho
+- Geleia de Pimenta
+- Molho Pesto
+- Molho Pimenta Artesanal
+- Patê de Alho
+- Patê de Azeitona Verde
+- Purê de Batata
+
+[ ACOMPANHAMENTOS ]
+- Farofa Temperada
+
+[ AVES ]
+- Coxa Sobrecoxa Assada
+- Filé de Frango à Milanesa
+- Filé Frango Parmegiana
+- Filé Sobrecoxa Assada
+- Frango Inteiro
+- Frango Metade
+- Frango Xadrez
+- Isca de Frango à Milanesa
+- Isca de Frango Acebolada
+- Medalhão de Frango
+- Sobrecoxa Recheada
+- Strogonoff de Frango
+- Tulipa Buffalo Wings
+
+[ BOVINO ]
+- Carne de Panela
+- Cupim Assado Molho Alho
+- Dobradinha
+- Iscas de Carne Oriental
+- Kafta Recheada com Queijo
+- Lagarto M. Madeira
+- Maminha Assada
+- Polpetone Recheado
+- Quibe Assado
+- Strogonoff de Carne
+- Tirinha de Carne Chinesa
+
+[ CARNES ]
+- Bife à Rolê
+
+[ GUARNIÇÃO ]
+- Arroz à Grega
+- Arroz Branco
+- Arroz Carreteiro
+- Banana Frita
+- Batata Assada
+- Batata Recheada Brócolis e Bacon
+- Berinjela Pizzaiola
+- Canelone Presunto e Queijo ao Molho Branco
+- Charuto
+- Couve Refogada
+- Couve-flor Empanada
+- Creme de Legumes
+- Ervilha Fresca
+- Escondidinho de Calabresa
+- Escondidinho de Carne Seca
+- Escondidinho de Frango
+- Espaguete à Bolonhesa
+- Farofa
+- Feijão
+- Feijoada
+- Jiló Frito
+- Lasanha à Bolonhesa
+- Legumes
+- Linguiça Assada
+- Macarrão c/ Brócolis e Bacon
+- Macarrão c/ Calabresa Molho Rosé
+- Macarrão c/ Cheddar e Bacon
+- Macarrão Caprese
+- Macarronada à Bolonhesa
+- Nhoque ao Molho Sugo
+- Panqueca de Carne ao Pomodoro
+- Panqueca Frango c/ Requeijão
+- Panqueca Presunto e Mussarela
+- Polenta ao Molho de Carne Moída
+- Purê de Cabotiá
+- Rondelli Frango Requeijão
+- Yakissoba
+
+[ MACARRÃO (ALMOÇO) ]
+- Rot.espaguete a Bolonhesa + Polpetone Recheado Bendito
+- Rotisseria Macarrao C/brocolis e Bacon KG
+- Rotisseria Macarrao C/calabresa Molho Rose Bendito KG
+- Rotisseria Macarrao C/cheddar e Bacon
+- Rotisseria Macarrao Caprese KG
+- ROTISSERIA MACARRAO ESPECIAL BENDITO KG
+- Rotisseria Macarronada a Bolonhesa Bendito KG
+- Rotisseria Yakissoba Bendito KG
+
+[ MARMITA 3 DIVISORIAS (ALMOÇO) ]
+- Refeição: Arroz, Farofa, [creme/pure] e File Sobre-coxa Assada Bendito UN
+- Refeição: Arroz, Farofa, [creme/purê] e Iscas Milanesa
+- Refeicao: Arroz, Farofa, [legumes], Lagarto M. Madeira
+- Refeicao: Arroz, Farofa, Abobrinha Gratinada e Carne Panela Bendito UN
+- Refeicao: Arroz, Farofa, Couve Refogada e Feijoada Bendito UN
+- Refeicao: Arroz, Farofa, Ervilha Fresca, File Frango Parmegiana Bendito UN
+- Refeição: Arroz, Farofa, Feijão e Kafta Recheada com Queijo Bendito UN
+- Refeição: Arroz, Farofa, Feijão e Linguiça Assada Bendito UN
+- Refeicao: Arroz, Farofa, Feijão e Medalhao Frango Bendito UN
+- Refeição: Arroz, Farofa, Feijão e Pernil ao Molho Ferrugem Bendito UN
+- Refeicao: Arroz, Farofa, Purê de Batata e Tirinha Carne Chinesa Bendito UN
+- Refeicao: Arroz, Farofa, Purê de Catotia e Isca de Frango a Acebolada Bendito UN
+
+[ MOLHOS ]
+- Molho de Tomate Rústico (assado)
+
+[ MOLHOS (TARDE) ]
+- Molho Pesto Bendito KG
+
+[ MOLHOS E PATÊS ]
+- Patê de Nozes
+
+[ MONO ARROZ (ALMOÇO) ]
+- Rotisseria Arroz a Grega Bendito KG
+- Rotisseria Arroz Branco Bendito KG
+- Rotisseria Arroz Carreteiro Bendito KG
+
+[ MONO FEIJÃO (ALMOÇO) ]
+- Rotisseria Feijao Bendito KG
+
+[ MONO GUARNIÇÃO (ALMOÇO) ]
+- Rotisseria Banana Bendito KG
+- Rotisseria Batata Assada Bendito KG
+- Rotisseria Berinjela Pizzaola Bendito KG
+- Rotisseria Couve Flor Empanada Bendito KG
+- Rotisseria Creme de Milho Bendito KG
+- Rotisseria Farofa Bendito KG
+- Rotisseria Jilo Frito Bendito KG
+- Rotisseria Legumes Bendito KG
+- Rotisseria Pure de Batata Bendito KG
+- Rotisseria Purê de Cabotia Bendito KG
+
+[ MONO PROTEINAS (ALMOÇO) ]
+- Ass.frango Metade Bendito Unidade
+- Rotisseria Bife a Role Bendito KG
+- Rotisseria Carne de Panela Bendito Kg
+- Rotisseria Charuto Bendito KG
+- Rotisseria Coxa Sobrecoxa Assada Bendito KG
+- Rotisseria Dobradinha Bendito KG
+- Rotisseria File Sobrecoxa Assada Bendito KG
+- Rotisseria Frango Xadrez Bendito KG
+- Rotisseria Lagarto ao Molho Madeira Bendito KG
+- Rotisseria Linguica Assada Bendito KG
+- Rotisseria Maminha Assada Bendito KG
+- Rotisseria Medalhao Frango Bendito KG
+- Rotisseria Quibe Assado Bendito KG
+- Rotisseria Sobrecoxa Recheada Bendito KG
+- Rotisseria Strogonoff de Frango Bendito KG
+- Rotisseria Tulipa Bufalo Wings KG
+
+[ PATES (TARDE) ]
+- Pate de Azeitona Verde Bendito KG
+- Pate de Nozes Bendito KG
+
+[ REFEIÇÕES ]
+- Refeição: Charuto
+- Refeição: Escondidinho de Calabresa
+- Refeição: Escondidinho de Carne Seca
+- Refeição: Escondidinho de Frango
+- Refeição: Filé Sobrecoxa Assada
+- Refeição: Iscas de Frango Milanesa
+- Refeição: Macarrão c/ Calabresa Molho Rosé
+- Refeição: Macarronada à Bolonhesa
+- Refeição: Medalhão de Frango
+- Refeição: Salada Batatonese
+- Refeição: Salada Cenoura c/ Vagem
+- Refeição: Tirinha de Carne Chinesa
+
+[ SALADAS ]
+- Caponata de Berinjela
+- Maionese de Legumes com Frango
+- Salada Batatonese
+- Salada Caesar c/ Frango
+- Salada Cenoura c/ Vagem
+- Salada de Batata Curtinha
+- Salada de Beterraba
+- Salada Mix Folhas e Legumes c/ Proteínas
+- Salada Sunomono
+- Tabule
+
+[ SUÍNOS ]
+- Copa Lombo Acebolado
+- Copa Lombo Suína à Milanesa
+- Joelho de Porco Assado
+- Linguiça Recheada Assada
+- Linguiça Toscana Assada
+- Pernil ao Molho Ferrugem
+
+[ SUSHI E JAPONESA ]
+- California Roll
+- Hot Roll
+- Poke de Kani
+- Poke de Shimeji
+- Sushi Kani c/ Cream Cheese
+- Temaki Hot Salmão Grelhado
+
+Total de Receitas (Recipe): 159
+
+=================================================
+          RELATÓRIO DE PRODUTOS
+=================================================
+
+
+[ 2R8RBSGCOR7VOWUG8OUI ]
+- Código: S/ CODIGO | California Roll
+- Código: S/ CODIGO | Hot Roll
+- Código: S/ CODIGO | Poke de Kani
+- Código: S/ CODIGO | Poke de Shimeji
+- Código: S/ CODIGO | Sushi Kani c/ Cream Cheese
+- Código: S/ CODIGO | Temaki Hot Salmão Grelhado
+
+[ 3IVU8NNM8HSHRX87YSEE ]
+- Código: 8221   | Rotisseria Caponata Berinjela Bendito KG
+- Código: 6857   | Rotisseria Maionese de Legumes com Frango
+- Código: 8671   | Rotisseria Salada Batatonese Bendito KG
+- Código: S/ CODIGO | Rotisseria Salada Cenoura C/vagem Bendito KG
+- Código: 8690   | Rotisseria Salada de Batata Curtinha Bendito KG
+- Código: 8695   | Rotisseria Salada de Beterraba Bendito KG
+- Código: 8789   | Rotisseria Salada Sunomono Benditokg
+- Código: 8839   | Rotisseria Tabule Bendito KG
+
+[ 48OBEP6CJ1RNB5H30EKD ]
+- Código: S/ CODIGO | Rotisseria Abobrinha Gratinada Bendito Kg
+- Código: S/ CODIGO | Rotisseria Batata/recheada  Brocolis e Bacon
+
+[ 4EJQXRPLX6UB9JVCSIHR ]
+- Código: 8204   | Rotisseria Canelone Pre/queijo e M.branco Bendito KG
+- Código: S/ CODIGO | Rotisseria Escondidinho de Calabresa Bendito KG
+- Código: 8307   | Rotisseria Escondidinho de Carne Seca Bendito KG
+- Código: S/ CODIGO | Rotisseria Escondidinho Frango Bendito KG
+- Código: 8400   | Rotisseria Lasanha a Bolonhesa Bendito  KG
+- Código: S/ CODIGO | Rotisseria Nhoque ao Molho Sugo KG
+- Código: 8529   | Rotisseria Panqueca de Carne ao Pomodoro Bendito KG
+- Código: 8541   | Rotisseria Panqueca Frango C Requeijao Bendito KG
+- Código: 8544   | Rotisseria Panqueca Presunto e Mussarela Bendito KG
+- Código: 8571   | Rotisseria Polenta ao Molho Carne Moida Bendito KG
+- Código: S/ CODIGO | Rotisseria Rondele Frango Requeijao Bendito KG
+
+[ 4UPUSFNW88QWMBREKG9Y ]
+- Código: 7575   | Pate de Azeitona Verde Bendito KG
+- Código: S/ CODIGO | Pate de Nozes Bendito KG
+- Código: 8551   | Rotisseria Pate Alho Bendito KG
+
+[ 4YVODCKUHVLA1OWES4RJ ]
+- Código: S/ CODIGO | Molho Pesto Bendito KG
+- Código: 8386   | Rotisseria Geleia de Pimenta Bendito KG
+- Código: 8498   | Rotisseria Molho Pimenta Artesanal Bendito KG
+
+[ IK5K9SU5JWTNQ4BXBX8Q ]
+- Código: S/ CODIGO | Ref Copa Lombo Suina Milanesa Bendito
+- Código: S/ CODIGO | Refeição: Arroz, Farofa, [creme/pure] e File Sobre-coxa Assada Bendito UN
+- Código: S/ CODIGO | Refeição: Arroz, Farofa, [creme/purê] e Iscas Milanesa
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, [legumes], Lagarto M. Madeira
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Abobrinha Gratinada e Carne Panela Bendito UN
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Batata Assada e Strogonoff Carne Bendito UN
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Batata Assada, Strogonoff Frango Bendito UN
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Ervilha Fresca, File Frango Parmegiana Bendito UN
+- Código: S/ CODIGO | Refeição: Arroz, Farofa, Feijão e Kafta Recheada com Queijo Bendito UN
+- Código: S/ CODIGO | Refeição: Arroz, Farofa, Feijão e Linguiça Assada Bendito UN
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Feijão e Medalhao Frango Bendito UN
+- Código: S/ CODIGO | Refeição: Arroz, Farofa, Feijão e Pernil ao Molho Ferrugem Bendito UN
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Purê de Batata e Tirinha Carne Chinesa Bendito UN
+- Código: S/ CODIGO | Refeicao: Arroz, Farofa, Purê de Catotia e Isca de Frango a Acebolada Bendito UN
+- Código: S/ CODIGO | Rotisseria: Arroz, Farofa, [legumes] e Copa Lombo Acebolado Bendito KG
+
+[ QHLESTF7NRVAIMDQ0PLD ]
+- Código: 8963   | Rotisseria Salada Ceaser C/frango Bendito
+- Código: S/ CODIGO | Rotisseria Salada MIX de Folha e Legumes C/proteinas Bendito
+
+[ RK84ZNLG98NHUTTVFRSC ]
+- Código: 93583  | Ass.frango Bendito Inteiro
+- Código: 8945   | Rot.isca de Frango a Milanesa Bendito KG
+- Código: S/ CODIGO | Rotisseria Bife De Pernil Ao Molho Barbecue Bendito Kg
+- Código: 93964  | Rotisseria Cupim Assado Molho Alho  KG
+- Código: 8349   | Rotisseria File Frango Parmegiana Bendito KG
+- Código: 8393   | Rotisseria Joelho Porco Assado Bendito KG
+- Código: 8416   | Rotisseria Linguica Recheada Assada Bendito KG
+- Código: 8834   | Rotisseria Strogonoff de Carne Bendito KG
+
+[ US3D4RIHLX3BDOZAPE6G ]
+- Código: S/ CODIGO | Rotisseria Salada Poke de Kani Bendito UN
+- Código: S/ CODIGO | Rotisseria Salada Poke de Shimeji Bendito UN
+- Código: S/ CODIGO | Rotisseria Temaki HOT Salmao Grelahado
+
+[ XZXDEGXH66MYRYLHHLB7 ]
+- Código: S/ CODIGO | Rotisseria California Bendito UN
+- Código: 9124   | Rotisseria HOT Holl Bendito UN
+- Código: 9123   | Rotisseria Sushi Kani C/cream Cheese Bendito UN
+
+Total de Produtos (Product): 64

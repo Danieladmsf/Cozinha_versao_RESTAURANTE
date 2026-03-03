@@ -1,0 +1,627 @@
+{
+  "menu_data": {
+    "group-x3lLCsradGvncKDNXgEF-1769948050195": {
+      "0": {
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "recipe_id": "zNfzJyH0mXjzGOt13NAc",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "iRzE2McgNMc41AGypLjH",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "R6l7ZZ5faJSe6AEE1v9e"
+          }
+        ],
+        "4YVodckUHVLA1OWeS4rj": [],
+        "4UPuSfNW88qWmbrekG9y": [],
+        "4ejQXrpLX6uB9jVcSIHR": [],
+        "iK5k9sU5JwTNq4bXbx8q": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "vrxcywPHEFKu4GYxMfmo"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "Nud8zGAeX0K6eUBYEQL8"
+          }
+        ],
+        "5DZfjeRbthB9M61rFRBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "mItwpcJdKcrNXS5ZnAc7"
+          }
+        ],
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC"
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "aE0anWbikjGXtk2w0bqb"
+          }
+        ]
+      },
+      "1": {
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "recipe_id": "nAOoVZWrVUyIYZvGIeQl",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4YVodckUHVLA1OWeS4rj": [],
+        "4ejQXrpLX6uB9jVcSIHR": [],
+        "4UPuSfNW88qWmbrekG9y": [],
+        "5DZfjeRbthB9M61rFRBz": [],
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "iK5k9sU5JwTNq4bXbx8q": [],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "recipe_id": "HY2rjJYHJdFRzpadf7pK",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC"
+          }
+        ]
+      },
+      "2": {
+        "4YVodckUHVLA1OWeS4rj": [],
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "nAOoVZWrVUyIYZvGIeQl"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "R6l7ZZ5faJSe6AEE1v9e"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "iRzE2McgNMc41AGypLjH"
+          }
+        ],
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "wtT4bAViPwfKHvKR1vtp"
+          }
+        ],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "5DZfjeRbthB9M61rFRBz": [
+          {
+            "recipe_id": "mItwpcJdKcrNXS5ZnAc7",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "SxQfoFIzvREMbWUce04P",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "iK5k9sU5JwTNq4bXbx8q": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "1LkN6bZ3zqf8vXSZsFp6"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "41ipemMxLNkyTgdfWGYK"
+          },
+          {
+            "recipe_id": "ztuUynKQxSVVlXwMa9KF",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4ejQXrpLX6uB9jVcSIHR": [
+          {
+            "recipe_id": "nOSq4sSKTkIOYtmwkVnB",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4UPuSfNW88qWmbrekG9y": []
+      },
+      "3": {
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "zNfzJyH0mXjzGOt13NAc"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "nAOoVZWrVUyIYZvGIeQl"
+          },
+          {
+            "recipe_id": "iRzE2McgNMc41AGypLjH",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4YVodckUHVLA1OWeS4rj": [],
+        "4UPuSfNW88qWmbrekG9y": [],
+        "4ejQXrpLX6uB9jVcSIHR": [],
+        "iK5k9sU5JwTNq4bXbx8q": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "ztuUynKQxSVVlXwMa9KF"
+          },
+          {
+            "recipe_id": "jaNVNHTyC41fYn4RO5ED",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "G6ImOFaDG6OVLJxPiUSO",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "5DZfjeRbthB9M61rFRBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "mItwpcJdKcrNXS5ZnAc7"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "SxQfoFIzvREMbWUce04P"
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "64CgitxGpuBhstgS8LOK"
+          }
+        ]
+      },
+      "4": {
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "recipe_id": "iRzE2McgNMc41AGypLjH",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "R6l7ZZ5faJSe6AEE1v9e",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "4YVodckUHVLA1OWeS4rj": [
+          {
+            "recipe_id": "nhQTA9CXHgox63S4joYq",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4UPuSfNW88qWmbrekG9y": [
+          {
+            "recipe_id": "xAPTfG00a76chLL0uZrp",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "s7F9GxljvHepFeIYdecf",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4ejQXrpLX6uB9jVcSIHR": [],
+        "iK5k9sU5JwTNq4bXbx8q": [
+          {
+            "recipe_id": "vrxcywPHEFKu4GYxMfmo",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "MmP7jpTYnGyfaRjFaoEw",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "ztuUynKQxSVVlXwMa9KF",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "5DZfjeRbthB9M61rFRBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "mItwpcJdKcrNXS5ZnAc7"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "SxQfoFIzvREMbWUce04P"
+          }
+        ],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "HY2rjJYHJdFRzpadf7pK"
+          },
+          {
+            "recipe_id": "9i1S8i4zUSHKPhIYDygy",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "aE0anWbikjGXtk2w0bqb",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ]
+      },
+      "5": {
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "5DZfjeRbthB9M61rFRBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "mItwpcJdKcrNXS5ZnAc7"
+          }
+        ],
+        "iK5k9sU5JwTNq4bXbx8q": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "ztuUynKQxSVVlXwMa9KF"
+          },
+          {
+            "recipe_id": "puEr2pcsxY07HqIWnfXX",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "ztuUynKQxSVVlXwMa9KF",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "NxIIS96VFPZTqYbIGkS2",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4ejQXrpLX6uB9jVcSIHR": [],
+        "4UPuSfNW88qWmbrekG9y": [],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "recipe_id": "64CgitxGpuBhstgS8LOK",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC"
+          }
+        ],
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "recipe_id": "zNfzJyH0mXjzGOt13NAc",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "iRzE2McgNMc41AGypLjH"
+          }
+        ],
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "4YVodckUHVLA1OWeS4rj": [
+          {
+            "recipe_id": "nhQTA9CXHgox63S4joYq",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ]
+      },
+      "6": {
+        "rk84ZnLG98NHUTtVFrsC": [
+          {
+            "recipe_id": "iRzE2McgNMc41AGypLjH",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "f6CMjDeF8pr51tDXCasN"
+          },
+          {
+            "recipe_id": "Vaa7obxmQDgqcfT7hB8y",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "nAOoVZWrVUyIYZvGIeQl",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "recipe_id": "R6l7ZZ5faJSe6AEE1v9e",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "3iVU8Nnm8hsHrx87ySeE": [],
+        "4YVodckUHVLA1OWeS4rj": [],
+        "5DZfjeRbthB9M61rFRBz": [
+          {
+            "recipe_id": "mItwpcJdKcrNXS5ZnAc7",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "9PNVdAlz11zrp9wbcrFP": [],
+        "iK5k9sU5JwTNq4bXbx8q": [
+          {
+            "recipe_id": "XUfKdPRuMmvSRYgjwMxk",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "ztuUynKQxSVVlXwMa9KF"
+          },
+          {
+            "recipe_id": "dJdJd1yCbV4yR5EEZjem",
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ]
+          }
+        ],
+        "4ejQXrpLX6uB9jVcSIHR": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "nOSq4sSKTkIOYtmwkVnB"
+          }
+        ],
+        "4UPuSfNW88qWmbrekG9y": [],
+        "48oBEp6CJ1Rnb5H30Ekd": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "HY2rjJYHJdFRzpadf7pK"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "aE0anWbikjGXtk2w0bqb"
+          },
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "9i1S8i4zUSHKPhIYDygy"
+          }
+        ],
+        "qjtXmabkTGnu0D5VGnLA": [],
+        "mA2f1y8BAUVSePKCcWBz": [
+          {
+            "locations": [
+              "1BOCkWBaHAUp8icfPCOu",
+              "ve9gvtbFzcxSYJY4pHQr"
+            ],
+            "recipe_id": "Ffu3OXlrBFNheRwpC5vC"
+          }
+        ]
+      }
+    }
+  },
+  "updatedAt": "2026-03-02T00:13:07.983Z",
+  "week_key": "2026-W9"
+}
