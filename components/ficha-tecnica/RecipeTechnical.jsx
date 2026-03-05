@@ -885,40 +885,13 @@ export default function RecipeTechnical() {
 
 
 
-  // ==== FILTRO DE RECEITAS POR TIPO DE CATEGORIA ====
+  // ==== FILTRO DE RECEITAS POR TIPO ====
   const typeFilteredRecipes = filteredRecipes.filter(recipe => {
-    // 1. Filtro por Tipo de Categoria (CategoryType - Ingredientes, Receitas, Contas, Produtos)
-    if (activeCategoryFilter !== 'all') {
-      // activeCategoryFilter é o 'value' do CategoryType (ex: 'ingredientes', 'receitas', 'produtos')
-      // Precisamos verificar se a CATEGORIA da receita pertence a esse type no CategoryTree
+    if (activeCategoryFilter === 'all') return true;
 
-      // Pegar todas as categorias do CategoryTree que pertencem ao tipo selecionado
-      const categoriesOfType = allCategories.filter(cat => cat.type === activeCategoryFilter);
-      const categoryNamesOfType = categoriesOfType.map(cat => cat.name);
-
-      // Verificar se a categoria da receita está na lista
-      const recipeCategory = recipe.category || '';
-
-      // Se a categoria da receita está diretamente na lista, ou
-      // Se qualquer ancestor da categoria da receita pertence ao tipo
-      if (!categoryNamesOfType.includes(recipeCategory)) {
-        // Tentar encontrar pelo categoryId se existir
-        if (recipe.category_id) {
-          const recipeCatObj = allCategories.find(c => c.id === recipe.category_id);
-          if (recipeCatObj && recipeCatObj.type !== activeCategoryFilter) {
-            return false;
-          }
-        } else {
-          // Encontrar a categoria pelo nome e verificar o type
-          const recipeCatObj = allCategories.find(c => c.name === recipeCategory);
-          if (!recipeCatObj || recipeCatObj.type !== activeCategoryFilter) {
-            return false;
-          }
-        }
-      }
-    }
-
-    return true;
+    // Filtrar diretamente pelo campo type da receita
+    // 'receitas' → aba Receitas | 'produtos' → aba Produtos
+    return recipe.type === activeCategoryFilter;
   });
 
   // Função para destacar o termo buscado em azul
