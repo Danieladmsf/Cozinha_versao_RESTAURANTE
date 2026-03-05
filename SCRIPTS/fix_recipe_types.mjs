@@ -1,10 +1,7 @@
 /**
- * Script para corrigir o type das receitas que foram auto-criadas de produtos.
- * 
- * Problema: Receitas criadas com source_product_id estão com type 'receitas'
- * quando deveriam ter type 'produtos'.
- * 
- * Uso: node SCRIPTS/fix_recipe_types.mjs
+ * Script para:
+ * 1. Corrigir "ROTISSERIA ARROZ BRANCO BENDITO KG" (type receitas → produtos)
+ * 2. Classificar receitas sem tipo: se o nome contém palavras de produto → 'produtos', senão → 'receitas'
  */
 
 import { initializeApp } from 'firebase/app';
@@ -19,59 +16,48 @@ const firebaseConfig = {
     appId: "1:727272047685:web:4ebca2e3d67b273f5b0f2c"
 };
 
-const app = initializeApp(firebaseConfig, 'fix-types-script');
+const app = initializeApp(firebaseConfig, 'fix-all-types');
 const db = getFirestore(app);
 
-async function fixRecipeTypes() {
-    console.log('🔍 Buscando todas as receitas...');
+// Palavras que indicam que é um PRODUTO, não uma receita
+const PRODUCT_KEYWORDS = ['BENDITO', 'ROTISSERIA', 'REFEICAO:', 'REFEIÇÃO:', 'MARMITA', 'SKU:', 'ASS.FRANGO', 'ASS.'];
+
+function isProductName(name) {
+    const upper = (name || '').toUpperCase();
+    return PRODUCT_KEYWORDS.some(kw => upper.includes(kw));
+}
+
+async function fixAll() {
+    console.log('🔍 Buscando todas as receitas...\n');
 
     const snapshot = await getDocs(collection(db, 'Recipe'));
     const allRecipes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    console.log(`📊 Total de receitas no banco: ${allRecipes.length}`);
+    let fixedCount = 0;
 
-    // Encontrar receitas que foram criadas de produtos (têm source_product_id)
-    const productRecipes = allRecipes.filter(r => r.source_product_id);
-    console.log(`🔗 Receitas com source_product_id: ${productRecipes.length}`);
-
-    // Filtrar as que estão com type errado
-    const toFix = productRecipes.filter(r => r.type !== 'produtos');
-    console.log(`⚠️  Receitas para corrigir (type != 'produtos'): ${toFix.length}`);
-
-    if (toFix.length === 0) {
-        console.log('✅ Nenhuma correção necessária!');
-        return;
+    // 1. Corrigir receitas com type='receitas' que são produtos
+    const wrongType = allRecipes.filter(r => r.type === 'receitas' && isProductName(r.name));
+    console.log(`⚠️  Receitas com type='receitas' que são produtos: ${wrongType.length}`);
+    for (const r of wrongType) {
+        await updateDoc(doc(db, 'Recipe', r.id), { type: 'produtos', updatedAt: new Date() });
+        console.log(`   ✅ "${r.name}" → type: 'produtos'`);
+        fixedCount++;
     }
 
-    console.log('\n📝 Receitas que serão corrigidas:');
-    toFix.forEach(r => {
-        console.log(`   - [${r.id}] "${r.name}" | type atual: "${r.type}" → será: "produtos"`);
-    });
+    // 2. Classificar receitas SEM tipo
+    const noType = allRecipes.filter(r => !r.type || r.type === 'undefined');
+    console.log(`\n⚠️  Receitas sem tipo definido: ${noType.length}`);
 
-    // Aplicar correções
-    let fixed = 0;
-    for (const recipe of toFix) {
-        try {
-            await updateDoc(doc(db, 'Recipe', recipe.id), {
-                type: 'produtos',
-                updatedAt: new Date()
-            });
-            fixed++;
-            console.log(`   ✅ Corrigido: "${recipe.name}"`);
-        } catch (err) {
-            console.error(`   ❌ Erro ao corrigir "${recipe.name}":`, err.message);
-        }
+    for (const r of noType) {
+        const newType = isProductName(r.name) ? 'produtos' : 'receitas';
+        await updateDoc(doc(db, 'Recipe', r.id), { type: newType, updatedAt: new Date() });
+        console.log(`   ✅ "${r.name}" → type: '${newType}'`);
+        fixedCount++;
     }
 
-    console.log(`\n🎯 Resultado: ${fixed}/${toFix.length} receitas corrigidas.`);
+    console.log(`\n🎯 Total corrigido: ${fixedCount} receitas.`);
 }
 
-fixRecipeTypes()
-    .then(() => {
-        console.log('\n✅ Script finalizado.');
-        process.exit(0);
-    })
-    .catch(err => {
-        console.error('❌ Erro fatal:', err);
-        process.exit(1);
-    });
+fixAll()
+    .then(() => { console.log('\n✅ Finalizado.'); process.exit(0); })
+    .catch(err => { console.error('❌', err); process.exit(1); });

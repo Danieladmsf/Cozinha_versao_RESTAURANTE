@@ -82,14 +82,8 @@ export async function GET(request) {
             }
           }
 
-          // Filtrar por tipo (ex: receitas_-_base)
-          // Se type for especificado, filtra. Se não, inclui receitas sem tipo também.
-          if (type && recipe.type !== type && recipe.type !== null && recipe.type !== undefined) {
-            // Se o tipo foi especificado mas não é null, verifica match
-            if (recipe.type !== type) {
-              return false;
-            }
-          } else if (type && recipe.type !== type) {
+          // Filtrar por tipo (receitas ou produtos)
+          if (type && recipe.type !== type) {
             return false;
           }
 
