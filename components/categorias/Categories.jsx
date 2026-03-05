@@ -513,6 +513,48 @@ export default function Categories() {
 
     try {
       await CategoryTree.delete(category.id);
+
+      // AUTO-SYNC: Remover do MenuConfig para não virar aba fantasma
+      try {
+        const configs = await MenuConfig.query([
+          { field: 'is_default', operator: '==', value: true }
+        ]);
+
+        if (configs && configs.length > 0) {
+          const config = configs[0];
+          let configChanged = false;
+
+          // Remove dos category_groups (abas)
+          const newGroups = (config.category_groups || []).map(group => {
+            if (group.items && group.items.includes(category.id)) {
+              configChanged = true;
+              return {
+                ...group,
+                items: group.items.filter(id => id !== category.id)
+              };
+            }
+            return group;
+          });
+
+          // Remove do active_categories
+          const newActive = { ...(config.active_categories || {}) };
+          if (newActive[category.id] !== undefined) {
+            delete newActive[category.id];
+            configChanged = true;
+          }
+
+          if (configChanged) {
+            await MenuConfig.update(config.id, {
+              category_groups: newGroups,
+              active_categories: newActive
+            });
+            console.log(`🧹 [AutoSync] Categoria ${category.name} removida do MenuConfig.`);
+          }
+        }
+      } catch (syncErr) {
+        console.error("Erro no AutoSync durante exclusão:", syncErr);
+      }
+
       toast({
         title: "Sucesso",
         description: "Categoria excluída com sucesso.",
