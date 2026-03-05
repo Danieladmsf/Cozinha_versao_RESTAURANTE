@@ -230,15 +230,43 @@ export function useRecipeConfig() {
         });
       }
 
-      // NOVO: Sincronizar com Produtos Comerciais (SKU) se for pertinente
+      // SYNC: Sincronizar com Produtos Comerciais (SKU) se for pertinente
       try {
         const isProductCategory =
           sanitizedRecipe.type === 'produtos' ||
           (sanitizedRecipe.category && sanitizedRecipe.category.toUpperCase().includes('PRODUTO'));
 
         if (isProductCategory) {
-          // Buscar se já existe produto espelhado
-          const existingProducts = await Product.query([{ field: 'recipe_link_id', operator: '==', value: result.id }]);
+          const recipeId = result.id;
+
+          // Buscar produto existente por MÚLTIPLOS critérios para evitar duplicatas
+          let existingProduct = null;
+
+          // 1. Buscar por recipe_link_id (campo do sync anterior)
+          const byLinkId = await Product.query([{ field: 'recipe_link_id', operator: '==', value: recipeId }]);
+          if (byLinkId && byLinkId.length > 0) {
+            existingProduct = byLinkId[0];
+          }
+
+          // 2. Se não encontrou, buscar por source_product_id na receita (campo do auto-create)
+          if (!existingProduct && sanitizedRecipe.source_product_id) {
+            try {
+              const bySourceId = await Product.getById(sanitizedRecipe.source_product_id);
+              if (bySourceId) {
+                existingProduct = bySourceId;
+              }
+            } catch (e) {
+              console.warn('[useRecipeConfig] source_product_id não encontrado:', e.message);
+            }
+          }
+
+          // 3. Se ainda não encontrou, buscar por components[].recipe_id (todos os produtos)
+          if (!existingProduct) {
+            const allProducts = await Product.getAll();
+            existingProduct = allProducts.find(p =>
+              p.components && p.components.some(c => c.recipe_id === recipeId)
+            );
+          }
 
           // Tentar extrair unidade
           let unitType = 'un';
@@ -258,28 +286,29 @@ export function useRecipeConfig() {
             category: sanitizedRecipe.category || '',
             unit_type: unitType,
             shelf_life_days: shelfLifeValue,
-            recipe_link_id: result.id,
+            recipe_link_id: recipeId,
             components: [{
-              recipe_id: result.id,
+              recipe_id: recipeId,
               weight_kg: parseFloat(sanitizedRecipe.yield_weight) || parseFloat(sanitizedRecipe.cuba_weight) || 1
             }]
           };
 
-          if (existingProducts && existingProducts.length > 0) {
-            // Mantém o código VR original
-            await Product.update(existingProducts[0].id, {
+          if (existingProduct) {
+            // Atualizar produto existente (mantém código VR original)
+            await Product.update(existingProduct.id, {
               ...productData,
               updatedAt: new Date()
             });
-            console.log(`[useRecipeConfig] Produto comercial sincronizado (ID: ${existingProducts[0].id})`);
+            console.log(`[useRecipeConfig] Produto comercial sincronizado (ID: ${existingProduct.id})`);
           } else {
+            // Criar novo produto APENAS se realmente não existe
             await Product.create({
               ...productData,
-              code: '', // Deixa vazio para preencher dps no SKU
+              code: '',
               createdAt: new Date(),
               updatedAt: new Date()
             });
-            console.log(`[useRecipeConfig] Produto comercial criado (Recipe ID: ${result.id})`);
+            console.log(`[useRecipeConfig] Produto comercial criado (Recipe ID: ${recipeId})`);
           }
         }
       } catch (syncError) {
