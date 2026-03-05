@@ -459,13 +459,30 @@ export default function ProductsList() {
                                                         </DropdownMenuItem>
 
                                                         <DropdownMenuItem
-                                                            onClick={() => {
-                                                                const recipeId = product.components?.[0]?.recipe_id;
-                                                                if (recipeId) {
-                                                                    window.location.href = `/ficha-tecnica?id=${recipeId}`;
-                                                                } else {
-                                                                    alert("Este produto não possui uma ficha técnica associada.");
+                                                            onClick={async () => {
+                                                                let recipeId = product.components?.[0]?.recipe_id;
+                                                                if (!recipeId) {
+                                                                    // Auto-criar receita vinculada ao produto
+                                                                    try {
+                                                                        const newRecipe = await Recipe.create({
+                                                                            name: product.name,
+                                                                            type: 'receitas',
+                                                                            category: product.category || '',
+                                                                            yield_weight: 0,
+                                                                            preparations: [],
+                                                                            source_product_id: product.id
+                                                                        });
+                                                                        recipeId = newRecipe.id;
+                                                                        // Vincular ao produto
+                                                                        await updateProduct(product.id, {
+                                                                            components: [{ recipe_id: recipeId, weight_kg: 0 }]
+                                                                        });
+                                                                    } catch (e) {
+                                                                        alert("Erro ao criar ficha técnica: " + e.message);
+                                                                        return;
+                                                                    }
                                                                 }
+                                                                window.location.href = `/ficha-tecnica?id=${recipeId}`;
                                                             }}
                                                             className="flex items-center cursor-pointer"
                                                         >
@@ -474,14 +491,28 @@ export default function ProductsList() {
                                                         </DropdownMenuItem>
 
                                                         <DropdownMenuItem
-                                                            onClick={() => {
-                                                                const recipeId = product.components?.[0]?.recipe_id;
-                                                                if (recipeId) {
-                                                                    alert("Acesse a Ficha Técnica para imprimir a receita.");
-                                                                    window.location.href = `/ficha-tecnica?id=${recipeId}`;
-                                                                } else {
-                                                                    alert("Este produto não possui uma receita para imprimir.");
+                                                            onClick={async () => {
+                                                                let recipeId = product.components?.[0]?.recipe_id;
+                                                                if (!recipeId) {
+                                                                    try {
+                                                                        const newRecipe = await Recipe.create({
+                                                                            name: product.name,
+                                                                            type: 'receitas',
+                                                                            category: product.category || '',
+                                                                            yield_weight: 0,
+                                                                            preparations: [],
+                                                                            source_product_id: product.id
+                                                                        });
+                                                                        recipeId = newRecipe.id;
+                                                                        await updateProduct(product.id, {
+                                                                            components: [{ recipe_id: recipeId, weight_kg: 0 }]
+                                                                        });
+                                                                    } catch (e) {
+                                                                        alert("Erro ao criar ficha técnica: " + e.message);
+                                                                        return;
+                                                                    }
                                                                 }
+                                                                window.location.href = `/ficha-tecnica?id=${recipeId}`;
                                                             }}
                                                             className="flex items-center cursor-pointer"
                                                         >
