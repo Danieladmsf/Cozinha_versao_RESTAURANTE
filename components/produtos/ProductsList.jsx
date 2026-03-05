@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useProducts } from "@/hooks/catalog/useProducts";
 import { CategoryTree, Recipe, MenuConfig, CategoryType } from "@/app/api/entities";
 import { APP_CONSTANTS } from "@/lib/constants";
+import { toTitleCase } from "@/lib/textUtils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -416,13 +417,13 @@ export default function ProductsList() {
                                                         <h3 className="font-medium text-base flex items-center gap-2">
                                                             {product.code && <span className="text-blue-600 text-sm font-mono mr-1">#{String(product.code).padStart(6, '0')}</span>}
                                                             <Box className="h-4 w-4 text-blue-500" />
-                                                            {product.name}
+                                                            {toTitleCase(product.name)}
                                                         </h3>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <Badge className="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0">{product.unit_type || 'un'}</Badge>
-                                                        <span className="text-xs text-gray-500 capitalize">
-                                                            {product.category || 'Sem Categoria'}
+                                                        <span className="text-xs text-gray-500">
+                                                            {toTitleCase(product.category) || 'Sem Categoria'}
                                                         </span>
                                                     </div>
                                                 </div>
