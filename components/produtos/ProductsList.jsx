@@ -467,7 +467,7 @@ export default function ProductsList() {
                                                                     try {
                                                                         const newRecipe = await Recipe.create({
                                                                             name: product.name,
-                                                                            type: 'receitas',
+                                                                            type: 'produtos',
                                                                             category: product.category || '',
                                                                             yield_weight: 0,
                                                                             preparations: [],
@@ -498,7 +498,7 @@ export default function ProductsList() {
                                                                     try {
                                                                         const newRecipe = await Recipe.create({
                                                                             name: product.name,
-                                                                            type: 'receitas',
+                                                                            type: 'produtos',
                                                                             category: product.category || '',
                                                                             yield_weight: 0,
                                                                             preparations: [],
