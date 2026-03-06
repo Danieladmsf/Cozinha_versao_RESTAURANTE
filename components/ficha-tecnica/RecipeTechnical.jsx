@@ -886,22 +886,9 @@ export default function RecipeTechnical() {
 
 
   // ==== FILTRO DE RECEITAS POR TIPO ====
-  // DEBUG: Verificar valores
-  console.log('🔵 [FILTRO DEBUG] activeCategoryFilter:', activeCategoryFilter);
-  console.log('🔵 [FILTRO DEBUG] recipe.type values:', [...new Set(filteredRecipes.map(r => r.type))]);
-  console.log('🔵 [FILTRO DEBUG] total filteredRecipes:', filteredRecipes.length);
-
   const typeFilteredRecipes = filteredRecipes.filter(recipe => {
     if (activeCategoryFilter === 'all') return true;
-
-    // Filtrar diretamente pelo campo type da receita
-    // 'receitas' → aba Receitas | 'produtos' → aba Produtos
-    const match = recipe.type === activeCategoryFilter;
-    if (!match && activeCategoryFilter !== 'all') {
-      // Log apenas 1x por tipo diferente
-      console.log(`🔴 [FILTRO] "${recipe.name}" type="${recipe.type}" ≠ filter="${activeCategoryFilter}" → EXCLUÍDO`);
-    }
-    return match;
+    return recipe.type === activeCategoryFilter;
   });
 
   // Função para destacar o termo buscado em azul

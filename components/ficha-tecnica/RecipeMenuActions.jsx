@@ -112,10 +112,7 @@ export function RecipeMenuActions({
                                     ? "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
                                     : "hover:bg-gray-100"
                             )}
-                            onClick={() => {
-                                console.log('🟢 [CLICK] Filtro: all');
-                                setActiveCategoryFilter('all');
-                            }}
+                            onClick={() => setActiveCategoryFilter('all')}
                         >
                             Todos
                         </Badge>
@@ -127,10 +124,7 @@ export function RecipeMenuActions({
                                     ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
                                     : "hover:bg-gray-100 text-gray-600"
                             )}
-                            onClick={() => {
-                                console.log('🟢 [CLICK] Filtro: receitas');
-                                setActiveCategoryFilter('receitas');
-                            }}
+                            onClick={() => setActiveCategoryFilter('receitas')}
                         >
                             Receitas
                         </Badge>
@@ -142,10 +136,7 @@ export function RecipeMenuActions({
                                     ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
                                     : "hover:bg-gray-100 text-gray-600"
                             )}
-                            onClick={() => {
-                                console.log('🟢 [CLICK] Filtro: produtos');
-                                setActiveCategoryFilter('produtos');
-                            }}
+                            onClick={() => setActiveCategoryFilter('produtos')}
                         >
                             Produtos
                         </Badge>
