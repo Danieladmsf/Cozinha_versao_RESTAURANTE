@@ -418,26 +418,48 @@ const ProgramacaoCozinhaTabs = () => {
   // Lógica segura de formatação (Arquitetura Nativa / Quilo e Unidade)
   const formatQuantityDisplay = (item) => {
     let quantity = item.quantity ?? 0;
-
-    // Arredondar base para evitar problemas de precisão flutuante
     quantity = Math.round(quantity * 1000) / 1000;
+
+    // A unidade ORIGINAL do pedido
+    let originalUnitType = (item.unit_type || "").toLowerCase();
 
     let unitType = item.unit_type;
     let unitsQuantity = 1;
     let portionWeight = 0;
     let assemblyUnitType = null;
+    let isUnitBased = false;
+
+    if (originalUnitType === 'porção' || originalUnitType === 'porcao' || originalUnitType === 'un' || originalUnitType === 'unidades') {
+      originalUnitType = 'unidade';
+    }
 
     let recipe = null;
-    if (item.recipe_id) {
-      recipe = recipes.find(r => r.id === item.recipe_id);
+    if (item.recipe_id || item.recipe_name) {
+      if (item.recipe_id) {
+        recipe = recipes.find(r => r.id === item.recipe_id);
+      }
+
+      // Upgrade: Se for um Product antigo, tenta buscar a Ficha Técnica correspondente pelo nome
+      // para garantir as informações de peso e etapas de montagem
+      if (recipe && recipe.entityType === 'product' && item.recipe_name) {
+        const fichaTecnica = recipes.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
+        if (fichaTecnica) recipe = fichaTecnica;
+      }
+
+      // Fallback para buscar pelo nome da receita (caso o recipe_id do pedido seja antigo)
+      if (!recipe && item.recipe_name) {
+        recipe = recipes.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim())
+          || recipes.find(r => r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
+      }
 
       if (recipe) {
-        // Buscar portion_weight_calculated (o peso configurado na 3ª etapa)
+        // Agora que o banco de dados foi limpo e padronizado, o portion_weight_calculated
+        // e o unit_type sempre existem de forma correta e definitiva na raiz.
         if (recipe.portion_weight_calculated && recipe.portion_weight_calculated > 0) {
           portionWeight = recipe.portion_weight_calculated;
         }
 
-        // Buscar configurações da preparação final (3ª etapa)
+        // Recupera também outras configurações de montagem, se existirem
         if (recipe.preparations && recipe.preparations.length > 0) {
           const lastPrep = recipe.preparations[recipe.preparations.length - 1];
           if (lastPrep.assembly_config) {
@@ -468,21 +490,35 @@ const ProgramacaoCozinhaTabs = () => {
     // Unificar variações de unidade
     if (unitType === 'porção' || unitType === 'porcao' || unitType === 'un' || unitType === 'unidades') {
       unitType = 'unidade';
+      isUnitBased = true;
     }
     if (unitType === 'quilo') {
       unitType = 'kg';
     }
 
     // === LÓGICA DE PRODUÇÃO / CÁLCULO DE EMBALAGENS ===
-    // 1. Se a receita é configurada em Quilo (kg) -> Total KG / Peso da Porção
+
+    // Se a unidade ORIGINAL do pedido já for Unidade (e não kg),
+    // a quantidade do pedido é DE FATO o número de embalagens vendidas (Ex: 4 combo/marmita).
+    if (originalUnitType === 'unidade' && portionWeight > 0) {
+      const portionGrams = Math.round(portionWeight * 1000);
+      return `${quantity} emb (${portionGrams}g)`;
+    }
+
+    // Se o pedido chegou em KG/PESO, calcula dividindo pela porção
     if (unitType === 'kg' && portionWeight > 0 && quantity > 0) {
       const numPackages = Math.ceil(quantity / portionWeight);
       const portionGrams = Math.round(portionWeight * 1000);
       return `${numPackages} emb (${portionGrams}g)`;
     }
 
-    // 2. Se a receita é configurada em Unidade -> Quantidade x Multiplicador da Porção
-    if (unitType === 'unidade') {
+    // Unidades genéricas sem peso configurado
+    if (unitType === 'unidade' || isUnitBased || unitType === 'cuba') {
+      const portionGrams = Math.round(portionWeight * 1000);
+      if (portionWeight > 0) {
+        return `${quantity} emb (${portionGrams}g)`;
+      }
+
       const finalQuantity = Math.round((quantity * unitsQuantity) * 100) / 100;
       return `${String(finalQuantity).replace('.', ',')} unidade`;
     }

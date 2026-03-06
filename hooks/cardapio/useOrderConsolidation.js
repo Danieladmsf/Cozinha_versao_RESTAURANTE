@@ -162,7 +162,20 @@ export const useOrderConsolidation = (orders, recipes, excludeCategories = []) =
 
         // Adicionar informações de categoria aos itens e normalizar quantidades
         const itemsWithCategory = order.items.map(item => {
-          const recipe = recipes?.find(r => r.id === item.recipe_id);
+          let recipe = recipes?.find(r => r.id === item.recipe_id);
+
+          // Se encontrou um Product antigo em vez de usar a nova Ficha Técnica,
+          // tentar buscar a Ficha Técnica pelo nome para extrair os dados corretos de produção
+          if (recipe && recipe.entityType === 'product' && item.recipe_name) {
+            const fichaTecnica = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
+            if (fichaTecnica) recipe = fichaTecnica;
+          }
+
+          // Fallback para buscar pelo nome caso o ID tenha mudado (ex: receita foi recriada)
+          if (!recipe && item.recipe_name) {
+            recipe = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim())
+              || recipes?.find(r => r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
+          }
           const correctUnitType = getCorrectUnitType(item, recipe);
 
           return {
@@ -200,7 +213,18 @@ export const useOrderConsolidation = (orders, recipes, excludeCategories = []) =
           if (!item.recipe_id && !item.recipe_name) return;
 
           // Verificar se a categoria deve ser excluída
-          const recipe = recipes?.find(r => r.id === item.recipe_id);
+          let recipe = recipes?.find(r => r.id === item.recipe_id);
+
+          if (recipe && recipe.entityType === 'product' && item.recipe_name) {
+            const fichaTecnica = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
+            if (fichaTecnica) recipe = fichaTecnica;
+          }
+
+          // Fallback para buscar pelo nome caso o ID do pedido seja de uma versão antiga da receita
+          if (!recipe && item.recipe_name) {
+            recipe = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim())
+              || recipes?.find(r => r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
+          }
           const category = recipe?.category || item.category || 'Outros';
           if (shouldExcludeCategory(category)) return;
 
