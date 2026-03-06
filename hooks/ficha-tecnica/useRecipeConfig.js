@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CategoryType, User, Recipe, Product } from '@/app/api/entities';
 import { useToast } from '@/components/ui';
 import { processTypes, defaultConfig, validationRules } from '@/lib/recipeConstants';
+import { toTitleCase } from '@/lib/textUtils';
 
 /**
  * Hook para gerenciar configurações da Ficha Técnica
@@ -173,7 +174,7 @@ export function useRecipeConfig() {
         ...recipeData, // Spread first to capture extra fields
 
         // Explicit fields overwrite base fields if needed
-        name: recipeData.name || '',
+        name: toTitleCase(recipeData.name || ''),
         name_complement: recipeData.name_complement || '',
         type: recipeData.type || 'receitas',
         category: recipeData.category || '',

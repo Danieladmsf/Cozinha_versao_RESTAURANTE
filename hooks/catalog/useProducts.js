@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Product } from '@/app/api/entities';
+import { toTitleCase } from '@/lib/textUtils';
 
 export const useProducts = () => {
     const [products, setProducts] = useState([]);
@@ -28,6 +29,7 @@ export const useProducts = () => {
         try {
             const newProduct = await Product.create({
                 ...productData,
+                name: toTitleCase(productData.name),
                 createdAt: new Date()
             });
             setProducts(prev => [...prev, newProduct]);
@@ -40,10 +42,9 @@ export const useProducts = () => {
 
     const updateProduct = async (id, productData) => {
         try {
-            await Product.update(id, {
-                ...productData,
-                updatedAt: new Date()
-            });
+            const dataToSave = { ...productData, updatedAt: new Date() };
+            if (dataToSave.name) dataToSave.name = toTitleCase(dataToSave.name);
+            await Product.update(id, dataToSave);
             setProducts(prev => prev.map(p => p.id === id ? { ...p, ...productData } : p));
         } catch (err) {
             console.error('Error updating product:', err);
