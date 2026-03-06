@@ -102,44 +102,54 @@ export function RecipeMenuActions({
                 {/* Barra de Busca e Filtros */}
                 <div className="relative search-container flex flex-col gap-2">
 
-                    {/* ABAS DE FILTRO DE CATEGORIA (Agora acima da busca) */}
-                    {!configLoading && selectedFilterCategories.length > 0 && (
-                        <div className="flex gap-1 overflow-x-auto py-1 px-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent mb-1">
-                            <Badge
-                                variant={activeCategoryFilter === 'all' ? "default" : "outline"}
-                                className={cn(
-                                    "cursor-pointer whitespace-nowrap px-3 py-1 text-xs",
-                                    activeCategoryFilter === 'all'
-                                        ? "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
-                                        : "hover:bg-gray-100"
-                                )}
-                                onClick={() => setActiveCategoryFilter('all')}
-                            >
-                                Todos
-                            </Badge>
-
-                            {selectedFilterCategories.map(catValue => {
-                                const catType = categoryTypes.find(c => c.value === catValue);
-                                if (!catType) return null;
-                                const isActive = activeCategoryFilter === catValue;
-                                return (
-                                    <Badge
-                                        key={catType.value}
-                                        variant={isActive ? "default" : "outline"}
-                                        className={cn(
-                                            "cursor-pointer whitespace-nowrap px-3 py-1 text-xs",
-                                            isActive
-                                                ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
-                                                : "hover:bg-gray-100 text-gray-600"
-                                        )}
-                                        onClick={() => setActiveCategoryFilter(catType.value)}
-                                    >
-                                        {catType.label}
-                                    </Badge>
-                                );
-                            })}
-                        </div>
-                    )}
+                    {/* ABAS FIXAS: Todos / Receitas / Produtos */}
+                    <div className="flex gap-1 overflow-x-auto py-1 px-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent mb-1">
+                        <Badge
+                            variant={activeCategoryFilter === 'all' ? "default" : "outline"}
+                            className={cn(
+                                "cursor-pointer whitespace-nowrap px-3 py-1 text-xs",
+                                activeCategoryFilter === 'all'
+                                    ? "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                                    : "hover:bg-gray-100"
+                            )}
+                            onClick={() => {
+                                console.log('🟢 [CLICK] Filtro: all');
+                                setActiveCategoryFilter('all');
+                            }}
+                        >
+                            Todos
+                        </Badge>
+                        <Badge
+                            variant={activeCategoryFilter === 'receitas' ? "default" : "outline"}
+                            className={cn(
+                                "cursor-pointer whitespace-nowrap px-3 py-1 text-xs",
+                                activeCategoryFilter === 'receitas'
+                                    ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+                                    : "hover:bg-gray-100 text-gray-600"
+                            )}
+                            onClick={() => {
+                                console.log('🟢 [CLICK] Filtro: receitas');
+                                setActiveCategoryFilter('receitas');
+                            }}
+                        >
+                            Receitas
+                        </Badge>
+                        <Badge
+                            variant={activeCategoryFilter === 'produtos' ? "default" : "outline"}
+                            className={cn(
+                                "cursor-pointer whitespace-nowrap px-3 py-1 text-xs",
+                                activeCategoryFilter === 'produtos'
+                                    ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+                                    : "hover:bg-gray-100 text-gray-600"
+                            )}
+                            onClick={() => {
+                                console.log('🟢 [CLICK] Filtro: produtos');
+                                setActiveCategoryFilter('produtos');
+                            }}
+                        >
+                            Produtos
+                        </Badge>
+                    </div>
 
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
