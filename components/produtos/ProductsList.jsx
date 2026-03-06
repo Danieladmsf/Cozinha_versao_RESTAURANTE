@@ -153,7 +153,38 @@ export default function ProductsList() {
             if (editingProduct) {
                 await updateProduct(editingProduct.id, formData);
             } else {
-                await addProduct(formData);
+                // Criar o produto
+                const newProduct = await addProduct(formData);
+
+                // Auto-criar Recipe vinculada para aparecer na Ficha Técnica
+                if (newProduct && newProduct.id) {
+                    try {
+                        const recipeData = {
+                            name: formData.name || '',
+                            category: formData.category || '',
+                            type: 'produtos',
+                            source_product_id: newProduct.id,
+                            active: true,
+                            total_weight: 0,
+                            yield_weight: 0,
+                            total_cost: 0,
+                            ingredients: [],
+                            preparations: [],
+                            dependencies: [],
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        };
+                        const newRecipe = await Recipe.create(recipeData);
+
+                        // Vincular produto à receita
+                        await updateProduct(newProduct.id, {
+                            components: [{ recipe_id: newRecipe.id, weight_kg: 0 }],
+                            recipe_link_id: newRecipe.id
+                        });
+                    } catch (recipeErr) {
+                        console.error('Erro ao auto-criar receita para produto:', recipeErr);
+                    }
+                }
             }
             setIsModalOpen(false);
             fetchProducts();
