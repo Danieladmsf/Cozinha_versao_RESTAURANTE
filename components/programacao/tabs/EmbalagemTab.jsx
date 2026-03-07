@@ -32,7 +32,7 @@ const EmbalagemTab = ({
     if (!orders.length || !recipes.length) return {};
 
     // Filtrar pedidos do dia selecionado
-    const dayOrders = orders.filter(order => order.day_of_week === selectedDay);
+    const dayOrders = orders.filter(order => Number(order.day_of_week) === Number(selectedDay));
 
     if (!dayOrders.length) return {};
 

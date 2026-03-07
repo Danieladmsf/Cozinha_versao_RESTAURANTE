@@ -81,28 +81,41 @@ const EscalaCozinhaTab = () => {
     const selectedDayInfo = weekDays?.find(d => d.dayNumber === selectedDay);
     const dateLabel = selectedDayInfo?.fullDate || format(currentDate, 'dd/MM/yyyy', { locale: ptBR });
 
-    // Extrair IDs das receitas que estão ativas no dia selecionado, expandindo as sub-receitas (Matrizes)
+    // Extrair IDs das receitas que estão ativas no dia selecionado, expandindo Products → base Recipes
     const activeRecipeIds = React.useMemo(() => {
-        if (!orders || orders.length === 0) return new Set();
+        if (!orders || orders.length === 0 || !recipes || recipes.length === 0) return new Set();
 
         const dayOrders = orders.filter(o => Number(o.day_of_week) === Number(selectedDay));
         if (dayOrders.length === 0) return new Set();
 
         const ids = new Set();
-        const queue = [];
 
         dayOrders.forEach(order => {
             if (order.items && Array.isArray(order.items)) {
                 order.items.forEach(item => {
                     if (item.recipe_id) {
                         ids.add(item.recipe_id);
-                        queue.push(item.recipe_id);
+
+                        // Se o item do pedido é um Product, resolver a receita base vinculada
+                        const entity = recipes.find(r => r.id === item.recipe_id);
+                        if (entity) {
+                            // Product.recipe_id → base Recipe ID
+                            if (entity.recipe_id) {
+                                ids.add(entity.recipe_id);
+                            }
+                            // Preparations com origin_id apontando para receitas-mãe
+                            if (entity.preparations) {
+                                entity.preparations.forEach(prep => {
+                                    if (prep.origin_id) {
+                                        ids.add(prep.origin_id);
+                                    }
+                                });
+                            }
+                        }
                     }
                 });
             }
         });
-
-        // Não expandir para Matrizes: a aba Configuração deve mostrar apenas os Produtos finais vendidos.
 
         return ids;
     }, [orders, recipes, selectedDay]);

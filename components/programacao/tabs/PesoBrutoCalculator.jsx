@@ -6,9 +6,9 @@ import { Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { parseQuantity } from "@/components/utils/orderUtils";
 
-const PesoBrutoCalculator = ({ 
-  orders, 
-  recipes, 
+const PesoBrutoCalculator = ({
+  orders,
+  recipes,
   selectedDay,
   weekDays,
   currentDate,
@@ -51,7 +51,7 @@ const PesoBrutoCalculator = ({
       const ordersByCustomer = {};
 
       orders
-        .filter(order => order.day_of_week === selectedDay)
+        .filter(order => Number(order.day_of_week) === Number(selectedDay))
         .forEach(order => {
           // Substituir pedido anterior - pega sempre o último do array
           ordersByCustomer[order.customer_name] = order;
@@ -77,7 +77,7 @@ const PesoBrutoCalculator = ({
 
           // Buscar dados de peso bruto da receita
           const pesoBrutoPorPorcao = getPesoBrutoPorPorcao(recipe);
-          
+
           if (pesoBrutoPorPorcao > 0) {
             if (!carnesConsolidadas[recipeName]) {
               carnesConsolidadas[recipeName] = {};
@@ -113,7 +113,7 @@ const PesoBrutoCalculator = ({
   const calcularTotaisPesoBruto = (clientes) => {
     let totalPorcoes = 0;
     let totalPesoBruto = 0;
-    
+
     Object.values(clientes).forEach(data => {
       totalPorcoes += data.quantidadePorcoes;
       totalPesoBruto += data.pesoBrutoTotal;
@@ -128,7 +128,7 @@ const PesoBrutoCalculator = ({
     // Encontrar receitas de carne do dia sem dados de peso bruto
     const dayOrders = orders.filter(order => order.day_of_week === selectedDay);
     const receitasCarnes = [];
-    
+
     dayOrders.forEach(order => {
       order.items?.forEach(item => {
         const recipe = recipes.find(r => r.id === item.recipe_id);
@@ -192,7 +192,7 @@ const PesoBrutoCalculator = ({
         <div className="space-y-8">
           {Object.entries(calculatePesoBruto).map(([nomeReceita, clientes]) => {
             const { totalPorcoes, totalPesoBruto } = calcularTotaisPesoBruto(clientes);
-            
+
             return (
               <div key={nomeReceita}>
                 {/* Nome da receita */}
@@ -201,7 +201,7 @@ const PesoBrutoCalculator = ({
                     {nomeReceita.toUpperCase()}
                   </h3>
                 </div>
-                
+
                 {/* Tabela de clientes */}
                 <div className="overflow-x-auto">
                   <table className="w-full border border-red-300">

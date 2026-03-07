@@ -31,14 +31,14 @@ const CozinhaTab = ({
     if (!orders.length || !recipes.length) return {};
 
     // Filtrar pedidos do dia selecionado
-    const dayOrders = orders.filter(order => order.day_of_week === selectedDay);
-    
+    const dayOrders = orders.filter(order => Number(order.day_of_week) === Number(selectedDay));
+
     if (!dayOrders.length) return {};
 
     // Organizar por categoria
     const categorias = {
       'PADRÃO': {},
-      'REFOGADO': {}, 
+      'REFOGADO': {},
       'ACOMPANHAMENTO': {}
     };
 
@@ -162,7 +162,7 @@ const CozinhaTab = ({
                 <div className="space-y-8">
                   {Object.entries(receitas).map(([nomeReceita, clientes], index) => {
                     const { totalQuantity, unitType } = calcularTotais(clientes);
-                    
+
                     return (
                       <div key={nomeReceita}>
                         {/* Nome da receita */}
@@ -171,12 +171,12 @@ const CozinhaTab = ({
                             {nomeReceita.toUpperCase()}
                           </h3>
                         </div>
-                        
+
                         {/* Lista de clientes */}
                         <div className="space-y-2 ml-4">
                           {Object.entries(clientes).map(([customerName, data]) => {
                             const hasNotes = data.items.some(item => item.notes && item.notes.trim());
-                            
+
                             return (
                               <div key={customerName} className="flex items-center gap-3">
                                 <span className="font-semibold text-gray-800 min-w-[80px] text-left">
@@ -199,7 +199,7 @@ const CozinhaTab = ({
                               </div>
                             );
                           })}
-                          
+
                           {/* Total por receita */}
                           <div className="mt-3 pt-2 border-t border-orange-200">
                             <div className="flex items-center gap-3">

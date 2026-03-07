@@ -40,7 +40,7 @@ export default function ProgramacaoPage() {
 
           <TabsContent value="programacao-cozinha" className="mt-6">
             <Suspense fallback={<div className="flex items-center justify-center p-8">Carregando...</div>}>
-              <ProgramacaoCozinhaTabs />
+              {activeTab === 'programacao-cozinha' && <ProgramacaoCozinhaTabs />}
             </Suspense>
           </TabsContent>
 
@@ -52,10 +52,9 @@ export default function ProgramacaoPage() {
 
           <TabsContent value="lista-compras" className="mt-6">
             <Suspense fallback={<div className="flex items-center justify-center p-8">Carregando...</div>}>
-              <ListaCompras />
+              {activeTab === 'lista-compras' && <ListaCompras />}
             </Suspense>
           </TabsContent>
-
         </Tabs>
       </div>
     </div>

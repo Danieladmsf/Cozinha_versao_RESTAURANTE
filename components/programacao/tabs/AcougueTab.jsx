@@ -39,7 +39,7 @@ const AcougueTab = ({
       const ordersByCustomer = {};
 
       orders
-        .filter(order => order.day_of_week === selectedDay)
+        .filter(order => Number(order.day_of_week) === Number(selectedDay))
         .forEach(order => {
           // Substituir pedido anterior - pega sempre o último do array
           ordersByCustomer[order.customer_name] = order;
@@ -155,7 +155,7 @@ const AcougueTab = ({
             <div className="space-y-8">
               {Object.entries(consolidateCarnes).map(([nomeReceita, clientes], index) => {
                 const { totalQuantity, unitType } = calcularTotais(clientes);
-                
+
                 return (
                   <div key={nomeReceita}>
                     {/* Número e nome da receita */}
@@ -164,7 +164,7 @@ const AcougueTab = ({
                         {index + 1}. {nomeReceita.toUpperCase()}
                       </h2>
                     </div>
-                    
+
                     {/* Lista de clientes - ordenados conforme configuração */}
                     <div className="space-y-2 ml-4">
                       {sortClientesByOrder(clientes, customerOrder).map(([customerName, data]) => {
@@ -192,7 +192,7 @@ const AcougueTab = ({
                           </div>
                         );
                       })}
-                      
+
                       {/* Total por receita */}
                       <div className="mt-3 pt-2 border-t border-red-200">
                         <div className="flex items-center gap-3">
@@ -214,7 +214,7 @@ const AcougueTab = ({
       )}
 
       {/* Tabela de Peso Bruto */}
-      <PesoBrutoCalculator 
+      <PesoBrutoCalculator
         orders={orders}
         recipes={recipes}
         selectedDay={selectedDay}

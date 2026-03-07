@@ -213,9 +213,7 @@ const ListaComprasTabs = () => {
         // Parallel fetching per weekDay mapped
         const daysToProject = menuConfig?.available_days || [0, 1, 2, 3, 4, 5, 6];
 
-        // Get all Recipe Adjustments at once
-        const activeRecipeIds = activeRecipes.map(r => r.id);
-        const recipeAdjustments = await OrderSuggestionManager.loadRecipeAdjustments(activeRecipeIds);
+        const recipeAdjustments = await OrderSuggestionManager.loadRecipeAdjustments(activeRecipeIds, recipes);
 
         const daysPromises = daysToProject.map(async (dayIndex) => {
           const result = await OrderSuggestionManager.generateOrderSuggestions(
@@ -342,8 +340,8 @@ const ListaComprasTabs = () => {
               <button
                 onClick={() => setIsSuggestionMode(false)}
                 className={`px-6 py-2.5 rounded-md text-sm font-semibold flex items-center gap-2 transition-all ${!isSuggestionMode
-                    ? 'bg-white shadow border border-gray-200 text-teal-700'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'bg-white shadow border border-gray-200 text-teal-700'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 disabled={generatingSuggestions}
               >
@@ -353,8 +351,8 @@ const ListaComprasTabs = () => {
               <button
                 onClick={() => setIsSuggestionMode(true)}
                 className={`px-6 py-2.5 rounded-md text-sm font-semibold flex items-center gap-2 transition-all ${isSuggestionMode
-                    ? 'bg-teal-600 shadow border border-teal-700 text-white'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'bg-teal-600 shadow border border-teal-700 text-white'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 disabled={generatingSuggestions}
               >

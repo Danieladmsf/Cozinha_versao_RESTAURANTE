@@ -32,8 +32,8 @@ const SaladaTab = ({
     if (!orders.length || !recipes.length) return {};
 
     // Filtrar pedidos do dia selecionado
-    const dayOrders = orders.filter(order => order.day_of_week === selectedDay);
-    
+    const dayOrders = orders.filter(order => Number(order.day_of_week) === Number(selectedDay));
+
     if (!dayOrders.length) return {};
 
     // Consolidar por ingrediente
@@ -128,7 +128,7 @@ const SaladaTab = ({
                       {index + 1}. {nomeReceita.toUpperCase()}
                     </h2>
                   </div>
-                  
+
                   {/* Lista de clientes - ordenados conforme configuração */}
                   <div className="space-y-2 ml-4">
                     {sortClientesByOrder(clientes, customerOrder).map(([customerName, data]) => {
