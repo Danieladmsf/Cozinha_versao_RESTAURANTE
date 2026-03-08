@@ -1032,6 +1032,12 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           const shouldInclude = !itemLocations || itemLocations.length === 0 ||
             itemLocations.includes(customer.id);
 
+          // DEBUG: Log para itens de Marmita / Refeição para rastrear filtros
+          const recipeForLog = recipes.find(r => r.id === item.recipe_id);
+          if (recipeForLog?.name?.includes('Parmegiana') || recipeForLog?.code === '7673' || item.recipe_id === 'vrxcywPHEFKu4GYxMfmo') {
+            console.log(`🔴 [Portal DEBUG PARMEGIANA] recipe_id: ${item.recipe_id}, name: ${recipeForLog?.name}, locations: ${JSON.stringify(itemLocations)}, shouldInclude: ${shouldInclude}, customerId: ${customer.id}`);
+          }
+
           if (!shouldInclude) {
             skippedItems++;
             return;
@@ -1040,11 +1046,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
           customerSpecificItems++;
           const recipe = recipes.find(r => r.id === item.recipe_id && r.active !== false);
 
-          // Adicionando logs específicos para depuração
-          if (recipe && (recipe.name.includes('Farofa de cuscuz') || recipe.name.includes('Brócolis'))) {
-          }
-
           if (!recipe) {
+            console.log(`🔴 [Portal DEBUG] RECIPE_NOT_FOUND: ${item.recipe_id}, recipeExists: ${!!recipeForLog}, active: ${recipeForLog?.active}`);
             conflictsDetected.push({
               type: 'RECIPE_NOT_FOUND',
               recipeId: item.recipe_id,
@@ -1132,18 +1135,29 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
     // Iterar para todos os grupos
     if (menu.menu_data) {
+      console.log(`🔍 [Portal DEBUG] menu_data keys:`, Object.keys(menu.menu_data));
+      console.log(`🔍 [Portal DEBUG] selectedDay: ${selectedDay} (type: ${typeof selectedDay})`);
+
       Object.keys(menu.menu_data).forEach(key => {
         const groupOrDayData = menu.menu_data[key];
 
         // Verificar se é estrutura de Grupo (contém dias dentro)
         const potentialDayData = groupOrDayData?.[selectedDay] || groupOrDayData?.[String(selectedDay)];
 
+        console.log(`🔍 [Portal DEBUG] Key: "${key}", potentialDayData for day ${selectedDay}:`,
+          potentialDayData ? `FOUND (${Object.keys(potentialDayData).length} categories)` : 'NULL',
+          'Available day keys:', groupOrDayData ? Object.keys(groupOrDayData) : 'N/A');
+
         if (potentialDayData) {
           Object.entries(potentialDayData).forEach(([categoryId, categoryData]) => {
+            const itemsInCat = Array.isArray(categoryData) ? categoryData : categoryData?.items;
+            console.log(`🔍 [Portal DEBUG] Category ${categoryId}: ${itemsInCat?.length || 0} items`,
+              itemsInCat?.map(i => i.recipe_id)?.join(', '));
             processCategoryData(categoryId, categoryData);
           });
         }
         else if (key === String(selectedDay) || parseInt(key) === selectedDay) {
+          console.log(`🔍 [Portal DEBUG] LEGACY mode for key "${key}"`);
           Object.entries(groupOrDayData).forEach(([categoryId, categoryData]) => {
             processCategoryData(categoryId, categoryData);
           });
@@ -2148,6 +2162,8 @@ const MobileOrdersPage = ({ customerId, customerData }) => {
 
       // Aplicar sugestões PRESERVANDO valores originais dos inputs
       setCurrentOrder(prevOrder => {
+        if (!prevOrder || !prevOrder.items) return prevOrder;
+
         const newItems = prevOrder.items.map(item => {
           // Encontrar a sugestão correspondente pelo unique_id
           const suggestedItem = itemsWithSuggestions.find(resItem => resItem.unique_id === item.unique_id);

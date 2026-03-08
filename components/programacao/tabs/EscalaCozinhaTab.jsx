@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,8 @@ import { useCategoryDisplay } from '@/hooks/shared/useCategoryDisplay';
 import WeekNavigator from '@/components/shared/WeekNavigator';
 import WeekDaySelector from '@/components/shared/WeekDaySelector';
 import RecipeTaskConfig from '../config/RecipeTaskConfig';
-import { CategoryTree } from '@/app/api/entities';
+import { CategoryTree, WeeklyMenu as WeeklyMenuEntity } from '@/app/api/entities';
+import { APP_CONSTANTS } from '@/lib/constants';
 
 /**
  * Formata peso em kg para exibição brasileira.
@@ -64,11 +65,78 @@ const EscalaCozinhaTab = () => {
         weekDays,
         currentDate,
         weekNumber,
+        year,
         navigateWeek,
         loading,
     } = useProgramacaoRealtimeData();
 
     const availableDays = useAvailableDays();
+
+    // =========================================
+    // WEEKLY MENU: Carregar cardápio da semana
+    // =========================================
+    const [weeklyMenu, setWeeklyMenu] = useState(null);
+
+    useEffect(() => {
+        const loadWeeklyMenu = async () => {
+            try {
+                const mockUserId = APP_CONSTANTS?.MOCK_USER_ID || 'mock-user-id';
+                const weekKey = `${year}-W${weekNumber}`;
+                const menus = await WeeklyMenuEntity.query([
+                    { field: 'user_id', operator: '==', value: mockUserId },
+                    { field: 'week_key', operator: '==', value: weekKey }
+                ]);
+                setWeeklyMenu(menus?.[0] || null);
+            } catch (error) {
+                console.error('Erro ao carregar WeeklyMenu:', error);
+                setWeeklyMenu(null);
+            }
+        };
+        if (weekNumber && year) {
+            loadWeeklyMenu();
+        }
+    }, [weekNumber, year]);
+
+    // Extrair IDs das receitas do cardápio para o dia selecionado (independente de pedidos)
+    // Usa APENAS os recipe_ids diretos do WeeklyMenu (sem expandir sub-receitas)
+    const menuRecipeIds = React.useMemo(() => {
+        if (!weeklyMenu?.menu_data || !recipes || recipes.length === 0) return new Set();
+
+        const ids = new Set();
+        const menuData = weeklyMenu.menu_data;
+
+        // Percorrer todos os mealTypes (ex: "almoco", "jantar", etc.)
+        Object.entries(menuData).forEach(([mealType, value]) => {
+            if (value && typeof value === 'object' && value[selectedDay]) {
+                const dayData = value[selectedDay];
+                if (dayData && typeof dayData === 'object') {
+                    Object.values(dayData).forEach(items => {
+                        if (Array.isArray(items)) {
+                            items.forEach(item => {
+                                if (item?.recipe_id) ids.add(item.recipe_id);
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
+        // Fallback: menu_data pode ter dayIndex direto (sem mealType)
+        if (ids.size === 0 && menuData[selectedDay]) {
+            const dayData = menuData[selectedDay];
+            if (dayData && typeof dayData === 'object') {
+                Object.values(dayData).forEach(items => {
+                    if (Array.isArray(items)) {
+                        items.forEach(item => {
+                            if (item?.recipe_id) ids.add(item.recipe_id);
+                        });
+                    }
+                });
+            }
+        }
+
+        return ids;
+    }, [weeklyMenu, recipes, selectedDay]);
 
     const {
         updateIngredientTaskType,
@@ -605,6 +673,7 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                         saving={saving}
                         configStats={configStats}
                         activeRecipeIds={activeRecipeIds}
+                        menuRecipeIds={menuRecipeIds}
                         categories={categories}
                         getCategoryInfo={getCategoryInfo}
                     />

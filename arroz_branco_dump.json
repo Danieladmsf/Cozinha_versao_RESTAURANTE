@@ -1,0 +1,25 @@
+{
+  "id": "35hPnWGrOuLiWXM8y4K5",
+  "active": true,
+  "total_weight": 0,
+  "updatedAt": {
+    "type": "firestore/timestamp/1.0",
+    "seconds": 1772757377,
+    "nanoseconds": 336000000
+  },
+  "category": "MACARRÃO (ALMOÇO)",
+  "createdAt": {
+    "type": "firestore/timestamp/1.0",
+    "seconds": 1772756920,
+    "nanoseconds": 52000000
+  },
+  "unit_type": "kg",
+  "yield_weight": 0,
+  "preparations": [],
+  "source_product_id": "D9J5h2UgqTXUvtZ9Oupm",
+  "dependencies": [],
+  "ingredients": [],
+  "total_cost": 0,
+  "name": "Rotisseria Macarrão Primavera",
+  "type": "produtos"
+}

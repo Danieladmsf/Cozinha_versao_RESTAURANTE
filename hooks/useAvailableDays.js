@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { MenuConfig as MenuConfigEntity } from "@/app/api/entities";
+import { APP_CONSTANTS } from "@/lib/constants";
 
 /**
  * Hook centralizado para obter os dias da semana disponíveis
- * Lê a configuração do localStorage e retorna os dias ordenados
+ * Lê a configuração do localStorage e sincroniza com o banco via Firebase
  * 
  * @returns {number[]} Array de dias disponíveis (0=Domingo, 1=Segunda, ..., 6=Sábado)
  */
@@ -26,7 +28,36 @@ export const useAvailableDays = () => {
             }
         };
 
+        const fetchRemoteConfig = async () => {
+            try {
+                const configs = await MenuConfigEntity.query([
+                    { field: 'user_id', operator: '==', value: APP_CONSTANTS.MOCK_USER_ID },
+                    { field: 'is_default', operator: '==', value: true }
+                ]);
+
+                if (configs && configs.length > 0) {
+                    const config = configs[0];
+                    if (config.available_days && Array.isArray(config.available_days)) {
+                        const remoteDays = [...config.available_days].sort((a, b) => a - b);
+                        setAvailableDays(remoteDays);
+
+                        // Update localStorage cache to keep it in sync
+                        const savedConfig = localStorage.getItem('menuConfig');
+                        const localConfig = savedConfig ? JSON.parse(savedConfig) : {};
+                        localConfig.available_days = remoteDays;
+                        localStorage.setItem('menuConfig', JSON.stringify(localConfig));
+                    }
+                }
+            } catch (error) {
+                console.warn('useAvailableDays: Erro ao buscar configuração do Firebase:', error);
+            }
+        };
+
+        // 1. Initial quick render from cache
         loadDays();
+
+        // 2. Fetch from Firebase right away to ensure we're not lagging behind
+        fetchRemoteConfig();
 
         // Escutar mudanças no localStorage (para atualizar quando configuração mudar)
         const handleStorageChange = (e) => {

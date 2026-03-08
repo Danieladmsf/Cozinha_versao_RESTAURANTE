@@ -80,7 +80,7 @@ const IngredientRow = React.memo(({ recipeId, prepIdx, ingIdx, ingName, currentT
  * mostra os ingredientes com 3 colunas de checkbox
  * (Rendimento | Pré-preparo | Processamento).
  */
-const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIngredientTaskType, saving, configStats, categories = [], getCategoryInfo }) => {
+const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecipeIds = new Set(), updateIngredientTaskType, saving, configStats, categories = [], getCategoryInfo }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('menu_only'); // all | configured | unconfigured | menu_only
     const [expandedRecipes, setExpandedRecipes] = useState(new Set());
@@ -107,16 +107,55 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIng
         if (modified) setLocalTaskMap(newMap);
     }, [recipes]);
 
+    // Enrich recipes (especially Products) with base recipe preparations if they don't have their own
+    const enrichedRecipes = useMemo(() => {
+        if (!recipes) return [];
+        return recipes.map(recipe => {
+            // Se já tem preparations, ok
+            if (recipe.preparations && recipe.preparations.length > 0) return recipe;
+
+            // Se for um Produto que tem um recipe_id base, vamos tentar encontrar as preparations da receita base
+            if (recipe.recipe_id) {
+                const baseRecipe = recipes.find(r => r.id === recipe.recipe_id);
+                if (baseRecipe && baseRecipe.preparations) {
+                    return { ...recipe, base_recipe_id: baseRecipe.id, preparations: baseRecipe.preparations };
+                }
+            } else {
+                // Fallback: Se não tem recipe_id, buscar por nome exato (útil para Produtos legacy/mal ligados)
+                const baseRecipeByName = recipes.find(r => r.name === recipe.name && r.id !== recipe.id && r.preparations);
+                if (baseRecipeByName && baseRecipeByName.preparations) {
+                    return { ...recipe, base_recipe_id: baseRecipeByName.id, preparations: baseRecipeByName.preparations };
+                }
+            }
+            return recipe;
+        });
+    }, [recipes]);
+
     // Filter recipes that have actual preparations with ingredients
     const configurableRecipes = useMemo(() => {
-        return recipes
+        return enrichedRecipes
             .filter(r => r.preparations?.some(p => p.ingredients?.length > 0))
             .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-    }, [recipes]);
+    }, [enrichedRecipes]);
 
     // Apply search and filter
     const filteredRecipes = useMemo(() => {
-        let result = configurableRecipes;
+        let result;
+
+        if (filterStatus === 'menu_only') {
+            // Para "Cardápio do Dia": começar de TODAS as receitas (não só configuráveis)
+            // para incluir Products sem preparations no menu
+            if (menuRecipeIds.size > 0) {
+                result = enrichedRecipes
+                    .filter(r => menuRecipeIds.has(r.id))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            } else {
+                // Sem cardápio configurado → mostra todas as configuráveis
+                result = [...configurableRecipes];
+            }
+        } else {
+            result = [...configurableRecipes];
+        }
 
         // Search
         if (searchTerm.trim()) {
@@ -135,24 +174,15 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIng
         const isRealIngredient = (ing) => {
             const name = (ing.name || '').trim();
             if (!name) return false;
-            // Notes usually don't have weight_raw or price. If they do, they are likely real.
-            // Also ignore things that look like instructions or are very long
             if (/^\d+\.\s/.test(name) || name.length > 80) return false;
             if (name.toLowerCase().includes('refrigerado') || name.toLowerCase().includes('congelado') || name.toLowerCase().includes('fogo médio')) return false;
-
-            // If it has a weight or a unit, it's definitely an ingredient
             if (parseFloat(ing.weight_raw) > 0 || ing.unit) return true;
-
-            // If it has no weight and is just descriptive text without a unit, it's probably a note
-            // But let's be careful not to exclude valid things that might just be missing weight temporarily
-            // Let's exclude some known note patterns
-            if (name.match(/[;.!]$/)) return false; // Ends with punctuation
-            if (name.split(' ').length > 6) return false; // Too many words for a simple ingredient name
-
+            if (name.match(/[;.!]$/)) return false;
+            if (name.split(' ').length > 6) return false;
             return true;
         };
 
-        // Filter by config status
+        // Filter by config status (only for non-menu filters)
         if (filterStatus === 'configured') {
             result = result.filter(r =>
                 r.preparations?.some(p =>
@@ -165,13 +195,10 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIng
                     p.ingredients?.some(ing => isRealIngredient(ing) && ing.task_type)
                 )
             );
-        } else if (filterStatus === 'menu_only') {
-            // Check if the recipe itself is in the orders
-            result = result.filter(r => activeRecipeIds.has(r.id));
         }
 
         return result;
-    }, [configurableRecipes, searchTerm, filterStatus, activeRecipeIds]);
+    }, [enrichedRecipes, configurableRecipes, searchTerm, filterStatus, menuRecipeIds]);
 
     // =============================================
     // AGRUPAR POR CATEGORIA (mesma ordem do Relatório)
@@ -337,27 +364,28 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIng
 
     // Bulk set: ADD a task_type to all ingredients (preserving existing ones)
     const handleBulkSet = async (recipeId, taskType) => {
-        const recipe = recipes.find(r => r.id === recipeId);
+        const recipe = enrichedRecipes.find(r => r.id === recipeId);
         if (!recipe?.preparations) return;
 
+        const targetRecipeId = recipe.base_recipe_id || recipe.id;
         const newMapSegment = {};
 
         for (let prepIdx = 0; prepIdx < recipe.preparations.length; prepIdx++) {
             const prep = recipe.preparations[prepIdx];
             if (!prep.ingredients) continue;
             for (let ingIdx = 0; ingIdx < prep.ingredients.length; ingIdx++) {
-                const key = `${recipeId}-${prepIdx}-${ingIdx}`;
+                const key = `${targetRecipeId}-${prepIdx}-${ingIdx}`;
                 const ing = prep.ingredients[ingIdx];
 
                 if (taskType === null) {
                     newMapSegment[key] = [];
-                    updateIngredientTaskType(recipeId, prepIdx, ingIdx, null);
+                    updateIngredientTaskType(targetRecipeId, prepIdx, ingIdx, null);
                 } else {
                     const current = localTaskMap[key] || (Array.isArray(ing.task_type) ? [...ing.task_type] : (ing.task_type ? [ing.task_type] : []));
                     if (!current.includes(taskType)) {
                         const updated = [...current, taskType];
                         newMapSegment[key] = updated;
-                        updateIngredientTaskType(recipeId, prepIdx, ingIdx, updated);
+                        updateIngredientTaskType(targetRecipeId, prepIdx, ingIdx, updated);
                     }
                 }
             }
@@ -581,7 +609,8 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIng
                                                                 const isClearlyNote = !parseFloat(ing.weight_raw) && !ing.unit && (ingName.match(/[;.!]$/) || ingName.split(' ').length > 6);
                                                                 if (isClearlyNote) return null;
 
-                                                                const key = `${recipe.id}-${prepIdx}-${ingIdx}`;
+                                                                const targetRecipeId = recipe.base_recipe_id || recipe.id;
+                                                                const key = `${targetRecipeId}-${prepIdx}-${ingIdx}`;
                                                                 let currentTaskTypes = localTaskMap[key] || (Array.isArray(ing.task_type) ? ing.task_type : (ing.task_type ? [ing.task_type] : []));
                                                                 let isInherited = false;
 
@@ -614,7 +643,7 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), updateIng
                                                                 return (
                                                                     <IngredientRow
                                                                         key={`${prepIdx}-${ingIdx}`}
-                                                                        recipeId={recipe.id}
+                                                                        recipeId={targetRecipeId}
                                                                         prepIdx={prepIdx}
                                                                         ingIdx={ingIdx}
                                                                         ingName={ingName}
