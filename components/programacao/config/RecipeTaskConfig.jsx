@@ -26,9 +26,10 @@ import {
     Cog,
 } from 'lucide-react';
 import { TASK_TYPES } from '@/hooks/programacao/useTaskDistribution';
+import { RecipeEngine } from '@/lib/recipe-engine/RecipeEngine';
 
 // Performance Optimization: Isolate row render to avoid full list re-renders
-const IngredientRow = React.memo(({ recipeId, prepIdx, ingIdx, ingName, currentTaskTypes, columns, onCheckboxChange, getCheckboxColors, isInherited }) => {
+const IngredientRow = React.memo(({ recipeId, prepIdx, ingIdx, ingName, currentTaskTypes, columns, onCheckboxChange, getCheckboxColors, isInherited, weightInfo }) => {
     // Row background based on selected task_types
     let rowBg = '';
     if (currentTaskTypes.includes('rendimento')) rowBg = 'bg-emerald-50/60';
@@ -44,6 +45,14 @@ const IngredientRow = React.memo(({ recipeId, prepIdx, ingIdx, ingName, currentT
                 {isInherited && (
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 font-bold uppercase tracking-wide" title="Herdado da receita matriz (editar lá)">
                         Herdado
+                    </span>
+                )}
+            </div>
+            {/* Peso Rendimento column */}
+            <div className="w-28 text-right px-2">
+                {weightInfo && (
+                    <span className="text-xs tabular-nums font-semibold text-emerald-600" title={`Bruto: ${weightInfo.raw} → Rendimento: ${weightInfo.yield}`}>
+                        {weightInfo.yield}
                     </span>
                 )}
             </div>
@@ -72,7 +81,7 @@ const IngredientRow = React.memo(({ recipeId, prepIdx, ingIdx, ingName, currentT
     for (let i = 0; i < prevProps.currentTaskTypes.length; i++) {
         if (prevProps.currentTaskTypes[i] !== nextProps.currentTaskTypes[i]) return false;
     }
-    return prevProps.ingName === nextProps.ingName && prevProps.isInherited === nextProps.isInherited;
+    return prevProps.ingName === nextProps.ingName && prevProps.isInherited === nextProps.isInherited && prevProps.weightInfo?.yield === nextProps.weightInfo?.yield;
 });
 
 /**
@@ -80,7 +89,7 @@ const IngredientRow = React.memo(({ recipeId, prepIdx, ingIdx, ingName, currentT
  * mostra os ingredientes com 3 colunas de checkbox
  * (Rendimento | Pré-preparo | Processamento).
  */
-const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecipeIds = new Set(), updateIngredientTaskType, saving, configStats, categories = [], getCategoryInfo }) => {
+const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecipeIds = new Set(), updateIngredientTaskType, saving, configStats, categories = [], getCategoryInfo, taskReports }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('menu_only'); // all | configured | unconfigured | menu_only
     const [expandedRecipes, setExpandedRecipes] = useState(new Set());
@@ -137,6 +146,36 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecip
             .filter(r => r.preparations?.some(p => p.ingredients?.length > 0))
             .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }, [enrichedRecipes]);
+
+    // Build a weight lookup from taskReports.grouped: recipeId -> ingredientKey -> { totalWeight, totalYieldWeight }
+    const scaledWeightLookup = useMemo(() => {
+        const lookup = new Map();
+        if (!taskReports?.grouped) return lookup;
+
+        for (const [taskType, catMap] of Object.entries(taskReports.grouped)) {
+            for (const [cat, recipeGroups] of Object.entries(catMap)) {
+                for (const rg of recipeGroups) {
+                    const recipeKey = rg.recipeId;
+                    if (!lookup.has(recipeKey)) lookup.set(recipeKey, new Map());
+                    const ingMap = lookup.get(recipeKey);
+
+                    for (const [ingKey, ingData] of rg.ingredients.entries()) {
+                        if (ingMap.has(ingKey)) {
+                            const existing = ingMap.get(ingKey);
+                            existing.totalWeight += ingData.totalWeight;
+                            existing.totalYieldWeight += (ingData.totalYieldWeight || 0);
+                        } else {
+                            ingMap.set(ingKey, {
+                                totalWeight: ingData.totalWeight,
+                                totalYieldWeight: ingData.totalYieldWeight || 0,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        return lookup;
+    }, [taskReports]);
 
     // Apply search and filter
     const filteredRecipes = useMemo(() => {
@@ -543,6 +582,9 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecip
                                                     <div className="flex-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                                         Ingrediente
                                                     </div>
+                                                    <div className="w-28 text-right px-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
+                                                        Peso Rend.
+                                                    </div>
                                                     {columns.map(col => (
                                                         <div
                                                             key={col.id}
@@ -640,6 +682,35 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecip
                                                                     }
                                                                 }
 
+                                                                // Calculate weight info for display (scaled by order)
+                                                                const ingKey = ingName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                                                                const recipeWeights = scaledWeightLookup.get(recipe.base_recipe_id || recipe.id);
+                                                                const scaledData = recipeWeights?.get(ingKey);
+
+                                                                const formatW = (w) => {
+                                                                    if (!w || w <= 0) return null;
+                                                                    if (w >= 1) return `${w.toFixed(3).replace('.', ',')} kg`;
+                                                                    return `${Math.round(w * 1000)} g`;
+                                                                };
+
+                                                                let weightInfo = null;
+                                                                if (scaledData && scaledData.totalYieldWeight > 0) {
+                                                                    weightInfo = {
+                                                                        raw: formatW(scaledData.totalWeight) || '—',
+                                                                        yield: formatW(scaledData.totalYieldWeight) || formatW(scaledData.totalWeight) || '—',
+                                                                    };
+                                                                } else {
+                                                                    // Fallback: show base recipe weight (not scaled)
+                                                                    const rawW = RecipeEngine.getInitialWeight(ing);
+                                                                    const yieldW = RecipeEngine.getFinalWeight(ing);
+                                                                    if (rawW > 0 || yieldW > 0) {
+                                                                        weightInfo = {
+                                                                            raw: formatW(rawW) || '—',
+                                                                            yield: formatW(yieldW) || formatW(rawW) || '—',
+                                                                        };
+                                                                    }
+                                                                }
+
                                                                 return (
                                                                     <IngredientRow
                                                                         key={`${prepIdx}-${ingIdx}`}
@@ -652,6 +723,7 @@ const RecipeTaskConfig = ({ recipes = [], activeRecipeIds = new Set(), menuRecip
                                                                         onCheckboxChange={handleCheckboxChange}
                                                                         getCheckboxColors={getCheckboxColors}
                                                                         isInherited={isInherited}
+                                                                        weightInfo={weightInfo}
                                                                     />
                                                                 );
                                                             })}

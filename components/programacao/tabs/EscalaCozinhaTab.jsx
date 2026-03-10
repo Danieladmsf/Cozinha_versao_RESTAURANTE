@@ -293,6 +293,88 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
     };
 
     // =========================================
+    // PRINT: Listas Consolidadas
+    // =========================================
+    const handlePrintConsolidated = async () => {
+        setPrinting(true);
+        try {
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            if (!printWindow) {
+                alert('Popup bloqueado! Habilite popups para imprimir.');
+                return;
+            }
+
+            const sectionsHTML = ['rendimento', 'pre_preparo', 'processamento'].map(taskKey => {
+                const items = taskReports[taskKey] || [];
+                const taskDef = TASK_TYPES[taskKey];
+                if (items.length === 0) return '';
+
+                const rows = items.map((ing, idx) => {
+                    const cats = (ing.sourceCategories || []).join(', ') || '—';
+                    const recs = (ing.sourceRecipes || []).map(r => `• ${r}`).join('<br/>');
+                    return `<tr style="border-bottom:1px solid #e5e7eb;${idx % 2 === 0 ? '' : 'background:#f9fafb;'}">
+                        <td style="padding:6px 12px;text-align:right;font-weight:700;color:#1d4ed8;white-space:nowrap;font-size:13px;">${formatWeight(ing.totalWeight)}</td>
+                        <td style="padding:6px 12px;font-weight:600;font-size:13px;color:#1f2937;">${ing.displayName}</td>
+                        <td style="padding:6px 12px;font-size:11px;color:#6b7280;">${cats}</td>
+                        <td style="padding:6px 12px;font-size:11px;color:#374151;line-height:1.5;">${recs || '—'}</td>
+                    </tr>`;
+                }).join('');
+
+                return `<div style="margin-bottom:28px;">
+                    <h2 style="font-size:15px;font-weight:700;margin:0 0 8px 0;padding:8px 12px;background:#f3f4f6;border-radius:4px;border-bottom:2px solid #d1d5db;text-transform:uppercase;letter-spacing:0.5px;">
+                        ${taskDef.label} (Consolidada)
+                        <span style="float:right;font-size:12px;font-weight:400;color:#6b7280;">${items.length} itens</span>
+                    </h2>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#e5e7eb;">
+                                <th style="padding:6px 12px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#374151;width:100px;">Peso Bruto</th>
+                                <th style="padding:6px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#374151;">Nome do Insumo</th>
+                                <th style="padding:6px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#374151;">Categoria</th>
+                                <th style="padding:6px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#374151;">Receitas</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+            }).join('');
+
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Listas Consolidadas - ${dateLabel}</title>
+<style>
+@page { margin: 15mm; size: A4 portrait; }
+body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #111; font-size: 13px; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
+<h1 style="font-size: 20px; margin: 0; letter-spacing: 0.5px;">TABELA DE RENDIMENTO</h1>
+<p style="font-size: 13px; margin: 4px 0 0 0; color: #374151;">${dateLabel}</p>
+</div>
+${sectionsHTML || '<p style="text-align: center; color: #9ca3af; padding: 40px;">Nenhum dado para este dia.</p>'}
+<div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #d1d5db; text-align: center; font-size: 11px; color: #9ca3af;">
+Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+</div>
+</body>
+</html>`.trim();
+
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        } finally {
+            setPrinting(false);
+        }
+    };
+
+    // =========================================
     // RENDER: Seção agrupada (para todos os tipos)
     // =========================================
     const renderGroupedSection = (taskTypeId) => {
@@ -581,6 +663,31 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
 
                 {/* LISTAS CONSOLIDADAS MODE */}
                 <TabsContent value="pre_preparo_list" className="mt-6 flex flex-col gap-6">
+                    {/* Header com botão de impressão */}
+                    <Card className="border border-gray-200 bg-white">
+                        <CardHeader className="py-3">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <CardTitle className="flex items-center gap-2 text-gray-800 text-base uppercase tracking-wide">
+                                    <ClipboardList className="w-5 h-5" />
+                                    Listas Consolidadas — {dateLabel}
+                                </CardTitle>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handlePrintConsolidated}
+                                    disabled={printing}
+                                    className="gap-2 border-gray-300 text-gray-600 hover:bg-gray-50"
+                                >
+                                    {printing ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Printer className="w-4 h-4" />
+                                    )}
+                                    Imprimir Consolidadas
+                                </Button>
+                            </div>
+                        </CardHeader>
+                    </Card>
                     {['rendimento', 'pre_preparo', 'processamento'].map(taskKey => {
                         const items = taskReports[taskKey] || [];
                         const taskDef = TASK_TYPES[taskKey];
@@ -607,7 +714,7 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                                         <div className="w-full">
                                             {/* Table Header */}
                                             <div className={`grid grid-cols-[120px_2fr_2fr_4fr] divide-x border-b ${taskDef.borderClass} ${taskDef.categoryBg} border-t-0 font-semibold text-xs tracking-wider uppercase ${taskDef.textClass}`}>
-                                                <div className="text-right px-4 py-3">Valor</div>
+                                                <div className="text-right px-4 py-3">Peso Bruto</div>
                                                 <div className="px-4 py-3">Nome do Insumo</div>
                                                 <div className="px-4 py-3">Categoria</div>
                                                 <div className="px-4 py-3">Receitas</div>
@@ -676,6 +783,7 @@ Cozinha Afeto — Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { loc
                         menuRecipeIds={menuRecipeIds}
                         categories={categories}
                         getCategoryInfo={getCategoryInfo}
+                        taskReports={taskReports}
                     />
                 </TabsContent>
             </Tabs>

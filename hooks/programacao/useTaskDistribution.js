@@ -266,6 +266,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
             topLevelAssemblyUnit,
             topLevelPortionWeight
         }) => {
+            const scaledYieldWeight = ing._scaledYieldQty || scaledWeight;
             let taskTypes = [];
             // Check local configuration:
             // If undefined -> never configured (inherit from base)
@@ -316,6 +317,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
             if (globalConsolidated.has(globalKey)) {
                 const entry = globalConsolidated.get(globalKey);
                 entry.totalWeight += scaledWeight;
+                entry.totalYieldWeight += scaledYieldWeight;
                 addRecipeSource(entry.sourceRecipesRaw, contextStr);
             } else {
                 const rawSources = [];
@@ -323,6 +325,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                 globalConsolidated.set(globalKey, {
                     name: titleCaseName(canonicalName),
                     totalWeight: scaledWeight,
+                    totalYieldWeight: scaledYieldWeight,
                     sourceRecipesRaw: rawSources,
                 });
             }
@@ -354,12 +357,15 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                     }
 
                     if (rg.ingredients.has(key)) {
-                        rg.ingredients.get(key).totalWeight += scaledWeight;
+                        const existing = rg.ingredients.get(key);
+                        existing.totalWeight += scaledWeight;
+                        existing.totalYieldWeight += scaledYieldWeight;
                     } else {
                         rg.ingredients.set(key, {
                             name: ingName,
                             displayName: titleCaseName(ingName),
                             totalWeight: scaledWeight,
+                            totalYieldWeight: scaledYieldWeight,
                             unit: ing.canonical_unit || 'kg',
                             itemType: ing.item_type || 'food'
                         });
@@ -371,6 +377,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                 if (targetMap.has(key)) {
                     const existing = targetMap.get(key);
                     existing.totalWeight += scaledWeight;
+                    existing.totalYieldWeight += scaledYieldWeight;
                     addRecipeSource(existing.sourceRecipesRaw, contextStr);
                     if (category && !existing.sourceCategories.includes(category)) {
                         existing.sourceCategories.push(category);
@@ -382,6 +389,7 @@ export function useTaskDistribution(orders = [], recipes = [], setRecipes, selec
                         name: ingName,
                         displayName: titleCaseName(ingName),
                         totalWeight: scaledWeight,
+                        totalYieldWeight: scaledYieldWeight,
                         unit: ing.canonical_unit || 'kg',
                         itemType: ing.item_type || 'food',
                         sourceRecipesRaw: rawSources,
