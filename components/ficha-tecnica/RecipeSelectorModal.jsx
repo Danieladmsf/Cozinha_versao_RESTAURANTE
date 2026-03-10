@@ -21,7 +21,7 @@ const EMPTY_FILTERS = {};
 /**
  * Modal para buscar e selecionar receitas para adicionar à preparação
  */
-export const RecipeSelectorContent = ({ onSelectRecipe, currentRecipeId, onCancel, filters = EMPTY_FILTERS }) => {
+export const RecipeSelectorContent = ({ onSelectRecipe, currentRecipeId, onCancel, filters = EMPTY_FILTERS, contextType }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -174,15 +174,18 @@ export const RecipeSelectorContent = ({ onSelectRecipe, currentRecipeId, onCance
             >
               Receitas - Base
             </button>
-            <button
-              onClick={() => { setActiveTab('produtos'); setFilteredRecipes([]); }}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'produtos'
-                ? 'border-orange-600 text-orange-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-            >
-              Produtos
-            </button>
+            {/* NOVO: Esconder a aba de Produtos caso já estejamos num Produto para evitar corrupção por imports aninhados de Produtos */}
+            {contextType !== 'produtos' && (
+              <button
+                onClick={() => { setActiveTab('produtos'); setFilteredRecipes([]); }}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'produtos'
+                  ? 'border-orange-600 text-orange-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                Produtos
+              </button>
+            )}
           </div>
 
           {/* Campo de busca - FIXO */}
@@ -341,7 +344,7 @@ export const RecipeSelectorContent = ({ onSelectRecipe, currentRecipeId, onCance
 /**
  * Modal para buscar e selecionar receitas para adicionar à preparação
  */
-const RecipeSelectorModal = ({ isOpen, onClose, onSelectRecipe, currentRecipeId }) => {
+const RecipeSelectorModal = ({ isOpen, onClose, onSelectRecipe, currentRecipeId, contextType }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl max-h-[85vh] p-0 overflow-hidden flex flex-col">
@@ -360,6 +363,7 @@ const RecipeSelectorModal = ({ isOpen, onClose, onSelectRecipe, currentRecipeId 
             }}
             currentRecipeId={currentRecipeId}
             onCancel={onClose}
+            contextType={contextType}
           />
         </div>
       </DialogContent>

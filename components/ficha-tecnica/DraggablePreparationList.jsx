@@ -57,9 +57,30 @@ const DraggablePreparationList = ({
     onBatchUpdatePreparations
 }) => {
     // ==== LOCAL UI STATE ====
-    const [expandedCards, setExpandedCards] = useState({});
+    const [expandedCards, setExpandedCards] = useState(() => {
+        const initial = {};
+        preparations.forEach(p => {
+            if (p.id) initial[p.id] = true;
+        });
+        return initial;
+    });
     const [editingTitle, setEditingTitle] = useState(null); // Index being edited
     const [tempTitle, setTempTitle] = useState('');
+
+    // Assegura que novas preparações ou ao carregar a receita abram expandidas
+    React.useEffect(() => {
+        setExpandedCards(prev => {
+            const next = { ...prev };
+            let changed = false;
+            preparations.forEach(p => {
+                if (p.id && next[p.id] === undefined) {
+                    next[p.id] = true;
+                    changed = true;
+                }
+            });
+            return changed ? next : prev;
+        });
+    }, [preparations]);
 
     // Notes State
     const [editingNote, setEditingNote] = useState(null); // { prepIndex, noteIndex }

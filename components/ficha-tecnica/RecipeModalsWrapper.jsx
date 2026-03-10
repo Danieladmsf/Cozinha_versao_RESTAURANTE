@@ -97,6 +97,7 @@ export function RecipeModalsWrapper({
                 handleSelectRecipe={handleSelectRecipe}
                 currentRecipeId={currentRecipeId}
                 recipeSelectorFilters={recipeSelectorFilters}
+                contextType={recipeData?.type || 'receitas'}
             />
 
             {/* Modal de AdiÃ§Ã£o de Item Ã  Montagem/Porcionamento */}

@@ -15,9 +15,9 @@ export function UnifiedSelectionModal({
     handleCloseIngredientModal,
     handleClosePackagingModal,
     ingredientsLoading,
-    handleSelectRecipe,
     currentRecipeId,
-    recipeSelectorFilters
+    recipeSelectorFilters,
+    contextType
 }) {
     const isOpen = ingredientModalOpen || recipeModalOpen || packagingModalOpen;
 
@@ -79,6 +79,7 @@ export function UnifiedSelectionModal({
                             currentRecipeId={currentRecipeId}
                             filters={recipeSelectorFilters} // Filtrar apenas Receitas (bases, molhos, etc) - NÃO os produtos finais (que estão como receitas_-_base)
                             onCancel={() => setRecipeModalOpen(false)}
+                            contextType={contextType}
                         />
                     )}
                 </div>

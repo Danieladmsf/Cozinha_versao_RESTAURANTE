@@ -243,12 +243,28 @@ const IngredientTable = ({
     );
   }
 
-  // 1. Agrupar ingredientes por seções (baseado nos "Headers")
+  // 1. Agrupar ingredientes por seções (baseado nos "Headers" manuais OU _imported_step_title)
   const sections = [];
   let currentSection = { header: null, items: [] };
+  let currentImportedTitle = null;
 
   ingredients.forEach((ing, index) => {
-    if (ing.is_header) {
+    // Nova Lógica Mista: Se a etapa for Matriz e tiver _imported_step_title, vamos agrupar automaticamente
+    if (ing._imported_step_title && ing._imported_step_title !== currentImportedTitle) {
+      if (currentSection.header || currentSection.items.length > 0) {
+        sections.push(currentSection);
+      }
+
+      let cleanTitle = ing._imported_step_title.replace(/^\d+º Etapa:\s*/, '').toUpperCase();
+      currentSection = {
+        header: { name: cleanTitle, header_theme: 'green' }, // Simulated header
+        items: []
+      };
+      currentImportedTitle = ing._imported_step_title;
+      currentSection.items.push({ data: ing, originalIndex: index });
+    }
+    // Lógica antiga de Cabeçalhos Manuais
+    else if (ing.is_header) {
       if (currentSection.header || currentSection.items.length > 0) {
         sections.push(currentSection);
       }

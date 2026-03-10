@@ -608,6 +608,7 @@ const ProcessCreatorModalComponent = ({
         onClose={() => setShowRecipeSelector(false)}
         onSelectRecipe={handleSelectRecipe}
         currentRecipeId={currentRecipeId}
+        contextType={contextType}
       />
 
       {/* Loading Overlay */}

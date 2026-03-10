@@ -30,10 +30,12 @@ import {
   Trash2,
   MessageCircle,
   Plus,
-  GripVertical
+  GripVertical,
+  CookingPot
 } from 'lucide-react';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
 import { renderFormattedRecipeName } from '@/lib/textHelpers';
+import { useRouter } from 'next/navigation';
 
 export default function CategoryMenuCard({
   category,
@@ -53,6 +55,7 @@ export default function CategoryMenuCard({
   renderLocationCheckboxes
 }) {
   const { headerStyle, buttonStyle } = menuHelpers.generateCategoryStyles(categoryColor);
+  const router = useRouter();
 
   const handleOpenChange = (itemIndex, open) => {
     menuInterface.handleOpenChange(category.id, itemIndex, open);
@@ -214,6 +217,15 @@ export default function CategoryMenuCard({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
+                              {item.recipe_id && (
+                                <DropdownMenuItem
+                                  onClick={() => router.push(`/ficha-tecnica?id=${item.recipe_id}`)}
+                                  className="cursor-pointer text-indigo-600 font-medium bg-indigo-50/50 mb-1"
+                                >
+                                  <CookingPot className="h-4 w-4 mr-2" />
+                                  Abrir na ficha técnica
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 onClick={() => {
                                   noteActions.startAddingNote(

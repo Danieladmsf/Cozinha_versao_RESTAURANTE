@@ -62,6 +62,12 @@ const AssemblySubComponents = ({
     const desiredWeight = parseNumericValue(sc.assembly_weight_kg);
     if (!desiredWeight || desiredWeight <= 0) return;
 
+    // We must find which preparation index corresponds to THIS assembly step
+    // because we have to update the sub_components array atomically alongside the source ingredients.
+    const currentPrepIndex = preparationsData.findIndex(p =>
+      p.sub_components && p.sub_components.some(sub => sub.id === sc.id)
+    );
+
     const sourcePrepIndex = preparationsData.findIndex(p => p.id === sc.source_id);
     if (sourcePrepIndex === -1) return;
 
@@ -79,18 +85,31 @@ const AssemblySubComponents = ({
     const factor = desiredWeight / currentYield;
     if (Math.abs(factor - 1) < 0.001) return;
 
-    // Scale using centralized utility + batch update
+    // Scale using centralized utility + ATOMIC batch update
     if (onBatchUpdatePreparations && preparationsData) {
       const clonedPreps = [...preparationsData];
       const scaledIngredients = RecipeCalculator.scaleIngredients(sourcePrep.ingredients, factor);
 
+      // 1. Update the source preparation (e.g. Cocção)
       clonedPreps[sourcePrepIndex] = {
         ...clonedPreps[sourcePrepIndex],
         ingredients: scaledIngredients
       };
 
+      // 2. We MUST also re-inject the modified assembly_weight_kg into the current assembly step
+      // otherwise, React state batching might overwrite the onChange `handleWeightChange` state
+      if (currentPrepIndex !== -1 && clonedPreps[currentPrepIndex].sub_components) {
+        clonedPreps[currentPrepIndex] = {
+          ...clonedPreps[currentPrepIndex],
+          sub_components: clonedPreps[currentPrepIndex].sub_components.map(sub =>
+            sub.id === sc.id ? { ...sub, assembly_weight_kg: sc.assembly_weight_kg } : sub
+          )
+        };
+      }
+
       onBatchUpdatePreparations(clonedPreps);
     } else if (onUpdatePreparation) {
+      // Legacy fallback
       const scaledIngredients = RecipeCalculator.scaleIngredients(sourcePrep.ingredients, factor);
       onUpdatePreparation(sourcePrepIndex, 'ingredients', scaledIngredients);
     }

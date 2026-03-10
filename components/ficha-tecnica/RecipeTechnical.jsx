@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { RecipeEngine as RecipeCalculator } from "@/lib/recipe-engine/RecipeEngine";
 
 import React, { useCallback, useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Button,
   Card, CardContent, CardHeader, CardTitle, CardFooter,
@@ -40,7 +40,8 @@ import {
   StickyNote,
   ChevronsUpDown,
   Package2,
-  HelpCircle
+  HelpCircle,
+  ChevronLeft
 } from "lucide-react";
 import {
   Tooltip,
@@ -109,6 +110,7 @@ import RecipeEngine from '@/lib/recipe-engine/RecipeEngine';
 
 export default function RecipeTechnical() {
   const { toast } = useToast();
+  const router = useRouter();
 
   // ==== HOOKS DE ESTADO (CONECTADOS) ====
   const {
@@ -912,16 +914,29 @@ export default function RecipeTechnical() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 p-2 md:p-4" style={{ zoom: '80%' }}>
       <div className="max-w-[1600px] ml-0 space-y-6">
 
-        {/* Título Principal */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-blue-600 flex-nowrap">
-            <ClipboardList className="h-6 w-6 flex-shrink-0" />
-            <h1 className="text-2xl font-bold whitespace-nowrap">Ficha Técnica</h1>
-            {isDirty && (
-              <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">
-                Não salvo
-              </span>
-            )}
+        {/* Header e Voltar */}
+        <div className="flex items-center gap-4 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 border-gray-300 hover:bg-gray-100 h-9"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Voltar
+          </Button>
+
+          {/* Título Principal */}
+          <div className="flex flex-1 items-center justify-between">
+            <div className="flex items-center gap-2 text-blue-600 flex-nowrap">
+              <ClipboardList className="h-6 w-6 flex-shrink-0" />
+              <h1 className="text-2xl font-bold whitespace-nowrap">Ficha Técnica</h1>
+              {isDirty && (
+                <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">
+                  Não salvo
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

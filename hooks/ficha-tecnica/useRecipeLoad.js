@@ -11,8 +11,9 @@ export function useRecipeLoad({
     toast
 }) {
 
-    const loadRecipeById = useCallback(async (recipeId) => {
-        if (!recipeId) return;
+    const loadRecipeById = useCallback(async (rawRecipeId) => {
+        if (!rawRecipeId) return;
+        const recipeId = String(rawRecipeId).trim();
 
         try {
             setLoading(true);
@@ -33,7 +34,7 @@ export function useRecipeLoad({
                 // Atualizar estados com os dados da receita (como no Editar Cliente)
                 setRecipeData(result.recipe);
                 setPreparationsData(result.preparations || []);
-                setCurrentRecipeId(recipeId);
+                setCurrentRecipeId(result.recipe.id);
                 setIsEditing(true);
                 setIsDirty(false);
 
@@ -44,7 +45,7 @@ export function useRecipeLoad({
             } else {
                 toast({
                     title: "Erro ao carregar",
-                    description: "Não foi possível carregar a receita.",
+                    description: result.error || "Não foi possível carregar a receita.",
                     variant: "destructive"
                 });
             }

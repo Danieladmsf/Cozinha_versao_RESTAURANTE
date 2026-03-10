@@ -1,0 +1,79 @@
+[
+  {
+    "productName": "Refeição: Arroz, Farofa, Legumes Assado, Lagarto M. Madeira",
+    "productId": "rec_1LkN6bZ3zqf8vXSZsFp6_1772574272126",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "Refeição: Arroz, Farofa, Creme de Milho e Iscas Milanesa",
+    "productId": "rec_41ipemMxLNkyTgdfWGYK_1772574272322",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "Refeicao: Arroz, Farofa, Purê de Batata e Tirinha Carne Chinesa Bendito Un",
+    "productId": "rec_G6ImOFaDG6OVLJxPiUSO_1772574273852",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "Refeicao: Arroz, Farofa, Couve Refogada e Feijoada Bendito Un",
+    "productId": "rec_Nud8zGAeX0K6eUBYEQL8_1772574274550",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "Refeicao: Arroz, Farofa, Feijão e Medalhao Frango Bendito Un",
+    "productId": "rec_NxIIS96VFPZTqYbIGkS2_1772574274644",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "Rotisseria Escondidinho de Carne Seca Bendito Kg",
+    "productId": "rec_aIXPh3rOFfABBbpiOSMM_1772574279426",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Rotisseria Escondidinho de Carne Seca Bendito Kg') importou PRODUTO ('Rotisseria Escondidinho de Carne Seca Bendito Kg') ao invés de MATRIZ. origin_id: rec_aIXPh3rOFfABBbpiOSMM_1772574279426"
+    ]
+  },
+  {
+    "productName": "Refeicao: Arroz, Farofa, Purê de Catotia e Isca de Frango A Acebolada Bendito Un",
+    "productId": "rec_dJdJd1yCbV4yR5EEZjem_1772574280587",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "Rotisseria Escondidinho Frango Bendito Kg",
+    "productId": "rec_kffd1wUv9S5dkHtoAjuR_1772574282158",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Rotisseria Escondidinho Frango Bendito Kg') importou PRODUTO ('Rotisseria Escondidinho Frango Bendito Kg') ao invés de MATRIZ. origin_id: rec_kffd1wUv9S5dkHtoAjuR_1772574282158"
+    ]
+  },
+  {
+    "productName": "Rotisseria Maionese de Legumes com Frango Bendito Kg",
+    "productId": "rec_rygiSjjNkPs7xpMNNwiS_1772574285233",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Rotisseria Maionese de Legumes com Frango Bendito Kg') importou PRODUTO ('Rotisseria Maionese de Legumes com Frango Bendito Kg') ao invés de MATRIZ. origin_id: rec_rygiSjjNkPs7xpMNNwiS_1772574285233"
+    ]
+  },
+  {
+    "productName": "Refeicao: Arroz, Farofa, Abobrinha Gratinada e Carne Panela Bendito Un",
+    "productId": "rec_ztuUynKQxSVVlXwMa9KF_1772574293832",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  },
+  {
+    "productName": "SKU: Refeicao: Arroz, Farofa, Batata Assada, Strogonoff de Carne",
+    "productId": "xx1SHFtzwZEGPi5G2Fy3",
+    "issues": [
+      "Etapa 1 ('1º Etapa: Arroz') importou PRODUTO ('Rotisseria Arroz Branco Bendito Kg') ao invés de MATRIZ. origin_id: 3pTB0f29hUIp66jBXI0G"
+    ]
+  }
+]
