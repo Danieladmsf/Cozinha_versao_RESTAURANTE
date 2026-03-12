@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { RecipeEngine } from '@/lib/recipe-engine/RecipeEngine';
 
 const IngredientRow = ({
   ingredient,
@@ -73,80 +74,15 @@ const IngredientRow = ({
 
 
   const calculatedValues = useMemo(() => {
-    const calculateLoss = (initial, final) => {
-      const initialNum = parseNumericValue(initial);
-      const finalNum = parseNumericValue(final);
-      if (initialNum === 0) return 0;
-      return ((initialNum - finalNum) / initialNum) * 100;
-    };
-
-    const calculateYield = () => {
-      let initialWeight = 0;
-      let finalWeight = 0;
-
-      // Determinar peso inicial - pegar o primeiro campo preenchido na ordem dos processos
-      if (hasProcess('defrosting')) {
-        initialWeight = parseNumericValue(ingredient.weight_frozen);
-      } else if (hasProcess('cleaning')) {
-        // Se tem limpeza, tentar weight_raw, senão pegar o próximo disponível
-        initialWeight = parseNumericValue(ingredient.weight_raw);
-        if (initialWeight === 0 && hasProcess('cooking')) {
-          initialWeight = parseNumericValue(ingredient.weight_pre_cooking);
-        }
-      } else if (hasProcess('cooking')) {
-        // Se só tem cocção, usar weight_pre_cooking ou weight_raw
-        initialWeight = parseNumericValue(ingredient.weight_pre_cooking) ||
-          parseNumericValue(ingredient.weight_raw);
-      } else if (hasProcess('portioning') || hasProcess('packaging')) {
-        initialWeight = parseNumericValue(ingredient.weight_raw) || parseNumericValue(ingredient.quantity);
-      }
-
-      // Determinar peso final - SEMPRE o último processo da cadeia
-      if (hasProcess('portioning')) {
-        finalWeight = parseNumericValue(ingredient.weight_portioned);
-      } else if (hasProcess('packaging')) {
-        // Para embalagem, o peso final é igual ao inicial (perda zero)
-        finalWeight = parseNumericValue(ingredient.weight_raw) || parseNumericValue(ingredient.quantity);
-      } else if (hasProcess('cooking')) {
-        finalWeight = parseNumericValue(ingredient.weight_cooked);
-      } else if (hasProcess('cleaning')) {
-        finalWeight = parseNumericValue(ingredient.weight_clean);
-      } else if (hasProcess('defrosting')) {
-        finalWeight = parseNumericValue(ingredient.weight_thawed);
-      }
-
-      if (initialWeight === 0) return 0;
-
-      return (finalWeight / initialWeight) * 100;
-    };
-
-    const defrostingLoss = calculateLoss(ingredient.weight_frozen, ingredient.weight_thawed);
-
-    let cleaningInitialWeight = 0;
-    if (hasProcess('defrosting')) {
-      cleaningInitialWeight = parseNumericValue(ingredient.weight_thawed);
-    } else {
-      cleaningInitialWeight = parseNumericValue(ingredient.weight_raw);
-    }
-    const cleaningLoss = calculateLoss(cleaningInitialWeight, parseNumericValue(ingredient.weight_clean));
-
-    let cookingInitialWeight = parseNumericValue(ingredient.weight_pre_cooking);
-    if (cookingInitialWeight === 0) {
-      cookingInitialWeight = parseNumericValue(ingredient.weight_clean) ||
-        parseNumericValue(ingredient.weight_thawed) ||
-        parseNumericValue(ingredient.weight_raw);
-    }
-    const cookingLoss = calculateLoss(cookingInitialWeight, parseNumericValue(ingredient.weight_cooked));
-
-    const portioningLoss = calculateLoss(
-      ingredient.weight_raw || ingredient.weight_cooked || ingredient.weight_clean,
-      ingredient.weight_portioned
-    );
-
-    const yieldPercentage = calculateYield();
+    // 🎯 USANDO O RECIPE ENGINE CENTRALIZADO PARA GARANTIR CONSISTÊNCIA
+    const thawingLoss = RecipeEngine.calculateAndClassifyThawingLoss(ingredient).value;
+    const cleaningLoss = RecipeEngine.calculateAndClassifyCleaningLoss(ingredient).value;
+    const cookingLoss = RecipeEngine.calculateAndClassifyCookingLoss(ingredient).value;
+    const portioningLoss = RecipeEngine.calculateAndClassifyPortioningLoss(ingredient).value;
+    const yieldPercentage = RecipeEngine.calculateIngredientYield(ingredient, prep.processes);
 
     return {
-      defrostingLoss,
+      defrostingLoss: thawingLoss, // Alias para compatibilidade com o resto do componente
       cleaningLoss,
       cookingLoss,
       portioningLoss,

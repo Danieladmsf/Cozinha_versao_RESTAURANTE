@@ -392,7 +392,7 @@ export default function RecipeTechnicalPrintDialog({
       if (isOnlyPortioningSubComponents) titleClass = 'portioning';
       else if (isOnlyAssembly) titleClass = 'assembly';
 
-      const displayTitle = prep.title?.replace(/^\d+[\s°ª]*Etapa:?\s*/i, '') || '';
+      const displayTitle = prep.title?.replace(/^\d+[\s°ªº]*Etapa:?\s*/i, '') || '';
 
       printContent += `
         <div class="process-section">
@@ -419,15 +419,29 @@ export default function RecipeTechnicalPrintDialog({
             const yieldWeight = RecipeCalculator.parseNumericValue(sc.assembly_weight_kg || sc.yield_weight);
             const inputWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight) || yieldWeight;
             
-            // Calcular custo proporcional se for sub-componente
-            let totalCost = RecipeCalculator.parseNumericValue(sc.total_cost);
-            if (totalCost === 0 && sc.input_total_cost) {
-              const inputTotalCost = RecipeCalculator.parseNumericValue(sc.input_total_cost);
-              const inputYieldWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
-              if (inputYieldWeight > 0) {
-                totalCost = (yieldWeight / inputYieldWeight) * inputTotalCost;
-              } else {
-                totalCost = inputTotalCost;
+            // Tentar obter custo real da etapa correspondente de forma dinâmica
+            let totalCost = 0;
+            const sourcePrep = preparations.find(p => p.id === sc.source_id);
+            
+            if (sourcePrep) {
+              const sourceMetrics = RecipeCalculator.calculatePreparationMetrics(sourcePrep, preparations);
+              const sourceYield = sourceMetrics.totalYieldWeight || 0;
+              const sourceTotalCost = sourceMetrics.totalCost || 0;
+              
+              if (sourceYield > 0) {
+                totalCost = (yieldWeight / sourceYield) * sourceTotalCost;
+              }
+            } else {
+              // Fallback para valores estáticos se não encontrar a etapa fonte
+              totalCost = RecipeCalculator.parseNumericValue(sc.total_cost);
+              if (totalCost === 0 && sc.input_total_cost) {
+                const inputTotalCost = RecipeCalculator.parseNumericValue(sc.input_total_cost);
+                const inputYieldWeightForCost = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
+                if (inputYieldWeightForCost > 0) {
+                  totalCost = (yieldWeight / inputYieldWeightForCost) * inputTotalCost;
+                } else {
+                  totalCost = inputTotalCost;
+                }
               }
             }
 
@@ -468,15 +482,29 @@ export default function RecipeTechnicalPrintDialog({
             const inputWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight) || yieldWeight;
             const portionedWeight = yieldWeight;
             
-            // Custo proporcional
-            let totalCost = RecipeCalculator.parseNumericValue(sc.total_cost);
-            if (totalCost === 0 && sc.input_total_cost) {
-              const inputTotalCost = RecipeCalculator.parseNumericValue(sc.input_total_cost);
-              const inputYieldWeightForCost = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
-              if (inputYieldWeightForCost > 0) {
-                totalCost = (portionedWeight / inputYieldWeightForCost) * inputTotalCost;
-              } else {
-                totalCost = inputTotalCost;
+            // Custo proporcional dinâmico
+            let totalCost = 0;
+            const sourcePrep = preparations.find(p => p.id === sc.source_id);
+
+            if (sourcePrep) {
+              const sourceMetrics = RecipeCalculator.calculatePreparationMetrics(sourcePrep, preparations);
+              const sourceYield = sourceMetrics.totalYieldWeight || 0;
+              const sourceTotalCost = sourceMetrics.totalCost || 0;
+
+              if (sourceYield > 0) {
+                totalCost = (portionedWeight / sourceYield) * sourceTotalCost;
+              }
+            } else {
+              // Fallback para valores estáticos
+              totalCost = RecipeCalculator.parseNumericValue(sc.total_cost);
+              if (totalCost === 0 && sc.input_total_cost) {
+                const inputTotalCost = RecipeCalculator.parseNumericValue(sc.input_total_cost);
+                const inputYieldWeightForCost = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
+                if (inputYieldWeightForCost > 0) {
+                  totalCost = (portionedWeight / inputYieldWeightForCost) * inputTotalCost;
+                } else {
+                  totalCost = inputTotalCost;
+                }
               }
             }
 
@@ -546,16 +574,18 @@ export default function RecipeTechnicalPrintDialog({
             const cookingLoss = cookingLossRes.value;
             const portioningLossIng = portioningLossRes.value;
 
+            // Rendimento inteligente usando RecipeEngine
             const yieldPercent = RecipeCalculator.calculateIngredientYield(ing, prep.processes);
-            const netPrice = RecipeCalculator.calculateItemLiquidPrice(ing);
             
-            // Calcular custo do ingrediente se não estiver presente
+            // Preço líquido inteligente
+            const currentPrice = RecipeCalculator.getUnitPrice(ing);
+            const netPrice = yieldPercent > 0 ? (currentPrice * 100) / yieldPercent : currentPrice;
+            
+            // Custo inteligente
             let ingredientCost = RecipeCalculator.parseNumericValue(ing.total_cost);
             if (ingredientCost === 0) {
               ingredientCost = RecipeCalculator.calculateIngredientCost(ing, prep.processes);
             }
-
-            const currentPrice = RecipeCalculator.parseNumericValue(ing.current_price || ing.unit_price) || 0;
 
             const thawingClass = `percentage-${thawingLossRes.status}`;
             const cleaningClass = `percentage-${cleaningLossRes.status}`;
@@ -570,7 +600,7 @@ export default function RecipeTechnicalPrintDialog({
                 <td class="currency-cell">${formatCurrencyPrint(netPrice)}</td>
                 ${hasDefrosting ? `
                   <td class="weight-cell">${formatWeightPrint(ing.weight_frozen)}</td>
-                  <td class="weight-cell">${formatWeightPrint(ing.weight_thawed)}</td>
+                  <td class="weight-cell">${formatWeightPrint(RecipeCalculator.parseValue(ing.weight_thawed) || RecipeCalculator.parseValue(ing.weight_raw))}</td>
                   <td class="percentage-cell ${thawingClass}">${formatPercentPrint(thawingLoss)}</td>
                 ` : ''}
                 ${hasCleaning ? `

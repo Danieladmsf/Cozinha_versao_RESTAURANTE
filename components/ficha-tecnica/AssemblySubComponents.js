@@ -4,7 +4,7 @@ import { formatCapitalize } from '@/lib/textUtils';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Scale, Layers } from "lucide-react";
+import { Trash2, Scale, Layers, AlertTriangle, RefreshCw } from "lucide-react";
 import { formatWeight, formatCurrency, parseNumericValue } from "@/lib/formatUtils";
 // Removed useRecipeStore - avoiding conflicting state logic
 
@@ -134,20 +134,33 @@ const AssemblySubComponents = ({
     );
   }
 
-  // Calculate proportional costs and percentages for each component
+  // Handle Sync Weight (Pull from Source Yield)
+  const handleSyncRowWeight = useCallback((sc) => {
+    if (!sc.source_id) return;
+    const sourcePrep = preparationsData.find(p => p.id === sc.source_id);
+    if (!sourcePrep) return;
+
+    const sourceMetrics = RecipeCalculator.calculatePreparationMetrics(sourcePrep, preparationsData);
+    const currentYield = sourceMetrics.totalYieldWeight || 0;
+    
+    if (currentYield > 0) {
+      handleWeightChange(sc.id, currentYield.toFixed(3).replace('.', ','));
+    }
+  }, [preparationsData, handleWeightChange]);
 
   const componentsWithCalculations = subComponents.map((sc, index) => {
     const componentWeightNumeric = parseNumericValue(sc.assembly_weight_kg) || 0;
     const percentage = totalAssemblyWeight > 0 ? (componentWeightNumeric / totalAssemblyWeight) * 100 : 0;
 
     let proportionalCost = 0;
+    let sourceYieldWeight = 0;
 
     const sourcePrep = preparationsData.find(p => p.id === sc.source_id);
 
     if (sourcePrep) {
       // Recalcula as métricas da preparação dinamicamente para obter os valores mais recentes
       const sourceMetrics = RecipeCalculator.calculatePreparationMetrics(sourcePrep, preparationsData);
-      let sourceYieldWeight = sourceMetrics.totalYieldWeight;
+      sourceYieldWeight = sourceMetrics.totalYieldWeight;
       let sourceTotalCost = sourceMetrics.totalCost;
 
       // PATCH: Se o custo da preparação for zero, verifique se é um ingrediente simples.
@@ -171,6 +184,8 @@ const AssemblySubComponents = ({
       const inputYieldWeightNumeric = parseNumericValue(sc.input_yield_weight) || 0;
       const inputTotalCostNumeric = parseNumericValue(sc.input_total_cost) || 0;
 
+      sourceYieldWeight = inputYieldWeightNumeric;
+
       // Handle raw ingredients added directly to assembly
       if (sc.type === 'ingredient' && sc.current_price) {
         proportionalCost = componentWeightNumeric * parseNumericValue(sc.current_price);
@@ -182,11 +197,16 @@ const AssemblySubComponents = ({
       }
     }
 
+    // Check if weights are OUT OF SYNC (consensus check)
+    const isOutOfSync = sourceYieldWeight > 0 && Math.abs(componentWeightNumeric - sourceYieldWeight) > 0.002;
+
     return {
       ...sc,
       percentage,
       proportionalCost,
       componentWeightNumeric,
+      sourceYieldWeight,
+      isOutOfSync,
       displayName: sourcePrep ? sourcePrep.title : sc.name
     };
   });
@@ -199,7 +219,24 @@ const AssemblySubComponents = ({
       {showComponentsTable && (
         <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
           <div className="bg-indigo-50 px-3 py-2 border-b flex items-center justify-between">
-            <h5 className="font-semibold text-indigo-800 text-sm">Componentes da Montagem</h5>
+            <div className="flex items-center gap-2">
+              <h5 className="font-semibold text-indigo-800 text-sm">Componentes da Montagem</h5>
+              {componentsWithCalculations.some(c => c.isOutOfSync) && (
+                <Badge variant="warning" className="text-[10px] animate-pulse bg-amber-100 text-amber-800 border-amber-200">
+                  <AlertTriangle className="h-3 w-3 mr-1" /> Fora de Consenso
+                </Badge>
+              )}
+            </div>
+            {componentsWithCalculations.some(c => c.isOutOfSync) && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[10px] bg-white border-amber-300 text-amber-700 hover:bg-amber-50"
+                onClick={() => componentsWithCalculations.forEach(c => c.isOutOfSync && handleSyncRowWeight(c))}
+              >
+                <RefreshCw className="h-3 w-3 mr-1" /> Sincronizar Tudo
+              </Button>
+            )}
           </div>
 
           <table className="w-full text-xs">
@@ -232,14 +269,23 @@ const AssemblySubComponents = ({
                   </td>
 
                   <td className="px-3 py-2 text-center">
-                    <Input
-                      type="text"
-                      value={sc.assembly_weight_kg || ''}
-                      onChange={(e) => handleWeightChange(sc.id, e.target.value)}
-                      onBlur={() => handleInputBlur(sc)}
-                      className="w-20 h-7 text-center text-xs border-gray-300 mx-auto transition-colors focus:border-indigo-500"
-                      placeholder="0,000"
-                    />
+                    <div className="flex items-center justify-center gap-1">
+                      <div className="relative group">
+                        <Input
+                          type="text"
+                          value={sc.assembly_weight_kg || ''}
+                          onChange={(e) => handleWeightChange(sc.id, e.target.value)}
+                          onBlur={() => handleInputBlur(sc)}
+                          className={`w-20 h-7 text-center text-xs border-gray-300 mx-auto transition-colors focus:border-indigo-500 ${sc.isOutOfSync ? 'border-amber-400 bg-amber-50 text-amber-900' : ''}`}
+                          placeholder="0,000"
+                        />
+                        {sc.isOutOfSync && (
+                          <div className="absolute -right-6 top-1/2 -translate-y-1/2 text-amber-500 animate-bounce" title={`O rendimento real é ${sc.sourceYieldWeight.toFixed(3)}kg`}>
+                            <AlertTriangle className="h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     {sc.origin_id && (
                       <div className="text-[10px] text-gray-400 mt-0.5">Matriz</div>
                     )}
@@ -261,6 +307,19 @@ const AssemblySubComponents = ({
                   </td>
 
                   <td className="px-3 py-2 text-center flex items-center justify-center gap-1">
+                    {/* Botão de Sincronização (Consenso) */}
+                    {sc.isOutOfSync && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleSyncRowWeight(sc)}
+                        className="h-6 w-6 rounded bg-amber-100 hover:bg-amber-200 text-amber-700"
+                        title="Vincular ao Rendimento Real (Consenso)"
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                      </Button>
+                    )}
+                    
                     {!sc.origin_id && (
                       <Button
                         variant="ghost"
