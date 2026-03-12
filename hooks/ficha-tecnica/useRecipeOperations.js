@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useToast } from '@/components/ui';
 
 /**
- * Hook para gerenciar operações CRUD da Ficha Técnica
+ * Hook de operações para a Ficha Técnica - v2 (Replacement Fix)
  * Extraído automaticamente de RecipeTechnicall.jsx
  */
 export function useRecipeOperations() {
@@ -149,6 +149,54 @@ export function useRecipeOperations() {
     });
   }, [toast]);
 
+  const unlockPreparation = useCallback((preparationsData, setPreparationsData, prepIndex) => {
+    console.log("🔓 [useRecipeOperations] unlockPreparation called for index:", prepIndex);
+    setPreparationsData(prev => {
+      console.log("🔓 [useRecipeOperations] Current preps count:", prev?.length);
+      const newPreparations = [...prev];
+      if (newPreparations[prepIndex]) {
+        const prep = { ...newPreparations[prepIndex] };
+        console.log("🔓 [useRecipeOperations] Unlocking prep:", prep.title);
+        
+        // 1. Remover origin_id da etapa
+        const { origin_id, ...restPrep } = prep;
+        
+        // 2. Destravar ingredientes
+        console.log(`🔓 [useRecipeOperations] Unlocking ${prep.ingredients?.length || 0} ingredients`);
+        const unlockedIngredients = (prep.ingredients || []).map(ing => ({
+          ...ing,
+          locked: false
+        }));
+
+        // 3. Destravar sub-componentes (montagens)
+        const unlockedSubComponents = (prep.sub_components || []).map(sc => ({
+          ...sc,
+          locked: false,
+          origin_id: null // Quebra o vínculo com a matriz se for item de montagem
+        }));
+
+        const finalPrep = {
+          ...restPrep,
+          ingredients: unlockedIngredients,
+          sub_components: unlockedSubComponents
+        };
+        
+        console.log("🔓 [useRecipeOperations] Final unlocked prep ingredients state:", finalPrep.ingredients.map(i => `${i.name}: ${i.locked}`));
+
+        newPreparations[prepIndex] = finalPrep;
+        console.log("🔓 [useRecipeOperations] Prep unlocked successfully");
+      } else {
+        console.warn("🔓 [useRecipeOperations] Prep not found at index:", prepIndex);
+      }
+      return newPreparations;
+    });
+
+    toast({
+      title: "Etapa desbloqueada",
+      description: "Agora você pode editar esta etapa localmente. O vínculo com a matriz foi removido.",
+    });
+  }, [toast]);
+
   // Operações de ingredientes
   const addIngredientToPreparation = useCallback((preparationsData, setPreparationsData, prepIndex, ingredient) => {
     setPreparationsData(prev => {
@@ -205,6 +253,23 @@ export function useRecipeOperations() {
             newPreparations[prepIndex] = newPrep;
           }
         }
+      }
+      return newPreparations;
+    });
+  }, []);
+
+  const replaceIngredientInPreparation = useCallback((preparationsData, setPreparationsData, prepIndex, ingredientIndex, newIngredientData) => {
+    setPreparationsData(prev => {
+      const newPreparations = [...prev];
+      if (newPreparations[prepIndex] && newPreparations[prepIndex].ingredients?.[ingredientIndex]) {
+        const currentIng = newPreparations[prepIndex].ingredients[ingredientIndex];
+        
+        // Substituir apenas os dados do ingrediente (nome, id, preço) mas PRESERVAR os pesos digitados
+        newPreparations[prepIndex].ingredients[ingredientIndex] = {
+          ...currentIng, // Mantém pesos (weight_raw, inclusive)
+          ...newIngredientData, // Sobrescreve nome, id, price, unit, etc
+          id: currentIng.id || String(Date.now()), // Preserva o ID exclusivo da linha se existir
+        };
       }
       return newPreparations;
     });
@@ -412,6 +477,7 @@ export function useRecipeOperations() {
     updatePreparation,
     removePreparation,
     addIngredientToPreparation,
+    replaceIngredientInPreparation,
     updateIngredient,
     removeIngredient,
     updateRecipe,
@@ -419,6 +485,7 @@ export function useRecipeOperations() {
     addSubComponent,
     updateSubComponent,
     removeSubComponent,
+    unlockPreparation,
     saveRecipe,
     loadRecipe
   };

@@ -17,8 +17,10 @@ const IngredientTable = ({
   onOpenIngredientModal,
   onOpenPackagingModal,
   onOpenRecipeModal,
+  onOpenIngredientReplacementModal,
   onOpenAddAssemblyItemModal,
   onUpdatePreparation,
+  onUnlockPreparation,
   isProduct = false, // New prop
   ...rest
 }) => {
@@ -339,10 +341,34 @@ const IngredientTable = ({
         </div>
       )}
 
+      {/* LOG DE STATUS DE BLOQUEIO PARA DEPURAÇÃO */}
+      {(() => {
+        if (prep?.ingredients?.some(i => i.locked) || prep?.origin_id) {
+          console.log(`🔍 [IngredientTable] Status: readOnly=${isReadOnly}, hasOrigin=${!!prep?.origin_id}, hasLockedIngs=${prep?.ingredients?.some(i => i.locked)}`);
+        }
+        return null;
+      })()}
+
       {isReadOnly && (
-        <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200 text-sm">
-          <span>🔒</span>
-          <span>Esta etapa faz parte de uma Receita Matriz e não pode ser editada aqui.</span>
+        <div className="flex items-center justify-between gap-2 text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200 text-sm overflow-hidden">
+          <div className="flex items-center gap-2">
+            <span>🔒</span>
+            <span>Esta etapa faz parte de uma Receita Matriz e não pode ser editada aqui.</span>
+          </div>
+          
+          {!isProduct && onUnlockPreparation && (
+            <Button 
+              variant="outline" 
+              size="xs" 
+              onClick={() => {
+                console.log("🔘 [IngredientTable] Unlocking preparation at index:", prepIndex);
+                onUnlockPreparation(prepIndex);
+              }}
+              className="bg-white hover:bg-amber-100 border-amber-300 text-amber-700 h-7 text-xs px-2 shrink-0 ml-2"
+            >
+              Desbloquear para Editar
+            </Button>
+          )}
         </div>
       )}
 
@@ -522,6 +548,7 @@ const IngredientTable = ({
                     ingredientIndex={item.originalIndex}
                     prep={prep}
                     readOnly={isReadOnly || item.data.locked}
+                    onOpenIngredientReplacementModal={onOpenIngredientReplacementModal}
                     {...rest}
                   />
                 ))}

@@ -17,7 +17,8 @@ export function UnifiedSelectionModal({
     ingredientsLoading,
     currentRecipeId,
     recipeSelectorFilters,
-    contextType
+    contextType,
+    isReplacing
 }) {
     const isOpen = ingredientModalOpen || recipeModalOpen || packagingModalOpen;
 
@@ -36,9 +37,10 @@ export function UnifiedSelectionModal({
                 <div className="px-6 pt-6 pb-2">
                     <DialogHeader className="mb-4">
                         <DialogTitle>
-                            {ingredientModalOpen ? 'Adicionar Ingrediente' :
-                                packagingModalOpen ? 'Adicionar Embalagem' :
-                                    recipeModalOpen ? 'Selecionar Receita' : 'Adicionar Item'}
+                            {isReplacing ? 'Substituir Ingrediente' :
+                                ingredientModalOpen ? 'Adicionar Ingrediente' :
+                                    packagingModalOpen ? 'Adicionar Embalagem' :
+                                        recipeModalOpen ? 'Selecionar Receita' : 'Adicionar Item'}
                         </DialogTitle>
                     </DialogHeader>
                 </div>

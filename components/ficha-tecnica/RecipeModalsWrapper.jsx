@@ -64,7 +64,8 @@ export function RecipeModalsWrapper({
     isPrintCollectDialogOpen,
     setIsPrintCollectDialogOpen,
     isPrintSimpleDialogOpen,
-    setIsPrintSimpleDialogOpen
+    setIsPrintSimpleDialogOpen,
+    isReplacing
 }) {
     return (
         <>
@@ -98,6 +99,7 @@ export function RecipeModalsWrapper({
                 currentRecipeId={currentRecipeId}
                 recipeSelectorFilters={recipeSelectorFilters}
                 contextType={recipeData?.type || 'receitas'}
+                isReplacing={isReplacing}
             />
 
             {/* Modal de AdiÃ§Ã£o de Item Ã  Montagem/Porcionamento */}

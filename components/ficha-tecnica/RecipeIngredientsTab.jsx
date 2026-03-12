@@ -25,8 +25,11 @@ export function RecipeIngredientsTab({
     handleOpenIngredientModal,
     handleOpenPackagingModal,
     handleOpenRecipeModal,
+    handleOpenIngredientReplacementModal,
     handleOpenProcessEditModal,
+    onUnlockPreparation,
     openAddAssemblyItemModal,
+    isProduct, // Propagate this
 
     // Operações Avançadas
     handleSyncPreparation,
@@ -80,13 +83,15 @@ export function RecipeIngredientsTab({
                             preparations={preparationsData}
                             setPreparations={setPreparationsData}
                             onDirty={setIsDirty}
-                            isProduct={recipeData.type === RECIPE_TYPES.PRODUCT}
                             onOpenIngredientModal={handleOpenIngredientModal}
                             onOpenPackagingModal={handleOpenPackagingModal}
                             onOpenRecipeModal={handleOpenRecipeModal}
+                            onOpenIngredientReplacementModal={handleOpenIngredientReplacementModal}
                             onOpenProcessEditModal={handleOpenProcessEditModal}
+                            onUnlockPreparation={onUnlockPreparation}
                             onSyncPreparation={handleSyncPreparation}
                             onOpenAddAssemblyItemModal={openAddAssemblyItemModal}
+                            isProduct={isProduct}
                             onDropPop={handleDropPop}
                             onEditPop={handleEditPop}
                             prioritizedCommand={editorCommand}

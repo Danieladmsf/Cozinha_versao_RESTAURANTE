@@ -160,6 +160,7 @@ export default function RecipeTechnical() {
     ingredientSearchTerm, setIngredientSearchTerm,
     currentIngredient, setCurrentIngredient,
     processFormData, setProcessFormData,
+    replacingIngredientContext, setReplacingIngredientContext,
 
     // Estados de cópia de receita
     sourceRecipeSearch, setSourceRecipeSearch,
@@ -230,6 +231,7 @@ export default function RecipeTechnical() {
     updatePreparation,
     removePreparation,
     addIngredientToPreparation,
+    replaceIngredientInPreparation,
     updateIngredient,
     removeIngredient,
     updateRecipe,
@@ -237,9 +239,14 @@ export default function RecipeTechnical() {
     addSubComponent,
     updateSubComponent,
     removeSubComponent,
+    unlockPreparation,
     saveRecipe,
     loadRecipe
   } = useRecipeOperations();
+
+  const handleUnlockPreparation = useCallback((prepIndex) => {
+    unlockPreparation(preparationsData, setPreparationsData, prepIndex);
+  }, [preparationsData, unlockPreparation]);
 
   const handleOpenProcessEditModal = useCallback((prepIndex, currentProcesses) => {
     setProcessEditData({ prepIndex, initialProcesses: currentProcesses || [] });
@@ -770,6 +777,12 @@ export default function RecipeTechnical() {
     clearIngredientSearch();
   };
 
+  const handleOpenIngredientReplacementModal = (prepIndex, ingredientIndex) => {
+    setReplacingIngredientContext({ prepIndex, ingredientIndex });
+    setIngredientModalOpen(true);
+    clearIngredientSearch();
+  };
+
   const handleCloseIngredientModal = () => {
     // If pending creation was active, clearing it implies cancel
     if (pendingPreparationRef.current) {
@@ -820,7 +833,6 @@ export default function RecipeTechnical() {
 
   const {
     handleSelectIngredient,
-    handleSelectMultipleIngredients,
     handleSelectRecipe,
     handleAddAssemblyItem
   } = useRecipeItemSelection({
@@ -843,6 +855,67 @@ export default function RecipeTechnical() {
     },
     handleCloseAssemblyItemModal
   });
+  const handleSelectMultipleIngredients = useCallback((selectedIngredients) => {
+    if (!selectedIngredients || selectedIngredients.length === 0) return;
+
+    if (replacingIngredientContext) {
+      // MODO SUBSTITUIÇÃO: Apenas um ingrediente (o primeiro selecionado)
+      const newIng = selectedIngredients[0];
+      const { prepIndex, ingredientIndex } = replacingIngredientContext;
+
+      replaceIngredientInPreparation(
+        preparationsData,
+        setPreparationsData,
+        prepIndex,
+        ingredientIndex,
+        {
+          ingredient_id: newIng.id,
+          name: newIng.name,
+          current_price: newIng.current_price || newIng.price || 0,
+          unit: newIng.unit || 'kg',
+          category: newIng.category,
+          category_id: newIng.category_id,
+          technical_data: newIng.technical_data || {}
+        }
+      );
+
+      setReplacingIngredientContext(null); // Limpar contexto
+      toast({ title: "Ingrediente substituído", description: "O ingrediente foi trocado mantendo as quantidades." });
+    } else {
+      // MODO ADIÇÃO (Existente)
+      const prepIndex = currentPrepIndexForIngredient ?? currentPrepIndexForPackaging;
+
+      if (prepIndex !== null) {
+        selectedIngredients.forEach(ing => {
+          addIngredientToPreparation(preparationsData, setPreparationsData, prepIndex, {
+            ingredient_id: ing.id,
+            name: ing.name,
+            current_price: ing.current_price || ing.price || 0,
+            unit: ing.unit || 'kg',
+            category: ing.category,
+            category_id: ing.category_id,
+            technical_data: ing.technical_data || {}
+          });
+        });
+      }
+    }
+
+    setIngredientModalOpen(false);
+    setPackagingModalOpen(false);
+    setIsDirty(true);
+  }, [
+    replacingIngredientContext,
+    currentPrepIndexForIngredient,
+    currentPrepIndexForPackaging,
+    preparationsData,
+    setPreparationsData,
+    replaceIngredientInPreparation,
+    addIngredientToPreparation,
+    toast,
+    setIngredientModalOpen,
+    setPackagingModalOpen,
+    setIsDirty
+  ]);
 
   // Handler para quando uma receita é selecionada na busca
   const handleRecipeSelection = useCallback((selectedRecipe) => {
@@ -1032,8 +1105,12 @@ export default function RecipeTechnical() {
 
               handleOpenProcessModal={handleOpenProcessModal}
               handleOpenIngredientModal={handleOpenIngredientModal}
+              onOpenProcessEditModal={handleOpenProcessEditModal}
+              onUnlockPreparation={handleUnlockPreparation}
+              onSyncPreparation={handleSyncPreparation}
               handleOpenPackagingModal={handleOpenPackagingModal}
               handleOpenRecipeModal={handleOpenRecipeModal}
+              handleOpenIngredientReplacementModal={handleOpenIngredientReplacementModal}
               handleOpenProcessEditModal={handleOpenProcessEditModal}
               openAddAssemblyItemModal={openAddAssemblyItemModal}
 
@@ -1049,6 +1126,7 @@ export default function RecipeTechnical() {
               removePreparation={removePreparation}
 
               handleSaveRecipe={handleSaveRecipe}
+              isProduct={recipeData.type === 'produtos'}
             />
           </TabsContent>
 
@@ -1110,6 +1188,7 @@ export default function RecipeTechnical() {
           setIsPrintCollectDialogOpen={setIsPrintCollectDialogOpen}
           isPrintSimpleDialogOpen={isPrintSimpleDialogOpen}
           setIsPrintSimpleDialogOpen={setIsPrintSimpleDialogOpen}
+          isReplacing={!!replacingIngredientContext}
         />
       </div >
     </div >

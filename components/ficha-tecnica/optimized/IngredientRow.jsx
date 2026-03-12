@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'; // Updated for ingredient replacement
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ const IngredientRow = ({
   prep,
   onUpdateIngredient,
   onRemoveIngredient,
+  onOpenIngredientReplacementModal,
   readOnly = false,
 }) => {
   const processes = prep.processes || [];
@@ -29,6 +30,11 @@ const IngredientRow = ({
   // State for Note Popover
   const [isNoteOpen, setIsNoteOpen] = React.useState(false);
   const [noteText, setNoteText] = React.useState(ingredient.usage_note || '');
+
+  // LOG DE DEPURAÇÃO PARA BLOQUEIO
+  if (ingredient.locked || readOnly) {
+    console.log(`🔒 [IngredientRow] Item: ${ingredient.name}, readOnly: ${readOnly}, ingLocked: ${ingredient.locked}`);
+  }
 
   // Update local state when prop changes
   React.useEffect(() => {
@@ -317,7 +323,7 @@ const IngredientRow = ({
 
       {hasProcess('cleaning') && (
         <>
-          {!hasProcess('defrosting') && (
+          {(!hasProcess('defrosting') || parseNumericValue(ingredient.weight_frozen) <= 0) && (
             <TableCell className="px-4 py-2">
               <Input
                 type="text"
@@ -325,15 +331,12 @@ const IngredientRow = ({
                 onChange={(e) => updateIngredientField('weight_raw', e.target.value)}
                 disabled={readOnly || ingredient.locked}
                 className={`w-24 h-8 text-center text-xs ${readOnly || ingredient.locked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder={(() => {
-                  // If purely cleaning (no defrost), raw is the start, so 0,000 is fine?
-                  // actually if it's the start, 0,000 is correct.
-                  return "0,000";
-                })()}
+                placeholder="0,000"
+                title="Peso Bruto / Entrada para Limpeza"
               />
             </TableCell>
           )}
-          {hasProcess('defrosting') && (
+          {hasProcess('defrosting') && parseNumericValue(ingredient.weight_frozen) > 0 && (
             <TableCell className="px-4 py-2">
               <Input
                 type="text"
@@ -341,7 +344,7 @@ const IngredientRow = ({
                 readOnly
                 className="w-24 h-8 text-center text-xs bg-gray-50 cursor-not-allowed"
                 placeholder="0,000"
-                title="Valor vem do processo de descongelamento"
+                title="Peso Resfriado (Vindo do descongelamento)"
               />
             </TableCell>
           )}
@@ -486,6 +489,7 @@ const IngredientRow = ({
                 <Button
                   variant="ghost"
                   size="icon"
+                  onClick={() => onOpenIngredientReplacementModal && onOpenIngredientReplacementModal(prepIndex, ingredientIndex)}
                   className="h-7 w-7 rounded-full hover:bg-blue-50"
                   title="Editar ingrediente"
                 >

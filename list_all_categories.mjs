@@ -1,29 +1,17 @@
-
 import { db } from './lib/firebase.js';
-import { collection, getDocsFromServer } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 
-async function main() {
-    console.log("🔍 LISTANDO TODO O CONTEÚDO ATUAL DA TABELA 'CATEGORY' 🔍\n");
-
-    const snap = await getDocsFromServer(collection(db, 'Category'));
-
-    const byType = {};
-    snap.docs.forEach(d => {
-        const data = d.data();
-        const type = data.type || 'S/ TIPO';
-        if (!byType[type]) byType[type] = [];
-        byType[type].push(data.name);
+async function listAllCategories() {
+    console.log("🔍 Listando todas as categorias...");
+    const snap = await getDocs(collection(db, 'Category'));
+    snap.forEach(doc => {
+        const data = doc.data();
+        console.log(`- ${data.name} (ID: ${doc.id}, Type: ${data.type})`);
     });
-
-    for (const type in byType) {
-        console.log(`\n📌 TIPO: [${type.toUpperCase()}] (${byType[type].length} itens)`);
-        byType[type].sort().forEach(name => {
-            console.log(`  - ${name}`);
-        });
-    }
-
-    console.log(`\nTotal Geral: ${snap.size} categorias.`);
-    setTimeout(() => process.exit(0), 1000);
+    process.exit(0);
 }
 
-main().catch(console.error);
+listAllCategories().catch(err => {
+    console.error(err);
+    process.exit(1);
+});

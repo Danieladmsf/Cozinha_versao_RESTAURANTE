@@ -21,40 +21,25 @@ const DraggablePreparationList = ({
     onOpenIngredientModal,
     onOpenPackagingModal,
     onOpenRecipeModal,
-    onOpenProcessEditModal, // New prop
-    onSyncPreparation, // New prop
+    onOpenIngredientReplacementModal,
+    onOpenProcessEditModal,
+    onUnlockPreparation,
+    onSyncPreparation,
     onOpenAddAssemblyItemModal,
-    // Helper functions passed from parent (from useRecipeOperations)
-    onRemovePreparation, // (preparations, setPreparations, id)
-    onUpdatePreparation, // (preparations, setPreparations, id, field, value) -> wait, RecipeTechnical uses inline setPreparations for local updates sometimes?
-    // Actually, RecipeTechnical passed:
-    // onUpdatePreparation={(prepIdx, field, value) => setPreparations(...)}
-    // I should check the props I plan to pass.
-    // Let's assume standard callbacks:
-    // onUpdatePreparation(prepIndex, field, value)
-    // onUpdateIngredient(prepIndex, ingIdx, field, value)
-    // onRemoveIngredient(prepIndex, ingIdx)
-    // onUpdateRecipe(prepIndex, recIdx, field, value)
-    // onRemoveRecipe(prepIndex, recIdx)
-
-    // Handlers needed for operations that require full state access (like removePreparation which takes preparationsData)
-    // or I can handle them here if I have setPreparations.
-
-    // To keep it simple and consistent with RecipeTechnical's patterns:
-    // I will accept "operations" object or individual props.
-    // RecipeTechnical used `updateIngredient(preparationsData, setPreparationsData, ...)`
-    // So I need to pass raw functions AND preparations/setPreparations?
-    // No, better to pass wrappers.
-
+    
+    // Handlers passed down to IngredientTable
+    onUpdatePreparation,
+    onBatchUpdatePreparations,
     updateIngredientWrapper,
-    removeIngredientWrapper,
     updateRecipeWrapper,
+    removeIngredientWrapper,
     removeRecipeWrapper,
     removePreparationWrapper,
+    
+    // POP Handlers
     onDropPop,
     onEditPop,
-    prioritizedCommand,
-    onBatchUpdatePreparations
+    prioritizedCommand
 }) => {
     // ==== LOCAL UI STATE ====
     const [expandedCards, setExpandedCards] = useState(() => {
@@ -565,6 +550,7 @@ const DraggablePreparationList = ({
                                                                         onOpenIngredientModal={onOpenIngredientModal}
                                                                         onOpenPackagingModal={onOpenPackagingModal}
                                                                         onOpenRecipeModal={onOpenRecipeModal}
+                                                                        onOpenIngredientReplacementModal={onOpenIngredientReplacementModal}
                                                                         onOpenAddAssemblyItemModal={onOpenAddAssemblyItemModal}
                                                                         isProduct={isProduct}
                                                                         onUpdatePreparation={onUpdatePreparation}
@@ -573,8 +559,13 @@ const DraggablePreparationList = ({
                                                                         onUpdateRecipe={updateRecipeWrapper}
                                                                         onRemoveIngredient={removeIngredientWrapper}
                                                                         onRemoveRecipe={removeRecipeWrapper}
+                                                                        onUnlockPreparation={onUnlockPreparation}
                                                                         preparations={preparations}
-                                                                        readOnly={!!prep.origin_id || (prep.sub_components && prep.sub_components.some(sc => !!sc.origin_id))}
+                                                                         readOnly={
+                                                                             !!prep.origin_id || 
+                                                                             (prep.sub_components && prep.sub_components.some(sc => !!sc.origin_id)) ||
+                                                                             (prep.ingredients && prep.ingredients.some(ing => ing.locked))
+                                                                         }
                                                                     />
                                                                 </div>
                                                             </CardContent>

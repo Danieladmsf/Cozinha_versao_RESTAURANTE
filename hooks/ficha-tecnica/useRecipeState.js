@@ -61,6 +61,7 @@ export function useRecipeState() {
   const [currentPrepIndex, setCurrentPrepIndex] = useState(null);
   const [currentPrepIndexForAssembly, setCurrentPrepIndexForAssembly] = useState(null);
   const [currentItemType, setCurrentItemType] = useState("ingredient");
+  const [replacingIngredientContext, setReplacingIngredientContext] = useState(null); // { prepIndex, ingredientIndex }
 
   // Estados de ingredientes e receitas
   const [ingredientSearchTerm, setIngredientSearchTerm] = useState("");
@@ -157,6 +158,7 @@ export function useRecipeState() {
     currentPrepIndex, setCurrentPrepIndex,
     currentPrepIndexForAssembly, setCurrentPrepIndexForAssembly,
     currentItemType, setCurrentItemType,
+    replacingIngredientContext, setReplacingIngredientContext,
 
     // Estados de ingredientes
     ingredientSearchTerm, setIngredientSearchTerm,

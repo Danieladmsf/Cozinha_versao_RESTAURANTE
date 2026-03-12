@@ -392,9 +392,11 @@ export default function RecipeTechnicalPrintDialog({
       if (isOnlyPortioningSubComponents) titleClass = 'portioning';
       else if (isOnlyAssembly) titleClass = 'assembly';
 
+      const displayTitle = prep.title?.replace(/^\d+[\s°ª]*Etapa:?\s*/i, '') || '';
+
       printContent += `
         <div class="process-section">
-          <h2 class="process-title ${titleClass}">${prepIndex + 1}º Etapa: ${prep.title}</h2>
+          <h2 class="process-title ${titleClass}">${prepIndex + 1}ª Etapa: ${displayTitle}</h2>
       `;
 
       if (isOnlyAssembly) {
@@ -414,9 +416,21 @@ export default function RecipeTechnicalPrintDialog({
           printContent += `<tr><td colspan="4" class="empty-state">Nenhum item para montagem</td></tr>`;
         } else {
           prep.sub_components.forEach(sc => {
-            const yieldWeight = RecipeCalculator.parseNumericValue(sc.yield_weight);
-            const inputWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
-            const totalCost = RecipeCalculator.parseNumericValue(sc.total_cost) || 0;
+            const yieldWeight = RecipeCalculator.parseNumericValue(sc.assembly_weight_kg || sc.yield_weight);
+            const inputWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight) || yieldWeight;
+            
+            // Calcular custo proporcional se for sub-componente
+            let totalCost = RecipeCalculator.parseNumericValue(sc.total_cost);
+            if (totalCost === 0 && sc.input_total_cost) {
+              const inputTotalCost = RecipeCalculator.parseNumericValue(sc.input_total_cost);
+              const inputYieldWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
+              if (inputYieldWeight > 0) {
+                totalCost = (yieldWeight / inputYieldWeight) * inputTotalCost;
+              } else {
+                totalCost = inputTotalCost;
+              }
+            }
+
             const yieldPercent = inputWeight > 0 ? (yieldWeight / inputWeight) * 100 : 100;
             const yieldClass = yieldPercent >= 95 ? 'percentage-good' : yieldPercent >= 85 ? 'percentage-warning' : 'percentage-bad';
             printContent += `
@@ -450,9 +464,22 @@ export default function RecipeTechnicalPrintDialog({
           printContent += `<tr><td colspan="6" class="empty-state">Nenhum produto para porcionar</td></tr>`;
         } else {
           prep.sub_components.forEach(sc => {
-            const inputWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
-            const portionedWeight = RecipeCalculator.parseNumericValue(sc.weight_portioned) || inputWeight;
-            const totalCost = RecipeCalculator.parseNumericValue(sc.total_cost) || 0;
+            const yieldWeight = RecipeCalculator.parseNumericValue(sc.weight_portioned || sc.assembly_weight_kg);
+            const inputWeight = RecipeCalculator.parseNumericValue(sc.input_yield_weight) || yieldWeight;
+            const portionedWeight = yieldWeight;
+            
+            // Custo proporcional
+            let totalCost = RecipeCalculator.parseNumericValue(sc.total_cost);
+            if (totalCost === 0 && sc.input_total_cost) {
+              const inputTotalCost = RecipeCalculator.parseNumericValue(sc.input_total_cost);
+              const inputYieldWeightForCost = RecipeCalculator.parseNumericValue(sc.input_yield_weight);
+              if (inputYieldWeightForCost > 0) {
+                totalCost = (portionedWeight / inputYieldWeightForCost) * inputTotalCost;
+              } else {
+                totalCost = inputTotalCost;
+              }
+            }
+
             const portioningLoss = inputWeight > 0 && portionedWeight >= 0 ? ((inputWeight - portionedWeight) / inputWeight) * 100 : 0;
             const yieldPercent = inputWeight > 0 ? (portionedWeight / inputWeight) * 100 : 100;
             const lossClass = portioningLoss <= 2 ? 'percentage-good' : portioningLoss <= 5 ? 'percentage-warning' : 'percentage-bad';
@@ -509,19 +536,31 @@ export default function RecipeTechnicalPrintDialog({
           printContent += `<tr><td colspan="${colCount}" class="empty-state">Nenhum ingrediente</td></tr>`;
         } else {
           prep.ingredients.forEach(ing => {
-            const thawingLoss = RecipeCalculator.calculateThawingLoss(ing);
-            const cleaningLoss = RecipeCalculator.calculateCleaningLoss(ing);
-            const cookingLoss = RecipeCalculator.calculateCookingLoss(ing);
-            const portioningLossIng = RecipeCalculator.calculatePortioningLoss(ing);
-            const yieldPercent = RecipeCalculator.calculateItemYieldPercent(ing);
-            const netPrice = RecipeCalculator.calculateItemNetPricePerKg(ing);
-            const ingredientCost = RecipeCalculator.parseNumericValue(ing.total_cost) || 0;
-            const currentPrice = RecipeCalculator.parseNumericValue(ing.current_price) || 0;
+            const thawingLossRes = RecipeCalculator.calculateAndClassifyThawingLoss(ing);
+            const cleaningLossRes = RecipeCalculator.calculateAndClassifyCleaningLoss(ing);
+            const cookingLossRes = RecipeCalculator.calculateAndClassifyCookingLoss(ing);
+            const portioningLossRes = RecipeCalculator.calculateAndClassifyPortioningLoss(ing);
+            
+            const thawingLoss = thawingLossRes.value;
+            const cleaningLoss = cleaningLossRes.value;
+            const cookingLoss = cookingLossRes.value;
+            const portioningLossIng = portioningLossRes.value;
 
-            const thawingClass = thawingLoss <= 5 ? 'percentage-good' : thawingLoss <= 10 ? 'percentage-warning' : 'percentage-bad';
-            const cleaningClass = cleaningLoss <= 10 ? 'percentage-good' : cleaningLoss <= 15 ? 'percentage-warning' : 'percentage-bad';
-            const cookingClass = cookingLoss <= 15 ? 'percentage-good' : cookingLoss <= 25 ? 'percentage-warning' : 'percentage-bad';
-            const portioningIngClass = portioningLossIng <= 2 ? 'percentage-good' : portioningLossIng <= 5 ? 'percentage-warning' : 'percentage-bad';
+            const yieldPercent = RecipeCalculator.calculateIngredientYield(ing, prep.processes);
+            const netPrice = RecipeCalculator.calculateItemLiquidPrice(ing);
+            
+            // Calcular custo do ingrediente se não estiver presente
+            let ingredientCost = RecipeCalculator.parseNumericValue(ing.total_cost);
+            if (ingredientCost === 0) {
+              ingredientCost = RecipeCalculator.calculateIngredientCost(ing, prep.processes);
+            }
+
+            const currentPrice = RecipeCalculator.parseNumericValue(ing.current_price || ing.unit_price) || 0;
+
+            const thawingClass = `percentage-${thawingLossRes.status}`;
+            const cleaningClass = `percentage-${cleaningLossRes.status}`;
+            const cookingClass = `percentage-${cookingLossRes.status}`;
+            const portioningIngClass = `percentage-${portioningLossRes.status}`;
             const yieldClass = yieldPercent >= 70 ? 'percentage-good' : yieldPercent >= 60 ? 'percentage-warning' : 'percentage-bad';
 
             printContent += `
@@ -565,6 +604,54 @@ export default function RecipeTechnicalPrintDialog({
       </div>
       `;
     });
+
+    // ADICIONANDO RESUMO DE CUSTOS E TOTAIS NO FINAL
+    printContent += `
+      <div class="process-section" style="margin-top: 1.5rem; border: 2px solid #2563eb; break-inside: avoid;">
+        <h2 class="process-title" style="background: #2563eb;">RESUMO DE CUSTOS E RESULTADOS</h2>
+        <table style="font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th style="background: #f1f5f9;">Métrica</th>
+              <th style="background: #f1f5f9;">Valor</th>
+              <th style="background: #f1f5f9;">Unidade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: left; padding-left: 1rem; font-weight: 600;">Peso Total (Bruto)</td>
+              <td style="font-weight: 700;">${formatWeightPrint(recipe.total_weight)}</td>
+              <td>kg</td>
+            </tr>
+            <tr>
+              <td style="text-align: left; padding-left: 1rem; font-weight: 600;">Peso Total (Rendimento)</td>
+              <td style="font-weight: 700;">${formatWeightPrint(recipe.yield_weight)}</td>
+              <td>kg</td>
+            </tr>
+            <tr style="background: #f8fafc;">
+              <td style="text-align: left; padding-left: 1rem; font-weight: 600;">Custo por Kg (Bruto)</td>
+              <td style="font-weight: 700; color: #1e40af;">${formatCurrencyPrint(recipe.cost_per_kg_raw)}</td>
+              <td>R$/kg</td>
+            </tr>
+            <tr style="background: #f8fafc;">
+              <td style="text-align: left; padding-left: 1rem; font-weight: 600;">Custo por Kg (Líquido/CMV)</td>
+              <td style="font-weight: 700; color: #1e40af;">${formatCurrencyPrint(recipe.cost_per_kg_yield)}</td>
+              <td>R$/kg</td>
+            </tr>
+            <tr>
+              <td style="text-align: left; padding-left: 1rem; font-weight: 600;">Custo Operacional (COO)</td>
+              <td style="font-weight: 700; color: #b91c1c;">${formatCurrencyPrint(recipe.operational_cost || 0)}</td>
+              <td>R$</td>
+            </tr>
+            <tr style="background: #eff6ff;">
+              <td style="text-align: left; padding-left: 1rem; font-weight: 700; font-size: 0.95rem;">CUSTO TOTAL DA RECEITA (CMV)</td>
+              <td style="font-weight: 800; color: #1d4ed8; font-size: 1rem;">${formatCurrencyPrint(recipe.total_cost)}</td>
+              <td>R$</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
 
     printContent += `
         <div class="footer">
