@@ -81,18 +81,24 @@ export const useLocationSelection = (allClientIds) => {
    * @returns {boolean} True se o cliente está selecionado
    */
   const isLocationSelected = useCallback((itemLocations, locationId) => {
-    const state = getSelectionState(itemLocations);
-    
-    switch (state) {
-      case LOCATION_STATES.ALL_SELECTED:
-        return true;
-      case LOCATION_STATES.NONE_SELECTED:
-        return false;
-      case LOCATION_STATES.PARTIAL_SELECTED:
-        return itemLocations.includes(locationId);
-      default:
-        return false;
+    // 1. Se não há locations definidas ou array vazio, assumimos "todos selecionados" (Padrão)
+    if (!itemLocations || itemLocations.length === 0) {
+      return true;
     }
+    
+    // 2. Caso especial: marcador de "nenhum selecionado"
+    if (itemLocations.includes(SPECIAL_VALUES.NONE_MARKER)) {
+      return false;
+    }
+    
+    // 3. Verificação direta por ID (Mais robusta e rápida)
+    if (locationId && itemLocations.includes(locationId)) {
+      return true;
+    }
+    
+    // 4. Fallback para análise de estado complexa (se necessário)
+    const state = getSelectionState(itemLocations);
+    return state === LOCATION_STATES.ALL_SELECTED;
   }, [getSelectionState]);
   
   // ===== OPERAÇÕES DE SELEÇÃO =====

@@ -182,47 +182,13 @@ export const useMenuData = (currentDate) => {
         // ...
       }
 
-      // Primeiro tenta carregar do cache local se existir e for recente
+      // IGNORANDO O CACHE LOCAL PARA FORÇAR ATUALIZAÇÃO E CORRIGIR BUG DAS RECEITAS INVISÍVEIS
+      /*
       const cachedConfig = localStorage.getItem('menuConfig_v2');
       if (cachedConfig) {
-        try {
-          const parsedConfig = JSON.parse(cachedConfig);
-
-          // Verificar se cache tem formato antigo (camelCase)
-          if (parsedConfig.categoryColors && !parsedConfig.category_colors) {
-            // Migrar cache antigo para novo formato
-            const migratedConfig = {
-              ...parsedConfig,
-              category_colors: parsedConfig.categoryColors,
-              active_categories: parsedConfig.activeCategories || {},
-              expanded_categories: parsedConfig.expandedCategories || [],
-              fixed_dropdowns: parsedConfig.fixedDropdowns || {},
-              available_days: parsedConfig.availableDays || [0, 1, 2, 3, 4, 5, 6],
-              category_order: parsedConfig.categoryOrder || [],
-              selected_main_categories: parsedConfig.selectedMainCategories || []
-            };
-
-            // Remover campos antigos
-            delete migratedConfig.categoryColors;
-            delete migratedConfig.activeCategories;
-            delete migratedConfig.expandedCategories;
-            delete migratedConfig.fixedDropdowns;
-            delete migratedConfig.availableDays;
-            delete migratedConfig.categoryOrder;
-            delete migratedConfig.selectedMainCategories;
-
-            localStorage.setItem('menuConfig_v2', JSON.stringify(migratedConfig));
-            return migratedConfig;
-          }
-
-          // Usar cache se disponível e no formato correto (incluindo category_groups)
-          if (parsedConfig && Object.keys(parsedConfig).length > 0 && parsedConfig.category_colors !== undefined && parsedConfig.category_groups !== undefined) {
-            return parsedConfig;
-          }
-        } catch (e) {
-          // Cache inválido, continua para carregar do banco
-        }
+        // ...
       }
+      */
 
       const configs = await MenuConfig.query([
         { field: 'user_id', operator: '==', value: mockUserId },

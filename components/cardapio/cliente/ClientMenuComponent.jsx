@@ -59,6 +59,37 @@ export default function ClientMenuComponent() {
 
   // Funções utilitárias
   const getActiveCategories = useMemo(() => {
+    // Se existem grupos de categorias, coletar categorias de todos os grupos ativos
+    if (menuConfig?.category_groups?.length > 0) {
+      const allCategories = [];
+      const seenIds = new Set();
+      
+      menuConfig.category_groups.forEach(group => {
+        console.log(`📂 [ClientMenuComponent] Processando grupo: ${group.name}`, { items: group.items?.length });
+        group.items?.forEach(id => {
+          if (!seenIds.has(id)) {
+            const cat = categories.find(c => c.id === id);
+            const isActive = menuConfig.active_categories?.[id] !== false;
+            console.log(`   - Categoria ${id}: ${cat ? cat.name : 'NÃO ENCONTRADA'}, ativa: ${isActive}`);
+            if (cat && isActive) {
+              allCategories.push(cat);
+              seenIds.add(id);
+            }
+          }
+        });
+      });
+      
+      console.log('✅ [ClientMenuComponent] Categorias totais encontradas nos grupos:', allCategories.map(c => c.name));
+      
+      let activeCategories = allCategories;
+      // Aplicar filtros específicos do cliente (visibilidade)
+      if (selectedCustomer && selectedCustomer.id !== 'all') {
+        activeCategories = applyClientConfig(activeCategories, selectedCustomer.id);
+      }
+      return activeCategories;
+    }
+
+    // Comportamento legado: usar helper padrão
     let activeCategories = menuHelpers.getActiveCategories(categories, menuConfig);
 
     if (selectedCustomer && selectedCustomer.id !== 'all') {

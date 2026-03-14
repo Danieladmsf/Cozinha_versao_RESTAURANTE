@@ -26,17 +26,14 @@ export default function WeeklyMenuGrid({
   const availableDays = useAvailableDays();
 
   // Log para debug
-  console.log('📊 [WeeklyMenuGrid] Props recebidas:', {
-    currentDate: currentDate.toLocaleDateString(),
-    weeklyMenu: weeklyMenu ? {
-      id: weeklyMenu.id,
-      weekKey: weeklyMenu.week_key,
-      menuData: weeklyMenu.menu_data ? 'presente' : 'ausente',
-      diasComDados: weeklyMenu.menu_data ? Object.keys(weeklyMenu.menu_data).length : 0
-    } : 'null',
-    activeCategories: activeCategories?.length || 0,
-    recipes: recipes?.length || 0,
-    selectedCustomer: selectedCustomer ? selectedCustomer.name : 'null'
+  console.log('📊 [WeeklyMenuGrid] Render Props:', {
+    hasWeeklyMenu: !!weeklyMenu,
+    weekKey: weeklyMenu?.week_key,
+    activeCategoriesCount: activeCategories?.length,
+    activeCategoriesPreview: activeCategories?.slice(0, 3).map(c => c.name),
+    recipesCount: recipes?.length,
+    selectedCustomer: selectedCustomer?.name,
+    availableDays
   });
 
   // Função para obter clientes desmarcados de uma receita
@@ -71,12 +68,32 @@ export default function WeeklyMenuGrid({
     }}>
       {availableDays.map(day => {
         const dayDate = addDays(weekStart, day);
-        const dayItems = weeklyMenu?.menu_data[day] || {};
+        // Agregação de itens de todos os tipos de refeição (grupos) para o dia
+        const dayItems = {};
+        if (weeklyMenu?.menu_data) {
+          console.log(`🔍 [WeeklyMenuGrid] Agregando dados para o dia ${day}...`);
+          Object.keys(weeklyMenu.menu_data).forEach(mealType => {
+            if (mealType.startsWith('_')) return;
 
-        console.log(`📅 [WeeklyMenuGrid] Dia ${day} (${DAY_NAMES_FULL[day]}):`, {
-          temDados: !!weeklyMenu?.menu_data?.[day],
-          categorias: Object.keys(dayItems).length,
-          dayItems
+            const itemsForDay = weeklyMenu.menu_data[mealType]?.[day] || weeklyMenu.menu_data[mealType]?.[String(day)];
+            if (itemsForDay) {
+              console.log(`   - Encontrados itens em "${mealType}" para o dia ${day}`);
+              Object.entries(itemsForDay).forEach(([catId, items]) => {
+                if (!dayItems[catId]) dayItems[catId] = [];
+                const itemList = Array.isArray(items) ? items : Object.values(items);
+                console.log(`     > Categoria ${catId}: adicionando ${itemList.length} itens`);
+                dayItems[catId] = [...dayItems[catId], ...itemList];
+              });
+            }
+          });
+        }
+
+        console.log(`📅 [WeeklyMenuGrid] Resultado Dia ${day}:`, {
+          temDados: Object.keys(dayItems).length > 0,
+          categoriasResumo: Object.keys(dayItems).map(id => {
+            const cat = activeCategories.find(c => c.id === id);
+            return `${cat ? cat.name : id} (${dayItems[id].length})`;
+          })
         });
 
         return (
@@ -98,39 +115,38 @@ export default function WeeklyMenuGrid({
               <h2 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0', textAlign: 'center' }}>{DAY_NAMES_FULL[day].toUpperCase().replace('-FEIRA', '')} - {format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
             </div>
 
-            <div style={{ flex: 1, overflow: 'visible' }}>
+            <div style={{ padding: '8px', borderTop: '1px solid #eee', minHeight: '100px', backgroundColor: '#fff' }}>
               {activeCategories.map((category, categoryIndex) => {
-                const items = dayItems[category.id] ? Object.values(dayItems[category.id]) : [];
+                const items = dayItems[category.id] || [];
                 const filteredItems = selectedCustomer?.id === 'all'
                   ? items
                   : getFilteredItemsForClient(items, category.id, selectedCustomer?.id);
 
-                return (
-                  <div key={category.id} style={{ marginBottom: '8px' }}>
-                    <h3 style={{
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      margin: '0 0 4px 0',
-                      backgroundColor: '#f0f0f0',
-                      padding: '2px 4px',
-                      borderBottom: '1px solid #ccc'
-                    }}>{category.name}</h3>
+                if (filteredItems.length === 0) return null;
 
-                    <div>
-                      {filteredItems.length > 0 ? (
-                        <div>
+                return (
+                  <div key={category.id} style={{ marginBottom: '10px', display: 'block' }}>
+                    <div style={{
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      backgroundColor: '#e2e8f0',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      color: '#1e293b',
+                      marginBottom: '4px'
+                    }}>{category.name}</div>
                           {filteredItems.map((item, idx) => {
                             const recipe = recipes.find(r => r.id === item.recipe_id);
                             if (!recipe) return null;
 
                             return (
-                              <div key={`${category.id}-${idx}`}>
+                              <div key={`${category.id}-${idx}`} style={{ marginBottom: '2px' }}>
                                 <div style={{
                                   fontSize: '10px',
-                                  marginBottom: '2px',
+                                  color: '#333',
                                   lineHeight: '1.2'
                                 }}>
-                                  {renderFormattedRecipeName(recipe.name)}
+                                  • {renderFormattedRecipeName(recipe.name)}
                                 </div>
                                 {selectedCustomer?.id === 'all' && getUncheckedClients(item).length > 0 && (
                                   <div style={{
@@ -146,11 +162,6 @@ export default function WeeklyMenuGrid({
                               </div>
                             );
                           })}
-                        </div>
-                      ) : (
-                        <div style={{ fontSize: '10px', color: '#999' }}>-</div>
-                      )}
-                    </div>
                   </div>
                 );
               })}

@@ -104,12 +104,13 @@ export const useClientConfig = (menuConfig, allClientIds = []) => {
     }
 
     // PRIMEIRO: EXCLUIR DEFINITIVAMENTE receitas não marcadas para o cliente
-    // Remove permanentemente da lista itens que não foram selecionados
     const availableForClient = items.filter(item => {
       const isSelected = locationSelection.isLocationSelected(item.locations, clientId);
-      // Se não está selecionado, EXCLUI DEFINITIVAMENTE da visualização
+      console.log(`🧪 [useClientConfig] item: ${item.recipe_id}, locations: ${JSON.stringify(item.locations)}, clientId: ${clientId}, isSelected: ${isSelected}`);
       return isSelected;
     });
+
+    console.log(`🧪 [useClientConfig] Itens disponíveis para ${clientId}: ${availableForClient.length}/${items.length}`);
 
     // SEGUNDO: Aplicar configurações específicas do cliente
     const clientSettings = menuConfig?.client_category_settings?.[clientId];
