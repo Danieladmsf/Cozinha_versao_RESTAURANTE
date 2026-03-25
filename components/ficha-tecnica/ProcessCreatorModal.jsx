@@ -347,7 +347,7 @@ const ProcessCreatorModalComponent = ({
             }º Etapa: ${recipeData.name}`,
           processes: finalProcesses,
           ingredients: consolidatedIngredients,
-          instructions: `Importado de: ${recipeData.name}. Etapas consolidadas: ${stepTitles.join(', ')}.`,
+          instructions: `Seguir a receita do: ${recipeData.name}.`,
           notes: [], // Notes are now interleaved as ingredients
           assembly_config: undefined,
           origin_id: recipeData.id // MARCAR COMO MATRIZ para bloquear edição
