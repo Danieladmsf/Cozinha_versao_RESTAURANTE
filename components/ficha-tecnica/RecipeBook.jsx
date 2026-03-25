@@ -818,28 +818,24 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
                             /* MODO 2: Resumo de Porcionamento */
                             <div className="space-y-3">
                                 {/* Cabeçalho da tabela */}
-                                <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 text-xs font-semibold text-gray-500 pb-2 border-b border-gray-300">
+                                <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-xs font-semibold text-gray-500 pb-2 border-b border-gray-300">
                                     <span>Componente</span>
                                     <span className="text-right">Peso</span>
-                                    <span className="text-right">%</span>
                                     <span className="text-right">Custo</span>
                                 </div>
 
                                 {/* Linhas de componentes */}
                                 {portioningSummary.map((comp, idx) => (
-                                    <div key={idx} className="grid grid-cols-[1fr_auto_auto_auto] gap-2 text-sm py-1.5 border-b border-gray-200 border-dashed last:border-0 items-center">
+                                    <div key={idx} className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm py-1.5 border-b border-gray-200 border-dashed last:border-0 items-center">
                                         <div>
                                             <span className="text-xs text-gray-400 mr-1">{comp.stageNumber}º</span>
-                                            <span className="text-gray-700 font-medium">{comp.name.replace(/^\d+[ªº]\s*Etapa:\s*/i, '')}</span>
+                                            <span className="text-gray-700 font-medium">{comp.name.replace(/^\\d+[ªº]\\s*Etapa:\\s*/i, '')}</span>
                                             {comp.isPackaging && (
                                                 <span className="ml-1 text-xs text-blue-500">(Emb.)</span>
                                             )}
                                         </div>
                                         <span className="text-right font-semibold text-gray-900 whitespace-nowrap">
                                             {comp.isPackaging ? `${Math.round(comp.weight)}` : `${(comp.weight * 1000).toFixed(0)}g`}
-                                        </span>
-                                        <span className="text-right text-gray-600 whitespace-nowrap">
-                                            {comp.isPackaging ? '-' : `${comp.percentage.toFixed(1)}%`}
                                         </span>
                                         <span className="text-right text-green-700 font-medium whitespace-nowrap">
                                             R$ {comp.cost.toFixed(2)}
@@ -849,12 +845,11 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
                                 {/* Linha de Total */}
                                 {portioningSummary.length > 0 && (
-                                    <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 text-sm py-2 border-t-2 border-gray-300 font-bold">
+                                    <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm py-2 border-t-2 border-gray-300 font-bold">
                                         <span className="text-gray-800">Total</span>
                                         <span className="text-right text-gray-900 whitespace-nowrap">
                                             {(portioningSummary.filter(c => !c.isPackaging).reduce((sum, c) => sum + c.weight, 0) * 1000).toFixed(0)}g
                                         </span>
-                                        <span className="text-right text-gray-600">100%</span>
                                         <span className="text-right text-green-700 whitespace-nowrap">
                                             R$ {portioningSummary.reduce((sum, c) => sum + c.cost, 0).toFixed(2)}
                                         </span>
