@@ -1096,7 +1096,11 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
                                                     }
 
                                                     const hasNotes = prep.notes && prep.notes.some(n => (n.content && n.content.trim().length > 0) || n.photo);
-                                                    if (lines.length === 0 && !hasNotes) return <p className="text-gray-500 italic text-sm">Sem instruções definidas.</p>;
+                                                    
+                                                    // Forçar a renderização de pelo menos uma linha para permitir anexar fotos mesmo sem texto!
+                                                    if (lines.length === 0) {
+                                                        lines = [""];
+                                                    }
 
                                                     // Debug da renderização
                                                     // console.log(`Prep ${idx} Photos:`, prep.photos);
@@ -1133,32 +1137,30 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
                                                                     {/* Botão de Upload Discreto - Lado Esquerdo (Ao lado do número) */}
                                                                     {!isPhotosHidden && (
                                                                         <div className="print:hidden shrink-0 mt-0.5 opacity-0 group-hover/line:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center">
-                                                                            {!currentPhoto && (
-                                                                                <>
-                                                                                    <input
-                                                                                        type="file"
-                                                                                        accept="image/*"
-                                                                                        className="hidden"
-                                                                                        id={`upload-step-${idx}-line-${lineIdx}`}
-                                                                                        onChange={(e) => handleStepImageUpload(idx, e, lineIdx)}
-                                                                                        disabled={stepUploadingIndex === `${idx}-${lineIdx}`}
-                                                                                    />
-                                                                                    <label
-                                                                                        htmlFor={`upload-step-${idx}-line-${lineIdx}`}
-                                                                                        className="flex items-center justify-center w-5 h-5 rounded-full text-gray-300 hover:text-orange-500 hover:bg-orange-50 cursor-pointer transition-colors"
-                                                                                        title="Adicionar foto na linha"
-                                                                                    >
-                                                                                        {stepUploadingIndex === `${idx}-${lineIdx}` ? (
-                                                                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                                                                        ) : (
-                                                                                            <Camera className="w-3 h-3" />
-                                                                                        )}
-                                                                                    </label>
-                                                                                </>
-                                                                            )}
-
+                                                                            {/* Sempre exibe o botão upload permite substituir foto existente */}
+                                                                            <>
+                                                                                <input
+                                                                                    type="file"
+                                                                                    accept="image/*"
+                                                                                    className="hidden"
+                                                                                    id={`upload-step-${idx}-line-${lineIdx}`}
+                                                                                    onChange={(e) => handleStepImageUpload(idx, e, lineIdx)}
+                                                                                    disabled={stepUploadingIndex === `${idx}-${lineIdx}`}
+                                                                                />
+                                                                                <label
+                                                                                    htmlFor={`upload-step-${idx}-line-${lineIdx}`}
+                                                                                    className={`flex items-center justify-center w-5 h-5 rounded-full cursor-pointer transition-colors ${currentPhoto ? 'text-orange-500 bg-orange-100 hover:bg-orange-200' : 'text-gray-300 hover:text-orange-500 hover:bg-orange-50'}`}
+                                                                                    title={currentPhoto ? "Substituir foto" : "Adicionar foto na linha"}
+                                                                                >
+                                                                                    {stepUploadingIndex === `${idx}-${lineIdx}` ? (
+                                                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                                                    ) : (
+                                                                                        <Camera className="w-3 h-3" />
+                                                                                    )}
+                                                                                </label>
+                                                                            </>
+                                                                            
                                                                             {/* Botão de Ferramenta */}
-                                                                            {/* Botão de Ferramenta com Tooltip Customizado */}
                                                                             <button
                                                                                 onClick={() => openToolModal(idx, lineIdx)}
                                                                                 className={`relative group/btn flex items-center justify-center w-5 h-5 rounded-full cursor-pointer transition-colors ml-1 ${prep.tools?.[lineIdx]?.length > 0 ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50'}`}
@@ -1182,7 +1184,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
                                                                     {/* Texto */}
                                                                     <p className="text-gray-700 leading-snug text-sm md:text-base flex-1">
-                                                                        {line}
+                                                                        {line || (!hasNotes && !currentPhoto ? <span className="text-gray-500 italic text-sm">Sem instruções definidas.</span> : null)}
                                                                     </p>
                                                                 </div>
 
