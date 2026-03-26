@@ -314,7 +314,9 @@
   html,
   main,
   #root,
-  .main-app-container {
+  .main-app-container,
+  .main-app-container > div,
+  .main-app-container > div > div {
     background-color: white !important;
     width: 100% !important;
     height: auto !important;
@@ -323,6 +325,9 @@
     padding: 0 !important;
     overflow: visible !important;
     position: static !important;
+    display: block !important;
+    zoom: 1 !important;
+    transform: none !important;
   }
 
   /* Reset overflow containers without breaking flex layouts */
@@ -332,10 +337,12 @@
     height: auto !important;
   }
 
-  /* Force background colors to print */
+  /* Force background colors to print and disable zoom/transforms that break Chrome printing */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    zoom: 1 !important;
+    transform: none !important;
   }
 
   /* Typographic adjustments for print */
