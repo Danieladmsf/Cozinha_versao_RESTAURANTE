@@ -988,7 +988,7 @@ export default function RecipeTechnical() {
       <div className="max-w-[1600px] ml-0 space-y-6">
 
         {/* Header e Voltar */}
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4 mb-4 print:hidden">
           <Button
             variant="outline"
             size="sm"
