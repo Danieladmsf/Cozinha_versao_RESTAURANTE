@@ -168,28 +168,6 @@ export const useMenuData = (currentDate) => {
     try {
       const mockUserId = APP_CONSTANTS.MOCK_USER_ID;
 
-      // ...rest of function
-
-      // Adicionar log se encontrar config "fantasma"
-      if (configs && configs.length > 0) {
-        const config = configs[0];
-        // SE encontrar abas proibidas vindo do banco (ou cache do banco), avisar e sugerir limpeza
-        if (config.category_groups && config.category_groups.some(g => g.name === 'Menu diário' || g.name === 'Almoço')) {
-          console.error('🚨 [useMenuData] DETECTADO DADO FANTASMA (Firestore Persistence)!');
-          console.error('🚨 [useMenuData] Execute nukeFirestoreCache() no console ou limpe os dados do site.');
-          // Opcional: Auto-nuke? Talvez perigoso de fazer loop. Melhor expor a função.
-        }
-        // ...
-      }
-
-      // IGNORANDO O CACHE LOCAL PARA FORÇAR ATUALIZAÇÃO E CORRIGIR BUG DAS RECEITAS INVISÍVEIS
-      /*
-      const cachedConfig = localStorage.getItem('menuConfig_v2');
-      if (cachedConfig) {
-        // ...
-      }
-      */
-
       const configs = await MenuConfig.query([
         { field: 'user_id', operator: '==', value: mockUserId },
         { field: 'is_default', operator: '==', value: true }
@@ -198,6 +176,12 @@ export const useMenuData = (currentDate) => {
       if (configs && configs.length > 0) {
         const config = configs[0];
 
+        // Detectar dados fantasma (Firestore Persistence)
+        if (config.category_groups && config.category_groups.some(g => g.name === 'Menu diário' || g.name === 'Almoço')) {
+          console.error('🚨 [useMenuData] DETECTADO DADO FANTASMA (Firestore Persistence)!');
+          console.error('🚨 [useMenuData] Execute nukeFirestoreCache() no console ou limpe os dados do site.');
+        }
+
         // Atualizar cache com dados do banco
         localStorage.setItem('menuConfig_v2', JSON.stringify(config));
 
@@ -205,6 +189,7 @@ export const useMenuData = (currentDate) => {
       }
       return null;
     } catch (error) {
+      console.error('❌ [loadMenuConfig] Erro ao carregar configuração:', error);
       return null;
     }
   };
@@ -249,6 +234,20 @@ export const useMenuData = (currentDate) => {
           temMenuData: !!menu.menu_data,
           diasComDados: menu.menu_data ? Object.keys(menu.menu_data).length : 0
         });
+        // DIAGNÓSTICO DETALHADO: mostrar toda a estrutura
+        if (menu.menu_data) {
+          console.log('📋 [loadWeeklyMenu] ESTRUTURA COMPLETA menu_data:');
+          Object.keys(menu.menu_data).forEach(key => {
+            if (key.startsWith('_')) return;
+            const mealData = menu.menu_data[key];
+            const dayKeys = Object.keys(mealData || {});
+            console.log(`   mealType="${key}" → dias: [${dayKeys.join(', ')}]`);
+            dayKeys.forEach(d => {
+              const cats = Object.keys(mealData[d] || {});
+              console.log(`     dia ${d} → categorias: [${cats.join(', ')}]`);
+            });
+          });
+        }
 
         // Salvar no cache
         weeklyMenuCache.set(weekKey, {

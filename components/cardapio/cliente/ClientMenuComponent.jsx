@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Printer } from 'lucide-react';
@@ -23,6 +23,7 @@ export default function ClientMenuComponent() {
 
   // Estados
   const [selectedCustomer, setSelectedCustomer] = useState({ id: "all", name: "Todos os Clientes" });
+  const [viewMode, setViewMode] = useState(7); // Quantos dias exibir por vez
 
   // Hooks
   const {
@@ -31,8 +32,17 @@ export default function ClientMenuComponent() {
     weeklyMenu,
     customers,
     menuConfig,
-    loading
+    loading,
+    forceReloadFromDatabase
   } = useMenuData(menuInterface.currentDate);
+
+  // Auto-recovery: Se menuConfig estiver nulo após carregar, forçar busca no banco
+  useEffect(() => {
+    if (!loading && !menuConfig) {
+      console.log('🔄 [ClientMenuComponent] Configuração não encontrada. Forçando recarregamento...');
+      forceReloadFromDatabase();
+    }
+  }, [loading, menuConfig, forceReloadFromDatabase]);
 
   // Log para debug
   console.log('🖥️ [ClientMenuComponent] Dados recebidos:', {
@@ -122,7 +132,8 @@ export default function ClientMenuComponent() {
         locations,
         customerId,
         menuInterface.currentDate,
-        getCategoryColor
+        getCategoryColor,
+        viewMode
       );
 
       toast({
@@ -147,16 +158,30 @@ export default function ClientMenuComponent() {
     );
   }
 
+  // View mode: quantos dias mostrar por vez
+  const VIEW_MODES = [
+    { label: '2 dias', value: 2 },
+    { label: '3 dias', value: 3 },
+    { label: '5 dias', value: 5 },
+    { label: '7 dias', value: 7 },
+  ];
+
+  // Dividir os dias em grupos baseado no viewMode (começando na Segunda)
+  const allDays = [1, 2, 3, 4, 5, 6, 0]; // Seg-Sáb, Dom
+  const dayGroups = [];
+  for (let i = 0; i < allDays.length; i += viewMode) {
+    dayGroups.push(allDays.slice(i, i + viewMode));
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="flex">
         {/* Sidebar Independente - Seleção de Clientes */}
-        <div className="w-52 flex-shrink-0 p-2">
+        <div className="w-36 flex-shrink-0 p-1">
           <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-gray-200/50 shadow-lg sticky top-6">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">Seleção de Cliente</h3>
-              <p className="text-xs text-gray-600">Escolha o cliente para visualizar o cardápio</p>
+            <div className="p-2 border-b border-gray-200">
+              <h3 className="text-xs font-semibold text-gray-900 mb-0.5">Seleção de Cliente</h3>
+              <p className="text-[10px] text-gray-600">Escolha o cliente para visualizar o cardápio</p>
             </div>
             <ClientTabs
               selectedCustomer={selectedCustomer}
@@ -170,13 +195,12 @@ export default function ClientMenuComponent() {
 
         {/* Main Content Area */}
         <div className="flex-1">
-          <div className="container mx-auto px-3 py-6">
+          <div className="px-2 py-4">
             {/* Cardápio Semanal Card Simplificado */}
             <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-gray-200/50 shadow-lg">
-              {/* Header unificado com título, navegação e botão de impressão */}
+              {/* Header */}
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  {/* Título e subtítulo à esquerda */}
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-1">Cardápio Semanal</h2>
                     <p className="text-sm text-gray-600">
@@ -187,7 +211,6 @@ export default function ClientMenuComponent() {
                     </p>
                   </div>
 
-                  {/* Navegação centralizada */}
                   <div className="flex-1 flex justify-center">
                     <MenuHeader
                       currentDate={menuInterface.currentDate}
@@ -196,7 +219,6 @@ export default function ClientMenuComponent() {
                     />
                   </div>
 
-                  {/* Botão de impressão à direita */}
                   <div>
                     <Button
                       variant="outline"
@@ -209,22 +231,50 @@ export default function ClientMenuComponent() {
                     </Button>
                   </div>
                 </div>
+
+                {/* Barra de modos de visualização */}
+                <div className="flex items-center mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-500 mr-1">Exibir:</span>
+                    {VIEW_MODES.map(mode => (
+                      <button
+                        key={mode.value}
+                        onClick={() => setViewMode(mode.value)}
+                        className={`px-2 py-1 text-xs rounded-md transition-all ${
+                          viewMode === mode.value
+                            ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {mode.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Grid do cardápio */}
-              <div className="p-4">
-                <WeeklyMenuGrid
-                  currentDate={menuInterface.currentDate}
-                  weeklyMenu={weeklyMenu}
-                  activeCategories={getActiveCategories}
-                  recipes={recipes}
-                  selectedCustomer={selectedCustomer}
-                  getFilteredItemsForClient={getFilteredItemsForClient}
-                  getCategoryColor={getCategoryColor}
-                  customers={customers}
-                  locations={locations}
-                  getAllClientIds={getAllClientIds}
-                />
+              {/* Grids do cardápio - empilhados verticalmente */}
+              <div className="p-2 space-y-4">
+                {dayGroups.map((group, groupIdx) => (
+                  <div key={groupIdx}>
+                    <WeeklyMenuGrid
+                      currentDate={menuInterface.currentDate}
+                      weeklyMenu={weeklyMenu}
+                      activeCategories={getActiveCategories}
+                      recipes={recipes}
+                      selectedCustomer={selectedCustomer}
+                      getFilteredItemsForClient={getFilteredItemsForClient}
+                      getCategoryColor={getCategoryColor}
+                      customers={customers}
+                      locations={locations}
+                      getAllClientIds={getAllClientIds}
+                      visibleDays={group}
+                    />
+                    {groupIdx < dayGroups.length - 1 && (
+                      <div className="border-t-2 border-dashed border-gray-300 mt-4" />
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

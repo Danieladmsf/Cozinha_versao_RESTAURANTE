@@ -5,7 +5,7 @@ import { renderFormattedRecipeName } from '@/lib/textHelpers';
 import { useLocationSelection } from './useLocationSelection';
 
 export const usePrintMenu = () => {
-  const getDayNames = () => ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+  const ALL_DAY_NAMES = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
   
   // Função para obter clientes desmarcados de uma receita
   const getUncheckedClients = useCallback((item, locations, allClientIds) => {
@@ -62,11 +62,17 @@ export const usePrintMenu = () => {
     return customer?.name || customer?.razao_social || location?.name || 'Cliente não encontrado';
   }, []);
 
-  const getPrintStyles = useCallback(() => {
+  const getPrintStyles = useCallback((viewMode = 7) => {
     return `
       @page {
         size: A4 landscape;
-        margin: 15mm;
+        margin: 8mm;
+      }
+      @media print {
+        html, body {
+          width: 297mm;
+          height: 210mm;
+        }
       }
       
       * {
@@ -111,19 +117,26 @@ export const usePrintMenu = () => {
       }
       
       h3 {
-        font-size: 12px;
-        font-weight: 600;
-        margin: 0 0 4px 0;
-        background-color: #f0f0f0;
-        padding: 2px 4px;
-        border-bottom: 1px solid #ccc;
+        font-size: 10px;
+        font-weight: normal;
+        margin: 0 0 2px 0;
+        background-color: #e8e8e8;
+        padding: 1px 4px;
       }
       
       .print-grid {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
         gap: 8px;
         flex: 1;
+      }
+      
+      .day-group {
+        margin-bottom: 20px;
+        page-break-after: always;
+      }
+      
+      .day-group:last-child {
+        page-break-after: avoid;
       }
       
       .print-day {
@@ -198,22 +211,39 @@ export const usePrintMenu = () => {
     `;
   }, []);
 
+  // Helper: agregar itens de todos os meal type groups para um dia
+  const aggregateDayItems = useCallback((weeklyMenu, dayIndex) => {
+    const dayItems = {};
+    if (!weeklyMenu?.menu_data) return dayItems;
+    
+    Object.keys(weeklyMenu.menu_data).forEach(mealType => {
+      if (mealType.startsWith('_')) return;
+      const itemsForDay = weeklyMenu.menu_data[mealType]?.[dayIndex] || weeklyMenu.menu_data[mealType]?.[String(dayIndex)];
+      if (itemsForDay) {
+        Object.entries(itemsForDay).forEach(([catId, items]) => {
+          if (!dayItems[catId]) dayItems[catId] = [];
+          const itemList = Array.isArray(items) ? items : Object.values(items);
+          dayItems[catId] = [...dayItems[catId], ...itemList];
+        });
+      }
+    });
+    return dayItems;
+  }, []);
+
   const calculateCategoryHeights = useCallback((weeklyMenu, categories, recipes, customers, locations, customerId) => {
     if (!weeklyMenu || !categories) return {};
 
     const dayNames = getDayNames();
     const categoryHeights = {};
 
-    // Para cada categoria, calcular a altura necessária em cada dia
     categories.forEach((category, categoryIndex) => {
       let maxItemsInCategory = 0;
       
       dayNames.forEach((dayName, index) => {
         const dayIndex = index + 1;
-        const dayItems = weeklyMenu?.menu_data?.[dayIndex] || {};
+        const dayItems = aggregateDayItems(weeklyMenu, dayIndex);
         const categoryItems = dayItems[category.id] || [];
         
-        // Filtrar por cliente se necessário
         const filteredItems = customerId === 'all' 
           ? categoryItems 
           : categoryItems.filter(item => 
@@ -222,12 +252,10 @@ export const usePrintMenu = () => {
               item.locations.includes(customerId)
             );
 
-        // Contar total de linhas necessárias (receitas + tags de clientes)
         let totalLines = 0;
         filteredItems.forEach(item => {
-          totalLines += 1; // linha da receita
+          totalLines += 1;
           if (customerId === 'all' && item.locations && item.locations.length > 0) {
-            // Estimar linhas de clientes (aprox 3 clientes por linha)
             const clientLines = Math.ceil(item.locations.length / 3);
             totalLines += clientLines;
           }
@@ -236,32 +264,26 @@ export const usePrintMenu = () => {
         maxItemsInCategory = Math.max(maxItemsInCategory, totalLines);
       });
 
-      // Calcular altura: título (15px) + items (cada item ~8px) + padding
       const titleHeight = 12;
       const itemHeight = 6;
       const padding = 5;
       const calculatedHeight = titleHeight + (maxItemsInCategory * itemHeight) + padding;
       
-      // Altura mínima de 25px, máxima de 80px
       categoryHeights[categoryIndex] = Math.max(25, Math.min(80, calculatedHeight));
     });
 
     return categoryHeights;
-  }, [getDayNames]);
+  }, [ALL_DAY_NAMES, aggregateDayItems]);
 
-  const generatePrintableMenu = useCallback((weeklyMenu, categories, recipes, customers, locations, customerId, currentDate, getCategoryColor) => {
+  const generatePrintableMenu = useCallback((weeklyMenu, categories, recipes, customers, locations, customerId, currentDate, getCategoryColor, viewMode = 7) => {
     if (!weeklyMenu) return '';
 
-    const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+    const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 });
     const weekNumber = getWeek(currentDate, { weekStartsOn: 1 });
     const year = getYear(currentDate);
     
-    // Obter todos os IDs de clientes para a função de clientes desmarcados
     const allClientIds = locations?.filter(loc => loc.active !== false).map(loc => loc.id) || [];
-    
-    // Calcular alturas das categorias
-    const categoryHeights = calculateCategoryHeights(weeklyMenu, categories, recipes, customers, locations, customerId);
     
     // Cabeçalho
     let html = `
@@ -279,50 +301,56 @@ export const usePrintMenu = () => {
       </div>
     `;
 
-    // Grid de dias da semana
-    html += '<div class="print-grid">';
+    // Todos os 7 dias (começando na Segunda)
+    const allDays = [1, 2, 3, 4, 5, 6, 0]; // Seg-Sáb, Dom
     
-    const dayNames = getDayNames();
-    
-    dayNames.forEach((dayName, index) => {
-      const dayIndex = index + 1;
-      const dayDate = addDays(weekStart, index);
-      const dayItems = weeklyMenu?.menu_data?.[dayIndex] || {};
-      
-      html += `
-      <div class="print-day">
-      <div class="day-header">
-      <h2>${dayName.toUpperCase()} - ${format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
-      </div>
-      
-      <div class="day-content">
-      `;
-      
-      // Categorias do dia (TODAS as categorias para manter alinhamento)
-      categories?.forEach((category, categoryIndex) => {
-        const categoryItems = dayItems[category.id] || [];
+    // Dividir em grupos baseado no viewMode
+    const dayGroups = [];
+    for (let i = 0; i < allDays.length; i += viewMode) {
+      dayGroups.push(allDays.slice(i, i + viewMode));
+    }
+
+    // Gerar cada grupo de dias
+    dayGroups.forEach((group, groupIdx) => {
+      const numCols = group.length;
+      html += `<div class="day-group">`;
+      html += `<div class="print-grid" style="grid-template-columns: repeat(${numCols}, 1fr);">`;
+
+      group.forEach(dayIndex => {
+        const dayDate = addDays(weekStart, dayIndex);
+        const dayItems = aggregateDayItems(weeklyMenu, dayIndex);
         
-        // Filtrar por cliente se necessário
-        const filteredItems = customerId === 'all' 
-          ? categoryItems 
-          : categoryItems.filter(item => 
-              !item.locations || 
-              item.locations.length === 0 || 
-              item.locations.includes(customerId)
-            );
-        
-        // SEMPRE mostrar a categoria (mesmo vazia) para manter alinhamento
         html += `
-          <div class="category-section">
-            <h3>${category.name}</h3>
-            <div>
+        <div class="print-day">
+        <div class="day-header">
+        <h2>${ALL_DAY_NAMES[dayIndex].toUpperCase()} - ${format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
+        </div>
+        
+        <div class="day-content">
         `;
         
-        if (filteredItems.length > 0) {
+        categories?.forEach((category) => {
+          const categoryItems = dayItems[category.id] || [];
+          
+          const filteredItems = customerId === 'all' 
+            ? categoryItems 
+            : categoryItems.filter(item => 
+                !item.locations || 
+                item.locations.length === 0 || 
+                item.locations.includes(customerId)
+              );
+          
+          if (filteredItems.length === 0) return;
+          
+          html += `
+            <div class="category-section">
+              <h3>${category.name}</h3>
+              <div>
+          `;
+          
           filteredItems.forEach(item => {
             const recipe = recipes?.find(r => r.id === item.recipe_id);
             if (recipe) {
-              // Obter clientes desmarcados apenas quando "Todos os Clientes" está selecionado
               const uncheckedClients = customerId === 'all' ? getUncheckedClients(item, locations, allClientIds) : [];
               
               html += `
@@ -335,9 +363,12 @@ export const usePrintMenu = () => {
               `;
             }
           });
-        } else {
-          html += '<div>-</div>';
-        }
+          
+          html += `
+              </div>
+            </div>
+          `;
+        });
         
         html += `
             </div>
@@ -345,29 +376,19 @@ export const usePrintMenu = () => {
         `;
       });
       
-      html += `
-          </div>
-        </div>
-      `;
+      html += '</div></div>';
     });
     
-    html += '</div>';
-    
-    // Rodapé (moved to header)
-    html += ``;
-    
     return html;
-  }, [getDayNames, getCustomerName, calculateCategoryHeights]);
+  }, [ALL_DAY_NAMES, getCustomerName, calculateCategoryHeights, aggregateDayItems]);
 
-  const handlePrintCardapio = useCallback((weeklyMenu, categories, recipes, customers, locations, customerId, currentDate, getCategoryColor) => {
+  const handlePrintCardapio = useCallback((weeklyMenu, categories, recipes, customers, locations, customerId, currentDate, getCategoryColor, viewMode) => {
     if (!weeklyMenu) {
       return;
     }
 
-    // Gerar estrutura HTML para impressão
-    const printContent = generatePrintableMenu(weeklyMenu, categories, recipes, customers, locations, customerId, currentDate, getCategoryColor);
+    const printContent = generatePrintableMenu(weeklyMenu, categories, recipes, customers, locations, customerId, currentDate, getCategoryColor, viewMode);
     
-    // Abrir janela de impressão
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -375,7 +396,7 @@ export const usePrintMenu = () => {
         <head>
           <title>Cardápio Semanal</title>
           <style>
-            ${getPrintStyles()}
+            ${getPrintStyles(viewMode)}
           </style>
         </head>
         <body>

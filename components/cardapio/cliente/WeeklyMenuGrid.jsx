@@ -17,24 +17,58 @@ export default function WeeklyMenuGrid({
   getCategoryColor,
   customers,
   locations,
-  getAllClientIds
+  getAllClientIds,
+  visibleDays: visibleDaysProp
 }) {
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
   const locationSelection = useLocationSelection(getAllClientIds());
 
   // Hook centralizado para dias disponíveis
   const availableDays = useAvailableDays();
+  // Usar visibleDays do prop se fornecido, senão usar todos os days disponíveis
+  const daysToRender = visibleDaysProp || availableDays;
 
-  // Log para debug
-  console.log('📊 [WeeklyMenuGrid] Render Props:', {
+  // ============================================================
+  // 🔍 DIAGNÓSTICO COMPLETO - Copie tudo do console e envie
+  // ============================================================
+  console.log('🔍🔍🔍 ═══════════════════════════════════════════════════');
+  console.log('🔍 DIAGNÓSTICO CARDÁPIO - COPIE TUDO ABAIXO E ENVIE');
+  console.log('🔍🔍🔍 ═══════════════════════════════════════════════════');
+  console.log('📊 [1] WeeklyMenuGrid Props:', {
     hasWeeklyMenu: !!weeklyMenu,
     weekKey: weeklyMenu?.week_key,
+    weeklyMenuId: weeklyMenu?.id || 'SEM ID',
     activeCategoriesCount: activeCategories?.length,
-    activeCategoriesPreview: activeCategories?.slice(0, 3).map(c => c.name),
+    activeCategoriesNames: activeCategories?.map(c => `${c.name} (${c.id})`),
     recipesCount: recipes?.length,
     selectedCustomer: selectedCustomer?.name,
     availableDays
   });
+  
+  if (weeklyMenu) {
+    console.log('📊 [2] weeklyMenu.menu_data KEYS:', Object.keys(weeklyMenu.menu_data || {}));
+    // Dumpar toda a estrutura de menu_data para diagnóstico
+    if (weeklyMenu.menu_data) {
+      Object.keys(weeklyMenu.menu_data).forEach(mealType => {
+        if (mealType.startsWith('_')) return;
+        const mealData = weeklyMenu.menu_data[mealType];
+        console.log(`📊 [3] menu_data["${mealType}"] KEYS (dias):`, Object.keys(mealData || {}));
+        Object.keys(mealData || {}).forEach(dayKey => {
+          const dayData = mealData[dayKey];
+          console.log(`📊 [4] menu_data["${mealType}"]["${dayKey}"] (categorias):`, 
+            Object.keys(dayData || {}).map(catId => {
+              const items = dayData[catId];
+              const itemList = Array.isArray(items) ? items : Object.values(items || {});
+              return `${catId}: ${itemList.length} itens`;
+            })
+          );
+        });
+      });
+    }
+  } else {
+    console.log('⚠️ [2] weeklyMenu É NULL! Nenhum cardápio encontrado para esta semana.');
+  }
+  console.log('🔍🔍🔍 ═══════════════════════════════════════════════════');
 
   // Função para obter clientes desmarcados de uma receita
   const getUncheckedClients = (item) => {
@@ -48,25 +82,21 @@ export default function WeeklyMenuGrid({
 
   // Determinar número de colunas do grid
   const getGridCols = () => {
-    const numDays = availableDays.length;
-    if (numDays <= 3) return 'repeat(3, 1fr)';
-    if (numDays === 4) return 'repeat(4, 1fr)';
-    if (numDays === 5) return 'repeat(5, 1fr)';
-    if (numDays === 6) return 'repeat(6, 1fr)';
-    return 'repeat(7, 1fr)';
+    const numDays = daysToRender.length;
+    return `repeat(${numDays}, 1fr)`;
   };
 
   return (
     <div style={{
       display: 'grid',
       gridTemplateColumns: getGridCols(),
-      gap: '12px',
+      gap: '6px',
       minHeight: 'auto',
       padding: '0',
       width: '100%',
       overflow: 'visible'
     }}>
-      {availableDays.map(day => {
+      {daysToRender.map(day => {
         const dayDate = addDays(weekStart, day);
         // Agregação de itens de todos os tipos de refeição (grupos) para o dia
         const dayItems = {};
@@ -99,7 +129,7 @@ export default function WeeklyMenuGrid({
         return (
           <div key={day} style={{
             border: '2px solid #000',
-            padding: '8px',
+            padding: '4px',
             display: 'flex',
             flexDirection: 'column',
             minHeight: 'auto',
@@ -108,14 +138,14 @@ export default function WeeklyMenuGrid({
           }}>
             <div style={{
               borderBottom: '1px solid #ccc',
-              paddingBottom: '5px',
-              marginBottom: '8px',
+              paddingBottom: '3px',
+              marginBottom: '4px',
               flexShrink: 0
             }}>
-              <h2 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0', textAlign: 'center' }}>{DAY_NAMES_FULL[day].toUpperCase().replace('-FEIRA', '')} - {format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
+              <h2 style={{ fontSize: '12px', fontWeight: 'bold', margin: '0', textAlign: 'center' }}>{DAY_NAMES_FULL[day].toUpperCase().replace('-FEIRA', '')} - {format(dayDate, 'dd/MM/yyyy', { locale: ptBR })}</h2>
             </div>
 
-            <div style={{ padding: '8px', borderTop: '1px solid #eee', minHeight: '100px', backgroundColor: '#fff' }}>
+            <div style={{ padding: '2px', borderTop: '1px solid #eee', minHeight: '100px', backgroundColor: '#fff' }}>
               {activeCategories.map((category, categoryIndex) => {
                 const items = dayItems[category.id] || [];
                 const filteredItems = selectedCustomer?.id === 'all'
@@ -127,10 +157,10 @@ export default function WeeklyMenuGrid({
                 return (
                   <div key={category.id} style={{ marginBottom: '10px', display: 'block' }}>
                     <div style={{
-                      fontSize: '11px',
-                      fontWeight: 'bold',
+                      fontSize: '10px',
+                      fontWeight: 'normal',
                       backgroundColor: '#e2e8f0',
-                      padding: '2px 6px',
+                      padding: '1px 4px',
                       borderRadius: '4px',
                       color: '#1e293b',
                       marginBottom: '4px'

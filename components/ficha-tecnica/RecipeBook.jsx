@@ -1123,7 +1123,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
                                                         }
 
                                                         return (
-                                                            <div key={lineIdx} className={containerClasses + " print-keep-together"}>
+                                                            <div key={lineIdx} className={containerClasses}>
                                                                 {/* Barra lateral colorida para highlights */}
                                                                 {hasMatch && (
                                                                     <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col">
@@ -1190,7 +1190,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
                                                                 {/* Área da Foto - Abaixo do texto */}
                                                                 {!isPhotosHidden && currentPhoto && (
-                                                                    <div className="mt-3 mb-5 ml-0 md:ml-2 print:mt-1 print:mb-2 print:ml-0">
+                                                                    <div className="mt-3 mb-5 ml-0 md:ml-2 print:mt-1 print:mb-2 print:ml-0 print-keep-together">
                                                                         <div className="relative group/line-photo w-full max-w-lg print:max-w-none rounded-lg overflow-hidden border border-gray-200 shadow-sm print:shadow-none">
                                                                             <img
                                                                                 src={currentPhoto}
@@ -1225,7 +1225,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
                                                             const isNoteUploading = stepUploadingIndex === `note-${idx}-${noteIdx}`;
 
                                                             return (
-                                                                <div key={noteIdx} className="group/note relative pl-0 md:pl-0 py-0.5 print-keep-together">
+                                                                <div key={noteIdx} className="group/note relative pl-0 md:pl-0 py-0.5">
                                                                     <div className="flex items-start gap-3">
                                                                         {/* Marcador Visual (Bullet point customizado ou Icone) */}
                                                                         <div className="mt-1 shrink-0 text-gray-400">
@@ -1273,7 +1273,7 @@ export default function RecipeBook({ recipeData: initialData, isDraft = false, o
 
                                                                             {/* Foto da Nota */}
                                                                             {note.photo && (
-                                                                                <div className="mt-3">
+                                                                                <div className="mt-3 print-keep-together">
                                                                                     <div className="relative group/note-photo w-full max-w-md print:max-w-none rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-50 print:shadow-none">
                                                                                         <img
                                                                                             src={note.photo}
