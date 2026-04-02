@@ -5,37 +5,20 @@ import { useState, useCallback, useEffect } from 'react';
  * Permite arrastar categorias no menu lateral e aplicar nos cards de empresa
  */
 
-const STORAGE_KEY = 'print-preview-category-order';
-
-// Ordem padrão das categorias
-const DEFAULT_CATEGORY_ORDER = [
-  'PADRÃO',
-  'REFOGADO',
-  'ACOMPANHAMENTO',
-  'CARNES',
-  'MOLHOS',
-  'SOBREMESA'
-];
+const STORAGE_KEY = 'print-preview-category-order-v2';
 
 export function useCategoryOrder() {
-  // Estado da ordem das categorias
+  // Estado da ordem das categorias - inicia vazio para herdar a ordem real dos dados
+  // (que já vêm ordenados pela Configuração Global do Cardápio)
   const [categoryOrder, setCategoryOrder] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        // Garantir que todas as categorias padrão estejam presentes
-        const merged = [...parsed];
-        DEFAULT_CATEGORY_ORDER.forEach(cat => {
-          if (!merged.includes(cat)) {
-            merged.push(cat);
-          }
-        });
-        return merged;
+        return JSON.parse(saved);
       }
-      return DEFAULT_CATEGORY_ORDER;
+      return [];
     } catch (error) {
-      return DEFAULT_CATEGORY_ORDER;
+      return [];
     }
   });
 
@@ -88,9 +71,10 @@ export function useCategoryOrder() {
     setDraggedCategoryIndex(null);
   }, []);
 
-  // Resetar para ordem padrão
+  // Limpar ordem salva para restaurar da configuração global
   const resetCategoryOrder = useCallback(() => {
-    setCategoryOrder(DEFAULT_CATEGORY_ORDER);
+    setCategoryOrder([]);
+    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   // Sincronizar categoryOrder com as categorias reais dos blocos

@@ -121,8 +121,8 @@ const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currenc
 (async () => {
     // Configurações do Relatório
     const DATA_INICIO = '2026-03-01';
-    const DATA_FIM = '2026-03-27';
-    const ULTIMO_DIA = '2026-03-27';
+    const DATA_FIM = '2026-03-30';
+    const ULTIMO_DIA = '2026-03-30';
 
     const METAS = {
         'Rotisseria': 225000.00,
@@ -158,7 +158,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currenc
     try {
         const results = await runQuery(sql);
 
-        console.log(`MARÇO 01/03/2026 A 27/03/2026`);
+        console.log(`MARÇO 01/03/2026 A 30/03/2026`);
         console.log('');
 
         // Ordem forçada pelo cliente
