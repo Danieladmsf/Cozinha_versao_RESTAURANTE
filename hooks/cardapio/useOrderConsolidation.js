@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { parseQuantity, formatCurrency } from '@/components/utils/orderUtils';
 import { useCategoryDisplay } from '@/hooks/shared/useCategoryDisplay';
+import { findLinkedRecipe } from '@/lib/findLinkedRecipe';
 
 /**
  * Hook para consolidação de pedidos e itens
@@ -164,16 +165,18 @@ export const useOrderConsolidation = (orders, recipes, excludeCategories = []) =
         const itemsWithCategory = order.items.map(item => {
           let recipe = recipes?.find(r => r.id === item.recipe_id);
 
-          // Se encontrou um Product antigo em vez de usar a nova Ficha Técnica,
-          // tentar buscar a Ficha Técnica pelo nome para extrair os dados corretos de produção
-          if (recipe && recipe.entityType === 'product' && item.recipe_name) {
-            const fichaTecnica = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
-            if (fichaTecnica) recipe = fichaTecnica;
+          // Smart Upgrade: Se encontrou um Product, buscar Ficha Técnica via matching inteligente
+          if (recipe && recipe.entityType === 'product') {
+            const searchName = item.recipe_name || recipe.name;
+            if (searchName) {
+              const fichaTecnica = findLinkedRecipe(searchName, recipes);
+              if (fichaTecnica) recipe = fichaTecnica;
+            }
           }
 
           // Fallback para buscar pelo nome caso o ID tenha mudado (ex: receita foi recriada)
           if (!recipe && item.recipe_name) {
-            recipe = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim())
+            recipe = findLinkedRecipe(item.recipe_name, recipes)
               || recipes?.find(r => r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
           }
           const correctUnitType = getCorrectUnitType(item, recipe);
@@ -215,14 +218,18 @@ export const useOrderConsolidation = (orders, recipes, excludeCategories = []) =
           // Verificar se a categoria deve ser excluída
           let recipe = recipes?.find(r => r.id === item.recipe_id);
 
-          if (recipe && recipe.entityType === 'product' && item.recipe_name) {
-            const fichaTecnica = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
-            if (fichaTecnica) recipe = fichaTecnica;
+          // Smart Upgrade: Se encontrou um Product, buscar Ficha Técnica via matching inteligente
+          if (recipe && recipe.entityType === 'product') {
+            const searchName = item.recipe_name || recipe.name;
+            if (searchName) {
+              const fichaTecnica = findLinkedRecipe(searchName, recipes);
+              if (fichaTecnica) recipe = fichaTecnica;
+            }
           }
 
           // Fallback para buscar pelo nome caso o ID do pedido seja de uma versão antiga da receita
           if (!recipe && item.recipe_name) {
-            recipe = recipes?.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim())
+            recipe = findLinkedRecipe(item.recipe_name, recipes)
               || recipes?.find(r => r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
           }
           const category = recipe?.category || item.category || 'Outros';

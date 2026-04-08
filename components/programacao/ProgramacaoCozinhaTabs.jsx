@@ -439,16 +439,21 @@ const ProgramacaoCozinhaTabs = () => {
         recipe = recipes.find(r => r.id === item.recipe_id);
       }
 
-      // Upgrade: Se for um Product antigo, tenta buscar a Ficha Técnica correspondente pelo nome
-      // para garantir as informações de peso e etapas de montagem
-      if (recipe && recipe.entityType === 'product' && item.recipe_name) {
-        const fichaTecnica = recipes.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
-        if (fichaTecnica) recipe = fichaTecnica;
+      // Upgrade: Se for um Product antigo, tenta buscar a Ficha Técnica correspondente
+      // Usa matching inteligente (nome contido, palavras-chave) para lidar com nomes diferentes
+      if (recipe && recipe.entityType === 'product') {
+        const searchName = item.recipe_name || recipe.name;
+        if (searchName) {
+          const { findLinkedRecipe } = require('@/lib/findLinkedRecipe');
+          const fichaTecnica = findLinkedRecipe(searchName, recipes);
+          if (fichaTecnica) recipe = fichaTecnica;
+        }
       }
 
       // Fallback para buscar pelo nome da receita (caso o recipe_id do pedido seja antigo)
       if (!recipe && item.recipe_name) {
-        recipe = recipes.find(r => r.entityType === 'recipe' && r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim())
+        const { findLinkedRecipe } = require('@/lib/findLinkedRecipe');
+        recipe = findLinkedRecipe(item.recipe_name, recipes)
           || recipes.find(r => r.name?.toLowerCase().trim() === item.recipe_name.toLowerCase().trim());
       }
 
