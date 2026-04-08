@@ -82,6 +82,11 @@ export default function Recipes() {
   const [editCategorySelectorOpen, setEditCategorySelectorOpen] = useState(false);
   const [editGroupedCategories, setEditGroupedCategories] = useState([]);
 
+  // State for create modal
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', code: '', category: '' });
+  const [createCategorySelectorOpen, setCreateCategorySelectorOpen] = useState(false);
+
   // State for config
   const [visibleTypes, setVisibleTypes] = useState({});
 
@@ -599,6 +604,19 @@ export default function Recipes() {
     return found ? found.label : editForm.category;
   };
 
+  const getCreateSelectedCategoryLabel = () => {
+    if (!createForm.category) return "Selecione a categoria";
+    const found = editGroupedCategories.flatMap(g => g.items).find(c => c.originalName === createForm.category);
+    return found ? found.label : createForm.category;
+  };
+
+  const openCreateModal = () => {
+    setCreateForm({ name: '', code: '', category: '' });
+    setEditGroupedCategories(buildEditGroupedCategories());
+    setCreateCategorySelectorOpen(false);
+    setIsCreateModalOpen(true);
+  };
+
   const openEditModal = (recipe) => {
     setEditingRecipe(recipe);
     setEditForm({
@@ -648,6 +666,38 @@ export default function Recipes() {
     }
   };
 
+  const handleCreateRecipe = async () => {
+    if (!createForm.name) {
+      toast({ title: "Nome obrigatório", description: "Preencha o nome da receita.", variant: "destructive" });
+      return;
+    }
+    try {
+      const selectedCat = editGroupedCategories.flatMap(g => g.items).find(c => c.originalName === createForm.category);
+      
+      const newRecipeData = {
+        name: createForm.name,
+        code: createForm.code,
+        category: createForm.category,
+        category_name: createForm.category,
+        entityType: 'recipe',
+        active: true,
+        type: 'receitas'
+      };
+
+      if (selectedCat) {
+        newRecipeData.category_id = selectedCat.id;
+        newRecipeData.type = getRootCategoryType(createForm.category, selectedCat.id);
+      }
+
+      const created = await Recipe.create(newRecipeData);
+      setIsCreateModalOpen(false);
+      toast({ title: "Receita criada!", description: "Redirecionando para a Ficha Técnica..." });
+      router.push(`/ficha-tecnica?id=${created.id}`);
+    } catch (error) {
+      toast({ title: "Erro ao criar", description: error.message, variant: "destructive" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
@@ -664,7 +714,7 @@ export default function Recipes() {
 
             <div className="flex gap-3 w-full md:w-auto">
               <Button
-                onClick={() => router.push('/ficha-tecnica')}
+                onClick={openCreateModal}
                 className="bg-orange-600 hover:bg-orange-700 text-white"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -1110,6 +1160,96 @@ export default function Recipes() {
             </Button>
             <Button onClick={handleSaveQuickEdit}>
               Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Nova Receita */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-blue-900">Nova Receita</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-name">Nome da Receita</Label>
+              <Input
+                id="create-name"
+                value={createForm.name}
+                onChange={(e) => setCreateForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Ex: Strogonoff de Frango"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Categoria</Label>
+                <Popover open={createCategorySelectorOpen} onOpenChange={setCreateCategorySelectorOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={createCategorySelectorOpen}
+                      className="w-full justify-between font-normal"
+                    >
+                      {getCreateSelectedCategoryLabel()}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Buscar categoria..." />
+                      <CommandList>
+                        <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
+                        {editGroupedCategories.map((group) => (
+                          <CommandGroup key={group.groupName} heading={group.groupName}>
+                            {group.items.map((category) => (
+                              <CommandItem
+                                key={category.value}
+                                value={category.label}
+                                onSelect={() => {
+                                  setCreateForm(prev => ({ ...prev, category: category.originalName }));
+                                  setCreateCategorySelectorOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    createForm.category === category.originalName ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {category.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        ))}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="create-code">Código (Opcional)</Label>
+                <Input
+                  id="create-code"
+                  value={createForm.code}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, code: e.target.value }))}
+                  placeholder="Ex: 5690"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-4 italic">
+              * Você será redirecionado para a Ficha Técnica para montar o modo de preparo desta receita.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsCreateModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCreateRecipe} className="bg-blue-600 hover:bg-blue-700 text-white">
+              Criar e Avançar
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -834,7 +834,8 @@ export default function RecipeTechnical() {
   const {
     handleSelectIngredient,
     handleSelectRecipe,
-    handleAddAssemblyItem
+    handleAddAssemblyItem,
+    handleSelectMultipleIngredients: handleSelectMultipleIngredientsHook
   } = useRecipeItemSelection({
     preparationsData,
     setPreparationsData,
@@ -855,6 +856,7 @@ export default function RecipeTechnical() {
     },
     handleCloseAssemblyItemModal
   });
+
   const handleSelectMultipleIngredients = useCallback((selectedIngredients) => {
     if (!selectedIngredients || selectedIngredients.length === 0) return;
 
@@ -881,40 +883,23 @@ export default function RecipeTechnical() {
 
       setReplacingIngredientContext(null); // Limpar contexto
       toast({ title: "Ingrediente substituído", description: "O ingrediente foi trocado mantendo as quantidades." });
+      setIngredientModalOpen(false);
+      setPackagingModalOpen(false);
+      setIsDirty(true);
     } else {
-      // MODO ADIÇÃO (Existente)
-      const prepIndex = currentPrepIndexForIngredient ?? currentPrepIndexForPackaging;
-
-      if (prepIndex !== null) {
-        selectedIngredients.forEach(ing => {
-          addIngredientToPreparation(preparationsData, setPreparationsData, prepIndex, {
-            ingredient_id: ing.id,
-            name: ing.name,
-            current_price: ing.current_price || ing.price || 0,
-            unit: ing.unit || 'kg',
-            category: ing.category,
-            category_id: ing.category_id,
-            technical_data: ing.technical_data || {}
-          });
-        });
-      }
+      // MODO ADIÇÃO (Usa a lógica completa do hook com suporte ao deferCreation)
+      handleSelectMultipleIngredientsHook(selectedIngredients);
     }
-
-    setIngredientModalOpen(false);
-    setPackagingModalOpen(false);
-    setIsDirty(true);
   }, [
     replacingIngredientContext,
-    currentPrepIndexForIngredient,
-    currentPrepIndexForPackaging,
     preparationsData,
     setPreparationsData,
     replaceIngredientInPreparation,
-    addIngredientToPreparation,
     toast,
     setIngredientModalOpen,
     setPackagingModalOpen,
-    setIsDirty
+    setIsDirty,
+    handleSelectMultipleIngredientsHook
   ]);
 
   // Handler para quando uma receita é selecionada na busca

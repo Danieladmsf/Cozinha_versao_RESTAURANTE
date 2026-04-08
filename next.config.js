@@ -3,9 +3,10 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  swcMinify: true,
+  swcMinify: false,
   experimental: {
     esmExternals: false,
+    forceSwcTransforms: false,
   },
   // Configurações para evitar problemas entre dev e prod
   reactStrictMode: process.env.NODE_ENV === 'production', // Desabilitado em dev para evitar duplicação
