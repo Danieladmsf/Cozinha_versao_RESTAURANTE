@@ -663,6 +663,13 @@ export default function Recipes() {
             </div>
 
             <div className="flex gap-3 w-full md:w-auto">
+              <Button
+                onClick={() => router.push('/ficha-tecnica')}
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Receita
+              </Button>
               <div className="relative flex-1 md:w-64">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                 <Input

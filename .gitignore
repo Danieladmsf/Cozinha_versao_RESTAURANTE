@@ -37,4 +37,6 @@ cozinha-afeto-2026-firebase-adminsdk-fbsvc-41985dc804.json
 
 # Specific Logs
 vr_soft_api/api_log.txt
-
+vr_soft_api/output_*.txt
+vr_soft_api/dados_extraidos/*.txt
+vr_soft_api/dados_extraidos/*.json
