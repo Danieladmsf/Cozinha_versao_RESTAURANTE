@@ -217,10 +217,11 @@ export default function ProductsList() {
         });
 
         if (searchTerm) {
+            const cleanSearch = searchTerm.replace(/^#/, '').toLowerCase().trim();
             filtered = filtered.filter(p =>
-                (p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (p.code && p.code.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (p.category && p.category.toLowerCase().includes(searchTerm.toLowerCase()))
+                (p.name && p.name.toLowerCase().includes(cleanSearch)) ||
+                (p.code && String(p.code).toLowerCase().includes(cleanSearch)) ||
+                (p.category && p.category.toLowerCase().includes(cleanSearch))
             );
             return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
         }
@@ -305,7 +306,7 @@ export default function ProductsList() {
                             <div className="relative flex-1 md:w-64">
                                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                                 <Input
-                                    placeholder="Buscar produtos..."
+                                    placeholder="Buscar por nome ou código..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="pl-8 bg-white"
